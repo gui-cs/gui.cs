@@ -79,9 +79,9 @@ public class ContextMenus : Scenario
 
         appWindow.MouseClick += (s, e) =>
                                 {
-                                    if (e.MouseEvent.Flags == MouseFlags.Button3Clicked)
+                                    if (e.Flags == MouseFlags.Button3Clicked)
                                     {
-                                        ShowWinContextMenu (e.MouseEvent.ScreenPosition);
+                                        ShowWinContextMenu (e.ScreenPosition);
                                         e.Handled = true;
                                     }
                                 };

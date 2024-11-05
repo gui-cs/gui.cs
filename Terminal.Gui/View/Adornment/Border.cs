@@ -265,13 +265,8 @@ public class Border : Adornment
     private Point _startGrabPoint;
 
     /// <inheritdoc/>
-    protected internal override bool OnMouseEvent (MouseEvent mouseEvent)
+    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
     {
-        if (base.OnMouseEvent (mouseEvent))
-        {
-            return true;
-        }
-
         // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/3312
         if (!_dragPosition.HasValue && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)
                                     // HACK: Prevents Window from being draggable if it's Top
@@ -1372,7 +1367,7 @@ public class Border : Adornment
         KeyBindings.Add (Key.Tab.WithShift, KeyBindingScope.HotKey, Command.BackTab);
     }
 
-    private void ApplicationOnMouseEvent (object? sender, MouseEvent e)
+    private void ApplicationOnMouseEvent (object? sender, MouseEventArgs e)
     {
         if (e.Flags != MouseFlags.Button1Clicked)
         {

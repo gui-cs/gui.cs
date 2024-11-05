@@ -138,7 +138,7 @@ public class ApplicationPopoverTests
         Assert.True (popover.HasFocus);
 
         // Act
-        Application.OnKeyDown (Application.QuitKey);
+        Application.RaiseKeyDownEvent (Application.QuitKey);
 
         // Assert
         Assert.False (popover.Visible);
@@ -169,7 +169,7 @@ public class ApplicationPopoverTests
         bool otherViewPressed = false;
         otherView.MouseEvent += (sender, e) =>
                                 {
-                                    otherViewPressed = e.MouseEvent.Flags.HasFlag(MouseFlags.Button1Pressed);
+                                    otherViewPressed = e.Flags.HasFlag(MouseFlags.Button1Pressed);
                                 };
 
         Application.Top.Add (otherView);
@@ -192,11 +192,11 @@ public class ApplicationPopoverTests
 
         // Act
         // Click on popover
-        Application.OnMouseEvent (new () { Flags = MouseFlags.Button1Pressed, ScreenPosition = new (5, 5) });
+        Application.RaiseMouseEvent (new () { Flags = MouseFlags.Button1Pressed, ScreenPosition = new (5, 5) });
         Assert.True (popover.Visible);
 
         // Click outside popover (on button)
-        Application.OnMouseEvent (new () { Flags = MouseFlags.Button1Pressed, ScreenPosition = new (1, 1) });
+        Application.RaiseMouseEvent (new () { Flags = MouseFlags.Button1Pressed, ScreenPosition = new (1, 1) });
 
         // Assert
         Assert.True (otherViewPressed);
@@ -238,7 +238,7 @@ public class ApplicationPopoverTests
         Assert.True (popover.HasFocus);
 
         // Act
-        Application.OnMouseEvent (new () { Flags = MouseFlags.Button1Pressed, ScreenPosition = new (mouseX, mouseY) });
+        Application.RaiseMouseEvent (new () { Flags = MouseFlags.Button1Pressed, ScreenPosition = new (mouseX, mouseY) });
 
         // Assert
         Assert.Equal (expectedVisible, popover.Visible);

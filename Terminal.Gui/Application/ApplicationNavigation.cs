@@ -30,6 +30,51 @@ public class ApplicationNavigation
     public View? GetFocused ()
     {
         return _focused;
+
+        if (_focused is { CanFocus: true, HasFocus: true })
+        {
+            return _focused;
+        }
+
+        _focused = null;
+
+        return null;
+    }
+
+    /// <summary>
+    ///     Gets whether <paramref name="view"/> is in the Subview hierarchy of <paramref name="start"/>.
+    /// </summary>
+    /// <param name="start"></param>
+    /// <param name="view"></param>
+    /// <returns></returns>
+    public static bool IsInHierarchy (View? start, View? view)
+    {
+        if (view is null)
+        {
+            return false;
+        }
+
+        if (view == start || start is null)
+        {
+            return true;
+        }
+
+        foreach (View subView in start.Subviews)
+        {
+            if (view == subView)
+            {
+                return true;
+            }
+
+            bool found = IsInHierarchy (subView, view);
+
+            if (found)
+            {
+                return found;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -48,6 +93,7 @@ public class ApplicationNavigation
         {
             return;
         }
+        Debug.Assert (value is null or { CanFocus: true, HasFocus: true });
 
         _focused = value;
 

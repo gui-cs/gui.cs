@@ -28,4 +28,10 @@ public static partial class Application // Driver abstractions
     /// </remarks>
     [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
     public static string ForceDriver { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Collection of sixel images to write out to screen when updating.
+    /// Only add to this collection if you are sure terminal supports sixel format.
+    /// </summary>
+    public static List<SixelToRender> Sixel = new List<SixelToRender> ();
 }

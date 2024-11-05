@@ -420,6 +420,13 @@ internal class CursesDriver : ConsoleDriver
                 }
             }
 
+            // SIXELS
+            foreach (var s in Application.Sixel)
+            {
+                SetCursorPosition (s.ScreenPosition.X, s.ScreenPosition.Y);
+                Console.Write(s.SixelData);
+            }
+
             SetCursorPosition (0, 0);
 
             _currentCursorVisibility = savedVisibility;
@@ -1004,7 +1011,7 @@ internal class CursesDriver : ConsoleDriver
 
         _lastMouseFlags = mouseFlag;
 
-        var me = new MouseEvent { Flags = mouseFlag, Position = pos };
+        var me = new MouseEventArgs { Flags = mouseFlag, Position = pos };
         //Debug.WriteLine ($"CursesDriver: ({me.Position}) - {me.Flags}");
 
         OnMouseEvent (me);

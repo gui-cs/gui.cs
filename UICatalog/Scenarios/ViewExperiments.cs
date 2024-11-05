@@ -87,12 +87,12 @@ public class ViewExperiments : Scenario
 
         testFrame.MouseClick += TestFrameOnMouseClick;
 
-        void TestFrameOnMouseClick (object sender, MouseEventEventArgs e)
+        void TestFrameOnMouseClick (object sender, MouseEventArgs e)
         {
-            if (e.MouseEvent.Flags == MouseFlags.Button3Clicked)
+            if (e.Flags == MouseFlags.Button3Clicked)
             {
-                popoverView.X = e.MouseEvent.ScreenPosition.X;
-                popoverView.Y = e.MouseEvent.ScreenPosition.Y;
+                popoverView.X = e.ScreenPosition.X;
+                popoverView.Y = e.ScreenPosition.Y;
                 Application.Popover = popoverView;
                 Application.Popover!.Visible = true;
             }

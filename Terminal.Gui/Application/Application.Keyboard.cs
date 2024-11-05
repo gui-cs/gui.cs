@@ -3,94 +3,19 @@ namespace Terminal.Gui;
 
 public static partial class Application // Keyboard handling
 {
-    private static Key _nextTabGroupKey = Key.F6; // Resources/config.json overrrides
-    private static Key _nextTabKey = Key.Tab; // Resources/config.json overrrides
-    private static Key _prevTabGroupKey = Key.F6.WithShift; // Resources/config.json overrrides
-    private static Key _prevTabKey = Key.Tab.WithShift; // Resources/config.json overrrides
-    private static Key _quitKey = Key.Esc; // Resources/config.json overrrides
-    private static Key _arrangeKey = Key.F5.WithCtrl; // Resources/config.json overrrides
-
-    static Application () { AddApplicationKeyBindings (); }
-
-    /// <summary>Gets the key bindings for this view.</summary>
-    public static KeyBindings KeyBindings { get; internal set; } = new ();
-
     /// <summary>
-    ///     Event fired when the user presses a key. Fired by <see cref="OnKeyDown"/>.
-    ///     <para>
-    ///         Set <see cref="Key.Handled"/> to <see langword="true"/> to indicate the key was handled and to prevent
-    ///         additional processing.
-    ///     </para>
-    /// </summary>
-    /// <remarks>
-    ///     All drivers support firing the <see cref="KeyDown"/> event. Some drivers (Curses) do not support firing the
-    ///     <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
-    ///     <para>Fired after <see cref="KeyDown"/> and before <see cref="KeyUp"/>.</para>
-    /// </remarks>
-    public static event EventHandler<Key>? KeyDown;
-
-    /// <summary>
-    ///     Event fired when the user releases a key. Fired by <see cref="OnKeyUp"/>.
-    ///     <para>
-    ///         Set <see cref="Key.Handled"/> to <see langword="true"/> to indicate the key was handled and to prevent
-    ///         additional processing.
-    ///     </para>
-    /// </summary>
-    /// <remarks>
-    ///     All drivers support firing the <see cref="KeyDown"/> event. Some drivers (Curses) do not support firing the
-    ///     <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
-    ///     <para>Fired after <see cref="KeyDown"/>.</para>
-    /// </remarks>
-    public static event EventHandler<Key>? KeyUp;
-
-    /// <summary>Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Key NextTabGroupKey
-    {
-        get => _nextTabGroupKey;
-        set
-        {
-            if (_nextTabGroupKey != value)
-            {
-                ReplaceKey (_nextTabGroupKey, value);
-                _nextTabGroupKey = value;
-            }
-        }
-    }
-
-    /// <summary>Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Key NextTabKey
-    {
-        get => _nextTabKey;
-        set
-        {
-            if (_nextTabKey != value)
-            {
-                ReplaceKey (_nextTabKey, value);
-                _nextTabKey = value;
-            }
-        }
-    }
-
-    /// <summary>
-    ///     Called by the <see cref="ConsoleDriver"/> when the user presses a key. Fires the <see cref="KeyDown"/> event
-    ///     then calls <see cref="View.NewKeyDownEvent"/> on all top level views. Called after <see cref="OnKeyDown"/> and
-    ///     before <see cref="OnKeyUp"/>.
+    ///     Called when the user presses a key (by the <see cref="ConsoleDriver"/>). Raises the cancelable
+    ///     <see cref="KeyDown"/> event, then calls <see cref="View.NewKeyDownEvent"/> on all top level views, and finally
+    ///     if the key was not handled, invokes any Application-scoped <see cref="KeyBindings"/>.
     /// </summary>
     /// <remarks>Can be used to simulate key press events.</remarks>
-    /// <param name="keyEvent"></param>
+    /// <param name="key"></param>
     /// <returns><see langword="true"/> if the key was handled.</returns>
-    public static bool OnKeyDown (Key keyEvent)
+    public static bool RaiseKeyDownEvent (Key key)
     {
-        //if (!IsInitialized)
-        //{
-        //    return true;
-        //}
+        KeyDown?.Invoke (null, key);
 
-        KeyDown?.Invoke (null, keyEvent);
-
-        if (keyEvent.Handled)
+        if (key.Handled)
         {
             return true;
         }
@@ -106,7 +31,7 @@ public static partial class Application // Keyboard handling
         {
             foreach (Toplevel topLevel in TopLevels.ToList ())
             {
-                if (topLevel.NewKeyDownEvent (keyEvent))
+                if (topLevel.NewKeyDownEvent (key))
                 {
                     return true;
                 }
@@ -119,7 +44,7 @@ public static partial class Application // Keyboard handling
         }
         else
         {
-            if (top.NewKeyDownEvent (keyEvent))
+            if (Top.NewKeyDownEvent (key))
             {
                 return true;
             }
@@ -127,7 +52,7 @@ public static partial class Application // Keyboard handling
 
         // Invoke any Application-scoped KeyBindings.
         // The first view that handles the key will stop the loop.
-        foreach (KeyValuePair<Key, KeyBinding> binding in KeyBindings.Bindings.Where (b => b.Key == keyEvent.KeyCode))
+        foreach (KeyValuePair<Key, KeyBinding> binding in KeyBindings.Bindings.Where (b => b.Key == key.KeyCode))
         {
             if (binding.Value.BoundView is { })
             {
@@ -145,7 +70,7 @@ public static partial class Application // Keyboard handling
             }
             else
             {
-                if (!KeyBindings.TryGet (keyEvent, out KeyBinding appBinding))
+                if (!KeyBindings.TryGet (key, KeyBindingScope.Application, out KeyBinding appBinding))
                 {
                     continue;
                 }
@@ -154,7 +79,7 @@ public static partial class Application // Keyboard handling
 
                 foreach (Command command in appBinding.Commands)
                 {
-                    toReturn = InvokeCommand (command, keyEvent, appBinding);
+                    toReturn = InvokeCommand (command, key, appBinding);
                 }
 
                 return toReturn ?? true;
@@ -162,59 +87,66 @@ public static partial class Application // Keyboard handling
         }
 
         return false;
+
+        static bool? InvokeCommand (Command command, Key key, KeyBinding appBinding)
+        {
+            if (!CommandImplementations!.ContainsKey (command))
+            {
+                throw new NotSupportedException (
+                                                 @$"A KeyBinding was set up for the command {command} ({key}) but that command is not supported by Application."
+                                                );
+            }
+
+            if (CommandImplementations.TryGetValue (command, out View.CommandImplementation? implementation))
+            {
+                var context = new CommandContext (command, key, appBinding); // Create the context here
+
+                return implementation (context);
+            }
+
+            return false;
+        }
     }
 
     /// <summary>
-    ///     INTENRAL method to invoke one of the commands in <see cref="CommandImplementations"/>
+    ///     Raised when the user presses a key.
+    ///     <para>
+    ///         Set <see cref="Key.Handled"/> to <see langword="true"/> to indicate the key was handled and to prevent
+    ///         additional processing.
+    ///     </para>
     /// </summary>
-    /// <param name="command"></param>
-    /// <param name="keyEvent"></param>
-    /// <param name="appBinding"></param>
-    /// <returns></returns>
-    /// <exception cref="NotSupportedException"></exception>
-    private static bool? InvokeCommand (Command command, Key keyEvent, KeyBinding appBinding)
-    {
-        if (!CommandImplementations!.ContainsKey (command))
-        {
-            throw new NotSupportedException (
-                                             @$"A KeyBinding was set up for the command {command} ({keyEvent}) but that command is not supported by Application."
-                                            );
-        }
-
-        if (CommandImplementations.TryGetValue (command, out View.CommandImplementation? implementation))
-        {
-            var context = new CommandContext (command, keyEvent, appBinding); // Create the context here
-
-            return implementation (context);
-        }
-
-        return false;
-    }
+    /// <remarks>
+    ///     All drivers support firing the <see cref="KeyDown"/> event. Some drivers (Curses) do not support firing the
+    ///     <see cref="KeyDown"/> and <see cref="KeyUp"/> events.
+    ///     <para>Fired after <see cref="KeyDown"/> and before <see cref="KeyUp"/>.</para>
+    /// </remarks>
+    public static event EventHandler<Key>? KeyDown;
 
     /// <summary>
-    ///     Called by the <see cref="ConsoleDriver"/> when the user releases a key. Fires the <see cref="KeyUp"/> event
-    ///     then calls <see cref="View.NewKeyUpEvent"/> on all top level views. Called after <see cref="OnKeyDown"/>.
+    ///     Called when the user releases a key (by the <see cref="ConsoleDriver"/>). Raises the cancelable <see cref="KeyUp"/>
+    ///     event
+    ///     then calls <see cref="View.NewKeyUpEvent"/> on all top level views. Called after <see cref="RaiseKeyDownEvent"/>.
     /// </summary>
-    /// <remarks>Can be used to simulate key press events.</remarks>
-    /// <param name="a"></param>
+    /// <remarks>Can be used to simulate key release events.</remarks>
+    /// <param name="key"></param>
     /// <returns><see langword="true"/> if the key was handled.</returns>
-    public static bool OnKeyUp (Key a)
+    public static bool RaiseKeyUpEvent (Key key)
     {
         if (!IsInitialized)
         {
             return true;
         }
 
-        KeyUp?.Invoke (null, a);
+        KeyUp?.Invoke (null, key);
 
-        if (a.Handled)
+        if (key.Handled)
         {
             return true;
         }
 
         foreach (Toplevel topLevel in TopLevels.ToList ())
         {
-            if (topLevel.NewKeyUpEvent (a))
+            if (topLevel.NewKeyUpEvent (key))
             {
                 return true;
             }
@@ -228,65 +160,12 @@ public static partial class Application // Keyboard handling
         return false;
     }
 
-    /// <summary>Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Key PrevTabGroupKey
-    {
-        get => _prevTabGroupKey;
-        set
-        {
-            if (_prevTabGroupKey != value)
-            {
-                ReplaceKey (_prevTabGroupKey, value);
-                _prevTabGroupKey = value;
-            }
-        }
-    }
+    #region Application-scoped KeyBindings
 
-    /// <summary>Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Key PrevTabKey
-    {
-        get => _prevTabKey;
-        set
-        {
-            if (_prevTabKey != value)
-            {
-                ReplaceKey (_prevTabKey, value);
-                _prevTabKey = value;
-            }
-        }
-    }
+    static Application () { AddApplicationKeyBindings (); }
 
-    /// <summary>Gets or sets the key to quit the application.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Key QuitKey
-    {
-        get => _quitKey;
-        set
-        {
-            if (_quitKey != value)
-            {
-                ReplaceKey (_quitKey, value);
-                _quitKey = value;
-            }
-        }
-    }
-
-    /// <summary>Gets or sets the key to activate arranging views using the keyboard.</summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Key ArrangeKey
-    {
-        get => _arrangeKey;
-        set
-        {
-            if (_arrangeKey != value)
-            {
-                ReplaceKey (_arrangeKey, value);
-                _arrangeKey = value;
-            }
-        }
-    }
+    /// <summary>Gets the Application-scoped key bindings.</summary>
+    public static KeyBindings KeyBindings { get; internal set; } = new ();
 
     internal static void AddApplicationKeyBindings ()
     {
@@ -304,6 +183,7 @@ public static partial class Application // Keyboard handling
                             return true;
                         }
                         RequestStop ();
+
                         return true;
                     }
                    );
@@ -366,7 +246,7 @@ public static partial class Application // Keyboard handling
 
         KeyBindings.Clear ();
 
-        // Resources/config.json overrrides
+        // Resources/config.json overrides
         NextTabKey = Key.Tab;
         PrevTabKey = Key.Tab.WithShift;
         NextTabGroupKey = Key.F6;
@@ -415,6 +295,26 @@ public static partial class Application // Keyboard handling
                           .ToList ();
     }
 
+    private static void ReplaceKey (Key oldKey, Key newKey)
+    {
+        if (KeyBindings.Bindings.Count == 0)
+        {
+            return;
+        }
+
+        if (newKey == Key.Empty)
+        {
+            KeyBindings.Remove (oldKey);
+        }
+        else
+        {
+            KeyBindings.ReplaceKey (oldKey, newKey);
+        }
+    }
+
+
+    #endregion Application-scoped KeyBindings
+
     /// <summary>
     ///     <para>
     ///         Sets the function that will be invoked for a <see cref="Command"/>.
@@ -438,20 +338,4 @@ public static partial class Application // Keyboard handling
     /// </summary>
     private static Dictionary<Command, View.CommandImplementation>? CommandImplementations { get; set; }
 
-    private static void ReplaceKey (Key oldKey, Key newKey)
-    {
-        if (KeyBindings.Bindings.Count == 0)
-        {
-            return;
-        }
-
-        if (newKey == Key.Empty)
-        {
-            KeyBindings.Remove (oldKey);
-        }
-        else
-        {
-            KeyBindings.ReplaceKey (oldKey, newKey);
-        }
-    }
 }

@@ -208,14 +208,14 @@ public class Bars : Scenario
 
         menuLikeExamples.MouseClick += MenuLikeExamplesMouseClick;
 
-        void MenuLikeExamplesMouseClick (object? sender, MouseEventEventArgs e)
+        void MenuLikeExamplesMouseClick (object? sender, MouseEventArgs e)
         {
-            if (e.MouseEvent.Flags.HasFlag (MouseFlags.Button3Clicked))
+            if (e.Flags.HasFlag (MouseFlags.Button3Clicked))
             {
                 Application.Popover = _popoverMenu;
 
-                _popoverMenu.X = e.MouseEvent.ScreenPosition.X;
-                _popoverMenu.Y = e.MouseEvent.ScreenPosition.Y;
+                _popoverMenu.X = e.ScreenPosition.X;
+                _popoverMenu.Y = e.ScreenPosition.Y;
                 _popoverMenu.Visible = true;
             }
         }
@@ -323,7 +323,7 @@ public class Bars : Scenario
 
     //private void ShowContextMenu (object s, MouseEventEventArgs e)
     //{
-    //    if (e.MouseEvent.Flags != MouseFlags.Button3Clicked)
+    //    if (e.Flags != MouseFlags.Button3Clicked)
     //    {
     //        return;
     //    }
@@ -331,8 +331,8 @@ public class Bars : Scenario
     //    var contextMenu = new Bar
     //    {
     //        Id = "contextMenu",
-    //        X = e.MouseEvent.Position.X,
-    //        Y = e.MouseEvent.Position.Y,
+    //        X = e.Position.X,
+    //        Y = e.Position.Y,
     //        Width = Dim.Auto (DimAutoStyle.Content),
     //        Height = Dim.Auto (DimAutoStyle.Content),
     //        Orientation = Orientation.Vertical,
@@ -435,7 +435,7 @@ public class Bars : Scenario
 
     //    contextMenu.Initialized += Menu_Initialized;
 
-    //    void Application_MouseEvent (object sender, MouseEvent e)
+    //    void Application_MouseEvent (object sender, MouseEventArgs e)
     //    {
     //        // If user clicks outside of the menuWindow, close it
     //        if (!contextMenu.Frame.Contains (e.Position.X, e.Position.Y))

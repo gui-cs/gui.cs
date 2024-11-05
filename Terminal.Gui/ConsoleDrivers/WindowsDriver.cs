@@ -37,6 +37,7 @@ internal class WindowsConsole
     private CursorVisibility? _currentCursorVisibility;
     private CursorVisibility? _pendingCursorVisibility;
     private readonly StringBuilder _stringBuilder = new (256 * 1024);
+    private string _lastWrite = string.Empty;
 
     public WindowsConsole ()
     {
@@ -118,7 +119,21 @@ internal class WindowsConsole
 
             var s = _stringBuilder.ToString ();
 
-            result = WriteConsole (_screenBuffer, s, (uint)s.Length, out uint _, nint.Zero);
+            // TODO: requires extensive testing if we go down this route
+            // If console output has changed
+            if (s != _lastWrite)
+            {
+                // supply console with the new content
+                result = WriteConsole (_screenBuffer, s, (uint)s.Length, out uint _, nint.Zero);
+            }
+
+            _lastWrite = s;
+
+            foreach (var sixel in Application.Sixel)
+            {
+                SetCursorPosition (new Coord ((short)sixel.ScreenPosition.X, (short)sixel.ScreenPosition.Y));
+                WriteConsole (_screenBuffer, sixel.SixelData, (uint)sixel.SixelData.Length, out uint _, nint.Zero);
+            }
         }
 
         if (!result)
@@ -1483,7 +1498,7 @@ internal class WindowsDriver : ConsoleDriver
                 break;
 
             case WindowsConsole.EventType.Mouse:
-                MouseEvent me = ToDriverMouse (inputEvent.MouseEvent);
+                MouseEventArgs me = ToDriverMouse (inputEvent.MouseEvent);
 
                 if (me is null || me.Flags == MouseFlags.None)
                 {
@@ -1827,9 +1842,9 @@ internal class WindowsDriver : ConsoleDriver
             }
             await Task.Delay (delay);
 
-            var me = new MouseEvent
+            var me = new MouseEventArgs
             {
-                Position = _pointMove,
+                ScreenPosition = _pointMove,
                 Flags = mouseFlag
             };
 
@@ -1883,7 +1898,7 @@ internal class WindowsDriver : ConsoleDriver
     }
 
     [CanBeNull]
-    private MouseEvent ToDriverMouse (WindowsConsole.MouseEventRecord mouseEvent)
+    private MouseEventArgs ToDriverMouse (WindowsConsole.MouseEventRecord mouseEvent)
     {
         var mouseFlag = MouseFlags.AllEvents;
 
@@ -2127,7 +2142,7 @@ internal class WindowsDriver : ConsoleDriver
         //System.Diagnostics.Debug.WriteLine (
         //	$"point.X:{(point is { } ? ((Point)point).X : -1)};point.Y:{(point is { } ? ((Point)point).Y : -1)}");
 
-        return new MouseEvent
+        return new MouseEventArgs
         {
             Position = new (mouseEvent.MousePosition.X, mouseEvent.MousePosition.Y),
             Flags = mouseFlag
