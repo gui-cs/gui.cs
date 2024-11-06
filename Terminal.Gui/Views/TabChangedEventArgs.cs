@@ -1,20 +1,20 @@
 ﻿namespace Terminal.Gui;
 
-/// <summary>Describes a change in <see cref="TabView.SelectedTab"/></summary>
+/// <summary>Describes a change in <see cref="TabView.SelectedTabIndex"/></summary>
 public class TabChangedEventArgs : EventArgs
 {
     /// <summary>Documents a tab change</summary>
-    /// <param name="oldTab"></param>
-    /// <param name="newTab"></param>
-    public TabChangedEventArgs (Tab oldTab, Tab newTab)
+    /// <param name="oldTabIndex"></param>
+    /// <param name="newTabIndex"></param>
+    public TabChangedEventArgs (int? oldTabIndex, int? newTabIndex)
     {
-        OldTab = oldTab;
-        NewTab = newTab;
+        OldTabIndex = oldTabIndex;
+        NewTabIndex = newTabIndex;
     }
 
-    /// <summary>The currently selected tab. May be null</summary>
-    public Tab NewTab { get; }
+    /// <summary>The currently selected tab.</summary>
+    public int? NewTabIndex { get; }
 
-    /// <summary>The previously selected tab. May be null</summary>
-    public Tab OldTab { get; }
+    /// <summary>The previously selected tab.</summary>
+    public int? OldTabIndex{ get; }
 }
