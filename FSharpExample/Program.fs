@@ -19,7 +19,7 @@ type ExampleWindow() as this =
         let btnLogin = new Button(Text = "Login", Y = Pos.Bottom(passwordLabel) +  Pos.op_Implicit(1), X = Pos.Center(), IsDefault = true)
 
         // When login button is clicked display a message popup
-        btnLogin.Accept.Add(fun _ ->
+        btnLogin.Accepting.Add(fun _ ->
             if userNameText.Text = "admin" && passwordText.Text = "password" then
                 MessageBox.Query("Logging In", "Login Successful", "Ok") |> ignore
                 ExampleWindow.UserName <- userNameText.Text.ToString()
