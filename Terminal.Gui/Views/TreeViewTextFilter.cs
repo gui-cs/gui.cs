@@ -51,6 +51,6 @@ public class TreeViewTextFilter<T> : ITreeViewFilter<T> where T : class
     private void RefreshTreeView ()
     {
         _forTree.InvalidateLineMap ();
-        _forTree.SetNeedsDisplay ();
+        _forTree.SetNeedsDraw ();
     }
 }

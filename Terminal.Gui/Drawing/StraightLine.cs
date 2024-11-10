@@ -6,11 +6,11 @@
 public class StraightLine
 {
     /// <summary>Creates a new instance of the <see cref="StraightLine"/> class.</summary>
-    /// <param name="start"></param>
-    /// <param name="length"></param>
-    /// <param name="orientation"></param>
-    /// <param name="style"></param>
-    /// <param name="attribute"></param>
+    /// <param name="start">The start location.</param>
+    /// <param name="length">The length of the line.</param>
+    /// <param name="orientation">The orientation of the line.</param>
+    /// <param name="style">The line style.</param>
+    /// <param name="attribute">The attribute to be used for rendering the line.</param>
     public StraightLine (
         Point start,
         int length,
@@ -43,11 +43,11 @@ public class StraightLine
 
     /// <summary>
     ///     Gets the rectangle that describes the bounds of the canvas. Location is the coordinates of the line that is
-    ///     furthest left/top and Size is defined by the line that extends the furthest right/bottom.
+    ///     the furthest left/top and Size is defined by the line that extends the furthest right/bottom.
     /// </summary>
 
-    // PERF: Probably better to store the rectangle rather than make a new one on every single access to Viewport.
-    internal Rectangle Viewport
+    // PERF: Probably better to store the rectangle rather than make a new one on every single access to Bounds.
+    internal Rectangle Bounds
     {
         get
         {

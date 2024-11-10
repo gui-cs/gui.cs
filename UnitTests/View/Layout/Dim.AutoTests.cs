@@ -4,12 +4,11 @@ using static Terminal.Gui.Dim;
 
 namespace Terminal.Gui.LayoutTests;
 
-[Trait("Category", "Layout")]
+[Trait ("Category", "Layout")]
 public partial class DimAutoTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
 
-    [SetupFakeDriver]
     [Fact]
     public void Change_To_Non_Auto_Resets_ContentSize ()
     {
@@ -26,6 +25,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
         // Change text to a longer string
         view.Text = "0123456789";
 
+        view.Layout (new (100, 100));
         Assert.Equal (new (0, 0, 10, 1), view.Frame);
         Assert.Equal (new (10, 1), view.GetContentSize ());
 
@@ -33,6 +33,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
         view.Width = 5;
         view.Height = 1;
 
+        view.SetRelativeLayout (new (100, 100));
         Assert.Equal (new (5, 1), view.GetContentSize ());
     }
 
@@ -88,6 +89,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
             Width = Auto (),
             Height = 1
         };
+        view.Layout ();
         Assert.Equal (4, view.TextFormatter.ConstrainToWidth);
         Assert.Equal (1, view.TextFormatter.ConstrainToHeight);
 
@@ -99,6 +101,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
             Width = 1,
             Height = Auto ()
         };
+        view.Layout ();
         Assert.Equal (1, view.TextFormatter.ConstrainToWidth);
         Assert.Equal (4, view.TextFormatter.ConstrainToHeight);
     }
@@ -113,6 +116,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
             Height = 1,
             Width = Auto ()
         };
+        view.Layout ();
         Assert.Equal (4, view.TextFormatter.ConstrainToWidth);
         Assert.Equal (1, view.TextFormatter.ConstrainToHeight);
     }
@@ -216,7 +220,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
                              Style: DimAutoStyle.Auto
                             );
 
-        var c = new DimAuto(
+        var c = new DimAuto (
                              MaximumContentDim: 2,
                              MinimumContentDim: 1,
                              Style: DimAutoStyle.Auto
@@ -271,10 +275,11 @@ public partial class DimAutoTests (ITestOutputHelper output)
             Text = "_1234",
             Width = Auto ()
         };
+        view.Layout ();
         Assert.Equal (new (4, 0), view.Frame.Size);
 
         view.Height = 1;
-        view.SetRelativeLayout (Application.Screen.Size);
+        view.Layout ();
         Assert.Equal (new (4, 1), view.Frame.Size);
         Size lastSize = view.Frame.Size;
 
@@ -287,8 +292,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
             Width = Auto (),
             Height = 1
         };
-        view.SetRelativeLayout (Application.Screen.Size);
-
+        view.Layout ();
         lastSize = view.Frame.Size;
         view.VerticalTextAlignment = Alignment.Center;
         Assert.Equal (lastSize, view.Frame.Size);
@@ -314,6 +318,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
         view.SetRelativeLayout (Application.Screen.Size);
         lastSize = view.Frame.Size;
         view.Text = "*ABCD";
+        view.SetRelativeLayout (Application.Screen.Size);
         Assert.NotEqual (lastSize, view.Frame.Size);
     }
 
@@ -357,15 +362,15 @@ public partial class DimAutoTests (ITestOutputHelper output)
         subView.Height = 10;
 
         subView.Height = Percent (50);
-        Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new (0, 0)));
+        Assert.Throws<LayoutException> (() => superView.SetRelativeLayout (new (0, 0)));
         subView.Height = 10;
 
         subView.X = Pos.Center ();
-        Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new (0, 0)));
+        Assert.Throws<LayoutException> (() => superView.SetRelativeLayout (new (0, 0)));
         subView.X = 0;
 
         subView.Y = Pos.Center ();
-        Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new (0, 0)));
+        Assert.Throws<LayoutException> (() => superView.SetRelativeLayout (new (0, 0)));
         subView.Y = 0;
 
         subView.Width = 10;
@@ -424,12 +429,12 @@ public partial class DimAutoTests (ITestOutputHelper output)
         subView.Height = 0;
 
         subView.Height = 3 + 5 + Percent (10);
-        Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new (0, 0)));
+        Assert.Throws<LayoutException> (() => superView.SetRelativeLayout (new (0, 0)));
         subView.Height = 0;
 
         // Tests nested Combine
         subView.Height = 5 + new DimCombine (AddOrSubtract.Add, 3, new DimCombine (AddOrSubtract.Add, Percent (10), 9));
-        Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new (0, 0)));
+        Assert.Throws<LayoutException> (() => superView.SetRelativeLayout (new (0, 0)));
     }
 
     [Fact]
@@ -478,28 +483,28 @@ public partial class DimAutoTests (ITestOutputHelper output)
         superView.SetRelativeLayout (new (0, 0)); // no throw
 
         subView.X = Pos.Center () + 3;
-        Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new (0, 0)));
+        Assert.Throws<LayoutException> (() => superView.SetRelativeLayout (new (0, 0)));
         subView.X = 0;
 
         subView.X = 3 + Pos.Center ();
-        Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new (0, 0)));
+        Assert.Throws<LayoutException> (() => superView.SetRelativeLayout (new (0, 0)));
         subView.X = 0;
 
         subView.X = 3 + 5 + Pos.Center ();
-        Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new (0, 0)));
+        Assert.Throws<LayoutException> (() => superView.SetRelativeLayout (new (0, 0)));
         subView.X = 0;
 
         subView.X = 3 + 5 + Pos.Percent (10);
-        Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new (0, 0)));
+        Assert.Throws<LayoutException> (() => superView.SetRelativeLayout (new (0, 0)));
         subView.X = 0;
 
         subView.X = Pos.Percent (10) + Pos.Center ();
-        Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new (0, 0)));
+        Assert.Throws<LayoutException> (() => superView.SetRelativeLayout (new (0, 0)));
         subView.X = 0;
 
         // Tests nested Combine
         subView.X = 5 + new PosCombine (AddOrSubtract.Add, Pos.Right (subView2), new PosCombine (AddOrSubtract.Add, Pos.Center (), 9));
-        Assert.Throws<InvalidOperationException> (() => superView.SetRelativeLayout (new (0, 0)));
+        Assert.Throws<LayoutException> (() => superView.SetRelativeLayout (new (0, 0)));
         subView.X = 0;
     }
 
@@ -781,13 +786,14 @@ public partial class DimAutoTests (ITestOutputHelper output)
         };
 
         super.Add (view);
+        super.Layout ();
 
         Rectangle expectedViewport = new (0, 0, 8, 1);
         Assert.Equal (expectedViewport.Size, view.GetContentSize ());
         Assert.Equal (expectedViewport, view.Frame);
         Assert.Equal (expectedViewport, view.Viewport);
 
-        super.LayoutSubviews ();
+        super.Layout ();
         Assert.Equal (expectedViewport, view.Viewport);
 
         super.Dispose ();
@@ -843,6 +849,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
         view.Width = Auto (DimAutoStyle.Text, maximumContentDim: maxWidth);
         view.Height = Auto (DimAutoStyle.Text);
         view.Text = text;
+        view.Layout ();
 
         Assert.Equal (new (expectedW, expectedH), view.Frame.Size);
     }
@@ -860,7 +867,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
         view.Height = Auto (DimAutoStyle.Text);
         view.SetContentSize (new (1, 1));
         view.Text = text;
-        view.SetRelativeLayout (Application.Screen.Size);
+        view.Layout ();
         Assert.Equal (new (expectedW, expectedH), view.Frame.Size);
     }
 
@@ -884,7 +891,7 @@ public partial class DimAutoTests (ITestOutputHelper output)
         view.Text = text;
         superView.Add (view);
 
-        superView.SetRelativeLayout (Application.Screen.Size);
+        superView.Layout ();
         Assert.Equal (new (expectedW, expectedH), view.Frame.Size);
     }
 
@@ -965,9 +972,9 @@ public partial class DimAutoTests (ITestOutputHelper output)
     [Fact]
     public void DimAutoStyle_Content_UsesLargestSubview_WhenContentSizeNotSet ()
     {
-        var view = new View ();
-        view.Add (new View { Frame = new (0, 0, 5, 5) }); // Smaller subview
-        view.Add (new View { Frame = new (0, 0, 10, 10) }); // Larger subview
+        var view = new View { Id = "view" };
+        view.Add (new View { Id = "smaller", Frame = new (0, 0, 5, 5) }); // Smaller subview
+        view.Add (new View { Id = "larger", Frame = new (0, 0, 10, 10) }); // Larger subview
 
         Dim dim = Auto (DimAutoStyle.Content);
 
@@ -987,8 +994,11 @@ public partial class DimAutoTests (ITestOutputHelper output)
     }
 
     [Fact]
+    [SetupFakeDriver]
     public void DimAutoStyle_Content_Pos_AnchorEnd_Locates_Correctly ()
     {
+        (((FakeDriver)Application.Driver)!).SetBufferSize(10,10);
+
         DimAutoTestView view = new (Auto (DimAutoStyle.Content), Auto (DimAutoStyle.Content));
 
         View subView = new ()
@@ -998,24 +1008,23 @@ public partial class DimAutoTests (ITestOutputHelper output)
         };
         view.Add (subView);
 
-        view.SetRelativeLayout (new (10, 10));
+        view.Layout ();
         Assert.Equal (new (5, 1), view.Frame.Size);
         Assert.Equal (new (0, 0), view.Frame.Location);
 
         view.X = 0;
-
         view.Y = Pos.AnchorEnd (1);
-        view.SetRelativeLayout (new (10, 10));
+        view.Layout ();
         Assert.Equal (new (5, 1), view.Frame.Size);
         Assert.Equal (new (0, 9), view.Frame.Location);
 
         view.Y = Pos.AnchorEnd ();
-        view.SetRelativeLayout (new (10, 10));
+        view.Layout ();
         Assert.Equal (new (5, 1), view.Frame.Size);
         Assert.Equal (new (0, 9), view.Frame.Location);
 
         view.Y = Pos.AnchorEnd () - 1;
-        view.SetRelativeLayout (new (10, 10));
+        view.Layout ();
         Assert.Equal (new (5, 1), view.Frame.Size);
         Assert.Equal (new (0, 8), view.Frame.Location);
     }

@@ -127,6 +127,17 @@ public class LegendAnnotation : View, IAnnotation
     /// <summary>Returns false i.e. Legends render after series</summary>
     public bool BeforeSeries => false;
 
+    // BUGBUG: Legend annotations are subviews. But for some reason the are rendered directly in OnDrawContent 
+    // BUGBUG: instead of just being normal subviews. They get rendered as blank rects and thus we disable subview drawing.
+    /// <inheritdoc />
+    protected override bool OnDrawingText () { return true; }
+
+    // BUGBUG: Legend annotations are subviews. But for some reason the are rendered directly in OnDrawContent 
+    // BUGBUG: instead of just being normal subviews. They get rendered as blank rects and thus we disable subview drawing.
+    /// <inheritdoc />
+    protected override bool OnClearingViewport () { return true; }
+
+
     /// <summary>Draws the Legend and all entries into the area within <see cref="View.Viewport"/></summary>
     /// <param name="graph"></param>
     public void Render (GraphView graph)
@@ -139,8 +150,8 @@ public class LegendAnnotation : View, IAnnotation
 
         if (BorderStyle != LineStyle.None)
         {
-            OnDrawAdornments ();
-            OnRenderLineCanvas ();
+            DrawBorderAndPadding ();
+            RenderLineCanvas ();
         }
 
         var linesDrawn = 0;
@@ -149,7 +160,7 @@ public class LegendAnnotation : View, IAnnotation
         {
             if (entry.Item1.Color.HasValue)
             {
-                Application.Driver?.SetAttribute (entry.Item1.Color.Value);
+                SetAttribute (entry.Item1.Color.Value);
             }
             else
             {
@@ -206,7 +217,7 @@ public class PathAnnotation : IAnnotation
     /// <param name="graph"></param>
     public void Render (GraphView graph)
     {
-        View.Driver.SetAttribute (LineColor ?? graph.ColorScheme.Normal);
+        graph.SetAttribute (LineColor ?? graph.ColorScheme.Normal);
 
         foreach (LineF line in PointsToLines ())
         {

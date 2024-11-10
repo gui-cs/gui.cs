@@ -30,15 +30,6 @@ public class ApplicationNavigation
     public View? GetFocused ()
     {
         return _focused;
-
-        if (_focused is { CanFocus: true, HasFocus: true })
-        {
-            return _focused;
-        }
-
-        _focused = null;
-
-        return null;
     }
 
     /// <summary>

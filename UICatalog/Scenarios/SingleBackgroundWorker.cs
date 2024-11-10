@@ -9,7 +9,7 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Single BackgroundWorker", "A single BackgroundWorker threading opening another Toplevel")]
 [ScenarioCategory ("Threading")]
-[ScenarioCategory ("Overlapped")]
+[ScenarioCategory ("Arrangement")]
 [ScenarioCategory ("Runnable")]
 public class SingleBackgroundWorker : Scenario
 {
@@ -51,7 +51,7 @@ public class SingleBackgroundWorker : Scenario
                                   () => Application.RequestStop (),
                                   null,
                                   null,
-                                  KeyCode.CtrlMask | KeyCode.Q
+                                  Application.QuitKey
                                  )
                          }
                         )
@@ -66,14 +66,14 @@ public class SingleBackgroundWorker : Scenario
 
             var workerLogTop = new Toplevel
             {
-                Title = "Worker Log Top",
-           };
+                Title = "Worker Log Top"
+            };
 
             workerLogTop.Add (
                               new Label { X = Pos.Center (), Y = 0, Text = "Worker Log" }
                              );
 
-            _listLog = new()
+            _listLog = new ()
             {
                 X = 0,
                 Y = 2,
@@ -92,30 +92,30 @@ public class SingleBackgroundWorker : Scenario
 
         private void RunWorker ()
         {
-            _worker = new() { WorkerSupportsCancellation = true };
+            _worker = new () { WorkerSupportsCancellation = true };
 
             var cancel = new Button { Text = "Cancel Worker" };
 
             cancel.Accepting += (s, e) =>
-                             {
-                                 if (_worker == null)
-                                 {
-                                     _log.Add ($"Worker is not running at {DateTime.Now}!");
-                                     _listLog.SetNeedsDisplay ();
+                                {
+                                    if (_worker == null)
+                                    {
+                                        _log.Add ($"Worker is not running at {DateTime.Now}!");
+                                        _listLog.SetNeedsDraw ();
 
-                                     return;
-                                 }
+                                        return;
+                                    }
 
-                                 _log.Add (
-                                           $"Worker {_startStaging}.{_startStaging:fff} is canceling at {DateTime.Now}!"
-                                          );
-                                 _listLog.SetNeedsDisplay ();
-                                 _worker.CancelAsync ();
-                             };
+                                    _log.Add (
+                                              $"Worker {_startStaging}.{_startStaging:fff} is canceling at {DateTime.Now}!"
+                                             );
+                                    _listLog.SetNeedsDraw ();
+                                    _worker.CancelAsync ();
+                                };
 
             _startStaging = DateTime.Now;
             _log.Add ($"Worker is started at {_startStaging}.{_startStaging:fff}");
-            _listLog.SetNeedsDisplay ();
+            _listLog.SetNeedsDraw ();
 
             var md = new Dialog
             {
@@ -130,7 +130,7 @@ public class SingleBackgroundWorker : Scenario
                               {
                                   List<string> stageResult = new ();
 
-                                  for (var i = 0; i < 500; i++)
+                                  for (var i = 0; i < 200; i++)
                                   {
                                       stageResult.Add ($"Worker {i} started at {DateTime.Now}");
                                       e.Result = stageResult;
@@ -159,7 +159,7 @@ public class SingleBackgroundWorker : Scenario
                                                   _log.Add (
                                                             $"Exception occurred {e.Error.Message} on Worker {_startStaging}.{_startStaging:fff} at {DateTime.Now}"
                                                            );
-                                                  _listLog.SetNeedsDisplay ();
+                                                  _listLog.SetNeedsDraw ();
                                               }
                                               else if (e.Cancelled)
                                               {
@@ -167,7 +167,7 @@ public class SingleBackgroundWorker : Scenario
                                                   _log.Add (
                                                             $"Worker {_startStaging}.{_startStaging:fff} was canceled at {DateTime.Now}!"
                                                            );
-                                                  _listLog.SetNeedsDisplay ();
+                                                  _listLog.SetNeedsDraw ();
                                               }
                                               else
                                               {
@@ -175,8 +175,8 @@ public class SingleBackgroundWorker : Scenario
                                                   _log.Add (
                                                             $"Worker {_startStaging}.{_startStaging:fff} was completed at {DateTime.Now}."
                                                            );
-                                                  _listLog.SetNeedsDisplay ();
-                                                  Application.Refresh ();
+                                                  _listLog.SetNeedsDraw ();
+                                                  Application.LayoutAndDraw ();
 
                                                   var builderUI =
                                                       new StagingUIController (_startStaging, e.Result as ObservableCollection<string>);
@@ -202,9 +202,9 @@ public class SingleBackgroundWorker : Scenario
 
         public StagingUIController (DateTime? start, ObservableCollection<string> list)
         {
-            _top = new()
+            _top = new ()
             {
-                Title = "_top", Width = Dim.Fill (), Height = Dim.Fill ()
+                Title = "_top", Width = Dim.Fill (), Height = Dim.Fill (), Modal = true
             };
 
             _top.KeyDown += (s, e) =>
@@ -275,6 +275,8 @@ public class SingleBackgroundWorker : Scenario
                                            ]);
             _top.Add (statusBar);
 
+            Y = 1;
+            Height = Dim.Fill (1);
             Title = $"Worker started at {start}.{start:fff}";
             ColorScheme = Colors.ColorSchemes ["Base"];
 

@@ -103,7 +103,7 @@ internal class KeyBindingsDialog : Dialog
             _keyLabel.Text = "Key: None";
         }
 
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
     }
 
     /// <summary>Tracks views as they are created in UICatalog so that their keybindings can be managed.</summary>

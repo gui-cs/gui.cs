@@ -111,7 +111,7 @@ public class LabelTests (ITestOutputHelper output)
 
         label.Text = "Say Hello 你 changed";
 
-        Application.Refresh ();
+        Application.LayoutAndDraw ();
 
         expected = @"
 ┌────────────────────────────┐
@@ -151,7 +151,7 @@ public class LabelTests (ITestOutputHelper output)
 
         label.Text = "Say Hello 你 changed";
 
-        Application.Refresh ();
+        Application.LayoutAndDraw ();
 
         expected = @"
 ┌────────────────────────────┐
@@ -192,7 +192,8 @@ public class LabelTests (ITestOutputHelper output)
 
         var top = new Toplevel ();
         top.Add (label);
-        Application.Begin (top);
+        RunState runState = Application.Begin (top);
+        Application.RunIteration (ref runState);
 
         Assert.False (label.TextFormatter.FillRemaining);
         Assert.False (tf1.FillRemaining);
@@ -210,13 +211,13 @@ This TextFormatter (tf2) with fill will be cleared on rewritten.       ",
                                                       output
                                                      );
 
-        Assert.False (label.NeedsDisplay);
-        Assert.False (label.LayoutNeeded);
-        Assert.False (label.SubViewNeedsDisplay);
+        Assert.False (label.NeedsDraw);
+        Assert.False (label.NeedsLayout);
+        Assert.False (label.SubViewNeedsDraw);
         label.Text = "This label is rewritten.";
-        Assert.True (label.NeedsDisplay);
-        Assert.True (label.LayoutNeeded);
-        //Assert.False (label.SubViewNeedsDisplay);
+        Assert.True (label.NeedsDraw);
+        Assert.True (label.NeedsLayout);
+        //Assert.False (label.SubViewNeedsDraw);
         label.Draw ();
 
         tf1.Text = "This TextFormatter (tf1) is rewritten.";
@@ -243,6 +244,7 @@ This TextFormatter (tf2) is rewritten.                                 ",
         var top = new Toplevel ();
         top.Add (label);
         Application.Begin (top);
+        Application.LayoutAndDraw ();
 
         Assert.Equal (new (0, 0, 16, 1), label.Frame);
 
@@ -263,7 +265,7 @@ Demo Simple Rune
         var top = new Toplevel ();
         top.Add (label);
         Application.Begin (top);
-
+        Application.LayoutAndDraw ();
         Assert.NotNull (label.Width);
         Assert.NotNull (label.Height);
 
@@ -299,6 +301,7 @@ e
         var top = new Toplevel ();
         top.Add (label);
         Application.Begin (top);
+        Application.LayoutAndDraw ();
 
         var expected = @"
 デ
@@ -469,6 +472,7 @@ e
         var top = new Toplevel ();
         top.Add (label);
         Application.Begin (top);
+        Application.LayoutAndDraw ();
 
         Assert.Equal (new (0, 0, 6, 3), label.Frame);
         Assert.Equal (new (0, 0, 4, 1), label.Viewport);
@@ -492,7 +496,7 @@ e
         var top = new Toplevel ();
         top.Add (label);
         Application.Begin (top);
-
+        Application.LayoutAndDraw ();
         Assert.Equal (new (0, 0, 6, 2), label.Frame);
         Assert.Equal (new (0, 0, 4, 1), label.Viewport);
         Application.Begin (top);
@@ -1073,7 +1077,7 @@ e
         Assert.Equal (10, text.Length);
         label.Width = Dim.Fill () - text.Length;
         win.LayoutSubviews ();
-        win.Clear ();
+        win.ClearViewport ();
         win.Draw ();
 
         Assert.Equal (Rectangle.Empty, label.Frame);
@@ -1220,7 +1224,7 @@ e
         Assert.Equal (10, text.Length);
 
         //label.Width = Dim.Fill () - text.Length;
-        Application.Refresh ();
+        Application.LayoutAndDraw ();
 
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
         Assert.Equal (new (5, 1), label.TextFormatter.ConstrainToSize);
@@ -1279,7 +1283,7 @@ e
         Assert.Equal (10, text.Length);
 
         //label.Width = Dim.Fill () - text.Length;
-        Application.Refresh ();
+        Application.LayoutAndDraw ();
 
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
         Assert.Equal (new (5, 1), label.TextFormatter.ConstrainToSize);
@@ -1360,6 +1364,7 @@ e
         Application.Navigation = new ();
         Application.Top = new ();
         Application.Top.Add (otherView, label, nextView);
+        Application.Top.Layout ();
 
         Application.Top.SetFocus ();
 
@@ -1432,6 +1437,7 @@ e
         };
         Application.Top.Add (label, otherView);
         Application.Top.SetFocus ();
+        Application.Top.Layout ();
 
         Assert.True (label.CanFocus);
         Assert.True (label.HasFocus);

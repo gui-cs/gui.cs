@@ -106,6 +106,65 @@ public class PosAlignTests
         Assert.IsType<PosAlign> (pos);
     }
 
+    [Fact]
+    public void PosAlign_Laysout ()
+    {
+        var view = new View ()
+        {
+            Id = "view",
+            X = Pos.Align (Alignment.Center),
+            Width = 1,
+            Height = 1
+        };
+        view.Layout (new (10, 10));
+
+        Assert.Equal (4, view.Frame.X);
+    }
+
+    // TODO: Test scenarios where views with matching GroupId's are added/removed from a Superview
+
+    // TODO: Make AlignAndUpdateGroup internal and write low-level unit tests for it
+
+    [Fact]
+    public void PosAlign_Set_View_X ()
+    {
+        Pos posAlign = Pos.Align (Alignment.Center);
+
+        var superView = new View ()
+        {
+            Id = "superView",
+            Width = 10,
+            Height = 1
+        };
+        var view = new View ()
+        {
+            Id = "view",
+            Width = 1,
+            Height = 1
+        };
+        superView.Add (view);
+        view.X = posAlign;
+        superView.Layout ();
+        Assert.Equal (4, view.Frame.X);
+        superView.Remove (view);
+
+        view = new View ()
+        {
+            Id = "view",
+            X = posAlign,
+            Width = 1,
+            Height = 1
+        };
+        superView.Add (view);
+        superView.Layout ();
+        Assert.Equal (4, view.Frame.X);
+
+        posAlign = Pos.Align (Alignment.End);
+        view.X = posAlign;
+        superView.Layout ();
+        Assert.Equal (9, view.Frame.X);
+    }
+
     // TODO: Test scenarios where views with matching GroupId's are added/removed from a Superview
 
     // TODO: Make AlignAndUpdateGroup internal and write low-level unit tests for it

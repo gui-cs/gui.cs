@@ -36,6 +36,7 @@ public class ProgressBarTests
         for (var i = 0; i <= pb.Frame.Width; i++)
         {
             pb.Fraction += 0.2F;
+            View.SetClipToScreen ();
             pb.Draw ();
 
             if (i == 0)
@@ -105,16 +106,20 @@ public class ProgressBarTests
         var pb2 = new ProgressBar { ProgressBarStyle = ProgressBarStyle.MarqueeContinuous };
 
         pb1.ProgressBarFormat = ProgressBarFormat.Simple;
+        pb1.Layout ();
         Assert.Equal (ProgressBarFormat.Simple, pb1.ProgressBarFormat);
         Assert.Equal (1, pb1.Frame.Height);
         pb2.ProgressBarFormat = ProgressBarFormat.Simple;
+        pb2.Layout ();
         Assert.Equal (ProgressBarFormat.Simple, pb2.ProgressBarFormat);
         Assert.Equal (1, pb2.Frame.Height);
 
         pb1.ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage;
+        pb1.Layout ();
         Assert.Equal (ProgressBarFormat.SimplePlusPercentage, pb1.ProgressBarFormat);
         Assert.Equal (1, pb1.Frame.Height);
         pb2.ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage;
+        pb2.Layout ();
         Assert.Equal (ProgressBarFormat.SimplePlusPercentage, pb2.ProgressBarFormat);
         Assert.Equal (1, pb2.Frame.Height);
     }
@@ -126,9 +131,11 @@ public class ProgressBarTests
         var pb = new ProgressBar ();
 
         pb.ProgressBarFormat = ProgressBarFormat.Simple;
+        pb.Layout ();
         Assert.Equal (1, pb.Frame.Height);
 
         pb.ProgressBarFormat = ProgressBarFormat.SimplePlusPercentage;
+        pb.Layout ();
         Assert.Equal (1, pb.Frame.Height);
     }
 
@@ -171,6 +178,7 @@ public class ProgressBarTests
         for (var i = 0; i < 38; i++)
         {
             pb.Pulse ();
+            View.SetClipToScreen ();
             pb.Draw ();
 
             if (i == 0)
@@ -875,6 +883,7 @@ public class ProgressBarTests
         for (var i = 0; i < 38; i++)
         {
             pb.Pulse ();
+            View.SetClipToScreen ();
             pb.Draw ();
 
             if (i == 0)

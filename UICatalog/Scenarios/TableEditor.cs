@@ -14,7 +14,6 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Dialogs")]
 [ScenarioCategory ("Text and Formatting")]
-[ScenarioCategory ("Overlapped")]
 public class TableEditor : Scenario
 {
     private readonly HashSet<FileSystemInfo> _checkedFileSystemInfos = new ();
@@ -344,57 +343,6 @@ public class TableEditor : Scenario
     private ColorScheme _redColorScheme;
     private ColorScheme _redColorSchemeAlt;
     private TableView _tableView;
-
-    /// <summary>
-    ///     Generates a new demo <see cref="DataTable"/> with the given number of <paramref name="cols"/> (min 5) and
-    ///     <paramref name="rows"/>
-    /// </summary>
-    /// <param name="cols"></param>
-    /// <param name="rows"></param>
-    /// <returns></returns>
-    public static DataTable BuildDemoDataTable (int cols, int rows)
-    {
-        var dt = new DataTable ();
-
-        var explicitCols = 6;
-        dt.Columns.Add (new DataColumn ("StrCol", typeof (string)));
-        dt.Columns.Add (new DataColumn ("DateCol", typeof (DateTime)));
-        dt.Columns.Add (new DataColumn ("IntCol", typeof (int)));
-        dt.Columns.Add (new DataColumn ("DoubleCol", typeof (double)));
-        dt.Columns.Add (new DataColumn ("NullsCol", typeof (string)));
-        dt.Columns.Add (new DataColumn ("Unicode", typeof (string)));
-
-        for (var i = 0; i < cols - explicitCols; i++)
-        {
-            dt.Columns.Add ("Column" + (i + explicitCols));
-        }
-
-        var r = new Random (100);
-
-        for (var i = 0; i < rows; i++)
-        {
-            List<object> row = new ()
-            {
-                "Some long text that is super cool",
-                new DateTime (2000 + i, 12, 25),
-                r.Next (i),
-                r.NextDouble () * i - 0.5 /*add some negatives to demo styles*/,
-                DBNull.Value,
-                "Les Mise"
-                + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber))
-                + "rables"
-            };
-
-            for (var j = 0; j < cols - explicitCols; j++)
-            {
-                row.Add ("SomeValue" + r.Next (100));
-            }
-
-            dt.Rows.Add (row.ToArray ());
-        }
-
-        return dt;
-    }
 
     /// <summary>
     ///     Builds a simple table in which cell values contents are the index of the cell.  This helps testing that
@@ -1007,7 +955,7 @@ public class TableEditor : Scenario
 
     private void OpenExample (bool big)
     {
-        SetTable (BuildDemoDataTable (big ? 30 : 5, big ? 1000 : 5));
+        SetTable (TableView.BuildDemoDataTable (big ? 30 : 5, big ? 1000 : 5));
         SetDemoTableStyles ();
     }
 
@@ -1222,7 +1170,7 @@ public class TableEditor : Scenario
                                              scrollBar.Position = _tableView.RowOffset;
                                          }
 
-                                         _tableView.SetNeedsDisplay ();
+                                         _tableView.SetNeedsDraw ();
                                      };
         /*
         scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
@@ -1230,10 +1178,10 @@ public class TableEditor : Scenario
             if (tableView.LeftItem != scrollBar.OtherScrollBarView.Position) {
                 scrollBar.OtherScrollBarView.Position = tableView.LeftItem;
             }
-            tableView.SetNeedsDisplay ();
+            tableView.SetNeedsDraw ();
         };*/
 
-        _tableView.DrawContent += (s, e) =>
+        _tableView.DrawingContent += (s, e) =>
                                   {
                                       scrollBar.Size = _tableView.Table?.Rows ?? 0;
                                       scrollBar.Position = _tableView.RowOffset;
@@ -1402,7 +1350,7 @@ public class TableEditor : Scenario
             _tableView.Style.RowColorGetter = null;
         }
 
-        _tableView.SetNeedsDisplay ();
+        _tableView.SetNeedsDraw ();
     }
 
     private void ToggleAlwaysShowHeaders ()
@@ -1520,7 +1468,7 @@ public class TableEditor : Scenario
         //toggle menu item
         _miCursor.Checked = !_miCursor.Checked;
         _tableView.Style.InvertSelectedCellFirstCharacter = (bool)_miCursor.Checked;
-        _tableView.SetNeedsDisplay ();
+        _tableView.SetNeedsDraw ();
     }
 
     private void ToggleNoCellLines ()

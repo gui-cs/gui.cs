@@ -8,7 +8,7 @@ namespace Terminal.Gui;
 ///     Modal dialog for selecting files/directories. Has auto-complete and expandable navigation pane (Recent, Root
 ///     drives etc).
 /// </summary>
-public class FileDialog : Dialog
+public class FileDialog : Dialog, IDesignable
 {
     private const int alignmentGroupInput = 32;
     private const int alignmentGroupComplete = 55;
@@ -78,20 +78,34 @@ public class FileDialog : Dialog
             Y = Pos.AnchorEnd (),
             IsDefault = true, Text = Style.OkButtonText
         };
-        _btnOk.Accepting += (s, e) => Accept (true);
+        _btnOk.Accepting += (s, e) =>
+                            {
+                                if (e.Cancel)
+                                {
+                                    return;
+                                }
+
+                                Accept (true);
+                            };
 
 
         _btnCancel = new Button
         {
             X = Pos.Align (Alignment.End, AlignmentModes.AddSpaceBetweenItems, alignmentGroupComplete),
-            Y = Pos.AnchorEnd(),
+            Y = Pos.AnchorEnd (),
             Text = Strings.btnCancel
         };
 
         _btnCancel.Accepting += (s, e) =>
         {
-            Canceled = true;
-            Application.RequestStop ();
+            if (e.Cancel)
+            {
+                return;
+            }
+            if (Modal)
+            {
+                Application.RequestStop ();
+            }
         };
 
         _btnUp = new Button { X = 0, Y = 1, NoPadding = true };
@@ -163,7 +177,7 @@ public class FileDialog : Dialog
         ColumnStyle typeStyle = Style.TableStyle.GetOrCreateColumnStyle (3);
         typeStyle.MinWidth = 6;
         typeStyle.ColorGetter = ColorGetter;
-        
+
         _treeView = new TreeView<IFileSystemInfo> { Width = Dim.Fill (), Height = Dim.Fill () };
 
         var fileDialogTreeBuilder = new FileSystemTreeBuilder ();
@@ -189,12 +203,12 @@ public class FileDialog : Dialog
                                                   bool newState = !tile.ContentView.Visible;
                                                   tile.ContentView.Visible = newState;
                                                   _btnToggleSplitterCollapse.Text = GetToggleSplitterText (newState);
-                                                  LayoutSubviews ();
+                                                  SetNeedsLayout ();
                                               };
 
         _tbFind = new TextField
         {
-            X = Pos.Align (Alignment.Start,AlignmentModes.AddSpaceBetweenItems, alignmentGroupInput),
+            X = Pos.Align (Alignment.Start, AlignmentModes.AddSpaceBetweenItems, alignmentGroupInput),
             CaptionColor = new Color (Color.Black),
             Width = 30,
             Y = Pos.Top (_btnToggleSplitterCollapse),
@@ -240,7 +254,7 @@ public class FileDialog : Dialog
         _tableView.KeyBindings.ReplaceCommands (Key.End, Command.End);
         _tableView.KeyBindings.ReplaceCommands (Key.Home.WithShift, Command.StartExtend);
         _tableView.KeyBindings.ReplaceCommands (Key.End.WithShift, Command.EndExtend);
-        
+
         AllowsMultipleSelection = false;
 
         UpdateNavigationVisibility ();
@@ -254,8 +268,8 @@ public class FileDialog : Dialog
         Add (_tbFind);
         Add (_spinnerView);
 
-        Add(_btnOk);
-        Add(_btnCancel);
+        Add (_btnOk);
+        Add (_btnCancel);
     }
 
     /// <summary>
@@ -368,10 +382,8 @@ public class FileDialog : Dialog
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle viewport)
+    protected override bool OnDrawingContent ()
     {
-        base.OnDrawContent (viewport);
-
         if (!string.IsNullOrWhiteSpace (_feedback))
         {
             int feedbackWidth = _feedback.EnumerateRunes ().Sum (c => c.GetColumns ());
@@ -386,11 +398,13 @@ public class FileDialog : Dialog
 
             Move (0, Viewport.Height / 2);
 
-            Driver.SetAttribute (new Attribute (Color.Red, ColorScheme.Normal.Background));
+            SetAttribute (new Attribute (Color.Red, ColorScheme.Normal.Background));
             Driver.AddStr (new string (' ', feedbackPadLeft));
             Driver.AddStr (_feedback);
             Driver.AddStr (new string (' ', feedbackPadRight));
         }
+
+        return true;
     }
 
     /// <inheritdoc/>
@@ -461,7 +475,7 @@ public class FileDialog : Dialog
             AllowedTypeMenuClicked (0);
 
             // TODO: Using v1's menu bar here is a hack. Need to upgrade this.
-            _allowedTypeMenuBar.DrawContentComplete += (s, e) =>
+            _allowedTypeMenuBar.DrawingContent += (s, e) =>
                                                        {
                                                            _allowedTypeMenuBar.Move (e.NewViewport.Width - 1, 0);
                                                            Driver.AddRune (Glyphs.DownArrow);
@@ -493,7 +507,9 @@ public class FileDialog : Dialog
             _btnOk.X = Pos.Right (_btnCancel) + 1;
             MoveSubviewTowardsStart (_btnCancel);
         }
-        LayoutSubviews ();
+
+        SetNeedsDraw ();
+        SetNeedsLayout ();
     }
 
     /// <inheritdoc/>
@@ -634,7 +650,7 @@ public class FileDialog : Dialog
         if (!IsCompatibleWithOpenMode (f.FullName, out string reason))
         {
             _feedback = reason;
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
 
             return;
         }
@@ -661,7 +677,7 @@ public class FileDialog : Dialog
             if (reason is { })
             {
                 _feedback = reason;
-                SetNeedsDisplay ();
+                SetNeedsDraw ();
             }
 
             return;
@@ -827,7 +843,11 @@ public class FileDialog : Dialog
         }
 
         Canceled = false;
-        Application.RequestStop ();
+
+        if (Modal)
+        {
+            Application.RequestStop ();
+        }
     }
 
     private string GetBackButtonText () { return Glyphs.LeftArrow + "-"; }
@@ -1115,7 +1135,7 @@ public class FileDialog : Dialog
             _tableView.RowOffset = 0;
             _tableView.SelectedRow = 0;
 
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
             UpdateNavigationVisibility ();
         }
         finally
@@ -1400,7 +1420,7 @@ public class FileDialog : Dialog
         if (reason is { })
         {
             _feedback = reason;
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
 
         return false;
@@ -1588,9 +1608,16 @@ public class FileDialog : Dialog
                                     Parent.WriteStateToTableView ();
 
                                     Parent._spinnerView.Visible = true;
-                                    Parent._spinnerView.SetNeedsDisplay ();
+                                    Parent._spinnerView.SetNeedsDraw ();
                                 }
                                );
         }
+    }
+
+    bool IDesignable.EnableForDesign ()
+    {
+        Modal = false;
+        OnLoaded ();
+        return true;
     }
 }

@@ -115,7 +115,7 @@ public class Notepad : Scenario
         }
 
         tab.Save ();
-        tabViewToSave.SetNeedsDisplay ();
+        tabViewToSave.SetNeedsDraw ();
     }
 
     public bool SaveAs ()

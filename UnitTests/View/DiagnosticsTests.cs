@@ -21,8 +21,8 @@ public class DiagnosticTests ()
         Assert.Equal (ViewDiagnosticFlags.Off, View.Diagnostics);
 
         // View.Diagnostics can be set to a new value.
-        View.Diagnostics = ViewDiagnosticFlags.Padding;
-        Assert.Equal (ViewDiagnosticFlags.Padding, View.Diagnostics);
+        View.Diagnostics = ViewDiagnosticFlags.Thickness;
+        Assert.Equal (ViewDiagnosticFlags.Thickness, View.Diagnostics);
 
         // Ensure we turn off at the end of the test
         View.Diagnostics = ViewDiagnosticFlags.Off;

@@ -526,7 +526,7 @@ namespace Terminal.Gui
 
                 _provider.Text = value;
 
-                SetNeedsDisplay ();
+                SetNeedsDraw ();
             }
         }
 
@@ -544,7 +544,7 @@ namespace Terminal.Gui
 
                 _cursorPosition = c;
                 SetFocus ();
-                SetNeedsDisplay ();
+                SetNeedsDraw ();
 
                 return true;
             }
@@ -553,14 +553,14 @@ namespace Terminal.Gui
         }
 
         /// <inheritdoc/>
-        public override void OnDrawContent (Rectangle viewport)
+        protected override bool OnDrawingContent ()
         {
             if (_provider is null)
             {
                 Move (0, 0);
-                Driver.AddStr ("Error: ITextValidateProvider not set!");
+                Driver?.AddStr ("Error: ITextValidateProvider not set!");
 
-                return;
+                return true;
             }
 
             Color bgcolor = !IsValid ? new Color (Color.BrightRed) : ColorScheme.Focus.Background;
@@ -571,29 +571,31 @@ namespace Terminal.Gui
             Move (0, 0);
 
             // Left Margin
-            Driver.SetAttribute (textColor);
+            SetAttribute (textColor);
 
             for (var i = 0; i < margin_left; i++)
             {
-                Driver.AddRune ((Rune)' ');
+                Driver?.AddRune ((Rune)' ');
             }
 
             // Content
-            Driver.SetAttribute (textColor);
+            SetAttribute (textColor);
 
             // Content
             for (var i = 0; i < _provider.DisplayText.Length; i++)
             {
-                Driver.AddRune ((Rune)_provider.DisplayText [i]);
+                Driver?.AddRune ((Rune)_provider.DisplayText [i]);
             }
 
             // Right Margin
-            Driver.SetAttribute (textColor);
+            SetAttribute (textColor);
 
             for (var i = 0; i < margin_right; i++)
             {
-                Driver.AddRune ((Rune)' ');
+                Driver?.AddRune ((Rune)' ');
             }
+
+            return true;
         }
 
         /// <inheritdoc/>
@@ -655,7 +657,7 @@ namespace Terminal.Gui
 
             _cursorPosition = _provider.CursorLeft (_cursorPosition);
             _provider.Delete (_cursorPosition);
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
 
             return true;
         }
@@ -671,7 +673,7 @@ namespace Terminal.Gui
 
             int current = _cursorPosition;
             _cursorPosition = _provider.CursorLeft (_cursorPosition);
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
 
             return current != _cursorPosition;
         }
@@ -687,7 +689,7 @@ namespace Terminal.Gui
 
             int current = _cursorPosition;
             _cursorPosition = _provider.CursorRight (_cursorPosition);
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
 
             return current != _cursorPosition;
         }
@@ -702,7 +704,7 @@ namespace Terminal.Gui
             }
 
             _provider.Delete (_cursorPosition);
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
 
             return true;
         }
@@ -712,7 +714,7 @@ namespace Terminal.Gui
         private bool EndKeyHandler ()
         {
             _cursorPosition = _provider.CursorEnd ();
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
 
             return true;
         }
@@ -743,7 +745,7 @@ namespace Terminal.Gui
         private bool HomeKeyHandler ()
         {
             _cursorPosition = _provider.CursorStart ();
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
 
             return true;
         }

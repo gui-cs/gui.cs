@@ -39,7 +39,6 @@ public static partial class Application // Initialization (Init/Shutdown)
     [RequiresDynamicCode ("AOT")]
     public static void Init (ConsoleDriver? driver = null, string? driverName = null) { InternalInit (driver, driverName); }
 
-    internal static bool IsInitialized { get; set; }
     internal static int MainThreadId { get; set; } = -1;
 
     // INTERNAL function for initializing an app with a Toplevel factory object, driver, and mainloop.
@@ -59,12 +58,12 @@ public static partial class Application // Initialization (Init/Shutdown)
         bool calledViaRunT = false
     )
     {
-        if (IsInitialized && driver is null)
+        if (Initialized && driver is null)
         {
             return;
         }
 
-        if (IsInitialized)
+        if (Initialized)
         {
             throw new InvalidOperationException ("Init has already been called and must be bracketed by Shutdown.");
         }
@@ -173,7 +172,7 @@ public static partial class Application // Initialization (Init/Shutdown)
 
         SupportedCultures = GetSupportedCultures ();
         MainThreadId = Thread.CurrentThread.ManagedThreadId;
-        bool init = IsInitialized = true;
+        bool init = Initialized = true;
         InitializedChanged?.Invoke (null, new (init));
     }
 
@@ -215,16 +214,26 @@ public static partial class Application // Initialization (Init/Shutdown)
     {
         // TODO: Throw an exception if Init hasn't been called.
 
-        bool wasInitialized = IsInitialized;
+        bool wasInitialized = Initialized;
         ResetState ();
         PrintJsonErrors ();
 
         if (wasInitialized)
         {
-            bool init = IsInitialized;
+            bool init = Initialized;
             InitializedChanged?.Invoke (null, new (in init));
         }
     }
+
+    /// <summary>
+    ///     Gets whether the application has been initialized with <see cref="Init"/> and not yet shutdown with <see cref="Shutdown"/>.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    ///     The <see cref="InitializedChanged"/> event is raised after the <see cref="Init"/> and <see cref="Shutdown"/> methods have been called.
+    /// </para>
+    /// </remarks>
+    public static bool Initialized { get; internal set; }
 
     /// <summary>
     ///     This event is raised after the <see cref="Init"/> and <see cref="Shutdown"/> methods have been called.

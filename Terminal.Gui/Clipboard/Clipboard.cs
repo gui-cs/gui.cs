@@ -148,7 +148,7 @@ internal static class ClipboardProcessRunner
         bool waitForOutput = true
     )
     {
-        var output = string.Empty;
+            var output = string.Empty;
 
         using (var process = new Process
                {

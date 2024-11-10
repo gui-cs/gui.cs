@@ -1,4 +1,5 @@
-﻿using System.Timers;
+﻿using System.Text;
+using System.Timers;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
@@ -6,7 +7,7 @@ namespace UICatalog.Scenarios;
 [ScenarioMetadata ("Navigation", "Navigation Tester")]
 [ScenarioCategory ("Mouse and Keyboard")]
 [ScenarioCategory ("Layout")]
-[ScenarioCategory ("Overlapped")]
+[ScenarioCategory ("Navigation")]
 public class Navigation : Scenario
 {
     private int _hotkeyCount;
@@ -26,6 +27,7 @@ public class Navigation : Scenario
             X = 0,
             Y = 0,
             AutoSelectViewToEdit = true,
+            ShowViewIdentifier = true,
             TabStop = TabBehavior.NoStop
         };
         app.Add (adornmentsEditor);
@@ -44,10 +46,11 @@ public class Navigation : Scenario
         {
             Title = "_1 Test Frame",
             X = Pos.Right (arrangementEditor),
-            Y = 0,
+            Y = 1,
             Width = Dim.Fill (),
             Height = Dim.Fill ()
         };
+
 
         app.Add (testFrame);
 
@@ -57,6 +60,7 @@ public class Navigation : Scenario
             Y = 0,
             Title = $"TopButton _{GetNextHotKey ()}"
         };
+        button.Accepting += (sender, args) => MessageBox.Query ("hi", button.Title, "_Ok");
 
         testFrame.Add (button);
 
@@ -80,29 +84,42 @@ public class Navigation : Scenario
             X = Pos.AnchorEnd (),
             Y = Pos.AnchorEnd (),
             Width = Dim.Fill (),
-            Id = "progressBar"
+            Id = "progressBar",
+            BorderStyle = LineStyle.Rounded
         };
         overlappedView1.Add (progressBar);
 
-        Timer timer = new (10)
-        {
-            AutoReset = true
-        };
+        //Timer timer = new (1)
+        //{
+        //    AutoReset = true
+        //};
 
-        timer.Elapsed += (o, args) =>
-                         {
-                             if (progressBar.Fraction == 1.0)
-                             {
-                                 progressBar.Fraction = 0;
-                             }
+        //timer.Elapsed += (o, args) =>
+        //                 {
+        //                     if (progressBar.Fraction == 1.0)
+        //                     {
+        //                         progressBar.Fraction = 0;
+        //                     }
 
-                             progressBar.Fraction += 0.01f;
+        //                     progressBar.Fraction += 0.01f;
 
-                             Application.Wakeup ();
+        //                     Application.Invoke (() => progressBar.SetNeedsDraw ());
+        //                    ;
+        //                 };
+        //timer.Start ();
 
-                             progressBar.SetNeedsDisplay ();
-                         };
-        timer.Start ();
+        Application.Iteration += (sender, args) =>
+                                 {
+                                     if (progressBar.Fraction == 1.0)
+                                     {
+                                         progressBar.Fraction = 0;
+                                     }
+
+                                     progressBar.Fraction += 0.01f;
+
+                                     Application.Invoke (() => { });
+
+                                 };
 
         View overlappedView2 = CreateOverlappedView (3, 8, 10);
 
@@ -198,7 +215,7 @@ public class Navigation : Scenario
 
         testFrame.SetFocus ();
         Application.Run (app);
-        timer.Close ();
+       // timer.Close ();
         app.Dispose ();
         Application.Shutdown ();
 
@@ -262,7 +279,8 @@ public class Navigation : Scenario
 
         Button button = new ()
         {
-            Title = $"Tiled Button{id} _{GetNextHotKey ()}"
+            Title = $"Tiled Button{id} _{GetNextHotKey ()}",
+            Y = 1,
         };
         overlapped.Add (button);
 
@@ -272,6 +290,7 @@ public class Navigation : Scenario
             Title = $"Tiled Button{id} _{GetNextHotKey ()}"
         };
         overlapped.Add (button);
+
 
         return overlapped;
     }

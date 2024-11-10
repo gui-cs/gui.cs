@@ -1,6 +1,7 @@
 #nullable enable
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Terminal.Gui;
 
@@ -80,26 +81,19 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     {
         ArgumentNullException.ThrowIfNull (toplevel);
 
-//#if DEBUG_IDISPOSABLE
-//        Debug.Assert (!toplevel.WasDisposed);
+        //#if DEBUG_IDISPOSABLE
+        //        Debug.Assert (!toplevel.WasDisposed);
 
-//        if (_cachedRunStateToplevel is { } && _cachedRunStateToplevel != toplevel)
-//        {
-//            Debug.Assert (_cachedRunStateToplevel.WasDisposed);
-//        }
-//#endif
+        //        if (_cachedRunStateToplevel is { } && _cachedRunStateToplevel != toplevel)
+        //        {
+        //            Debug.Assert (_cachedRunStateToplevel.WasDisposed);
+        //        }
+        //#endif
 
         // Ensure the mouse is ungrabbed.
         MouseGrabView = null;
 
         var rs = new RunState (toplevel);
-
-        // View implements ISupportInitializeNotification which is derived from ISupportInitialize
-        if (!toplevel.IsInitialized)
-        {
-            toplevel.BeginInit ();
-            toplevel.EndInit ();
-        }
 
 #if DEBUG_IDISPOSABLE
         if (Top is { } && toplevel != Top && !TopLevels.Contains (Top))
@@ -176,16 +170,26 @@ public static partial class Application // Run (Begin, Run, End, Stop)
                     Top.HasFocus = false;
                 }
 
+                // Force leave events for any entered views in the old Top
+                if (GetLastMousePosition () is { })
+                {
+                    RaiseMouseEnterLeaveEvents (GetLastMousePosition ()!.Value, new List<View?> ());
+                }
+
                 Top?.OnDeactivate (toplevel);
-                Toplevel previousCurrent = Top!;
+                Toplevel previousTop = Top!;
 
                 Top = toplevel;
-                Top.OnActivate (previousCurrent);
+                Top.OnActivate (previousTop);
             }
         }
 
-        toplevel.SetRelativeLayout (Driver!.Screen.Size);
-        toplevel.LayoutSubviews ();
+        // View implements ISupportInitializeNotification which is derived from ISupportInitialize
+        if (!toplevel.IsInitialized)
+        {
+            toplevel.BeginInit ();
+            toplevel.EndInit (); // Calls Layout
+        }
 
         // Try to set initial focus to any TabStop
         if (!toplevel.HasFocus)
@@ -195,14 +199,15 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         toplevel.OnLoaded ();
 
-        Refresh ();
-
         if (PositionCursor ())
         {
-            Driver.UpdateCursor ();
+            Driver?.UpdateCursor ();
         }
 
         NotifyNewRunState?.Invoke (toplevel, new (rs));
+
+        // Force an Idle event so that an Iteration (and Refresh) happen.
+        Application.Invoke (() => { });
 
         return rs;
     }
@@ -225,11 +230,12 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         // If the view is not visible or enabled, don't position the cursor
         if (mostFocused is null || !mostFocused.Visible || !mostFocused.Enabled)
         {
-            Driver!.GetCursorVisibility (out CursorVisibility current);
+            CursorVisibility current = CursorVisibility.Invisible;
+            Driver?.GetCursorVisibility (out current);
 
             if (current != CursorVisibility.Invisible)
             {
-                Driver.SetCursorVisibility (CursorVisibility.Invisible);
+                Driver?.SetCursorVisibility (CursorVisibility.Invisible);
             }
 
             return false;
@@ -326,7 +332,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     public static T Run<T> (Func<Exception, bool>? errorHandler = null, ConsoleDriver? driver = null)
         where T : Toplevel, new()
     {
-        if (!IsInitialized)
+        if (!Initialized)
         {
             // Init() has NOT been called.
             InternalInit (driver, null, true);
@@ -381,7 +387,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     {
         ArgumentNullException.ThrowIfNull (view);
 
-        if (IsInitialized)
+        if (Initialized)
         {
             if (Driver is null)
             {
@@ -452,7 +458,10 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     ///     reset, repeating the invocation. If it returns false, the timeout will stop and be removed. The returned value is a
     ///     token that can be used to stop the timeout by calling <see cref="RemoveTimeout(object)"/>.
     /// </remarks>
-    public static object AddTimeout (TimeSpan time, Func<bool> callback) { return MainLoop!.AddTimeout (time, callback); }
+    public static object? AddTimeout (TimeSpan time, Func<bool> callback)
+    {
+        return MainLoop?.AddTimeout (time, callback) ?? null;
+    }
 
     /// <summary>Removes a previously scheduled timeout</summary>
     /// <remarks>The token parameter is the value returned by <see cref="AddTimeout"/>.</remarks>
@@ -486,27 +495,25 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     /// <summary>Wakes up the running application that might be waiting on input.</summary>
     public static void Wakeup () { MainLoop?.Wakeup (); }
 
-    /// <summary>Triggers a refresh of the entire display.</summary>
-    public static void Refresh ()
+    /// <summary>
+    /// Causes any Toplevels that need layout to be laid out. Then draws any Toplevels that need display. Only Views that need to be laid out (see <see cref="View.NeedsLayout"/>) will be laid out.
+    /// Only Views that need to be drawn (see <see cref="View.NeedsDraw"/>) will be drawn.
+    /// </summary>
+    /// <param name="forceDraw">If <see langword="true"/> the entire View hierarchy will be redrawn. The default is <see langword="false"/> and should only be overriden for testing.</param>
+    public static void LayoutAndDraw (bool forceDraw = false)
     {
-        foreach (Toplevel tl in TopLevels.Reverse ())
-        {
-            if (tl.LayoutNeeded)
-            {
-                tl.LayoutSubviews ();
-            }
+        bool neededLayout = View.Layout (TopLevels.Reverse (), Screen.Size);
 
-            tl.Draw ();
+        if (forceDraw)
+        {
+            Driver?.ClearContents ();
         }
 
-        if (Popover is { LayoutNeeded: true })
-        {
-            Popover.LayoutSubviews ();
-        }
+        View.SetClipToScreen ();
+        View.Draw (TopLevels, neededLayout || forceDraw);
+        View.SetClipToScreen ();
 
-        Popover?.Draw ();
-
-        Driver!.Refresh ();
+        Driver?.Refresh ();
     }
 
     /// <summary>This event is raised on each iteration of the main loop.</summary>
@@ -541,24 +548,25 @@ public static partial class Application // Run (Begin, Run, End, Stop)
                 return;
             }
 
-            RunIteration (ref state, ref firstIteration);
+            firstIteration = RunIteration (ref state, firstIteration);
         }
 
         MainLoop!.Running = false;
 
         // Run one last iteration to consume any outstanding input events from Driver
         // This is important for remaining OnKeyUp events.
-        RunIteration (ref state, ref firstIteration);
+        RunIteration (ref state, firstIteration);
     }
 
     /// <summary>Run one application iteration.</summary>
     /// <param name="state">The state returned by <see cref="Begin(Toplevel)"/>.</param>
     /// <param name="firstIteration">
-    ///     Set to <see langword="true"/> if this is the first run loop iteration. Upon return, it
-    ///     will be set to <see langword="false"/> if at least one iteration happened.
+    ///     Set to <see langword="true"/> if this is the first run loop iteration.
     /// </param>
-    public static void RunIteration (ref RunState state, ref bool firstIteration)
+    /// <returns><see langword="false"/> if at least one iteration happened.</returns>
+    public static bool RunIteration (ref RunState state, bool firstIteration = false)
     {
+        // If the driver has events pending do an iteration of the driver MainLoop
         if (MainLoop!.Running && MainLoop.EventsPending ())
         {
             // Notify Toplevel it's ready
@@ -568,6 +576,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             }
 
             MainLoop.RunIteration ();
+
             Iteration?.Invoke (null, new ());
         }
 
@@ -575,16 +584,17 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         if (Top is null)
         {
-            return;
+            return firstIteration;
         }
 
-        Refresh ();
+        LayoutAndDraw ();
 
         if (PositionCursor ())
         {
             Driver!.UpdateCursor ();
         }
 
+        return firstIteration;
     }
 
     /// <summary>Stops the provided <see cref="Toplevel"/>, causing or the <paramref name="top"/> if provided.</summary>
@@ -659,7 +669,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         if (TopLevels.Count > 0)
         {
             Top = TopLevels.Peek ();
-            Top.SetNeedsDisplay ();
+            Top.SetNeedsDraw ();
         }
 
         if (runState.Toplevel is { HasFocus: true })
@@ -682,6 +692,6 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         runState.Toplevel = null;
         runState.Dispose ();
 
-        Refresh ();
+        LayoutAndDraw ();
     }
 }

@@ -45,6 +45,47 @@ public partial class DimAutoTests
 
     #endregion PosAbsolute
 
+    #region PosAlign
+
+    //[Theory]
+    //[InlineData (0, 0, 0, 0, 0, 0)]
+    //[InlineData (0, 19, 0, 9, 19, 9)]
+    //[InlineData (0, 20, 0, 10, 20, 10)]
+    //[InlineData (0, 21, 0, 11, 20, 10)]
+    //[InlineData (1, 21, 1, 11, 20, 10)]
+    //[InlineData (21, 21, 11, 11, 21, 11)]
+    //public void With_Subview_Using_PosAlign (int minWidth, int maxWidth, int minHeight, int maxHeight, int expectedWidth, int expectedHeight)
+    //{
+    //    var view = new View
+    //    {
+    //        Width = Dim.Auto (minimumContentDim: minWidth, maximumContentDim: maxWidth),
+    //        Height = Dim.Auto (minimumContentDim: minHeight, maximumContentDim: maxHeight)
+    //    };
+
+    //    var subview = new View
+    //    {
+    //        X = Pos.Align (Alignment.Center),
+    //        Y = Pos.Absolute (5),
+    //        Width = 20,
+    //        Height = 10
+    //    };
+    //    view.Add (subview);
+
+    //    // Assuming the calculation is done after layout
+    //    int calculatedX = view.X.Calculate (100, view.Width, view, Dimension.Width);
+    //    int calculatedY = view.Y.Calculate (100, view.Height, view, Dimension.Height);
+    //    int calculatedWidth = view.Width.Calculate (0, 100, view, Dimension.Width);
+    //    int calculatedHeight = view.Height.Calculate (0, 100, view, Dimension.Height);
+
+    //    Assert.Equal (expectedWidth, calculatedWidth);
+    //    Assert.Equal (expectedHeight, calculatedHeight);
+
+    //    Assert.Equal (0, calculatedX);
+    //    Assert.Equal (0, calculatedY);
+    //}
+
+    #endregion PosAlign
+
     #region PosPercent
 
     [Theory]

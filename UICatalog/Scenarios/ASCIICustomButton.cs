@@ -111,7 +111,7 @@ public class ASCIICustomButtonTest : Scenario
             Add (_border, _fill, title);
         }
 
-        protected override void OnHasFocusChanged (bool newHasFocus, [CanBeNull] View previousFocusedView, [CanBeNull] View focusedVew)
+        protected override void OnHasFocusChanged (bool newHasFocus, [CanBeNull] View previousFocusedView, [CanBeNull] View focusedView)
         {
             if (newHasFocus)
             {

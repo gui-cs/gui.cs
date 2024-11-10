@@ -187,8 +187,8 @@ public class ResponderTests
 
         Assert.True (
                      Responder.IsOverridden (
-                                             new ScrollBarView { Text = "ScrollBarView overrides OnDrawContent" },
-                                             "OnDrawContent"
+                                             new ScrollBarView { Text = "ScrollBarView overrides OnDrawingContent" },
+                                             "OnDrawingContent"
                                             )
                     );
 #if DEBUG_IDISPOSABLE

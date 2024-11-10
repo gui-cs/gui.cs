@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
@@ -286,5 +287,60 @@ public class MessageBoxes : Scenario
         app.Dispose ();
 
         Application.Shutdown ();
+    }
+
+
+    public override List<Key> GetDemoKeyStrokes ()
+    {
+        var keys = new List<Key> ();
+
+        keys.Add (Key.S.WithAlt);
+        keys.Add (Key.Esc);
+
+        keys.Add (Key.E.WithAlt);
+        keys.Add (Key.S.WithAlt);
+        keys.Add (Key.Esc);
+
+        keys.Add (Key.N.WithAlt);
+        keys.Add (Key.D5);
+        keys.Add (Key.S.WithAlt);
+        keys.Add (Key.Enter);
+
+        keys.Add (Key.T.WithAlt);
+        keys.Add (Key.T.WithCtrl);
+        keys.AddRange (GetKeysFromText ("This is a really long title"));
+        keys.Add (Key.M.WithAlt);
+        keys.Add (Key.T.WithCtrl);
+        keys.AddRange (GetKeysFromText ("This is a long,\nmulti-line message.\nThis is a test of the emergency\nbroadcast\nsystem."));
+        keys.Add (Key.S.WithAlt);
+
+        for (int i = 0; i < 10; i++)
+        {
+            keys.Add (Key.Tab);
+        }
+        keys.Add (Key.Enter);
+
+        keys.Add (Key.W.WithAlt);
+        keys.Add (Key.S.WithAlt);
+
+        for (int i = 0; i < 10; i++)
+        {
+            keys.Add (Key.Tab);
+        }
+        keys.Add (Key.Enter);
+
+        return keys;
+    }
+
+    List<Key> GetKeysFromText (string text)
+    {
+        List<Key> keys = new ();
+
+        foreach (var r in text)
+        {
+            keys.Add (r);
+        }
+
+        return keys;
     }
 }

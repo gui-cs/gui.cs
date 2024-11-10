@@ -335,8 +335,6 @@ public sealed class PosAlignDemo : Scenario
                 }
             }
         }
-
-        superView.LayoutSubviews ();
     }
 
     /// <summary>
@@ -401,9 +399,10 @@ public sealed class PosAlignDemo : Scenario
             var v = new View
             {
                 Title = $"{i}",
+                Text = $"{i}",
                 BorderStyle = LineStyle.Dashed,
-                Height = 3,
-                Width = 5
+                Height = Dim.Auto (),
+                Width = Dim.Auto() + 2
             };
 
             v.X = Pos.Align (widthAligner.Alignment, widthAligner.AlignmentModes, i / 3);

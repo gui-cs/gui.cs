@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using System.Timers;
+﻿using System.Collections.Generic;
 using Terminal.Gui;
 using Timer = System.Timers.Timer;
 
@@ -8,7 +7,7 @@ namespace UICatalog.Scenarios;
 [ScenarioMetadata ("Arrangement", "Arrangement Tester")]
 [ScenarioCategory ("Mouse and Keyboard")]
 [ScenarioCategory ("Layout")]
-[ScenarioCategory ("Overlapped")]
+[ScenarioCategory ("Arrangement")]
 public class Arrangement : Scenario
 {
     private int _hotkeyCount;
@@ -29,12 +28,16 @@ public class Arrangement : Scenario
             Y = 0,
             AutoSelectViewToEdit = true,
             TabStop = TabBehavior.NoStop,
+            ShowViewIdentifier = true
         };
 
         app.Add (adornmentsEditor);
-        adornmentsEditor.ExpandButton!.Collapsed = true;
 
-        var arrangementEditor = new ArrangementEditor ()
+        adornmentsEditor.ExpanderButton.Orientation = Orientation.Horizontal;
+
+        //  adornmentsEditor.ExpanderButton!.Collapsed = true;
+
+        var arrangementEditor = new ArrangementEditor
         {
             X = Pos.Right (adornmentsEditor),
             Y = 0,
@@ -66,8 +69,10 @@ public class Arrangement : Scenario
         View overlappedView1 = CreateOverlappedView (2, 0, 13);
         overlappedView1.Title = "Movable _& Sizable";
         View tiledSubView = CreateTiledView (4, 0, 2);
+        tiledSubView.Arrangement = ViewArrangement.Fixed;
         overlappedView1.Add (tiledSubView);
         tiledSubView = CreateTiledView (5, Pos.Right (tiledSubView), Pos.Top (tiledSubView));
+        tiledSubView.Arrangement = ViewArrangement.Fixed;
         overlappedView1.Add (tiledSubView);
 
         ProgressBar progressBar = new ()
@@ -94,7 +99,7 @@ public class Arrangement : Scenario
 
                              Application.Wakeup ();
 
-                             progressBar.SetNeedsDisplay ();
+                             progressBar.SetNeedsDraw ();
                          };
         timer.Start ();
 
@@ -231,12 +236,66 @@ public class Arrangement : Scenario
             BorderStyle = LineStyle.Single,
             CanFocus = true,
             TabStop = TabBehavior.TabStop,
-            Arrangement = ViewArrangement.Resizable,
-//            SuperViewRendersLineCanvas = true
+            Arrangement = ViewArrangement.Resizable
+
+            //            SuperViewRendersLineCanvas = true
         };
 
         return tiled;
     }
 
     private char GetNextHotKey () { return (char)('A' + _hotkeyCount++); }
+
+    public override List<Key> GetDemoKeyStrokes ()
+    {
+        var keys = new List<Key> ();
+
+        // Select view with progress bar
+        keys.Add ((Key)'&');
+
+        keys.Add (Application.ArrangeKey);
+
+        for (int i = 0; i < 8; i++)
+        {
+            keys.Add (Key.CursorUp);
+        }
+
+        for (int i = 0; i < 25; i++)
+        {
+            keys.Add (Key.CursorRight);
+        }
+
+        keys.Add (Application.ArrangeKey);
+
+        keys.Add (Key.S);
+
+        keys.Add (Application.ArrangeKey);
+
+        for (int i = 0; i < 10; i++)
+        {
+            keys.Add (Key.CursorUp);
+        }
+
+        for (int i = 0; i < 25; i++)
+        {
+            keys.Add (Key.CursorLeft);
+        }
+
+        keys.Add (Application.ArrangeKey);
+
+        // Select view with progress bar
+        keys.Add ((Key)'&');
+
+        keys.Add (Application.ArrangeKey);
+
+        keys.Add (Key.Tab);
+
+        for (int i = 0; i < 10; i++)
+        {
+            keys.Add (Key.CursorRight);
+            keys.Add (Key.CursorDown);
+        }
+
+        return keys;
+    }
 }

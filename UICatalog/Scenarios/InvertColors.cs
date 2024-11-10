@@ -45,7 +45,7 @@ public class InvertColors : Scenario
 
                                   label.ColorScheme = new ColorScheme (label.ColorScheme) { Normal = color };
                                   label.Text = $"{color.Foreground} on {color.Background}";
-                                  label.SetNeedsDisplay ();
+                                  label.SetNeedsDraw ();
                               }
                           };
         win.Add (button);

@@ -64,7 +64,7 @@ public class NumericUpDown<T> : View where T : notnull
             Text = Value?.ToString () ?? "Err",
             X = Pos.Right (_down),
             Y = Pos.Top (_down),
-            Width = Dim.Auto (minimumContentDim: Dim.Func (() => string.Format (Format, Value).Length)),
+            Width = Dim.Auto (minimumContentDim: Dim.Func (() => string.Format (Format, Value).GetColumns())),
             Height = 1,
             TextAlignment = Alignment.Center,
             CanFocus = true,
@@ -93,11 +93,16 @@ public class NumericUpDown<T> : View where T : notnull
 
         AddCommand (
                     Command.ScrollUp,
-                    () =>
+                    (ctx) =>
                     {
                         if (type == typeof (object))
                         {
                             return false;
+                        }
+
+                        if (RaiseSelecting (ctx) is true)
+                        {
+                            return true;
                         }
 
                         if (Value is { } && Increment is { })
@@ -110,11 +115,16 @@ public class NumericUpDown<T> : View where T : notnull
 
         AddCommand (
                     Command.ScrollDown,
-                    () =>
+                    (ctx) =>
                     {
                         if (type == typeof (object))
                         {
                             return false;
+                        }
+
+                        if (RaiseSelecting (ctx) is true)
+                        {
+                            return true;
                         }
 
                         if (Value is { } && Increment is { })
@@ -251,6 +261,10 @@ public class NumericUpDown<T> : View where T : notnull
     ///     Raised when <see cref="Increment"/> has changed.
     /// </summary>
     public event EventHandler<EventArgs<T>>? IncrementChanged;
+
+    // Prevent the drawing of Text
+    /// <inheritdoc />
+    protected override bool OnDrawingText () { return true; }
 }
 
 /// <summary>

@@ -1,4 +1,5 @@
 using System.Data;
+using System.Globalization;
 
 namespace Terminal.Gui;
 
@@ -16,7 +17,7 @@ public delegate ColorScheme RowColorGetterDelegate (RowColorGetterArgs args);
 ///     View for tabular data based on a <see cref="ITableSource"/>.
 ///     <a href="../docs/tableview.md">See TableView Deep Dive for more information</a>.
 /// </summary>
-public class TableView : View
+public class TableView : View, IDesignable
 {
     /// <summary>
     ///     The default maximum cell width for <see cref="TableView.MaxCellWidth"/> and <see cref="ColumnStyle.MaxWidth"/>
@@ -319,8 +320,13 @@ public class TableView : View
         //try to prevent this being set to an out of bounds column
         set
         {
+            int prev = columnOffset;
             columnOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Columns - 1, value));
-            SetNeedsDisplay ();
+
+            if (prev != columnOffset)
+            {
+                SetNeedsDraw ();
+            }
         }
     }
 
@@ -357,7 +363,16 @@ public class TableView : View
     public int RowOffset
     {
         get => rowOffset;
-        set => rowOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Rows - 1, value));
+        set
+        {
+            int prev = rowOffset;
+            rowOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Rows - 1, value));
+
+            if (rowOffset != prev)
+            {
+                SetNeedsDraw ();
+            }
+        }
     }
 
     /// <summary>The index of <see cref="DataTable.Columns"/> in <see cref="Table"/> that the user has currently selected</summary>
@@ -582,7 +597,7 @@ public class TableView : View
     ///     not been set.
     /// </summary>
     /// <remarks>
-    ///     Changes will not be immediately visible in the display until you call <see cref="View.SetNeedsDisplay()"/>
+    ///     Changes will not be immediately visible in the display until you call <see cref="View.SetNeedsDraw()"/>
     /// </remarks>
     public void EnsureSelectedCellIsVisible ()
     {
@@ -643,7 +658,7 @@ public class TableView : View
     ///     (by adjusting them to the nearest existing cell).  Has no effect if <see cref="Table"/> has not been set.
     /// </summary>
     /// <remarks>
-    ///     Changes will not be immediately visible in the display until you call <see cref="View.SetNeedsDisplay()"/>
+    ///     Changes will not be immediately visible in the display until you call <see cref="View.SetNeedsDraw()"/>
     /// </remarks>
     public void EnsureValidScrollOffsets ()
     {
@@ -662,7 +677,7 @@ public class TableView : View
     ///     <see cref="Table"/> has not been set.
     /// </summary>
     /// <remarks>
-    ///     Changes will not be immediately visible in the display until you call <see cref="View.SetNeedsDisplay()"/>
+    ///     Changes will not be immediately visible in the display until you call <see cref="View.SetNeedsDraw()"/>
     /// </remarks>
     public void EnsureValidSelection ()
     {
@@ -829,28 +844,28 @@ public class TableView : View
             case MouseFlags.WheeledDown:
                 RowOffset++;
                 EnsureValidScrollOffsets ();
-                SetNeedsDisplay ();
+                //SetNeedsDraw ();
 
                 return true;
 
             case MouseFlags.WheeledUp:
                 RowOffset--;
                 EnsureValidScrollOffsets ();
-                SetNeedsDisplay ();
+                //SetNeedsDraw ();
 
                 return true;
 
             case MouseFlags.WheeledRight:
                 ColumnOffset++;
                 EnsureValidScrollOffsets ();
-                SetNeedsDisplay ();
+                //SetNeedsDraw ();
 
                 return true;
 
             case MouseFlags.WheeledLeft:
                 ColumnOffset--;
                 EnsureValidScrollOffsets ();
-                SetNeedsDisplay ();
+                //SetNeedsDraw ();
 
                 return true;
         }
@@ -866,7 +881,7 @@ public class TableView : View
             {
                 ColumnOffset--;
                 EnsureValidScrollOffsets ();
-                SetNeedsDisplay ();
+                SetNeedsDraw ();
             }
 
             if (scrollRightPoint != null
@@ -875,7 +890,7 @@ public class TableView : View
             {
                 ColumnOffset++;
                 EnsureValidScrollOffsets ();
-                SetNeedsDisplay ();
+                SetNeedsDraw ();
             }
 
             Point? hit = ScreenToCell (boundsX, boundsY);
@@ -910,10 +925,8 @@ public class TableView : View
     }
 
     ///<inheritdoc/>
-    public override void OnDrawContent (Rectangle viewport)
+    protected override bool OnDrawingContent ()
     {
-        base.OnDrawContent (viewport);
-
         Move (0, 0);
 
         scrollRightPoint = null;
@@ -922,7 +935,7 @@ public class TableView : View
         // What columns to render at what X offset in viewport
         ColumnToRender [] columnsToRender = CalculateViewport (Viewport).ToArray ();
 
-        Driver?.SetAttribute (GetNormalColor ());
+        SetAttribute (GetNormalColor ());
 
         //invalidate current row (prevents scrolling around leaving old characters in the frame
         Driver?.AddStr (new string (' ', Viewport.Width));
@@ -985,6 +998,8 @@ public class TableView : View
 
             RenderRow (line, rowToRender, columnsToRender);
         }
+
+        return true;
     }
 
     /// <inheritdoc/>
@@ -1226,12 +1241,12 @@ public class TableView : View
     ///     Updates the view to reflect changes to <see cref="Table"/> and to (<see cref="ColumnOffset"/> /
     ///     <see cref="RowOffset"/>) etc
     /// </summary>
-    /// <remarks>This always calls <see cref="View.SetNeedsDisplay()"/></remarks>
+    /// <remarks>This always calls <see cref="View.SetNeedsDraw()"/></remarks>
     public void Update ()
     {
         if (!IsInitialized || TableIsNullOrInvisible ())
         {
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
 
             return;
         }
@@ -1241,7 +1256,7 @@ public class TableView : View
 
         EnsureSelectedCellIsVisible ();
 
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
     }
 
     /// <summary>Invokes the <see cref="CellActivated"/> event</summary>
@@ -1280,20 +1295,20 @@ public class TableView : View
             if (render.Length > 0)
             {
                 // invert the color of the current cell for the first character
-                Driver.SetAttribute (new Attribute (cellColor.Background, cellColor.Foreground));
-                Driver.AddRune ((Rune)render [0]);
+                SetAttribute (new Attribute (cellColor.Background, cellColor.Foreground));
+                Driver?.AddRune ((Rune)render [0]);
 
                 if (render.Length > 1)
                 {
-                    Driver.SetAttribute (cellColor);
-                    Driver.AddStr (render.Substring (1));
+                    SetAttribute (cellColor);
+                    Driver?.AddStr (render.Substring (1));
                 }
             }
         }
         else
         {
-            Driver.SetAttribute (cellColor);
-            Driver.AddStr (render);
+            SetAttribute (cellColor);
+            Driver?.AddStr (render);
         }
     }
 
@@ -1323,7 +1338,7 @@ public class TableView : View
     private void AddRuneAt (ConsoleDriver d, int col, int row, Rune ch)
     {
         Move (col, row);
-        d.AddRune (ch);
+        d?.AddRune (ch);
     }
 
     /// <summary>
@@ -1505,8 +1520,12 @@ public class TableView : View
     /// <param name="width"></param>
     private void ClearLine (int row, int width)
     {
+        if (Driver is null)
+        {
+            return;
+        }
         Move (0, row);
-        Driver.SetAttribute (GetNormalColor ());
+        SetAttribute (GetNormalColor ());
         Driver.AddStr (new string (' ', width));
     }
 
@@ -1580,7 +1599,7 @@ public class TableView : View
             SelectedRow = match;
             EnsureValidSelection ();
             EnsureSelectedCellIsVisible ();
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
 
             return true;
         }
@@ -1728,7 +1747,7 @@ public class TableView : View
 
             Move (current.X, row);
 
-            Driver.AddStr (TruncateOrPad (colName, colName, current.Width, colStyle));
+            Driver?.AddStr (TruncateOrPad (colName, colName, current.Width, colStyle));
 
             if (Style.ExpandLastColumn == false && current.IsVeryLast)
             {
@@ -1776,7 +1795,10 @@ public class TableView : View
                 }
             }
 
-            AddRuneAt (Driver, c, row, rune);
+            if (Driver is { })
+            {
+                AddRuneAt (Driver, c, row, rune);
+            }
         }
     }
 
@@ -1885,19 +1907,22 @@ public class TableView : View
         //start by clearing the entire line
         Move (0, row);
 
-        Attribute color;
+        Attribute? color;
 
         if (FullRowSelect && IsSelected (0, rowToRender))
         {
-            color = focused ? rowScheme.Focus : rowScheme.HotNormal;
+            color = focused ? rowScheme?.Focus : rowScheme?.HotNormal;
         }
         else
         {
-            color = Enabled ? rowScheme.Normal : rowScheme.Disabled;
+            color = Enabled ? rowScheme?.Normal : rowScheme?.Disabled;
         }
 
-        Driver.SetAttribute (color);
-        Driver.AddStr (new string (' ', Viewport.Width));
+        if (color is { })
+        {
+            SetAttribute (color.Value);
+        }
+        Driver?.AddStr (new string (' ', Viewport.Width));
 
         // Render cells for each visible header for the current row
         for (var i = 0; i < columnsToRender.Length; i++)
@@ -1948,15 +1973,15 @@ public class TableView : View
                 scheme = rowScheme;
             }
 
-            Attribute cellColor;
+            Attribute? cellColor;
 
             if (isSelectedCell)
             {
-                cellColor = focused ? scheme.Focus : scheme.HotNormal;
+                cellColor = focused ? scheme?.Focus : scheme?.HotNormal;
             }
             else
             {
-                cellColor = Enabled ? scheme.Normal : scheme.Disabled;
+                cellColor = Enabled ? scheme?.Normal : scheme?.Disabled;
             }
 
             string render = TruncateOrPad (val, representation, current.Width, colStyle);
@@ -1964,7 +1989,10 @@ public class TableView : View
             // While many cells can be selected (see MultiSelectedRegions) only one cell is the primary (drives navigation etc)
             bool isPrimaryCell = current.Column == selectedColumn && rowToRender == selectedRow;
 
-            RenderCell (cellColor, render, isPrimaryCell);
+            if (cellColor.HasValue)
+            {
+                RenderCell (cellColor.Value, render, isPrimaryCell);
+            }
 
             // Reset color scheme to normal for drawing separators if we drew text with custom scheme
             if (scheme != rowScheme)
@@ -1978,18 +2006,24 @@ public class TableView : View
                     color = Enabled ? rowScheme.Normal : rowScheme.Disabled;
                 }
 
-                Driver.SetAttribute (color);
+                SetAttribute (color.Value);
             }
 
             // If not in full row select mode always, reset color scheme to normal and render the vertical line (or space) at the end of the cell
             if (!FullRowSelect)
             {
-                Driver.SetAttribute (Enabled ? rowScheme.Normal : rowScheme.Disabled);
+                if (rowScheme is { })
+                {
+                    SetAttribute (Enabled ? rowScheme.Normal : rowScheme.Disabled);
+                }
             }
 
             if (style.AlwaysUseNormalColorForVerticalCellLines && style.ShowVerticalCellLines)
             {
-                Driver.SetAttribute (rowScheme.Normal);
+                if (rowScheme is { })
+                {
+                    SetAttribute (rowScheme.Normal);
+                }
             }
 
             RenderSeparator (current.X - 1, row, false);
@@ -2002,7 +2036,10 @@ public class TableView : View
 
         if (style.ShowVerticalCellLines)
         {
-            Driver.SetAttribute (rowScheme.Normal);
+            if (rowScheme is { })
+            {
+                SetAttribute (rowScheme.Normal);
+            }
 
             //render start and end of line
             AddRune (0, row, Glyphs.VLine);
@@ -2296,5 +2333,63 @@ public class TableView : View
 
         /// <summary>The horizontal position to begin rendering the column at</summary>
         public int X { get; set; }
+    }
+
+    bool IDesignable.EnableForDesign ()
+    {
+        var dt = BuildDemoDataTable (5, 5);
+        Table = new DataTableSource (dt);
+        return true;
+    }
+
+    /// <summary>
+    ///     Generates a new demo <see cref="DataTable"/> with the given number of <paramref name="cols"/> (min 5) and
+    ///     <paramref name="rows"/>
+    /// </summary>
+    /// <param name="cols"></param>
+    /// <param name="rows"></param>
+    /// <returns></returns>
+    public static DataTable BuildDemoDataTable (int cols, int rows)
+    {
+        var dt = new DataTable ();
+
+        var explicitCols = 6;
+        dt.Columns.Add (new DataColumn ("StrCol", typeof (string)));
+        dt.Columns.Add (new DataColumn ("DateCol", typeof (DateTime)));
+        dt.Columns.Add (new DataColumn ("IntCol", typeof (int)));
+        dt.Columns.Add (new DataColumn ("DoubleCol", typeof (double)));
+        dt.Columns.Add (new DataColumn ("NullsCol", typeof (string)));
+        dt.Columns.Add (new DataColumn ("Unicode", typeof (string)));
+
+        for (var i = 0; i < cols - explicitCols; i++)
+        {
+            dt.Columns.Add ("Column" + (i + explicitCols));
+        }
+
+        var r = new Random (100);
+
+        for (var i = 0; i < rows; i++)
+        {
+            List<object> row = new ()
+            {
+                $"Demo text in row {i}",
+                new DateTime (2000 + i, 12, 25),
+                r.Next (i),
+                r.NextDouble () * i - 0.5 /*add some negatives to demo styles*/,
+                DBNull.Value,
+                "Les Mise"
+                + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber))
+                + "rables"
+            };
+
+            for (var j = 0; j < cols - explicitCols; j++)
+            {
+                row.Add ("SomeValue" + r.Next (100));
+            }
+
+            dt.Rows.Add (row.ToArray ());
+        }
+
+        return dt;
     }
 }

@@ -64,13 +64,12 @@ public class ListViewWithSelection : Scenario
             Title = "_ListView",
             X = 0,
             Y = Pos.Bottom(_allowMarkingCB),
-            Height = Dim.Fill (),
             Width = Dim.Func (() => _listView?.MaxLength ?? 10),
-
+            Height = Dim.Fill (),
             AllowsMarking = false,
             AllowsMultipleSelection = false
         };
-        _listView.Border.Thickness = new Thickness (0, 1, 0, 0);
+        //_listView.Border.Thickness = new Thickness (0, 1, 0, 0);
         _listView.RowRender += ListView_RowRender;
         _appWindow.Add (_listView);
 
@@ -85,7 +84,7 @@ public class ListViewWithSelection : Scenario
                 scrollBar.Position = _listView.TopItem;
             }
 
-            _listView.SetNeedsDisplay ();
+            _listView.SetNeedsDraw ();
         };
 
         scrollBar.OtherScrollBarView.ChangedPosition += (s, e) =>
@@ -97,10 +96,10 @@ public class ListViewWithSelection : Scenario
                 scrollBar.OtherScrollBarView.Position = _listView.LeftItem;
             }
 
-            _listView.SetNeedsDisplay ();
+            _listView.SetNeedsDraw ();
         };
 
-        _listView.DrawContent += (s, e) =>
+        _listView.DrawingContent += (s, e) =>
         {
             scrollBar.Size = _listView.Source.Count;
             scrollBar.Position = _listView.TopItem;
@@ -167,20 +166,20 @@ public class ListViewWithSelection : Scenario
             _listView.Source = new ScenarioListDataSource (_scenarios);
         }
 
-        _appWindow.SetNeedsDisplay ();
+        _appWindow.SetNeedsDraw ();
     }
 
     private void AllowMarkingCB_Toggle (object sender, [NotNull] CancelEventArgs<CheckState> stateEventArgs)
     {
         _listView.AllowsMarking = stateEventArgs.NewValue == CheckState.Checked;
         _allowMultipleCB.Visible = _listView.AllowsMarking;
-        _appWindow.SetNeedsDisplay ();
+        _appWindow.SetNeedsDraw ();
     }
 
     private void AllowMultipleCB_Toggle (object sender, [NotNull] CancelEventArgs<CheckState> stateEventArgs)
     {
         _listView.AllowsMultipleSelection = stateEventArgs.NewValue == CheckState.Checked;
-        _appWindow.SetNeedsDisplay ();
+        _appWindow.SetNeedsDraw ();
     }
 
     private void ListView_RowRender (object sender, ListViewRowEventArgs obj)
@@ -251,7 +250,6 @@ public class ListViewWithSelection : Scenario
 
         public void Render (
             ListView container,
-            ConsoleDriver driver,
             bool selected,
             int item,
             int col,
@@ -267,7 +265,7 @@ public class ListViewWithSelection : Scenario
                                       string.Format ("{{0,{0}}}", -_nameColumnWidth),
                                       Scenarios [item].GetName ()
                                      );
-            RenderUstr (driver, $"{s} ({Scenarios [item].GetDescription ()})", col, line, width, start);
+            RenderUstr (container, $"{s} ({Scenarios [item].GetDescription ()})", col, line, width, start);
         }
 
         public void SetMark (int item, bool value)
@@ -308,7 +306,7 @@ public class ListViewWithSelection : Scenario
         }
 
         // A slightly adapted method from: https://github.com/gui-cs/Terminal.Gui/blob/fc1faba7452ccbdf49028ac49f0c9f0f42bbae91/Terminal.Gui/Views/ListView.cs#L433-L461
-        private void RenderUstr (ConsoleDriver driver, string ustr, int col, int line, int width, int start = 0)
+        private void RenderUstr (View view, string ustr, int col, int line, int width, int start = 0)
         {
             var used = 0;
             int index = start;
@@ -323,14 +321,14 @@ public class ListViewWithSelection : Scenario
                     break;
                 }
 
-                driver.AddRune (rune);
+                view.AddRune (rune);
                 used += count;
                 index += size;
             }
 
             while (used < width)
             {
-                driver.AddRune ((Rune)' ');
+                view.AddRune ((Rune)' ');
                 used++;
             }
         }

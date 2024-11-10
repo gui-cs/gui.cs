@@ -244,7 +244,7 @@ public static partial class Application // Mouse handling
         {
             if (deepestViewUnderMouse is Adornment adornmentView)
             {
-                deepestViewUnderMouse = adornmentView.Parent!.SuperView;
+                deepestViewUnderMouse = adornmentView.Parent?.SuperView;
             }
             else
             {

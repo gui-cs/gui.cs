@@ -217,7 +217,7 @@ public class TreeViewFileSystem : Scenario
         _miInvertSymbols.Checked = !_miInvertSymbols.Checked;
 
         _treeViewFiles.Style.InvertExpandSymbolColors = (bool)_miInvertSymbols.Checked;
-        _treeViewFiles.SetNeedsDisplay ();
+        _treeViewFiles.SetNeedsDraw ();
     }
 
     private void Quit () { Application.RequestStop (); }
@@ -226,7 +226,7 @@ public class TreeViewFileSystem : Scenario
     {
         _treeViewFiles.Style.HighlightModelTextOnly = !_treeViewFiles.Style.HighlightModelTextOnly;
         _miHighlightModelTextOnly.Checked = _treeViewFiles.Style.HighlightModelTextOnly;
-        _treeViewFiles.SetNeedsDisplay ();
+        _treeViewFiles.SetNeedsDraw ();
     }
 
     private void SetCursor ()
@@ -287,7 +287,7 @@ public class TreeViewFileSystem : Scenario
             _treeViewFiles.ColorGetter = null;
         }
 
-        _treeViewFiles.SetNeedsDisplay ();
+        _treeViewFiles.SetNeedsDraw ();
     }
 
     private void SetExpandableSymbols (Rune expand, Rune? collapse)
@@ -298,7 +298,7 @@ public class TreeViewFileSystem : Scenario
 
         _treeViewFiles.Style.ExpandableSymbol = expand;
         _treeViewFiles.Style.CollapseableSymbol = collapse;
-        _treeViewFiles.SetNeedsDisplay ();
+        _treeViewFiles.SetNeedsDraw ();
     }
 
     private void SetFullName ()
@@ -314,7 +314,7 @@ public class TreeViewFileSystem : Scenario
             _treeViewFiles.AspectGetter = f => f.Name;
         }
 
-        _treeViewFiles.SetNeedsDisplay ();
+        _treeViewFiles.SetNeedsDraw ();
     }
 
     private void SetLeaveLastRow ()
@@ -380,7 +380,7 @@ public class TreeViewFileSystem : Scenario
                                              scrollBar.Position = _treeViewFiles.ScrollOffsetVertical;
                                          }
 
-                                         _treeViewFiles.SetNeedsDisplay ();
+                                         _treeViewFiles.SetNeedsDraw ();
                                      };
 
         scrollBar.OtherScrollBarView.ChangedPosition += (s, e) =>
@@ -392,10 +392,10 @@ public class TreeViewFileSystem : Scenario
                                                                 scrollBar.OtherScrollBarView.Position = _treeViewFiles.ScrollOffsetHorizontal;
                                                             }
 
-                                                            _treeViewFiles.SetNeedsDisplay ();
+                                                            _treeViewFiles.SetNeedsDraw ();
                                                         };
 
-        _treeViewFiles.DrawContent += (s, e) =>
+        _treeViewFiles.DrawingContent += (s, e) =>
                                       {
                                           scrollBar.Size = _treeViewFiles.ContentHeight;
                                           scrollBar.Position = _treeViewFiles.ScrollOffsetVertical;
@@ -410,7 +410,7 @@ public class TreeViewFileSystem : Scenario
         _miColoredSymbols.Checked = !_miColoredSymbols.Checked;
 
         _treeViewFiles.Style.ColorExpandSymbol = (bool)_miColoredSymbols.Checked;
-        _treeViewFiles.SetNeedsDisplay ();
+        _treeViewFiles.SetNeedsDraw ();
     }
 
     private void ShowContextMenu (Point screenPoint, IFileSystemInfo forObject)
@@ -429,7 +429,7 @@ public class TreeViewFileSystem : Scenario
         _miShowLines.Checked = !_miShowLines.Checked;
 
         _treeViewFiles.Style.ShowBranchLines = (bool)_miShowLines.Checked!;
-        _treeViewFiles.SetNeedsDisplay ();
+        _treeViewFiles.SetNeedsDraw ();
     }
 
     private void ShowPropertiesOf (IFileSystemInfo fileSystemInfo) { _detailsFrame.FileInfo = fileSystemInfo; }
@@ -514,7 +514,7 @@ public class TreeViewFileSystem : Scenario
         _miBasicIcons.Checked = !_iconProvider.UseNerdIcons && !_iconProvider.UseUnicodeCharacters;
         _miUnicodeIcons.Checked = _iconProvider.UseUnicodeCharacters;
         _miNerdIcons.Checked = _iconProvider.UseNerdIcons;
-        _treeViewFiles.SetNeedsDisplay ();
+        _treeViewFiles.SetNeedsDraw ();
     }
 
     private class DetailsFrame : FrameView

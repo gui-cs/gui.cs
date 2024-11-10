@@ -104,7 +104,7 @@ public class HexView : View, IDesignable
         KeyBindings.Remove (Key.Space);
         KeyBindings.Remove (Key.Enter);
 
-        LayoutComplete += HexView_LayoutComplete;
+        SubviewsLaidOut += HexView_LayoutComplete;
     }
 
     /// <summary>Initializes a <see cref="HexView"/> class.</summary>
@@ -198,7 +198,8 @@ public class HexView : View, IDesignable
                 Address = 0;
             }
 
-            SetNeedsDisplay ();
+            SetNeedsLayout ();
+            SetNeedsDraw ();
         }
     }
 
@@ -270,7 +271,8 @@ public class HexView : View, IDesignable
             }
 
             _addressWidth = value;
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
+            SetNeedsLayout ();
         }
     }
 
@@ -291,7 +293,7 @@ public class HexView : View, IDesignable
             _displayStart = value;
         }
 
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
     }
 
     /// <summary>
@@ -317,7 +319,7 @@ public class HexView : View, IDesignable
         }
 
         _edits = new ();
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
     }
 
     /// <summary>
@@ -413,35 +415,35 @@ public class HexView : View, IDesignable
             }
         }
 
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
 
         return true;
     }
 
     ///<inheritdoc/>
-    public override void OnDrawContent (Rectangle viewport)
+    protected override bool OnDrawingContent ()
     {
         if (Source is null)
         {
-            return;
+            return true;
         }
 
-        Attribute currentAttribute;
+        Attribute currentAttribute = Attribute.Default;
         Attribute current = GetFocusColor ();
-        Driver.SetAttribute (current);
+        SetAttribute (current);
         Move (0, 0);
 
         int nBlocks = BytesPerLine / NUM_BYTES_PER_HEX_COLUMN;
-        var data = new byte [nBlocks * NUM_BYTES_PER_HEX_COLUMN * viewport.Height];
+        var data = new byte [nBlocks * NUM_BYTES_PER_HEX_COLUMN * Viewport.Height];
         Source.Position = _displayStart;
         int n = _source!.Read (data, 0, data.Length);
 
         Attribute selectedAttribute = GetHotNormalColor ();
         Attribute editedAttribute = new Attribute (GetNormalColor ().Foreground.GetHighlightColor (), GetNormalColor ().Background);
         Attribute editingAttribute = new Attribute (GetFocusColor ().Background, GetFocusColor ().Foreground);
-        for (var line = 0; line < viewport.Height; line++)
+        for (var line = 0; line < Viewport.Height; line++)
         {
-            Rectangle lineRect = new (0, line, viewport.Width, 1);
+            Rectangle lineRect = new (0, line, Viewport.Width, 1);
 
             if (!Viewport.Contains (lineRect))
             {
@@ -450,13 +452,13 @@ public class HexView : View, IDesignable
 
             Move (0, line);
             currentAttribute = new Attribute (GetNormalColor ().Foreground.GetHighlightColor (), GetNormalColor ().Background);
-            Driver.SetAttribute (currentAttribute);
+            SetAttribute (currentAttribute);
             var address = $"{_displayStart + line * nBlocks * NUM_BYTES_PER_HEX_COLUMN:x8}";
-            Driver.AddStr ($"{address.Substring (8 - AddressWidth)}");
+            Driver?.AddStr ($"{address.Substring (8 - AddressWidth)}");
 
             if (AddressWidth > 0)
             {
-                Driver.AddStr (" ");
+                Driver?.AddStr (" ");
             }
 
             SetAttribute (GetNormalColor ());
@@ -478,12 +480,12 @@ public class HexView : View, IDesignable
                         SetAttribute (edited ? editedAttribute : GetNormalColor ());
                     }
 
-                    Driver.AddStr (offset >= n && !edited ? "  " : $"{value:x2}");
+                    Driver?.AddStr (offset >= n && !edited ? "  " : $"{value:x2}");
                     SetAttribute (GetNormalColor ());
-                    Driver.AddRune (_spaceCharRune);
+                    Driver?.AddRune (_spaceCharRune);
                 }
 
-                Driver.AddStr (block + 1 == nBlocks ? " " : $"{_columnSeparatorRune} ");
+                Driver?.AddStr (block + 1 == nBlocks ? " " : $"{_columnSeparatorRune} ");
             }
 
             for (var byteIndex = 0; byteIndex < nBlocks * NUM_BYTES_PER_HEX_COLUMN; byteIndex++)
@@ -536,22 +538,24 @@ public class HexView : View, IDesignable
                     SetAttribute (edited ? editedAttribute : GetNormalColor ());
                 }
 
-                Driver.AddRune (c);
+                Driver?.AddRune (c);
 
                 for (var i = 1; i < utf8BytesConsumed; i++)
                 {
                     byteIndex++;
-                    Driver.AddRune (_periodCharRune);
+                    Driver?.AddRune (_periodCharRune);
                 }
             }
         }
+
+        return true;
 
         void SetAttribute (Attribute attribute)
         {
             if (currentAttribute != attribute)
             {
                 currentAttribute = attribute;
-                Driver.SetAttribute (attribute);
+                SetAttribute (attribute);
             }
         }
     }
@@ -577,6 +581,8 @@ public class HexView : View, IDesignable
     /// </summary>
     protected void RaisePositionChanged ()
     {
+        SetNeedsDraw ();
+
         HexViewEventArgs args = new (Address, Position, BytesPerLine);
         OnPositionChanged (args);
         PositionChanged?.Invoke (this, args);
@@ -594,6 +600,11 @@ public class HexView : View, IDesignable
     protected override bool OnKeyDownNotHandled (Key keyEvent)
     {
         if (!AllowEdits || _source is null)
+        {
+            return false;
+        }
+
+        if (keyEvent.IsAlt)
         {
             return false;
         }
@@ -775,7 +786,7 @@ public class HexView : View, IDesignable
         if (Address >= DisplayStart + BytesPerLine * Viewport.Height)
         {
             SetDisplayStart (DisplayStart + bytes);
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
         else
         {
@@ -793,7 +804,7 @@ public class HexView : View, IDesignable
         if (Address >= DisplayStart + BytesPerLine * Viewport.Height)
         {
             SetDisplayStart (Address);
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
         else
         {
@@ -807,7 +818,7 @@ public class HexView : View, IDesignable
     {
         // This lets address go past the end of the stream one, enabling adding to the stream.
         Address = Math.Min (Address / BytesPerLine * BytesPerLine + BytesPerLine - 1, GetEditedSize ());
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
 
         return true;
     }
@@ -815,7 +826,7 @@ public class HexView : View, IDesignable
     private bool MoveHome ()
     {
         DisplayStart = 0;
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
 
         return true;
     }
@@ -844,7 +855,7 @@ public class HexView : View, IDesignable
         if (Address - 1 < DisplayStart)
         {
             SetDisplayStart (_displayStart - BytesPerLine);
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
         else
         {
@@ -881,7 +892,7 @@ public class HexView : View, IDesignable
         if (Address >= DisplayStart + BytesPerLine * Viewport.Height)
         {
             SetDisplayStart (DisplayStart + BytesPerLine);
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
         else
         {
@@ -906,7 +917,7 @@ public class HexView : View, IDesignable
     private bool MoveLeftStart ()
     {
         Address = Address / BytesPerLine * BytesPerLine;
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
 
         return true;
     }
@@ -923,7 +934,7 @@ public class HexView : View, IDesignable
         if (Address < DisplayStart)
         {
             SetDisplayStart (DisplayStart - bytes);
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
         else
         {
@@ -943,7 +954,7 @@ public class HexView : View, IDesignable
         var delta = (int)(pos - DisplayStart);
         int line = delta / BytesPerLine;
 
-        SetNeedsDisplay (new (0, line, Viewport.Width, 1));
+        SetNeedsDraw (new (0, line, Viewport.Width, 1));
     }
 
     /// <inheritdoc />

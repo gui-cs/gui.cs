@@ -19,20 +19,20 @@ internal class CursesDriver : ConsoleDriver
     private UnixMainLoop _mainLoopDriver;
     private object _processInputToken;
 
-    public override int Cols
+    internal override int Cols
     {
         get => Curses.Cols;
-        internal set
+        set
         {
             Curses.Cols = value;
             ClearContents ();
         }
     }
 
-    public override int Rows
+    internal override int Rows
     {
         get => Curses.Lines;
-        internal set
+        set
         {
             Curses.Lines = value;
             ClearContents ();
@@ -93,7 +93,7 @@ internal class CursesDriver : ConsoleDriver
             return;
         }
 
-        if (IsValidLocation (col, row))
+        if (IsValidLocation (default, col, row))
         {
             Curses.move (row, col);
         }
@@ -101,16 +101,12 @@ internal class CursesDriver : ConsoleDriver
         {
             // Not a valid location (outside screen or clip region)
             // Move within the clip region, then AddRune will actually move to Col, Row
-            Curses.move (Clip.Y, Clip.X);
+            Rectangle clipRect = Clip.GetBounds ();
+            Curses.move (clipRect.Y, clipRect.X);
         }
     }
 
-    public override void Refresh ()
-    {
-        UpdateScreen ();
-        UpdateCursor ();
-    }
-
+    
     public override void SendKeys (char keyChar, ConsoleKey consoleKey, bool shift, bool alt, bool control)
     {
         KeyCode key;
@@ -228,8 +224,9 @@ internal class CursesDriver : ConsoleDriver
         }
     }
 
-    public override void UpdateScreen ()
+    public override bool UpdateScreen ()
     {
+        bool updated = false;
         if (Force16Colors)
         {
             for (var row = 0; row < Rows; row++)
@@ -297,7 +294,7 @@ internal class CursesDriver : ConsoleDriver
                 || Contents.Length != Rows * Cols
                 || Rows != Console.WindowHeight)
             {
-                return;
+                return updated;
             }
 
             var top = 0;
@@ -315,7 +312,7 @@ internal class CursesDriver : ConsoleDriver
             {
                 if (Console.WindowHeight < 1)
                 {
-                    return;
+                    return updated;
                 }
 
                 if (!_dirtyLines [row])
@@ -325,7 +322,7 @@ internal class CursesDriver : ConsoleDriver
 
                 if (!SetCursorPosition (0, row))
                 {
-                    return;
+                    return updated;
                 }
 
                 _dirtyLines [row] = false;
@@ -338,6 +335,7 @@ internal class CursesDriver : ConsoleDriver
 
                     for (; col < cols; col++)
                     {
+                        updated = true;
                         if (!Contents [row, col].IsDirty)
                         {
                             if (output.Length > 0)
@@ -440,6 +438,8 @@ internal class CursesDriver : ConsoleDriver
                 outputWidth = 0;
             }
         }
+
+        return updated;
     }
 
     private bool SetCursorPosition (int col, int row)

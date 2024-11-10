@@ -8,7 +8,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Dialogs")]
 [ScenarioCategory ("Text and Formatting")]
-[ScenarioCategory ("Overlapped")]
+[ScenarioCategory ("Navigation")]
 [ScenarioCategory ("Files and IO")]
 public class HexEditor : Scenario
 {
@@ -41,6 +41,7 @@ public class HexEditor : Scenario
             Title = _fileName ?? "Untitled",
             BorderStyle = LineStyle.Rounded,
         };
+        _hexView.Arrangement = ViewArrangement.Resizable;
         _hexView.Edited += _hexView_Edited;
         _hexView.PositionChanged += _hexView_PositionChanged;
         app.Add (_hexView);

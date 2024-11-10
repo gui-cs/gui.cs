@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Text;
 using Terminal.Gui;
 
@@ -36,7 +37,6 @@ public class ExpanderButton : Button
         Height = 1;
         NoDecorations = true;
         NoPadding = true;
-        ShadowStyle = ShadowStyle.None;
 
         AddCommand (Command.HotKey, Toggle);
         AddCommand (Command.Toggle, Toggle);
@@ -44,10 +44,51 @@ public class ExpanderButton : Button
 
         Orientation = Orientation.Vertical;
 
+        HighlightStyle = HighlightStyle.None;
+
         Initialized += ExpanderButton_Initialized;
+
+        EnabledChanged += (sender, args) =>
+                          {
+                              ShowHide ();
+                          };
     }
 
-    private void ExpanderButton_Initialized (object sender, EventArgs e) { ExpandOrCollapse (Collapsed); }
+    private void ShowHide ()
+    {
+        if (!Enabled)
+        {
+            Visible = false;
+        }
+
+        if (SuperView is Border { } border)
+        {
+            switch (Orientation)
+            {
+                case Orientation.Vertical:
+                    Visible = border.Thickness.Top > 0;
+
+                    break;
+
+                case Orientation.Horizontal:
+                    Visible = border.Border?.Thickness.Left > 0;
+
+                    break;
+            }
+        }
+    }
+
+    private void ExpanderButton_Initialized (object? sender, EventArgs e)
+    {
+        ShadowStyle = ShadowStyle.None;
+
+        ExpandOrCollapse (Collapsed);
+
+        if (SuperView is Border { } border)
+        {
+            border.ThicknessChanged += (o, args) => ShowHide ();
+        }
+    }
 
     private Orientation _orientation = Orientation.Horizontal;
 
@@ -82,15 +123,15 @@ public class ExpanderButton : Button
             {
                 X = Pos.AnchorEnd ();
                 Y = 0;
-                CollapsedGlyph = new ('\u21d1'); // ⇑
-                ExpandedGlyph = new ('\u21d3'); // ⇓
+                CollapseGlyph = new ('\u21d1'); // ⇑
+                ExpandGlyph = new ('\u21d3'); // ⇓
             }
             else
             {
                 X = 0;
                 Y = Pos.AnchorEnd ();
-                CollapsedGlyph = new ('\u21d0'); // ⇐
-                ExpandedGlyph = new ('\u21d2'); // ⇒
+                CollapseGlyph = new ('\u21d0'); // ⇐
+                ExpandGlyph = new ('\u21d2'); // ⇒
             }
 
             ExpandOrCollapse (Collapsed);
@@ -102,17 +143,17 @@ public class ExpanderButton : Button
     /// <summary>
     ///     Fired when the orientation has changed. Can be cancelled.
     /// </summary>
-    public event EventHandler<CancelEventArgs<Orientation>> OrientationChanging;
+    public event EventHandler<CancelEventArgs<Orientation>>? OrientationChanging;
 
     /// <summary>
-    ///     The glyph to display when the view is collapsed.
+    ///     The glyph that indicates the button will collapse the view.
     /// </summary>
-    public Rune CollapsedGlyph { get; set; }
+    public Rune CollapseGlyph { get; set; }
 
     /// <summary>
-    ///     The glyph to display when the view is expanded.
+    ///     The glyph that indicates the button will expand the view.
     /// </summary>
-    public Rune ExpandedGlyph { get; set; }
+    public Rune ExpandGlyph { get; set; }
 
     private bool _collapsed;
 
@@ -146,7 +187,7 @@ public class ExpanderButton : Button
     /// <summary>
     ///     Fired when the orientation has changed. Can be cancelled.
     /// </summary>
-    public event EventHandler<CancelEventArgs<bool>> CollapsedChanging;
+    public event EventHandler<CancelEventArgs<bool>>? CollapsedChanging;
 
     /// <summary>
     ///     Collapses or Expands the view.
@@ -159,13 +200,13 @@ public class ExpanderButton : Button
         return true;
     }
 
-    private Dim _previousDim;
+    private Dim? _previousDim;
 
     private void ExpandOrCollapse (bool collapse)
     {
-        Text = $"{(Collapsed ? CollapsedGlyph : ExpandedGlyph)}";
+        Text = $"{(Collapsed ? ExpandGlyph : CollapseGlyph)}";
 
-        View superView = SuperView;
+        View? superView = SuperView;
 
         if (superView is Adornment adornment)
         {
@@ -182,12 +223,12 @@ public class ExpanderButton : Button
             // Collapse
             if (Orientation == Orientation.Vertical)
             {
-                _previousDim = superView.Height;
+                _previousDim = superView!.Height!;
                 superView.Height = 1;
             }
             else
             {
-                _previousDim = superView.Width;
+                _previousDim = superView!.Width!;
                 superView.Width = 1;
             }
         }
@@ -212,7 +253,6 @@ public class ExpanderButton : Button
         foreach (View subview in superView.Subviews)
         {
             subview.Visible = !Collapsed;
-            subview.Enabled = !Collapsed;
         }
     }
 }

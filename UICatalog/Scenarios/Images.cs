@@ -113,9 +113,9 @@ public class Images : Scenario
         };
 
 
-/*        CheckedState = _sixelSupportResult.IsSupported
-                           ? CheckState.Checked
-                           : CheckState.UnChecked;*/
+        /*        CheckedState = _sixelSupportResult.IsSupported
+                                   ? CheckState.Checked
+                                   : CheckState.UnChecked;*/
         cbSupportsSixel.CheckedStateChanging += (s, e) =>
                                                 {
                                                     _sixelSupportResult.IsSupported = e.NewValue == CheckState.Checked;
@@ -164,7 +164,7 @@ public class Images : Scenario
     private void SetupSixelSupported (bool isSupported)
     {
         _tabSixel.View = isSupported ? _sixelSupported : _sixelNotSupported;
-        _tabView.SetNeedsDisplay ();
+        _tabView.SetNeedsDraw ();
     }
 
     private void BtnStartFireOnAccept (object sender, CommandEventArgs e)
@@ -225,7 +225,7 @@ public class Images : Scenario
 
         Application.Sixel.Add (_fireSixel);
 
-        _win.SetNeedsDisplay ();
+        _win.SetNeedsDraw ();
 
         return !_isDisposed;
     }
@@ -288,15 +288,15 @@ public class Images : Scenario
 
         _imageView.SetImage (img);
         ApplyShowTabViewHack ();
-        Application.Refresh ();
+        Application.LayoutAndDraw ();
     }
 
     private void ApplyShowTabViewHack ()
     {
         // TODO HACK: This hack seems to be required to make tabview actually refresh itself
-        _tabView.SetNeedsDisplay();
+        _tabView.SetNeedsDraw ();
         var orig = _tabView.SelectedTab;
-        _tabView.SelectedTab = _tabView.Tabs.Except (new []{orig}).ElementAt (0);
+        _tabView.SelectedTab = _tabView.Tabs.Except (new [] { orig }).ElementAt (0);
         _tabView.SelectedTab = orig;
     }
 
@@ -401,7 +401,7 @@ public class Images : Scenario
             Y = Pos.Bottom (_pxY) + 1
         };
 
-        _rgPaletteBuilder = new()
+        _rgPaletteBuilder = new ()
         {
             RadioLabels = new []
             {
@@ -435,7 +435,7 @@ public class Images : Scenario
             Y = Pos.Bottom (_rgPaletteBuilder) + 1
         };
 
-        _rgDistanceAlgorithm = new()
+        _rgDistanceAlgorithm = new ()
         {
             RadioLabels = new []
             {
@@ -458,7 +458,7 @@ public class Images : Scenario
         _sixelSupported.Add (_popularityThreshold);
         _sixelSupported.Add (lblPopThreshold);
 
-        _sixelView.DrawContent += SixelViewOnDrawContent;
+        _sixelView.DrawingContent += SixelViewOnDrawingContent;
     }
 
     private IPaletteBuilder GetPaletteBuilder ()
@@ -514,10 +514,10 @@ public class Images : Scenario
             _sixelImage.SixelData = _encodedSixelData;
         }
 
-        _sixelView.SetNeedsDisplay ();
+        _sixelView.SetNeedsDraw ();
     }
 
-    private void SixelViewOnDrawContent (object sender, DrawEventArgs e)
+    private void SixelViewOnDrawingContent (object sender, DrawEventArgs e)
     {
         if (!string.IsNullOrWhiteSpace (_encodedSixelData))
         {
@@ -624,25 +624,23 @@ public class Images : Scenario
         public Image<Rgba32> FullResImage;
         private Image<Rgba32> _matchSize;
 
-        public override void OnDrawContent (Rectangle bounds)
+        protected override bool OnDrawingContent ()
         {
-            base.OnDrawContent (bounds);
-
             if (FullResImage == null)
             {
-                return;
+                return true;
             }
 
             // if we have not got a cached resized image of this size
-            if (_matchSize == null || bounds.Width != _matchSize.Width || bounds.Height != _matchSize.Height)
+            if (_matchSize == null || Viewport.Width != _matchSize.Width || Viewport.Height != _matchSize.Height)
             {
                 // generate one
-                _matchSize = FullResImage.Clone (x => x.Resize (bounds.Width, bounds.Height));
+                _matchSize = FullResImage.Clone (x => x.Resize (Viewport.Width, Viewport.Height));
             }
 
-            for (var y = 0; y < bounds.Height; y++)
+            for (var y = 0; y < Viewport.Height; y++)
             {
-                for (var x = 0; x < bounds.Width; x++)
+                for (var x = 0; x < Viewport.Width; x++)
                 {
                     Rgba32 rgb = _matchSize [x, y];
 
@@ -654,16 +652,18 @@ public class Images : Scenario
                                                                  )
                                                      );
 
-                    Driver.SetAttribute (attr);
+                    SetAttribute (attr);
                     AddRune (x, y, (Rune)' ');
                 }
             }
+
+            return true;
         }
 
         internal void SetImage (Image<Rgba32> image)
         {
             FullResImage = image;
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
     }
 
@@ -682,8 +682,8 @@ public class Images : Scenario
         private (int columns, int rows) CalculateGridSize (Rectangle bounds)
         {
             // Characters are twice as wide as they are tall, so use 2:1 width-to-height ratio
-            int availableWidth = bounds.Width / 2; // Each color block is 2 character wide
-            int availableHeight = bounds.Height;
+            int availableWidth = Viewport.Width / 2; // Each color block is 2 character wide
+            int availableHeight = Viewport.Height;
 
             int numColors = _palette.Count;
 
@@ -701,17 +701,15 @@ public class Images : Scenario
             return (columns, rows);
         }
 
-        public override void OnDrawContent (Rectangle bounds)
+        protected override bool OnDrawingContent ()
         {
-            base.OnDrawContent (bounds);
-
             if (_palette == null || _palette.Count == 0)
             {
-                return;
+                return false;
             }
 
             // Calculate the grid size based on the bounds
-            (int columns, int rows) = CalculateGridSize (bounds);
+            (int columns, int rows) = CalculateGridSize (Viewport);
 
             // Draw the colors in the palette
             for (var i = 0; i < _palette.Count && i < columns * rows; i++)
@@ -724,7 +722,7 @@ public class Images : Scenario
                 int y = row;
 
                 // Set the color attribute for the block
-                Driver.SetAttribute (new (_palette [i], _palette [i]));
+                SetAttribute (new (_palette [i], _palette [i]));
 
                 // Draw the block (2 characters wide per block)
                 for (var dx = 0; dx < 2; dx++) // Fill the width of the block
@@ -732,6 +730,8 @@ public class Images : Scenario
                     AddRune (x + dx, y, (Rune)' ');
                 }
             }
+
+            return true;
         }
     }
 }

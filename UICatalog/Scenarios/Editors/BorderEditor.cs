@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terminal.Gui;
@@ -7,9 +8,9 @@ namespace UICatalog.Scenarios;
 
 public class BorderEditor : AdornmentEditor
 {
-    private CheckBox _ckbTitle;
-    private RadioGroup _rbBorderStyle;
-    private CheckBox _ckbGradient;
+    private CheckBox? _ckbTitle;
+    private RadioGroup? _rbBorderStyle;
+    private CheckBox? _ckbGradient;
 
     public BorderEditor ()
     {
@@ -18,35 +19,34 @@ public class BorderEditor : AdornmentEditor
         AdornmentChanged += BorderEditor_AdornmentChanged;
     }
 
-    private void BorderEditor_AdornmentChanged (object sender, EventArgs e)
+    private void BorderEditor_AdornmentChanged (object? sender, EventArgs e)
     {
-        _ckbTitle.CheckedState = ((Border)AdornmentToEdit).Settings.FastHasFlags (BorderSettings.Title) ? CheckState.Checked : CheckState.UnChecked;
-        _rbBorderStyle.SelectedItem = (int)((Border)AdornmentToEdit).LineStyle;
-        _ckbGradient.CheckedState = ((Border)AdornmentToEdit).Settings.FastHasFlags (BorderSettings.Gradient) ? CheckState.Checked : CheckState.UnChecked;
+        _ckbTitle!.CheckedState = ((Border)AdornmentToEdit!).Settings.FastHasFlags (BorderSettings.Title) ? CheckState.Checked : CheckState.UnChecked;
+        _rbBorderStyle!.SelectedItem = (int)((Border)AdornmentToEdit).LineStyle;
+        _ckbGradient!.CheckedState = ((Border)AdornmentToEdit).Settings.FastHasFlags (BorderSettings.Gradient) ? CheckState.Checked : CheckState.UnChecked;
     }
 
-    private void BorderEditor_Initialized (object sender, EventArgs e)
+    private void BorderEditor_Initialized (object? sender, EventArgs e)
     {
         List<LineStyle> borderStyleEnum = Enum.GetValues (typeof (LineStyle)).Cast<LineStyle> ().ToList ();
 
-        _rbBorderStyle = new()
+        _rbBorderStyle = new ()
         {
             X = 0,
 
             Y = Pos.Bottom (Subviews [^1]),
             Width = Dim.Fill (),
-            SelectedItem = (int)(((Border)AdornmentToEdit)?.LineStyle ?? LineStyle.None),
+            SelectedItem = (int)(((Border)AdornmentToEdit!)?.LineStyle ?? LineStyle.None),
             BorderStyle = LineStyle.Single,
             Title = "Border St_yle",
             SuperViewRendersLineCanvas = true,
-            Enabled = AdornmentToEdit is { },
-            RadioLabels = borderStyleEnum.Select (e => e.ToString ()).ToArray ()
+            RadioLabels = borderStyleEnum.Select (style => style.ToString ()).ToArray ()
         };
         Add (_rbBorderStyle);
 
         _rbBorderStyle.SelectedItemChanged += OnRbBorderStyleOnSelectedItemChanged;
 
-        _ckbTitle = new()
+        _ckbTitle = new ()
         {
             X = 0,
             Y = Pos.Bottom (_rbBorderStyle),
@@ -54,7 +54,6 @@ public class BorderEditor : AdornmentEditor
             CheckedState = CheckState.Checked,
             SuperViewRendersLineCanvas = true,
             Text = "Title",
-            Enabled = AdornmentToEdit is { }
         };
 
         _ckbTitle.CheckedStateChanging += OnCkbTitleOnToggle;
@@ -68,7 +67,6 @@ public class BorderEditor : AdornmentEditor
             CheckedState = CheckState.Checked,
             SuperViewRendersLineCanvas = true,
             Text = "Gradient",
-            Enabled = AdornmentToEdit is { }
         };
 
         _ckbGradient.CheckedStateChanging += OnCkbGradientOnToggle;
@@ -76,10 +74,10 @@ public class BorderEditor : AdornmentEditor
 
         return;
 
-        void OnRbBorderStyleOnSelectedItemChanged (object s, SelectedItemChangedArgs e)
+        void OnRbBorderStyleOnSelectedItemChanged (object? s, SelectedItemChangedArgs args)
         {
-            LineStyle prevBorderStyle = AdornmentToEdit.BorderStyle;
-            ((Border)AdornmentToEdit).LineStyle = (LineStyle)e.SelectedItem;
+            LineStyle prevBorderStyle = AdornmentToEdit!.BorderStyle;
+            ((Border)AdornmentToEdit).LineStyle = (LineStyle)args.SelectedItem;
 
             if (((Border)AdornmentToEdit).LineStyle == LineStyle.None)
             {
@@ -90,35 +88,35 @@ public class BorderEditor : AdornmentEditor
                 ((Border)AdornmentToEdit).Thickness = new (1);
             }
 
-            ((Border)AdornmentToEdit).SetNeedsDisplay ();
-            LayoutSubviews ();
+            ((Border)AdornmentToEdit).SetNeedsDraw ();
+            SetNeedsLayout ();
         }
 
-        void OnCkbTitleOnToggle (object sender, CancelEventArgs<CheckState> args)
+        void OnCkbTitleOnToggle (object? _, CancelEventArgs<CheckState> args)
         {
             if (args.NewValue == CheckState.Checked)
 
             {
-                ((Border)AdornmentToEdit).Settings |= BorderSettings.Title;
+                ((Border)AdornmentToEdit!).Settings |= BorderSettings.Title;
             }
             else
 
             {
-                ((Border)AdornmentToEdit).Settings &= ~BorderSettings.Title;
+                ((Border)AdornmentToEdit!).Settings &= ~BorderSettings.Title;
             }
         }
 
-        void OnCkbGradientOnToggle (object sender, CancelEventArgs<CheckState> args)
+        void OnCkbGradientOnToggle (object? _, CancelEventArgs<CheckState> args)
         {
             if (args.NewValue == CheckState.Checked)
 
             {
-                ((Border)AdornmentToEdit).Settings |= BorderSettings.Gradient;
+                ((Border)AdornmentToEdit!).Settings |= BorderSettings.Gradient;
             }
             else
 
             {
-                ((Border)AdornmentToEdit).Settings &= ~BorderSettings.Gradient;
+                ((Border)AdornmentToEdit!).Settings &= ~BorderSettings.Gradient;
             }
         }
     }

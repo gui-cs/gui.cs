@@ -16,8 +16,7 @@ public class DimFillTests (ITestOutputHelper output)
         RunState rs = Application.Begin (top);
         ((FakeDriver)Application.Driver!).SetBufferSize (32, 5);
 
-        //view.SetNeedsLayout ();
-        top.LayoutSubviews ();
+        top.Layout ();
 
         //view.SetRelativeLayout (new (0, 0, 32, 5));
         Assert.Equal (32, view.Frame.Width);
@@ -61,7 +60,7 @@ public class DimFillTests (ITestOutputHelper output)
         super.Add (view);
         super.BeginInit ();
         super.EndInit ();
-        super.LayoutSubviews ();
+        super.Layout ();
 
         Assert.Equal (25, super.Frame.Width);
         Assert.Equal (25, super.Frame.Height);
@@ -103,7 +102,7 @@ public class DimFillTests (ITestOutputHelper output)
         super.Add (view);
         super.BeginInit ();
         super.EndInit ();
-        super.LayoutSubviews ();
+        super.Layout ();
 
         Assert.Equal (25, super.Frame.Width);
         Assert.Equal (25, super.Frame.Height);
@@ -167,7 +166,7 @@ public class DimFillTests (ITestOutputHelper output)
         super.Add (view);
 
         view.Text = "New text\nNew line";
-        super.LayoutSubviews ();
+        super.Layout ();
         Rectangle expectedViewBounds = new (0, 0, 30, 80);
 
         Assert.Equal (expectedViewBounds, view.Viewport);

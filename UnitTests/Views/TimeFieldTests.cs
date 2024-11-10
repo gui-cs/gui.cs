@@ -6,6 +6,7 @@ public class TimeFieldTests
     public void Constructors_Defaults ()
     {
         var tf = new TimeField ();
+        tf.Layout ();
         Assert.False (tf.IsShortFormat);
         Assert.Equal (TimeSpan.MinValue, tf.Time);
         Assert.Equal (1, tf.CursorPosition);
@@ -13,24 +14,28 @@ public class TimeFieldTests
 
         TimeSpan time = DateTime.Now.TimeOfDay;
         tf = new TimeField { Time = time };
+        tf.Layout ();
         Assert.False (tf.IsShortFormat);
         Assert.Equal (time, tf.Time);
         Assert.Equal (1, tf.CursorPosition);
         Assert.Equal (new Rectangle (0, 0, 10, 1), tf.Frame);
 
         tf = new TimeField { X = 1, Y = 2, Time = time };
+        tf.Layout ();
         Assert.False (tf.IsShortFormat);
         Assert.Equal (time, tf.Time);
         Assert.Equal (1, tf.CursorPosition);
         Assert.Equal (new Rectangle (1, 2, 10, 1), tf.Frame);
 
         tf = new TimeField { X = 3, Y = 4, Time = time, IsShortFormat = true };
+        tf.Layout ();
         Assert.True (tf.IsShortFormat);
         Assert.Equal (time, tf.Time);
         Assert.Equal (1, tf.CursorPosition);
         Assert.Equal (new Rectangle (3, 4, 7, 1), tf.Frame);
 
         tf.IsShortFormat = false;
+        tf.Layout ();
         Assert.Equal (new Rectangle (3, 4, 10, 1), tf.Frame);
         Assert.Equal (10, tf.Width);
     }

@@ -1,4 +1,5 @@
-﻿using Terminal.Gui;
+﻿using System.Collections.Generic;
+using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -81,5 +82,32 @@ public class Clipping : Scenario
         Application.Run (win);
         win.Dispose ();
         Application.Shutdown ();
+    }
+
+    public override List<Key> GetDemoKeyStrokes ()
+    {
+        var keys = new List<Key> ();
+
+        for (int i = 0; i < 25; i++)
+        {
+            keys.Add (Key.CursorDown);
+        }
+
+        for (int i = 0; i < 25; i++)
+        {
+            keys.Add (Key.CursorRight);
+        }
+
+        for (int i = 0; i < 25; i++)
+        {
+            keys.Add (Key.CursorLeft);
+        }
+
+        for (int i = 0; i < 25; i++)
+        {
+            keys.Add (Key.CursorUp);
+        }
+
+        return keys;
     }
 }

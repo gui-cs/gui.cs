@@ -16,7 +16,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Dialogs")]
 [ScenarioCategory ("Text and Formatting")]
-[ScenarioCategory ("Overlapped")]
+[ScenarioCategory ("Arrangement")]
 [ScenarioCategory ("Files and IO")]
 [ScenarioCategory ("TextView")]
 [ScenarioCategory ("Menus")]
@@ -281,7 +281,7 @@ public class Editor : Scenario
                                               _scrollBar.Position = _textView.TopRow;
                                           }
 
-                                          _textView.SetNeedsDisplay ();
+                                          _textView.SetNeedsDraw ();
                                       };
 
         _scrollBar.OtherScrollBarView.ChangedPosition += (s, e) =>
@@ -293,10 +293,10 @@ public class Editor : Scenario
                                                                  _scrollBar.OtherScrollBarView.Position = _textView.LeftColumn;
                                                              }
 
-                                                             _textView.SetNeedsDisplay ();
+                                                             _textView.SetNeedsDraw ();
                                                          };
 
-        _textView.DrawContent += (s, e) =>
+        _textView.DrawingContent += (s, e) =>
                                  {
                                      _scrollBar.Size = _textView.Lines;
                                      _scrollBar.Position = _textView.TopRow;
@@ -306,9 +306,6 @@ public class Editor : Scenario
                                          _scrollBar.OtherScrollBarView.Size = _textView.Maxlength;
                                          _scrollBar.OtherScrollBarView.Position = _textView.LeftColumn;
                                      }
-
-                                     _scrollBar.LayoutSubviews ();
-                                     _scrollBar.Refresh ();
                                  };
 
 

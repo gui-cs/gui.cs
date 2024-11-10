@@ -193,7 +193,7 @@ public class ClassExplorer : Scenario
     {
         _treeView.Style.HighlightModelTextOnly = !_treeView.Style.HighlightModelTextOnly;
         _highlightModelTextOnly.Checked = _treeView.Style.HighlightModelTextOnly;
-        _treeView.SetNeedsDisplay ();
+        _treeView.SetNeedsDraw ();
     }
 
     private void Quit () { Application.RequestStop (); }
@@ -292,7 +292,7 @@ public class ClassExplorer : Scenario
             _textView.Text = ex.Message;
         }
 
-        _textView.SetNeedsDisplay ();
+        _textView.SetNeedsDraw ();
     }
 
     private enum Showable

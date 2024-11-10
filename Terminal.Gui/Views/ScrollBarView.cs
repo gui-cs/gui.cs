@@ -5,6 +5,8 @@
 //   Miguel de Icaza (miguel@gnome.org)
 //
 
+using System.Diagnostics;
+
 namespace Terminal.Gui;
 
 /// <summary>ScrollBarViews are views that display a 1-character scrollbar, either horizontal or vertical</summary>
@@ -113,7 +115,7 @@ public class ScrollBarView : View
             if (_autoHideScrollBars != value)
             {
                 _autoHideScrollBars = value;
-                SetNeedsDisplay ();
+                SetNeedsDraw ();
             }
         }
     }
@@ -259,7 +261,7 @@ public class ScrollBarView : View
             {
                 SetRelativeLayout (SuperView?.Frame.Size ?? Host.Frame.Size);
                 ShowHideScrollBars (false);
-                SetNeedsDisplay ();
+                SetNeedsLayout ();
             }
         }
     }
@@ -444,7 +446,7 @@ public class ScrollBarView : View
     public virtual void OnChangedPosition () { ChangedPosition?.Invoke (this, EventArgs.Empty); }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle viewport)
+    protected override bool OnDrawingContent ()
     {
         if (ColorScheme is null || ((!ShowScrollIndicator || Size == 0) && AutoHideScrollBars && Visible))
         {
@@ -453,21 +455,21 @@ public class ScrollBarView : View
                 ShowHideScrollBars (false);
             }
 
-            return;
+            return false;
         }
 
         if (Size == 0 || (_vertical && Viewport.Height == 0) || (!_vertical && Viewport.Width == 0))
         {
-            return;
+            return false;
         }
 
-        Driver.SetAttribute (Host.HasFocus ? ColorScheme.Focus : GetNormalColor ());
+        SetAttribute (Host.HasFocus ? ColorScheme.Focus : GetNormalColor ());
 
         if (_vertical)
         {
             if (Viewport.Right < Viewport.Width - 1)
             {
-                return;
+                return true;
             }
 
             int col = Viewport.Width - 1;
@@ -575,7 +577,7 @@ public class ScrollBarView : View
         {
             if (Viewport.Bottom < Viewport.Height - 1)
             {
-                return;
+                return true;
             }
 
             int row = Viewport.Height - 1;
@@ -661,6 +663,8 @@ public class ScrollBarView : View
                 Driver.AddRune (Glyphs.RightArrow);
             }
         }
+
+        return false;
     }
 
 
@@ -761,11 +765,11 @@ public class ScrollBarView : View
 
     private void ContentBottomRightCorner_DrawContent (object sender, DrawEventArgs e)
     {
-        Driver.SetAttribute (Host.HasFocus ? ColorScheme.Focus : GetNormalColor ());
+        SetAttribute (Host.HasFocus ? ColorScheme.Focus : GetNormalColor ());
 
         // I'm forced to do this here because the Clear method is
         // changing the color attribute and is different of this one
-        Driver.FillRect (Driver.Clip);
+        Driver.FillRect (Driver.Clip.GetBounds());
         e.Cancel = true;
     }
 
@@ -823,7 +827,7 @@ public class ScrollBarView : View
             _contentBottomRightCorner.Width = 1;
             _contentBottomRightCorner.Height = 1;
             _contentBottomRightCorner.MouseClick += ContentBottomRightCorner_MouseClick;
-            _contentBottomRightCorner.DrawContent += ContentBottomRightCorner_DrawContent;
+            _contentBottomRightCorner.DrawingContent += ContentBottomRightCorner_DrawContent;
         }
     }
 
@@ -899,7 +903,7 @@ public class ScrollBarView : View
         if (newPosition < 0)
         {
             _position = 0;
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
 
             return;
         }
@@ -924,7 +928,7 @@ public class ScrollBarView : View
         }
 
         OnChangedPosition ();
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
     }
 
     // BUGBUG: v2 - rationalize this with View.SetMinWidthHeight

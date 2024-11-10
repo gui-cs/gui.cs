@@ -90,7 +90,7 @@ public class PosTests ()
         f.X = Pos.X (v2) - Pos.X (v1);
         f.Y = Pos.Y (v2) - Pos.Y (v1);
 
-        Assert.Throws<InvalidOperationException> (() => Application.Run (t));
+        Assert.Throws<LayoutException> (() => Application.Run (t));
         t.Dispose ();
         Application.Shutdown ();
 

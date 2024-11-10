@@ -115,7 +115,7 @@ public class RuneWidthGreaterThanOne : Scenario
         _labelV.Text = "This is a test text 你";
         _win.Title = "HACC Demo 你";
         _lastRunesUsed = "Mixed";
-        Application.Refresh ();
+        Application.LayoutAndDraw ();
     }
 
     private void NarrowMessage (object sender, EventArgs e) { MessageBox.Query ("Say Hello", $"Hello {_text.Text}", "Ok"); }
@@ -135,7 +135,7 @@ public class RuneWidthGreaterThanOne : Scenario
         _labelV.Text = "This is a test text";
         _win.Title = "HACC Demo";
         _lastRunesUsed = "Narrow";
-        Application.Refresh ();
+        Application.LayoutAndDraw ();
     }
 
     private void UnsetClickedEvent ()
@@ -174,6 +174,6 @@ public class RuneWidthGreaterThanOne : Scenario
         _labelV.Text = "あなたの名前を入力してください";
         _win.Title = "デモエムポンズ";
         _lastRunesUsed = "Wide";
-        Application.Refresh ();
+        Application.LayoutAndDraw ();
     }
 }

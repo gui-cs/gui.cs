@@ -61,7 +61,7 @@ public class ViewDisposalTest (ITestOutputHelper output)
         // make sure the application is doing to the views whatever its supposed to do to the views
         for (var i = 0; i < 100; i++)
         {
-            Application.Refresh ();
+            Application.LayoutAndDraw ();
         }
 
         top.Remove (container);

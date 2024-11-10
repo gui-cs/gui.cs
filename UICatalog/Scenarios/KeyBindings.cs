@@ -125,39 +125,33 @@ public sealed class KeyBindings : Scenario
         };
         appWindow.Add (_focusedBindingsListView);
 
-        appWindow.HasFocusChanged += AppWindow_HasFocusChanged;
-        appWindow.DrawContent += AppWindow_DrawContent;
+        Application.Navigation!.FocusedChanged += Application_HasFocusChanged;
 
         // Run - Start the application.
         Application.Run (appWindow);
+        Application.Navigation!.FocusedChanged -= Application_HasFocusChanged;
         appWindow.Dispose ();
 
         // Shutdown - Calling Application.Shutdown is required.
         Application.Shutdown ();
     }
 
-    private void AppWindow_DrawContent (object sender, DrawEventArgs e)
-    {
-        _focusedBindingsListView.Title = $"_Focused ({Application.Top.MostFocused.GetType ().Name}) Bindings";
 
-        _focusedBindings.Clear ();
-        foreach (var binding in Application.Top.MostFocused.KeyBindings.Bindings.Where (b => b.Value.Scope == KeyBindingScope.Focused))
+    private void Application_HasFocusChanged (object sender, EventArgs e)
+    {
+        View focused = Application.Navigation!.GetFocused ();
+
+        if (focused == null)
+        {
+            return;
+        }
+
+        _focusedBindingsListView.Title = $"_Focused ({focused?.GetType ().Name}) Bindings";
+
+        _focusedBindings.Clear();
+        foreach (var binding in focused?.KeyBindings!.Bindings.Where (b => b.Value.Scope == KeyBindingScope.Focused)!)
         {
             _focusedBindings.Add ($"{binding.Key} -> {binding.Value.Commands [0]}");
-        }
-    }
-
-    private void AppWindow_HasFocusChanged (object sender, HasFocusEventArgs e)
-    {
-        if (e.NewValue)
-        {
-            if (Application.Top is { MostFocused: {} })
-            {
-                foreach (var binding in Application.Top.MostFocused.KeyBindings.Bindings.Where (b => b.Value.Scope == KeyBindingScope.Focused))
-                {
-                    _focusedBindings.Add ($"{binding.Key} -> {binding.Value.Commands [0]}");
-                }
-            }
         }
     }
 }

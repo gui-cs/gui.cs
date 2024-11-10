@@ -10,7 +10,7 @@ using Terminal.Gui;
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Dynamic StatusBar", "Demonstrates how to add and remove a StatusBar and change items dynamically.")]
-[ScenarioCategory ("Overlapped")]
+[ScenarioCategory ("Arrangement")]
 public class DynamicStatusBar : Scenario
 {
     public override void Main ()
@@ -201,7 +201,7 @@ public class DynamicStatusBar : Scenario
                                       TextTitle.Text = string.Empty;
                                       Application.RequestStop ();
                                   };
-            var dialog = new Dialog { Title = "Enter the menu details.", Buttons = [btnOk, btnCancel], Height = Dim.Auto (DimAutoStyle.Content, 17, Driver.Rows) };
+            var dialog = new Dialog { Title = "Enter the menu details.", Buttons = [btnOk, btnCancel], Height = Dim.Auto (DimAutoStyle.Content, 17, Application.Screen.Height) };
 
             Width = Dim.Fill ();
             Height = Dim.Fill () - 1;
@@ -329,7 +329,7 @@ public class DynamicStatusBar : Scenario
                                           DataContext.Items [i - 1] =
                                               new DynamicStatusItemList (statusItem.Title, statusItem);
                                           _lstItems.SelectedItem = i - 1;
-                                          _statusBar.SetNeedsDisplay ();
+                                          _statusBar.SetNeedsDraw ();
                                       }
                                   }
                               };
@@ -352,7 +352,7 @@ public class DynamicStatusBar : Scenario
                                             DataContext.Items [i + 1] =
                                                 new DynamicStatusItemList (statusItem.Title, statusItem);
                                             _lstItems.SelectedItem = i + 1;
-                                            _statusBar.SetNeedsDisplay ();
+                                            _statusBar.SetNeedsDraw ();
                                         }
                                     }
                                 };
@@ -435,7 +435,7 @@ public class DynamicStatusBar : Scenario
                                               _lstItems.SelectedItem = _lstItems.Source.Count - 1;
                                           }
 
-                                          _lstItems.SetNeedsDisplay ();
+                                          _lstItems.SetNeedsDraw ();
                                           SetFrameDetails ();
                                       }
                                   };

@@ -2,178 +2,41 @@
 
 namespace Terminal.Gui.LayoutTests;
 
-public class LayoutTests (ITestOutputHelper output)
+public class LayoutTests (ITestOutputHelper _output) : TestsAllViews
 {
-    private readonly ITestOutputHelper _output = output;
-
-    [Fact]
-    public void LayoutSubviews_No_SuperView ()
+    [Theory]
+    [MemberData (nameof (AllViewTypes))]
+    public void AllViews_Layout_Does_Not_Draw (Type viewType)
     {
-        var root = new View ();
+        var view = (View)CreateInstanceIfNotGeneric (viewType);
 
-        var first = new View
+        if (view == null)
         {
-            Id = "first",
-            X = 1,
-            Y = 2,
-            Height = 3,
-            Width = 4
-        };
-        root.Add (first);
+            _output.WriteLine ($"Ignoring {viewType} - It's a Generic");
 
-        var second = new View { Id = "second" };
-        root.Add (second);
+            return;
+        }
 
-        second.X = Pos.Right (first) + 1;
-
-        root.LayoutSubviews ();
-
-        Assert.Equal (6, second.Frame.X);
-        root.Dispose ();
-        first.Dispose ();
-        second.Dispose ();
-    }
-
-    [Fact]
-    public void LayoutSubviews_RootHas_SuperView ()
-    {
-        var top = new View ();
-        var root = new View ();
-        top.Add (root);
-
-        var first = new View
+        if (view is IDesignable designable)
         {
-            Id = "first",
-            X = 1,
-            Y = 2,
-            Height = 3,
-            Width = 4
-        };
-        root.Add (first);
+            designable.EnableForDesign ();
+        }
 
-        var second = new View { Id = "second" };
-        root.Add (second);
+        var drawContentCount = 0;
+        view.DrawingContent += (s, e) => drawContentCount++;
 
-        second.X = Pos.Right (first) + 1;
+        var layoutStartedCount = 0;
+        view.SubviewLayout += (s, e) => layoutStartedCount++;
 
-        root.LayoutSubviews ();
+        var layoutCompleteCount = 0;
+        view.SubviewsLaidOut += (s, e) => layoutCompleteCount++;
 
-        Assert.Equal (6, second.Frame.X);
-        root.Dispose ();
-        top.Dispose ();
-        first.Dispose ();
-        second.Dispose ();
-    }
+        view.SetNeedsLayout ();
+        view.SetNeedsDraw();
+        view.Layout ();
 
-    [Fact]
-    public void LayoutSubviews_ViewThatRefsSubView_Throws ()
-    {
-        var root = new View ();
-        var super = new View ();
-        root.Add (super);
-        var sub = new View ();
-        super.Add (sub);
-        super.Width = Dim.Width (sub);
-        Assert.Throws<InvalidOperationException> (() => root.LayoutSubviews ());
-        root.Dispose ();
-        super.Dispose ();
-    }
-
-    [Fact]
-    public void TopologicalSort_Missing_Add ()
-    {
-        var root = new View ();
-        var sub1 = new View ();
-        root.Add (sub1);
-        var sub2 = new View ();
-        sub1.Width = Dim.Width (sub2);
-
-        Assert.Throws<InvalidOperationException> (() => root.LayoutSubviews ());
-
-        sub2.Width = Dim.Width (sub1);
-
-        Assert.Throws<InvalidOperationException> (() => root.LayoutSubviews ());
-        root.Dispose ();
-        sub1.Dispose ();
-        sub2.Dispose ();
-    }
-
-    [Fact]
-    public void TopologicalSort_Recursive_Ref ()
-    {
-        var root = new View ();
-        var sub1 = new View ();
-        root.Add (sub1);
-        var sub2 = new View ();
-        root.Add (sub2);
-        sub2.Width = Dim.Width (sub2);
-
-        Exception exception = Record.Exception (root.LayoutSubviews);
-        Assert.Null (exception);
-        root.Dispose ();
-        sub1.Dispose ();
-        sub2.Dispose ();
-    }
-
-    [Fact]
-    public void LayoutSubviews_Uses_ContentSize ()
-    {
-        var superView = new View ()
-        {
-            Width = 5,
-            Height = 5,
-        };
-        superView.SetContentSize (new (10, 10));
-        var view = new View ()
-        {
-            X = Pos.Center ()
-        };
-        superView.Add (view);
-
-        superView.LayoutSubviews ();
-
-        Assert.Equal (5, view.Frame.X);
-        superView.Dispose ();
-    }
-
-    // Test OnLayoutStarted/OnLayoutComplete - ensure that they are called at right times
-    [Fact]
-    public void LayoutSubviews_LayoutStarted_Complete ()
-    {
-        var superView = new View ();
-        var view = new View ();
-        superView.Add (view);
-        superView.BeginInit ();
-        superView.EndInit ();
-
-        var layoutStarted = false;
-        var layoutComplete = false;
-
-        var borderLayoutStarted = false;
-        var borderLayoutComplete = false;
-
-        view.LayoutStarted += (sender, e) => layoutStarted = true;
-        view.LayoutComplete += (sender, e) => layoutComplete = true;
-
-        view.Border.LayoutStarted += (sender, e) =>
-                                     {
-                                         Assert.True (layoutStarted);
-                                         borderLayoutStarted = true;
-                                     };
-        view.Border.LayoutComplete += (sender, e) =>
-                                      {
-                                          Assert.True (layoutStarted);
-                                          Assert.False (layoutComplete);
-                                          borderLayoutComplete = true;
-                                      };
-
-        superView.LayoutSubviews ();
-
-        Assert.True (borderLayoutStarted);
-        Assert.True (borderLayoutComplete);
-
-        Assert.True (layoutStarted);
-        Assert.True (layoutComplete);
-        superView.Dispose ();
+        Assert.Equal (0, drawContentCount);
+        Assert.Equal (1, layoutStartedCount);
+        Assert.Equal (1, layoutCompleteCount);
     }
 }

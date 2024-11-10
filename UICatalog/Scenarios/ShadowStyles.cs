@@ -9,6 +9,7 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("ShadowStyles Demo", "Demonstrates ShadowStyles Effects.")]
 [ScenarioCategory ("Layout")]
+[ScenarioCategory ("Adornments")]
 public class ShadowStyles : Scenario
 {
     public override void Main ()
@@ -24,7 +25,10 @@ public class ShadowStyles : Scenario
         var editor = new AdornmentsEditor ()
         {
             AutoSelectViewToEdit = true,
+            ShowViewIdentifier = true,
         };
+        editor.Initialized += (sender, args) => editor.MarginEditor.ExpanderButton.Collapsed = false;
+
         app.Add (editor);
 
         Window win = new ()
@@ -36,8 +40,14 @@ public class ShadowStyles : Scenario
             Title = "Shadow Window",
             Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped,
             BorderStyle = LineStyle.Double,
-            ShadowStyle = ShadowStyle.Transparent
+            ShadowStyle = ShadowStyle.Transparent,
         };
+
+        app.DrawingContent += (s, e) =>
+                           {
+                               app!.FillRect (app!.Viewport, CM.Glyphs.Dot);
+                               e.Cancel = true;
+                           };
 
         var buttonInWin = new Button
         {

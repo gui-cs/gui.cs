@@ -54,12 +54,10 @@ public class LineView : View
     public Rune? StartingAnchor { get; set; }
 
     /// <summary>Draws the line including any starting/ending anchors</summary>
-    public override void OnDrawContent (Rectangle viewport)
+    protected override bool OnDrawingContent ()
     {
-        base.OnDrawContent (viewport);
-
         Move (0, 0);
-        Driver.SetAttribute (GetNormalColor ());
+        SetAttribute (GetNormalColor ());
 
         int hLineWidth = Math.Max (1, Glyphs.HLine.GetColumns ());
 
@@ -87,7 +85,8 @@ public class LineView : View
                 rune = EndingAnchor ?? LineRune;
             }
 
-            Driver.AddRune (rune);
+            Driver?.AddRune (rune);
         }
+        return true;
     }
 }

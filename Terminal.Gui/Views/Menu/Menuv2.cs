@@ -43,24 +43,6 @@ public class Menuv2 : Bar
         ColorScheme = Colors.ColorSchemes ["Menu"];
     }
 
-    // Menuv2 arranges the items horizontally.
-    // The first item has no left border, the last item has no right border.
-    // The Shortcuts are configured with the command, help, and key views aligned in reverse order (EndToStart).
-    internal override void OnLayoutStarted (LayoutEventArgs args)
-    {
-        for (int index = 0; index < Subviews.Count; index++)
-        {
-            View barItem = Subviews [index];
-
-            if (!barItem.Visible)
-            {
-                continue;
-            }
-
-        }
-        base.OnLayoutStarted (args);
-    }
-
     /// <inheritdoc/>
     public override View Add (View view)
     {

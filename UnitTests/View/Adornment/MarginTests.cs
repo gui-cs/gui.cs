@@ -6,30 +6,29 @@ public class MarginTests (ITestOutputHelper output)
 {
     [Fact]
     [SetupFakeDriver]
-    public void Margin_Uses_SuperView_ColorScheme ()
+    public void Margin_Is_Transparent ()
     {
         ((FakeDriver)Application.Driver!).SetBufferSize (5, 5);
+
         var view = new View { Height = 3, Width = 3 };
+        view.Margin.Diagnostics = ViewDiagnosticFlags.Thickness;
         view.Margin.Thickness = new (1);
 
-        var superView = new View ();
+        Application.Top = new Toplevel ();
+        Application.TopLevels.Push (Gui.Application.Top);
 
-        superView.ColorScheme = new()
+        Application.Top.ColorScheme = new()
         {
             Normal = new (Color.Red, Color.Green), Focus = new (Color.Green, Color.Red)
         };
 
-        superView.Add (view);
+        Application.Top.Add (view);
         Assert.Equal (ColorName16.Red, view.Margin.GetNormalColor ().Foreground.GetClosestNamedColor16 ());
-        Assert.Equal (ColorName16.Red, superView.GetNormalColor ().Foreground.GetClosestNamedColor16 ());
-        Assert.Equal (superView.GetNormalColor (), view.Margin.GetNormalColor ());
-        Assert.Equal (superView.GetFocusColor (), view.Margin.GetFocusColor ());
+        Assert.Equal (ColorName16.Red, Application.Top.GetNormalColor ().Foreground.GetClosestNamedColor16 ());
 
-        superView.BeginInit ();
-        superView.EndInit ();
-        View.Diagnostics = ViewDiagnosticFlags.Padding;
-        view.Draw ();
-        View.Diagnostics = ViewDiagnosticFlags.Off;
+        Application.Top.BeginInit ();
+        Application.Top.EndInit ();
+        Application.LayoutAndDraw();
 
         TestHelpers.AssertDriverContentsAre (
                                              @"
@@ -38,6 +37,8 @@ M M
 MMM",
                                              output
                                             );
-        TestHelpers.AssertDriverAttributesAre ("0", null, superView.GetNormalColor ());
+        TestHelpers.AssertDriverAttributesAre ("0", output, null, Application.Top.GetNormalColor ());
+
+        Application.ResetState (true);
     }
 }

@@ -54,7 +54,7 @@ public class PosCombineTests (ITestOutputHelper output)
         f.X = Pos.X (v2) - Pos.X (v1);
         f.Y = Pos.Y (v2) - Pos.Y (v1);
 
-        Assert.Throws<InvalidOperationException> (() => Application.Run (t));
+        Assert.Throws<LayoutException> (() => Application.Run (t));
         t.Dispose ();
         Application.Shutdown ();
 
@@ -86,8 +86,7 @@ public class PosCombineTests (ITestOutputHelper output)
         win2.Add (view2);
         win1.Add (view1, win2);
         Application.Top.Add (win1);
-        Application.Top.BeginInit ();
-        Application.Top.EndInit ();
+        Application.Top.Layout ();
 
         Assert.Equal (new Rectangle (0, 0, 80, 25), Application.Top.Frame);
         Assert.Equal (new Rectangle (0, 0, 5, 1), view1.Frame);
@@ -121,7 +120,7 @@ public class PosCombineTests (ITestOutputHelper output)
         f.X = Pos.X (Application.Top) + Pos.X (v2) - Pos.X (v1);
         f.Y = Pos.Y (Application.Top) + Pos.Y (v2) - Pos.Y (v1);
 
-        Application.Top.LayoutComplete += (s, e) =>
+        Application.Top.SubviewsLaidOut += (s, e) =>
         {
             Assert.Equal (0, Application.Top.Frame.X);
             Assert.Equal (0, Application.Top.Frame.Y);
@@ -137,7 +136,7 @@ public class PosCombineTests (ITestOutputHelper output)
 
         Application.Iteration += (s, a) => Application.RequestStop ();
 
-        Assert.Throws<InvalidOperationException> (() => Application.Run ());
+        Assert.Throws<LayoutException> (() => Application.Run ());
         top.Dispose ();
         Application.ResetState (ignoreDisposed: true);
     }

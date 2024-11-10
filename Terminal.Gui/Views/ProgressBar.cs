@@ -1,4 +1,5 @@
-﻿namespace Terminal.Gui;
+﻿#nullable enable
+namespace Terminal.Gui;
 
 /// <summary>Specifies the style that a <see cref="ProgressBar"/> uses to indicate the progress of an operation.</summary>
 public enum ProgressBarStyle
@@ -37,30 +38,29 @@ public enum ProgressBarFormat
 /// </remarks>
 public class ProgressBar : View, IDesignable
 {
-    private int [] _activityPos;
-    private bool _bidirectionalMarquee = true;
+    private int []? _activityPos;
     private int _delta;
     private float _fraction;
     private bool _isActivity;
     private ProgressBarStyle _progressBarStyle = ProgressBarStyle.Blocks;
-    private ProgressBarFormat _progressBarFormat = ProgressBarFormat.Simple;
-    private Rune _segmentCharacter = Glyphs.BlocksMeterSegment;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ProgressBar"/> class, starts in percentage mode and uses relative
     ///     layout.
     /// </summary>
-    public ProgressBar () { SetInitialProperties (); }
+    public ProgressBar ()
+    {
+        Width = Dim.Auto (DimAutoStyle.Content);
+        Height = Dim.Auto (DimAutoStyle.Content, 1);
+        CanFocus = false;
+        _fraction = 0;
+    }
 
     /// <summary>
     ///     Specifies if the <see cref="ProgressBarStyle.MarqueeBlocks"/> or the
     ///     <see cref="ProgressBarStyle.MarqueeContinuous"/> styles is unidirectional or bidirectional.
     /// </summary>
-    public bool BidirectionalMarquee
-    {
-        get => _bidirectionalMarquee;
-        set => _bidirectionalMarquee = value;
-    }
+    public bool BidirectionalMarquee { get; set; } = true;
 
     /// <summary>Gets or sets the <see cref="ProgressBar"/> fraction to display, must be a value between 0 and 1.</summary>
     /// <value>The fraction representing the progress.</value>
@@ -71,16 +71,12 @@ public class ProgressBar : View, IDesignable
         {
             _fraction = Math.Min (value, 1);
             _isActivity = false;
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
     }
 
     /// <summary>Specifies the format that a <see cref="ProgressBar"/> uses to indicate the visual presentation.</summary>
-    public ProgressBarFormat ProgressBarFormat
-    {
-        get => _progressBarFormat;
-        set => _progressBarFormat = value;
-    }
+    public ProgressBarFormat ProgressBarFormat { get; set; } = ProgressBarFormat.Simple;
 
     /// <summary>Gets/Sets the progress bar style based on the <see cref="Terminal.Gui.ProgressBarStyle"/></summary>
     public ProgressBarStyle ProgressBarStyle
@@ -109,16 +105,13 @@ public class ProgressBar : View, IDesignable
 
                     break;
             }
-            SetNeedsDisplay ();
+
+            SetNeedsDraw ();
         }
     }
 
     /// <summary>Segment indicator for meter views.</summary>
-    public Rune SegmentCharacter
-    {
-        get => _segmentCharacter;
-        set => _segmentCharacter = value;
-    }
+    public Rune SegmentCharacter { get; set; } = Glyphs.BlocksMeterSegment;
 
     /// <summary>
     ///     Gets or sets the text displayed on the progress bar. If set to an empty string and
@@ -130,8 +123,7 @@ public class ProgressBar : View, IDesignable
         get => string.IsNullOrEmpty (base.Text) ? $"{_fraction * 100:F0}%" : base.Text;
         set
         {
-            if (ProgressBarStyle == ProgressBarStyle.MarqueeBlocks
-                || ProgressBarStyle == ProgressBarStyle.MarqueeContinuous)
+            if (ProgressBarStyle is ProgressBarStyle.MarqueeBlocks or ProgressBarStyle.MarqueeContinuous)
             {
                 base.Text = value;
             }
@@ -139,9 +131,9 @@ public class ProgressBar : View, IDesignable
     }
 
     ///<inheritdoc/>
-    public override void OnDrawContent (Rectangle viewport)
+    protected override bool OnDrawingContent ()
     {
-        Driver.SetAttribute (GetHotNormalColor ());
+        SetAttribute (GetHotNormalColor ());
 
         Move (0, 0);
 
@@ -149,13 +141,13 @@ public class ProgressBar : View, IDesignable
         {
             for (var i = 0; i < Viewport.Width; i++)
             {
-                if (Array.IndexOf (_activityPos, i) != -1)
+                if (Array.IndexOf (_activityPos!, i) != -1)
                 {
-                    Driver.AddRune (SegmentCharacter);
+                    Driver?.AddRune (SegmentCharacter);
                 }
                 else
                 {
-                    Driver.AddRune ((Rune)' ');
+                    Driver?.AddRune ((Rune)' ');
                 }
             }
         }
@@ -166,32 +158,34 @@ public class ProgressBar : View, IDesignable
 
             for (i = 0; (i < mid) & (i < Viewport.Width); i++)
             {
-                Driver.AddRune (SegmentCharacter);
+                Driver?.AddRune (SegmentCharacter);
             }
 
             for (; i < Viewport.Width; i++)
             {
-                Driver.AddRune ((Rune)' ');
+                Driver?.AddRune ((Rune)' ');
             }
         }
 
         if (ProgressBarFormat != ProgressBarFormat.Simple && !_isActivity)
         {
             var tf = new TextFormatter { Alignment = Alignment.Center, Text = Text };
-            var attr = new Attribute (ColorScheme.HotNormal.Foreground, ColorScheme.HotNormal.Background);
+            var attr = new Attribute (ColorScheme!.HotNormal.Foreground, ColorScheme.HotNormal.Background);
 
             if (_fraction > .5)
             {
-                attr = new Attribute (ColorScheme.HotNormal.Background, ColorScheme.HotNormal.Foreground);
+                attr = new (ColorScheme.HotNormal.Background, ColorScheme.HotNormal.Foreground);
             }
 
-            tf?.Draw (
-                      ViewportToScreen (Viewport),
-                      attr,
-                      ColorScheme.Normal,
-                      SuperView?.ViewportToScreen (SuperView.Viewport) ?? default (Rectangle)
-                     );
+            tf.Draw (
+                     ViewportToScreen (Viewport),
+                     attr,
+                     ColorScheme.Normal,
+                     SuperView?.ViewportToScreen (SuperView.Viewport) ?? default (Rectangle)
+                    );
         }
+
+        return true;
     }
 
     /// <summary>Notifies the <see cref="ProgressBar"/> that some progress has taken place.</summary>
@@ -234,7 +228,7 @@ public class ProgressBar : View, IDesignable
             }
             else if (_activityPos [0] >= Viewport.Width)
             {
-                if (_bidirectionalMarquee)
+                if (BidirectionalMarquee)
                 {
                     for (var i = 0; i < _activityPos.Length; i++)
                     {
@@ -250,7 +244,7 @@ public class ProgressBar : View, IDesignable
             }
         }
 
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
     }
 
     private void PopulateActivityPos ()
@@ -263,29 +257,13 @@ public class ProgressBar : View, IDesignable
         }
     }
 
-    private void ProgressBar_Initialized (object sender, EventArgs e)
-    {
-        //ColorScheme = new ColorScheme (ColorScheme ?? SuperView?.ColorScheme ?? Colors.ColorSchemes ["Base"])
-        //{
-        //    HotNormal = new Attribute (Color.BrightGreen, Color.Gray)
-        //};
-    }
-
-    private void SetInitialProperties ()
-    {
-        Width = Dim.Auto (DimAutoStyle.Content);
-        Height = Dim.Auto (DimAutoStyle.Content, minimumContentDim: 1);
-        CanFocus = false;
-        _fraction = 0;
-        Initialized += ProgressBar_Initialized;
-    }
-
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public bool EnableForDesign ()
     {
         Width = Dim.Fill ();
-        Height = Dim.Auto (DimAutoStyle.Text, minimumContentDim: 1);
+        Height = Dim.Auto (DimAutoStyle.Text, 1);
         Fraction = 0.75f;
+
         return true;
     }
 }

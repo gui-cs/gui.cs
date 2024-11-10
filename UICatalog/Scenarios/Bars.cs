@@ -146,6 +146,7 @@ public class Bars : Scenario
             Y = Pos.Bottom (label),
         };
         ConfigureMenu (bar);
+        bar.Arrangement = ViewArrangement.RightResizable;
 
         menuLikeExamples.Add (bar);
 

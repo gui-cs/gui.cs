@@ -1,4 +1,5 @@
-﻿namespace Terminal.Gui;
+﻿#nullable enable
+namespace Terminal.Gui;
 
 /// <summary>The Padding for a <see cref="View"/>. Accessed via <see cref="View.Padding"/></summary>
 /// <remarks>
@@ -21,21 +22,13 @@ public class Padding : Adornment
     ///     The color scheme for the Padding. If set to <see langword="null"/>, gets the <see cref="Adornment.Parent"/>
     ///     scheme. color scheme.
     /// </summary>
-    public override ColorScheme ColorScheme
+    public override ColorScheme? ColorScheme
     {
-        get
-        {
-            if (base.ColorScheme is { })
-            {
-                return base.ColorScheme;
-            }
-
-            return Parent?.ColorScheme;
-        }
+        get => base.ColorScheme ?? Parent?.ColorScheme;
         set
         {
             base.ColorScheme = value;
-            Parent?.SetNeedsDisplay ();
+            Parent?.SetNeedsDraw ();
         }
     }
 
@@ -62,7 +55,7 @@ public class Padding : Adornment
             if (Parent.CanFocus && !Parent.HasFocus)
             {
                 Parent.SetFocus ();
-                Parent.SetNeedsDisplay ();
+                Parent.SetNeedsDraw ();
                 return mouseEvent.Handled = true;
             }
         }

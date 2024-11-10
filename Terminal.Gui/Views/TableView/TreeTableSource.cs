@@ -162,7 +162,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
         if (e.Handled)
         {
             _tree.InvalidateLineMap ();
-            _tableView.SetNeedsDisplay ();
+            _tableView.SetNeedsDraw ();
         }
     }
 
@@ -197,7 +197,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
         if (e.Handled)
         {
             _tree.InvalidateLineMap ();
-            _tableView.SetNeedsDisplay ();
+            _tableView.SetNeedsDraw ();
         }
     }
 }

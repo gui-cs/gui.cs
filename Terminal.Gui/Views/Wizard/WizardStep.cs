@@ -29,7 +29,7 @@ public class WizardStep : View
     //			OnTitleChanged (old, title);
     //		}
     //		base.Title = value;
-    //		SetNeedsDisplay ();
+    //		SetNeedsDraw ();
     //	}
     //}
 
@@ -73,7 +73,7 @@ public class WizardStep : View
         //	if (helpTextView.TopRow != scrollBar.Position) {
         //		scrollBar.Position = helpTextView.TopRow;
         //	}
-        //	helpTextView.SetNeedsDisplay ();
+        //	helpTextView.SetNeedsDraw ();
         //};
 
         //scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
@@ -81,7 +81,7 @@ public class WizardStep : View
         //	if (helpTextView.LeftColumn != scrollBar.OtherScrollBarView.Position) {
         //		scrollBar.OtherScrollBarView.Position = helpTextView.LeftColumn;
         //	}
-        //	helpTextView.SetNeedsDisplay ();
+        //	helpTextView.SetNeedsDraw ();
         //};
 
         //scrollBar.VisibleChanged += (s,e) => {
@@ -130,7 +130,7 @@ public class WizardStep : View
         {
             _helpTextView.Text = value;
             ShowHide ();
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
     }
 
@@ -158,7 +158,7 @@ public class WizardStep : View
     /// <remarks></remarks>
     public override View Remove (View view)
     {
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
         View container = view?.SuperView;
 
         if (container == this)

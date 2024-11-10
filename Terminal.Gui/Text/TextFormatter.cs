@@ -68,7 +68,10 @@ public class TextFormatter
             return;
         }
 
-        driver ??= Application.Driver;
+        if (driver is null)
+        {
+            driver = Application.Driver;
+        }
 
         driver?.SetAttribute (normalColor);
 

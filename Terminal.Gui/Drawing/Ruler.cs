@@ -1,10 +1,11 @@
-﻿namespace Terminal.Gui;
+﻿#nullable enable
+namespace Terminal.Gui;
 
 /// <summary>Draws a ruler on the screen.</summary>
 /// <remarks>
 ///     <para></para>
 /// </remarks>
-public class Ruler
+internal class Ruler
 {
     /// <summary>Gets or sets the foreground and background color to use.</summary>
     public Attribute Attribute { get; set; } = new ();
@@ -36,7 +37,7 @@ public class Ruler
         if (Orientation == Orientation.Horizontal)
         {
             string hrule =
-                _hTemplate.Repeat ((int)Math.Ceiling (Length + 2 / (double)_hTemplate.Length)) [start..(Length + start)];
+                _hTemplate.Repeat ((int)Math.Ceiling (Length + 2 / (double)_hTemplate.Length))! [start..(Length + start)];
 
             // Top
             Application.Driver?.Move (location.X, location.Y);
@@ -45,7 +46,7 @@ public class Ruler
         else
         {
             string vrule =
-                _vTemplate.Repeat ((int)Math.Ceiling ((Length + 2) / (double)_vTemplate.Length))
+                _vTemplate.Repeat ((int)Math.Ceiling ((Length + 2) / (double)_vTemplate.Length))!
                     [start..(Length + start)];
 
             for (int r = location.Y; r < location.Y + Length; r++)

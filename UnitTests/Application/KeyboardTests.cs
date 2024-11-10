@@ -724,7 +724,7 @@ public class KeyboardTests
             iteration++;
             Assert.True (iteration < 2, "Too many iterations, something is wrong.");
 
-            if (Application.IsInitialized)
+            if (Application.Initialized)
             {
                 _output.WriteLine ("  Pressing QuitKey");
                 Application.RaiseKeyDownEvent (Application.QuitKey);

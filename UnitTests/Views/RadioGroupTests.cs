@@ -549,7 +549,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.Equal (new (0, 0, 30, 5), pos);
 
         rg.Orientation = Orientation.Horizontal;
-        Application.Refresh ();
+        Application.LayoutAndDraw ();
 
         Assert.Equal (Orientation.Horizontal, rg.Orientation);
         Assert.Equal (2, rg.HorizontalSpace);
@@ -570,7 +570,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.Equal (new (0, 0, 30, 5), pos);
 
         rg.HorizontalSpace = 4;
-        Application.Refresh ();
+        Application.LayoutAndDraw ();
 
         Assert.Equal (Orientation.Horizontal, rg.Orientation);
         Assert.Equal (4, rg.HorizontalSpace);

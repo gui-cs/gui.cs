@@ -1,6 +1,7 @@
 #nullable enable
 
 using System.ComponentModel;
+using System.Text.RegularExpressions;
 
 namespace Terminal.Gui;
 
@@ -10,7 +11,7 @@ namespace Terminal.Gui;
 /// <remarks>
 ///     <para>
 ///         Updating the properties of <see cref="Aligner"/> is supported, but will not automatically cause re-layout to
-///         happen. <see cref="View.LayoutSubviews"/>
+///         happen. <see cref="View.Layout()"/>
 ///         must be called on the SuperView.
 ///     </para>
 ///     <para>
@@ -28,7 +29,7 @@ public record PosAlign : Pos
     /// <summary>
     ///     The cached location. Used to store the calculated location to minimize recalculating it.
     /// </summary>
-    public int? _cachedLocation;
+    internal int? _cachedLocation;
 
     private readonly Aligner? _aligner;
 
@@ -63,17 +64,7 @@ public record PosAlign : Pos
         List<int> dimensionsList = new ();
 
         // PERF: If this proves a perf issue, consider caching a ref to this list in each item
-        List<View> viewsInGroup = views.Where (
-                                               v =>
-                                               {
-                                                   return dimension switch
-                                                   {
-                                                       Dimension.Width when v.X is PosAlign alignX => alignX.GroupId == groupId,
-                                                       Dimension.Height when v.Y is PosAlign alignY => alignY.GroupId == groupId,
-                                                       _ => false
-                                                   };
-                                               })
-                                       .ToList ();
+        List<View> viewsInGroup = views.Where (v => HasGroupId (v, dimension, groupId)).ToList ();
 
         if (viewsInGroup.Count == 0)
         {
@@ -99,6 +90,16 @@ public record PosAlign : Pos
         return dimensionsList.Sum ();
     }
 
+    internal static bool HasGroupId (View v, Dimension dimension, int groupId)
+    {
+        return dimension switch
+        {
+            Dimension.Width when v.X.Has<PosAlign> (out PosAlign pos) => pos.GroupId == groupId,
+            Dimension.Height when v.Y.Has<PosAlign> (out PosAlign pos) => pos.GroupId == groupId,
+            _ => false
+        };
+    }
+
     /// <summary>
     ///     Gets the identifier of a set of views that should be aligned together. When only a single
     ///     set of views in a SuperView is aligned, setting <see cref="GroupId"/> is not needed because it defaults to 0.
@@ -110,17 +111,23 @@ public record PosAlign : Pos
 
     internal override int Calculate (int superviewDimension, Dim dim, View us, Dimension dimension)
     {
-        if (_cachedLocation.HasValue && Aligner.ContainerSize == superviewDimension)
+        if (_cachedLocation.HasValue && Aligner.ContainerSize == superviewDimension && !us.NeedsLayout)
         {
             return _cachedLocation.Value;
         }
 
-        if (us?.SuperView is null)
+        IList<View>? groupViews;
+        if (us.SuperView is null)
         {
-            return 0;
+            groupViews = new List<View> ();
+            groupViews.Add (us);
+        }
+        else
+        {
+            groupViews = us.SuperView!.Subviews.Where (v => HasGroupId (v, dimension, GroupId)).ToList ();
         }
 
-        AlignAndUpdateGroup (GroupId, us.SuperView.Subviews, dimension, superviewDimension);
+        AlignAndUpdateGroup (GroupId, groupViews, dimension, superviewDimension);
 
         if (_cachedLocation.HasValue)
         {
@@ -145,31 +152,9 @@ public record PosAlign : Pos
         List<int> dimensionsList = new ();
 
         // PERF: If this proves a perf issue, consider caching a ref to this list in each item
-        List<PosAlign?> posAligns = views.Select (
-                                                  v =>
-                                                  {
-                                                      switch (dimension)
-                                                      {
-                                                          case Dimension.Width when v.X.Has<PosAlign> (out Pos pos):
-
-                                                              if (pos is PosAlign posAlignX && posAlignX.GroupId == groupId)
-                                                              {
-                                                                  return posAlignX;
-                                                              }
-
-                                                              break;
-                                                          case Dimension.Height when v.Y.Has<PosAlign> (out Pos pos):
-                                                              if (pos is PosAlign posAlignY && posAlignY.GroupId == groupId)
-                                                              {
-                                                                  return posAlignY;
-                                                              }
-
-                                                              break;
-                                                      }
-
-                                                      return null;
-                                                  })
-                                         .ToList ();
+        List<PosAlign?> posAligns = views.Where (v => PosAlign.HasGroupId (v, dimension, groupId))
+                                        .Select (v => dimension == Dimension.Width ? v.X as PosAlign : v.Y as PosAlign)
+                                        .ToList ();
 
         // PERF: We iterate over viewsInGroup multiple times here.
 
@@ -185,7 +170,9 @@ public record PosAlign : Pos
                     firstInGroup = posAligns [index]!.Aligner;
                 }
 
-                dimensionsList.Add (dimension == Dimension.Width ? views [index].Frame.Width : views [index].Frame.Height);
+                dimensionsList.Add (dimension == Dimension.Width 
+                                        ? views [index].Width!.Calculate(0, size, views [index], dimension) 
+                                        : views [index].Height!.Calculate (0, size, views [index], dimension));
             }
         }
 

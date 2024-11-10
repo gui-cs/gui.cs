@@ -54,7 +54,7 @@ public abstract class SpinnerStyle
     /// </summary>
     /// <remarks>
     ///     This is the maximum speed the spinner will rotate at.  You still need to call
-    ///     <see cref="View.SetNeedsDisplay()"/> or <see cref="SpinnerView.AutoSpin"/> to advance/start animation.
+    ///     <see cref="View.SetNeedsDraw()"/> or <see cref="SpinnerView.AutoSpin"/> to advance/start animation.
     /// </remarks>
     public abstract int SpinDelay { get; }
 

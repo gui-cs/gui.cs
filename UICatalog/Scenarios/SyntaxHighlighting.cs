@@ -281,17 +281,13 @@ public class SyntaxHighlighting : Scenario
             AllSuggestions = _keywords.ToList ()
         };
 
-        _textView.TextChanged += (s, e) => HighlightTextBasedOnKeywords ();
-        _textView.DrawContent += (s, e) => HighlightTextBasedOnKeywords ();
-        _textView.DrawContentComplete += (s, e) => HighlightTextBasedOnKeywords ();
+        // DrawingText happens before DrawingContent so we use it to highlight
+        _textView.DrawingText += (s, e) => HighlightTextBasedOnKeywords ();
     }
 
     private void ClearAllEvents ()
     {
-        _textView.ClearEventHandlers ("TextChanged");
-        _textView.ClearEventHandlers ("DrawContent");
-        _textView.ClearEventHandlers ("DrawContentComplete");
-
+        _textView.ClearEventHandlers ("DrawingText");
         _textView.InheritsPreviousAttribute = false;
     }
 

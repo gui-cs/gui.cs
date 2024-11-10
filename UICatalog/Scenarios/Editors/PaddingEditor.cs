@@ -1,4 +1,5 @@
-﻿namespace UICatalog.Scenarios;
+﻿#nullable enable
+namespace UICatalog.Scenarios;
 
 public class PaddingEditor : AdornmentEditor
 {

@@ -16,7 +16,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Dialogs")]
 [ScenarioCategory ("Text and Formatting")]
 [ScenarioCategory ("Dialogs")]
-[ScenarioCategory ("Overlapped")]
+[ScenarioCategory ("Arrangement")]
 [ScenarioCategory ("Files and IO")]
 public class CsvEditor : Scenario
 {
@@ -357,7 +357,7 @@ public class CsvEditor : Scenario
 
                 _tableView.SetSelection (newIdx, _tableView.SelectedRow, false);
                 _tableView.EnsureSelectedCellIsVisible ();
-                _tableView.SetNeedsDisplay ();
+                _tableView.SetNeedsDraw ();
             }
         }
         catch (Exception ex)
@@ -406,7 +406,7 @@ public class CsvEditor : Scenario
 
                 _tableView.SetSelection (_tableView.SelectedColumn, newIdx, false);
                 _tableView.EnsureSelectedCellIsVisible ();
-                _tableView.SetNeedsDisplay ();
+                _tableView.SetNeedsDraw ();
             }
         }
         catch (Exception ex)
@@ -627,7 +627,7 @@ public class CsvEditor : Scenario
                                              scrollBar.Position = _tableView.RowOffset;
                                          }
 
-                                         _tableView.SetNeedsDisplay ();
+                                         _tableView.SetNeedsDraw ();
                                      };
         /*
         scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
@@ -635,10 +635,10 @@ public class CsvEditor : Scenario
             if (tableView.LeftItem != scrollBar.OtherScrollBarView.Position) {
                 scrollBar.OtherScrollBarView.Position = tableView.LeftItem;
             }
-            tableView.SetNeedsDisplay ();
+            tableView.SetNeedsDraw ();
         };*/
 
-        _tableView.DrawContent += (s, e) =>
+        _tableView.DrawingContent += (s, e) =>
                                   {
                                       scrollBar.Size = _tableView.Table?.Rows ?? 0;
                                       scrollBar.Position = _tableView.RowOffset;

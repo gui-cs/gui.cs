@@ -6,7 +6,6 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Wizards", "Demonstrates the Wizard class")]
 [ScenarioCategory ("Dialogs")]
-[ScenarioCategory ("Overlapped")]
 [ScenarioCategory ("Wizards")]
 [ScenarioCategory ("Runnable")]
 
@@ -323,10 +322,10 @@ public class Wizards : Scenario
                                                                                 scrollBar.Position = someText.TopRow;
                                                                             }
 
-                                                                            someText.SetNeedsDisplay ();
+                                                                            someText.SetNeedsDraw ();
                                                                         };
 
-                                           someText.DrawContent += (s, e) =>
+                                           someText.DrawingContent += (s, e) =>
                                                                    {
                                                                        scrollBar.Size = someText.Lines;
                                                                        scrollBar.Position = someText.TopRow;
@@ -336,9 +335,6 @@ public class Wizards : Scenario
                                                                            scrollBar.OtherScrollBarView.Size = someText.Maxlength;
                                                                            scrollBar.OtherScrollBarView.Position = someText.LeftColumn;
                                                                        }
-
-                                                                       scrollBar.LayoutSubviews ();
-                                                                       scrollBar.Refresh ();
                                                                    };
                                            fourthStep.Add (scrollBar);
 
