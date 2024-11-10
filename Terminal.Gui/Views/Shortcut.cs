@@ -490,12 +490,19 @@ public class Shortcut : View, IOrientation, IDesignable
                 if (e.Context.Data != this)
                 {
                     // Forward command to ourselves
-                    e.Cancel = InvokeCommand (Command.Select, new (Command.Select, null, null, this)) == true;
+                    InvokeCommand (Command.Select, new (Command.Select, null, null, this));
                 }
-                else
-                {
-                    e.Cancel = true;
-                }
+
+                e.Cancel = true;
+                //if (e.Context.Data != this)
+                //{
+                //    // Forward command to ourselves
+                //    e.Cancel = InvokeCommand (Command.Select, new (Command.Select, null, null, this)) == true;
+                //}
+                //else
+                //{
+                //    e.Cancel = true;
+                //}
             }
         }
     }
