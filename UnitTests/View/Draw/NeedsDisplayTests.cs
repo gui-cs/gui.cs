@@ -67,15 +67,18 @@ public class NeedsDrawTests ()
 
         view.BeginInit ();
         Assert.True (view.NeedsDraw);
+        Assert.True (view.NeedsLayout);
 
         view.NeedsDraw = false;
 
         view.BeginInit ();
         // NeedsDraw is only set on View initialization
         Assert.False (view.NeedsDraw);
+        Assert.False (view.NeedsLayout);
 
         view.Layout ();
         Assert.False (view.NeedsDraw);
+        Assert.False (view.NeedsLayout);
     }
 
     [Fact]
@@ -127,12 +130,14 @@ public class NeedsDrawTests ()
         // SRL won't change anything since the view is Absolute
         view.SetRelativeLayout (Application.Screen.Size);
         Assert.False (view.NeedsDraw);
+        Assert.False (view.NeedsLayout);
 
         view.SetNeedsLayout ();
 
         // SRL won't change anything since the view is Absolute
         view.SetRelativeLayout (Application.Screen.Size);
         Assert.True (view.NeedsDraw);
+        Assert.True (view.NeedsLayout);
 
         view.NeedsDraw = false;
 
@@ -140,6 +145,7 @@ public class NeedsDrawTests ()
         // Since the frame wasn't changed then don't need to draw
         view.SetRelativeLayout (new (10, 10));
         Assert.False (view.NeedsDraw);
+        Assert.False (view.NeedsLayout);
     }
 
     [Fact]
