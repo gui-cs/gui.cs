@@ -406,10 +406,12 @@ internal sealed class Menu : View
             return;
         }
 
+        // In DrawComplete the NeedsDraw is false and need to set to true
+        Border?.SetNeedsDraw ();
         DrawBorderAndPadding ();
         RenderLineCanvas ();
 
-        // BUGBUG: Views should not change the clip. Doing so is an indcation of poor design or a bug in the framework.
+        // BUGBUG: Views should not change the clip. Doing so is an indication of poor design or a bug in the framework.
         Region? savedClip = View.SetClipToScreen ();
 
         SetAttribute (GetNormalColor ());

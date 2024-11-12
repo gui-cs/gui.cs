@@ -487,7 +487,11 @@ public abstract class ConsoleDriver
     internal void Refresh ()
     {
         bool updated = UpdateScreen ();
-        UpdateCursor ();
+
+        if (updated)
+        {
+            UpdateCursor ();
+        }
 
         Refreshed?.Invoke (this, new EventArgs<bool> (in updated));
     }

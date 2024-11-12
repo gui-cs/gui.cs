@@ -500,7 +500,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     /// Only Views that need to be drawn (see <see cref="View.NeedsDraw"/>) will be drawn.
     /// </summary>
     /// <param name="forceDraw">If <see langword="true"/> the entire View hierarchy will be redrawn. The default is <see langword="false"/> and should only be overriden for testing.</param>
-    public static void LayoutAndDraw (bool forceDraw = false)
+    public static bool LayoutAndDraw (bool forceDraw = false)
     {
         bool neededLayout = View.Layout (TopLevels.Reverse (), Screen.Size);
 
@@ -510,10 +510,15 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         }
 
         View.SetClipToScreen ();
-        View.Draw (TopLevels, neededLayout || forceDraw);
+        bool neededDraw = View.Draw (TopLevels, neededLayout || forceDraw);
         View.SetClipToScreen ();
 
-        Driver?.Refresh ();
+        if (neededDraw)
+        {
+            Driver?.Refresh ();
+        }
+
+        return neededDraw;
     }
 
     /// <summary>This event is raised on each iteration of the main loop.</summary>
@@ -587,11 +592,12 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             return firstIteration;
         }
 
-        LayoutAndDraw ();
-
-        if (PositionCursor ())
+        if (LayoutAndDraw ())
         {
-            Driver!.UpdateCursor ();
+            if (PositionCursor ())
+            {
+                Driver!.UpdateCursor ();
+            }
         }
 
         return firstIteration;

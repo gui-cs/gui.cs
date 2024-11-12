@@ -71,7 +71,8 @@ public class NeedsDrawTests ()
         view.NeedsDraw = false;
 
         view.BeginInit ();
-        Assert.True (view.NeedsDraw); // Because layout is still needed
+        // NeedsDraw is only set on View initialization
+        Assert.False (view.NeedsDraw);
 
         view.Layout ();
         Assert.False (view.NeedsDraw);
@@ -136,8 +137,9 @@ public class NeedsDrawTests ()
         view.NeedsDraw = false;
 
         // SRL won't change anything since the view is Absolute. However, Layout has not been called
+        // Since the frame wasn't changed then don't need to draw
         view.SetRelativeLayout (new (10, 10));
-        Assert.True (view.NeedsDraw);
+        Assert.False (view.NeedsDraw);
     }
 
     [Fact]

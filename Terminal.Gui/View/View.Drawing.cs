@@ -10,21 +10,32 @@ public partial class View // Drawing APIs
     /// </summary>
     /// <param name="views">The peer views to draw.</param>
     /// <param name="force">If <see langword="true"/>, <see cref="View.SetNeedsDraw()"/> will be called on each view to force it to be drawn.</param>
-    internal static void Draw (IEnumerable<View> views, bool force)
+    internal static bool Draw (IEnumerable<View> views, bool force)
     {
         IEnumerable<View> viewsArray = views as View [] ?? views.ToArray ();
+        bool neededDraw = false;
 
         foreach (View view in viewsArray)
         {
             if (force)
             {
                 view.SetNeedsDraw ();
+                neededDraw = true;
             }
 
-            view.Draw ();
+            if (view.NeedsDraw || view.SubViewNeedsDraw)
+            {
+                neededDraw = true;
+                view.Draw ();
+            }
         }
 
-        Margin.DrawMargins (viewsArray);
+        if (neededDraw)
+        {
+            Margin.DrawMargins (viewsArray);
+        }
+
+        return neededDraw;
     }
 
     /// <summary>
@@ -749,6 +760,7 @@ public partial class View // Drawing APIs
     {
         _needsDrawRect = Rectangle.Empty;
         SubViewNeedsDraw = false;
+        NeedsLayout = false;
 
         if (Margin is { } && Margin.Thickness != Thickness.Empty)
         {
