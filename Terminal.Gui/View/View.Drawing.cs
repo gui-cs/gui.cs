@@ -113,7 +113,7 @@ public partial class View // Drawing APIs
             // Advance the diagnostics draw indicator
             Border?.AdvanceDrawIndicator ();
 
-            ClearNeedsDraw ();
+            ClearNeedsDrawAndNeedsLayout ();
         }
 
         // This causes the Margin to be drawn in a second pass
@@ -646,7 +646,7 @@ public partial class View // Drawing APIs
             }
             else
             {
-                ClearNeedsDraw ();
+                ClearNeedsDrawAndNeedsLayout ();
             }
         }
     }
@@ -755,8 +755,8 @@ public partial class View // Drawing APIs
         }
     }
 
-    /// <summary>Clears <see cref="NeedsDraw"/> and <see cref="SubViewNeedsDraw"/>.</summary>
-    protected void ClearNeedsDraw ()
+    /// <summary>Clears <see cref="NeedsDraw"/>, <see cref="SubViewNeedsDraw"/> and <see cref="NeedsLayout"/>.</summary>
+    protected void ClearNeedsDrawAndNeedsLayout ()
     {
         _needsDrawRect = Rectangle.Empty;
         SubViewNeedsDraw = false;
@@ -764,22 +764,22 @@ public partial class View // Drawing APIs
 
         if (Margin is { } && Margin.Thickness != Thickness.Empty)
         {
-            Margin?.ClearNeedsDraw ();
+            Margin?.ClearNeedsDrawAndNeedsLayout ();
         }
 
         if (Border is { } && Border.Thickness != Thickness.Empty)
         {
-            Border?.ClearNeedsDraw ();
+            Border?.ClearNeedsDrawAndNeedsLayout ();
         }
 
         if (Padding is { } && Padding.Thickness != Thickness.Empty)
         {
-            Padding?.ClearNeedsDraw ();
+            Padding?.ClearNeedsDrawAndNeedsLayout ();
         }
 
         foreach (View subview in Subviews)
         {
-            subview.ClearNeedsDraw ();
+            subview.ClearNeedsDrawAndNeedsLayout ();
         }
 
         if (SuperView is { })
@@ -792,7 +792,6 @@ public partial class View // Drawing APIs
         {
             LineCanvas.Clear ();
         }
-
     }
 
     #endregion NeedsDraw

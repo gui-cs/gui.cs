@@ -1131,7 +1131,7 @@ At 0,0
                 }
             }
 
-            ClearNeedsDraw ();
+            ClearNeedsDrawAndNeedsLayout ();
 
             return true;
         }
