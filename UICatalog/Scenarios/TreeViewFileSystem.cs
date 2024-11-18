@@ -299,7 +299,7 @@ public class TreeViewFileSystem : Scenario
         _miNoSymbols.Checked = expand.Value == default (int);
 
         _treeViewFiles.Style.ExpandableSymbol = expand;
-        _treeViewFiles.Style.CollapseableSymbol = collapse;
+        _treeViewFiles.Style.CollapsableSymbol = collapse;
         _treeViewFiles.SetNeedsDraw ();
     }
 
