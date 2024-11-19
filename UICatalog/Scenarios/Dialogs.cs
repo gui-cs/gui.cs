@@ -340,7 +340,6 @@ public class Dialogs : Scenario
                                       button.Text += char.ConvertFromUtf32 (CODE_POINT);
                                   }
 
-                                  dialog.LayoutSubviews ();
                                   e.Cancel = true;
                               };
             dialog.Add (addChar);
@@ -353,5 +352,58 @@ public class Dialogs : Scenario
         }
 
         return dialog;
+    }
+
+    public override List<Key> GetDemoKeyStrokes ()
+    {
+        var keys = new List<Key> ();
+
+        keys.Add (Key.D6);
+        keys.Add (Key.D5);
+
+        keys.Add (Key.Tab);
+        keys.Add (Key.D2);
+        keys.Add (Key.D0);
+
+        keys.Add (Key.Enter);
+        for (int i = 0; i < 5; i++)
+        {
+            keys.Add (Key.A);
+        }
+        keys.Add (Key.Enter);
+
+        keys.Add (Key.S.WithAlt);
+        keys.Add (Key.Enter);
+        for (int i = 0; i < 5; i++)
+        {
+            keys.Add (Key.A);
+        }
+        keys.Add (Key.Enter);
+
+        keys.Add (Key.E.WithAlt);
+        keys.Add (Key.Enter);
+        for (int i = 0; i < 5; i++)
+        {
+            keys.Add (Key.A);
+        }
+        keys.Add (Key.Enter);
+
+        keys.Add (Key.C.WithAlt);
+        keys.Add (Key.Enter);
+        for (int i = 0; i < 5; i++)
+        {
+            keys.Add (Key.A);
+        }
+        keys.Add (Key.Enter);
+
+        keys.Add (Key.F.WithAlt);
+        keys.Add (Key.Enter);
+        for (int i = 0; i < 5; i++)
+        {
+            keys.Add (Key.A);
+        }
+        keys.Add (Key.Enter);
+
+        return keys;
     }
 }

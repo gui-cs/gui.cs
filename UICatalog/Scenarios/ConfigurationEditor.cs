@@ -94,7 +94,7 @@ public class ConfigurationEditor : Scenario
                                          foreach (Tile t in _tileView.Tiles)
                                          {
                                              t.ContentView.ColorScheme = EditorColorScheme;
-                                             t.ContentView.SetNeedsDisplay ();
+                                             t.ContentView.SetNeedsDraw ();
                                          }
 
                                          ;
@@ -154,8 +154,6 @@ public class ConfigurationEditor : Scenario
         {
             _tileView.Tiles.ToArray () [1].ContentView.SetFocus ();
         }
-
-        Application.Top.LayoutSubviews ();
     }
 
     private void Quit ()

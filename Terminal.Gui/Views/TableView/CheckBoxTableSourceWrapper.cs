@@ -147,7 +147,7 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
         }
 
         e.Cancel = true;
-        tableView.SetNeedsDisplay ();
+        tableView.SetNeedsDraw ();
     }
 
     private void TableView_MouseClick (object sender, MouseEventArgs e)
@@ -171,7 +171,7 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
             // otherwise it ticks all rows
             ToggleAllRows ();
             e.Handled = true;
-            tableView.SetNeedsDisplay ();
+            tableView.SetNeedsDraw ();
         }
         else if (hit.HasValue && hit.Value.X == 0)
         {
@@ -186,7 +186,7 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
             }
 
             e.Handled = true;
-            tableView.SetNeedsDisplay ();
+            tableView.SetNeedsDraw ();
         }
     }
 }

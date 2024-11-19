@@ -10,18 +10,18 @@ public class OrientationHelperTests
         // Arrange
         Mock<IOrientation> mockIOrientation = new Mock<IOrientation> ();
         var orientationHelper = new OrientationHelper (mockIOrientation.Object);
-        var changingEventInvoked = false;
-        var changedEventInvoked = false;
+        var changingEventInvoked = 0;
+        var changedEventInvoked = 0;
 
-        orientationHelper.OrientationChanging += (sender, e) => { changingEventInvoked = true; };
-        orientationHelper.OrientationChanged += (sender, e) => { changedEventInvoked = true; };
+        orientationHelper.OrientationChanging += (sender, e) => { changingEventInvoked++; };
+        orientationHelper.OrientationChanged += (sender, e) => { changedEventInvoked++; };
 
         // Act
         orientationHelper.Orientation = Orientation.Vertical;
 
         // Assert
-        Assert.True (changingEventInvoked, "OrientationChanging event was not invoked.");
-        Assert.True (changedEventInvoked, "OrientationChanged event was not invoked.");
+        Assert.Equal (1, changingEventInvoked);
+        Assert.Equal(1, changedEventInvoked);
     }
 
     [Fact]
@@ -29,15 +29,15 @@ public class OrientationHelperTests
     {
         // Arrange
         Mock<IOrientation> mockIOrientation = new Mock<IOrientation> ();
-        var onChangingOverrideCalled = false;
-        var onChangedOverrideCalled = false;
+        var onChangingOverrideCalled = 0;
+        var onChangedOverrideCalled = 0;
 
         mockIOrientation.Setup (x => x.OnOrientationChanging (It.IsAny<Orientation> (), It.IsAny<Orientation> ()))
-                        .Callback (() => onChangingOverrideCalled = true)
+                        .Callback (() => onChangingOverrideCalled++)
                         .Returns (false); // Ensure it doesn't cancel the change
 
         mockIOrientation.Setup (x => x.OnOrientationChanged (It.IsAny<Orientation> ()))
-                        .Callback (() => onChangedOverrideCalled = true);
+                        .Callback (() => onChangedOverrideCalled++);
 
         var orientationHelper = new OrientationHelper (mockIOrientation.Object);
 
@@ -45,8 +45,8 @@ public class OrientationHelperTests
         orientationHelper.Orientation = Orientation.Vertical;
 
         // Assert
-        Assert.True (onChangingOverrideCalled, "OnOrientationChanging override was not called.");
-        Assert.True (onChangedOverrideCalled, "OnOrientationChanged override was not called.");
+        Assert.Equal (1, onChangingOverrideCalled);
+        Assert.Equal (1, onChangedOverrideCalled);
     }
 
     [Fact]
@@ -56,18 +56,18 @@ public class OrientationHelperTests
         Mock<IOrientation> mockIOrientation = new Mock<IOrientation> ();
         var orientationHelper = new OrientationHelper (mockIOrientation.Object);
         orientationHelper.Orientation = Orientation.Horizontal; // Set initial orientation
-        var changingEventInvoked = false;
-        var changedEventInvoked = false;
+        var changingEventInvoked = 0;
+        var changedEventInvoked = 0;
 
-        orientationHelper.OrientationChanging += (sender, e) => { changingEventInvoked = true; };
-        orientationHelper.OrientationChanged += (sender, e) => { changedEventInvoked = true; };
+        orientationHelper.OrientationChanging += (sender, e) => { changingEventInvoked++; };
+        orientationHelper.OrientationChanged += (sender, e) => { changedEventInvoked++; };
 
         // Act
         orientationHelper.Orientation = Orientation.Horizontal; // Set to the same value
 
         // Assert
-        Assert.False (changingEventInvoked, "OrientationChanging event was invoked.");
-        Assert.False (changedEventInvoked, "OrientationChanged event was invoked.");
+        Assert.Equal (0, changingEventInvoked);
+        Assert.Equal (0, changedEventInvoked);
     }
 
     [Fact]

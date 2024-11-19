@@ -46,7 +46,8 @@ public class Menuv2 : Bar
     // Menuv2 arranges the items horizontally.
     // The first item has no left border, the last item has no right border.
     // The Shortcuts are configured with the command, help, and key views aligned in reverse order (EndToStart).
-    internal override void OnLayoutStarted (LayoutEventArgs args)
+    /// <inheritdoc />
+    protected override void OnSubviewLayout (LayoutEventArgs args)
     {
         for (int index = 0; index < Subviews.Count; index++)
         {
@@ -58,7 +59,7 @@ public class Menuv2 : Bar
             }
 
         }
-        base.OnLayoutStarted (args);
+        base.OnSubviewLayout (args);
     }
 
     /// <inheritdoc/>

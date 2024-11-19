@@ -595,7 +595,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         // Focus work is done. Notify.
         RaiseFocusChanged (HasFocus, currentFocusedView, this);
 
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
 
         // Post-conditions - prove correctness
         if (HasFocus == previousValue)
@@ -858,21 +858,21 @@ public partial class View // Focus and cross-view navigation management (TabStop
             throw new InvalidOperationException ("SetHasFocusFalse and the HasFocus value did not change.");
         }
 
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
     }
 
-    private void RaiseFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedVew)
+    private void RaiseFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView)
     {
-        if (newHasFocus && focusedVew?.Focused is null)
+        if (newHasFocus && focusedView?.Focused is null)
         {
-            Application.Navigation?.SetFocused (focusedVew);
+            Application.Navigation?.SetFocused (focusedView);
         }
 
         // Call the virtual method
-        OnHasFocusChanged (newHasFocus, previousFocusedView, focusedVew);
+        OnHasFocusChanged (newHasFocus, previousFocusedView, focusedView);
 
         // Raise the event
-        var args = new HasFocusEventArgs (newHasFocus, newHasFocus, previousFocusedView, focusedVew);
+        var args = new HasFocusEventArgs (newHasFocus, newHasFocus, previousFocusedView, focusedView);
         HasFocusChanged?.Invoke (this, args);
     }
 
@@ -887,8 +887,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// </remarks>
     /// <param name="newHasFocus">The new value of <see cref="View.HasFocus"/>.</param>
     /// <param name="previousFocusedView"></param>
-    /// <param name="focusedVew">The view that is now focused. May be <see langword="null"/></param>
-    protected virtual void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedVew) { }
+    /// <param name="focusedView">The view that is now focused. May be <see langword="null"/></param>
+    protected virtual void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView) { }
 
     /// <summary>Raised after <see cref="HasFocus"/> has changed.</summary>
     /// <remarks>

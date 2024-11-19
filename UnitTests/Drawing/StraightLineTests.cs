@@ -321,6 +321,6 @@ public class StraightLineTests (ITestOutputHelper output)
     {
         var sl = new StraightLine (new (x, y), length, orientation, LineStyle.Single);
 
-        Assert.Equal (new (expectedX, expectedY, expectedWidth, expectedHeight), sl.Viewport);
+        Assert.Equal (new (expectedX, expectedY, expectedWidth, expectedHeight), sl.Bounds);
     }
 }

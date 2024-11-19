@@ -15,19 +15,12 @@ public class NumericUpDownDemo : Scenario
         Window app = new ()
         {
             Title = GetQuitKeyAndName (),
+            BorderStyle = LineStyle.None
         };
-
-        var editor = new AdornmentsEditor
-        {
-            X = 0,
-            Y = 0,
-            AutoSelectViewToEdit = true,
-        };
-        app.Add (editor);
 
         NumericUpDownEditor<int> intEditor = new ()
         {
-            X = Pos.Right (editor),
+            X = 0,
             Y = 0,
             Title = "int",
         };
@@ -50,7 +43,6 @@ public class NumericUpDownDemo : Scenario
             floatEditor!.NumericUpDown!.Format = "{0:0.0}";
         }
 
-        editor.AutoSelectSuperView = app;
         intEditor.SetFocus ();
 
         Application.Run (app);

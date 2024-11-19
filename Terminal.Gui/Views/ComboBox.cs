@@ -57,7 +57,7 @@ public class ComboBox : View, IDesignable
         Initialized += (s, e) => ProcessLayout ();
 
         // On resize
-        LayoutComplete += (sender, a) => ProcessLayout ();
+        SubviewsLaidOut += (sender, a) => ProcessLayout ();
 
         Added += (s, e) =>
                  {
@@ -73,7 +73,7 @@ public class ComboBox : View, IDesignable
                      }
 
                      SetNeedsLayout ();
-                     SetNeedsDisplay ();
+                     SetNeedsDraw ();
                      ShowHideList (Text);
                  };
 
@@ -118,7 +118,7 @@ public class ComboBox : View, IDesignable
         {
             _listview.ColorScheme = value;
             base.ColorScheme = value;
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
     }
 
@@ -198,7 +198,7 @@ public class ComboBox : View, IDesignable
             if (SuperView is { } && SuperView.Subviews.Contains (this))
             {
                 Text = string.Empty;
-                SetNeedsDisplay ();
+                SetNeedsDraw ();
             }
         }
     }
@@ -294,18 +294,21 @@ public class ComboBox : View, IDesignable
     public virtual void OnCollapsed () { Collapsed?.Invoke (this, EventArgs.Empty); }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle viewport)
+    protected override bool OnDrawingContent ()
     {
-        base.OnDrawContent (viewport);
 
         if (!_autoHide)
         {
-            return;
+            return true;
         }
 
-        Driver.SetAttribute (ColorScheme.Focus);
-        Move (Viewport.Right - 1, 0);
-        Driver.AddRune (Glyphs.DownArrow);
+        if (ColorScheme != null)
+        {
+            SetAttribute (ColorScheme.Focus);
+        }
+        AddRune (Viewport.Right - 1, 0, Glyphs.DownArrow);
+
+        return true;
     }
 
 
@@ -504,11 +507,13 @@ public class ComboBox : View, IDesignable
         }
 
         Reset (true);
-        _listview.Clear ();
+        _listview.ClearViewport ();
         _listview.TabStop = TabBehavior.NoStop;
         SuperView?.MoveSubviewToStart (this);
+
+        // BUGBUG: SetNeedsDraw takes Viewport relative coordinates, not Screen
         Rectangle rect = _listview.ViewportToScreen (_listview.IsInitialized ? _listview.Viewport : Rectangle.Empty);
-        SuperView?.SetNeedsDisplay (rect);
+        SuperView?.SetNeedsDraw (rect);
         OnCollapsed ();
     }
 
@@ -803,7 +808,7 @@ public class ComboBox : View, IDesignable
         _listview.SetSource (_searchSet);
         _listview.ResumeSuspendCollectionChangedEvent ();
 
-        _listview.Clear ();
+        _listview.ClearViewport ();
         _listview.Height = CalculateHeight ();
         SuperView?.MoveSubviewToStart (this);
     }
@@ -872,7 +877,7 @@ public class ComboBox : View, IDesignable
                 if (isMousePositionValid)
                 {
                     _highlighted = Math.Min (TopItem + me.Position.Y, Source.Count);
-                    SetNeedsDisplay ();
+                    SetNeedsDraw ();
                 }
 
                 _isFocusing = false;
@@ -883,10 +888,10 @@ public class ComboBox : View, IDesignable
             return res;
         }
 
-        public override void OnDrawContent (Rectangle viewport)
+        protected override bool OnDrawingContent ()
         {
-            Attribute current = ColorScheme.Focus;
-            Driver.SetAttribute (current);
+            Attribute current = ColorScheme?.Focus ?? Attribute.Default;
+            SetAttribute (current);
             Move (0, 0);
             Rectangle f = Frame;
             int item = TopItem;
@@ -916,7 +921,7 @@ public class ComboBox : View, IDesignable
 
                 if (newcolor != current)
                 {
-                    Driver.SetAttribute (newcolor);
+                    SetAttribute (newcolor);
                     current = newcolor;
                 }
 
@@ -926,7 +931,7 @@ public class ComboBox : View, IDesignable
                 {
                     for (var c = 0; c < f.Width; c++)
                     {
-                        Driver.AddRune ((Rune)' ');
+                        AddRune (0, row, (Rune)' ');
                     }
                 }
                 else
@@ -937,24 +942,26 @@ public class ComboBox : View, IDesignable
                     if (rowEventArgs.RowAttribute is { } && current != rowEventArgs.RowAttribute)
                     {
                         current = (Attribute)rowEventArgs.RowAttribute;
-                        Driver.SetAttribute (current);
+                        SetAttribute (current);
                     }
 
                     if (AllowsMarking)
                     {
-                        Driver.AddRune (
+                        AddRune (
                                         Source.IsMarked (item) ? AllowsMultipleSelection ? Glyphs.CheckStateChecked : Glyphs.Selected :
                                         AllowsMultipleSelection ? Glyphs.CheckStateUnChecked : Glyphs.UnSelected
                                        );
-                        Driver.AddRune ((Rune)' ');
+                        AddRune ((Rune)' ');
                     }
 
-                    Source.Render (this, Driver, isSelected, item, col, row, f.Width - col, start);
+                    Source.Render (this, isSelected, item, col, row, f.Width - col, start);
                 }
             }
+
+            return true;
         }
 
-        protected override void OnHasFocusChanged (bool newHasFocus, [CanBeNull] View previousFocusedView, [CanBeNull] View focusedVew)
+        protected override void OnHasFocusChanged (bool newHasFocus, [CanBeNull] View previousFocusedView, [CanBeNull] View focusedView)
         {
             if (newHasFocus)
             {

@@ -69,12 +69,16 @@ namespace Terminal.Gui;
 ///     </para>
 ///     <para>
 ///         To flag a region of the View's <see cref="Viewport"/> to be redrawn call
-///         <see cref="SetNeedsDisplay(Rectangle)"/>
+///         <see cref="SetNeedsDraw(System.Drawing.Rectangle)"/>
 ///         .
-///         To flag the entire view for redraw call <see cref="SetNeedsDisplay()"/>.
+///         To flag the entire view for redraw call <see cref="SetNeedsDraw()"/>.
 ///     </para>
 ///     <para>
-///         The <see cref="LayoutSubviews"/> method is invoked when the size or layout of a view has changed.
+///         The <see cref="SetNeedsLayout"/> method is called when the size or layout of a view has changed. The
+///         <see cref="MainLoop"/> will
+///         cause <see cref="Layout()"/> to be called on the next <see cref="Application.Iteration"/> so there is normally
+///         no reason to direclty call
+///         see <see cref="Layout()"/>.
 ///     </para>
 ///     <para>
 ///         Views have a <see cref="ColorScheme"/> property that defines the default colors that subviews should use for
@@ -105,7 +109,7 @@ namespace Terminal.Gui;
 
 #endregion API Docs
 
-public partial class View : Responder, ISupportInitializeNotification
+public partial class View : IDisposable, ISupportInitializeNotification
 {
     /// <summary>Gets or sets arbitrary data for the view.</summary>
     /// <remarks>This property is not used internally.</remarks>
@@ -122,7 +126,7 @@ public partial class View : Responder, ISupportInitializeNotification
     ///     Points to the current driver in use by the view, it is a convenience property for simplifying the development
     ///     of new views.
     /// </summary>
-    public static ConsoleDriver Driver => Application.Driver!;
+    public static ConsoleDriver? Driver => Application.Driver;
 
     /// <summary>Initializes a new instance of <see cref="View"/>.</summary>
     /// <remarks>
@@ -133,6 +137,10 @@ public partial class View : Responder, ISupportInitializeNotification
     /// </remarks>
     public View ()
     {
+#if DEBUG_IDISPOSABLE
+        Instances.Add (this);
+#endif
+
         SetupAdornments ();
 
         SetupCommands ();
@@ -143,6 +151,7 @@ public partial class View : Responder, ISupportInitializeNotification
 
         SetupText ();
 
+        SetupScrollBars ();
     }
 
     /// <summary>
@@ -229,7 +238,6 @@ public partial class View : Responder, ISupportInitializeNotification
         // These calls were moved from BeginInit as they access Viewport which is indeterminate until EndInit is called.
         UpdateTextDirection (TextDirection);
         UpdateTextFormatterText ();
-        OnResizeNeeded ();
 
         if (_subviews is { })
         {
@@ -242,6 +250,10 @@ public partial class View : Responder, ISupportInitializeNotification
             }
         }
 
+        // TODO: Figure out how to move this out of here and just depend on LayoutNeeded in Mainloop
+        Layout (); // the EventLog in AllViewsTester fails to layout correctly if this is not here (convoluted Dim.Fill(Func)).
+        SetNeedsLayout ();
+
         Initialized?.Invoke (this, EventArgs.Empty);
     }
 
@@ -251,10 +263,7 @@ public partial class View : Responder, ISupportInitializeNotification
 
     private bool _enabled = true;
 
-    // This is a cache of the Enabled property so that we can restore it when the superview is re-enabled.
-    private bool _oldEnabled;
-
-    /// <summary>Gets or sets a value indicating whether this <see cref="Responder"/> can respond to user interaction.</summary>
+    /// <summary>Gets or sets a value indicating whether this <see cref="View"/> can respond to user interaction.</summary>
     public bool Enabled
     {
         get => _enabled;
@@ -282,7 +291,12 @@ public partial class View : Responder, ISupportInitializeNotification
             }
 
             OnEnabledChanged ();
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
+
+            if (Border is { })
+            {
+                Border.Enabled = _enabled;
+            }
 
             if (_subviews is null)
             {
@@ -291,18 +305,7 @@ public partial class View : Responder, ISupportInitializeNotification
 
             foreach (View view in _subviews)
             {
-                if (!_enabled)
-                {
-                    view._oldEnabled = view.Enabled;
-                    view.Enabled = _enabled;
-                }
-                else
-                {
-                    view.Enabled = view._oldEnabled;
-#if AUTO_CANFOCUS
-                    view._addingViewSoCanFocusAlsoUpdatesSuperView = _enabled;
-#endif
-                }
+                view.Enabled = Enabled;
             }
         }
     }
@@ -363,7 +366,10 @@ public partial class View : Responder, ISupportInitializeNotification
             OnVisibleChanged ();
             VisibleChanged?.Invoke (this, EventArgs.Empty);
 
-            SetNeedsDisplay ();
+            SetNeedsLayout ();
+            SuperView?.SetNeedsLayout ();
+            SetNeedsDraw ();
+            SuperView?.SetNeedsDraw ();
         }
     }
 
@@ -469,7 +475,7 @@ public partial class View : Responder, ISupportInitializeNotification
 
                 SetTitleTextFormatterSize ();
                 SetHotKeyFromTitle ();
-                SetNeedsDisplay ();
+                SetNeedsDraw ();
 #if DEBUG
                 if (string.IsNullOrEmpty (Id))
                 {
@@ -524,13 +530,22 @@ public partial class View : Responder, ISupportInitializeNotification
     /// <returns></returns>
     public override string ToString () { return $"{GetType ().Name}({Id}){Frame}"; }
 
-    /// <inheritdoc/>
-    protected override void Dispose (bool disposing)
+    private bool _disposedValue;
+
+    /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
+    /// <remarks>
+    ///     If disposing equals true, the method has been called directly or indirectly by a user's code. Managed and
+    ///     unmanaged resources can be disposed. If disposing equals false, the method has been called by the runtime from
+    ///     inside the finalizer and you should not reference other objects. Only unmanaged resources can be disposed.
+    /// </remarks>
+    /// <param name="disposing"></param>
+    protected virtual void Dispose (bool disposing)
     {
         LineCanvas.Dispose ();
 
         DisposeKeyboard ();
         DisposeAdornments ();
+        DisposeScrollBars ();
 
         for (int i = InternalSubviews.Count - 1; i >= 0; i--)
         {
@@ -539,7 +554,49 @@ public partial class View : Responder, ISupportInitializeNotification
             subview.Dispose ();
         }
 
-        base.Dispose (disposing);
+        if (!_disposedValue)
+        {
+            if (disposing)
+            {
+                // TODO: dispose managed state (managed objects)
+            }
+
+            _disposedValue = true;
+        }
+
         Debug.Assert (InternalSubviews.Count == 0);
     }
+
+    /// <summary>
+    ///     Riased when the <see cref="View"/> is being disposed. 
+    /// </summary>
+    public event EventHandler? Disposing;
+
+    /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resource.</summary>
+    public void Dispose ()
+    {
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        Disposing?.Invoke (this, EventArgs.Empty);
+        Dispose (true);
+        GC.SuppressFinalize (this);
+#if DEBUG_IDISPOSABLE
+        WasDisposed = true;
+
+        foreach (View instance in Instances.Where (x => x.WasDisposed).ToList ())
+        {
+            Instances.Remove (instance);
+        }
+#endif
+    }
+
+#if DEBUG_IDISPOSABLE
+    /// <summary>For debug purposes to verify objects are being disposed properly</summary>
+    public bool WasDisposed { get; set; }
+
+    /// <summary>For debug purposes to verify objects are being disposed properly</summary>
+    public int DisposedCount { get; set; } = 0;
+
+    /// <summary>For debug purposes</summary>
+    public static List<View> Instances { get; set; } = [];
+#endif
 }

@@ -160,6 +160,7 @@ public class ViewportTests (ITestOutputHelper output)
             Height = 10,
             ViewportSettings = ViewportSettings.AllowNegativeLocation
         };
+        view.Layout ();
 
         Assert.Equal (new Rectangle (0, 0, 10, 10), view.Frame);
 
@@ -237,6 +238,7 @@ public class ViewportTests (ITestOutputHelper output)
             Width = viewWidth,
             Height = viewHeight,
         };
+        view.Layout ();
         var newViewport = new Rectangle (viewportX, viewportY, viewWidth, viewHeight);
 
         // Act
@@ -383,6 +385,93 @@ public class ViewportTests (ITestOutputHelper output)
         view.Viewport = new (0, 0, 10, 10);
         view.ContentSizeTracksViewport = false;
         Assert.NotEqual (view.Viewport.Size, view.GetContentSize ());
+    }
+
+    private class TestViewportEventsView : View
+    {
+        public int OnViewportChangedCallCount { get; private set; }
+        public int ViewportChangedEventCallCount { get; private set; }
+
+        public TestViewportEventsView ()
+        {
+            ViewportChanged += (sender, args) => ViewportChangedEventCallCount++;
+        }
+
+        protected override void OnViewportChanged (DrawEventArgs e)
+        {
+            OnViewportChangedCallCount++;
+            base.OnViewportChanged (e);
+        }
+    }
+
+    [Fact]
+    public void OnViewportChanged_Called_When_Viewport_Changes ()
+    {
+        // Arrange
+        var view = new TestViewportEventsView ();
+        var initialViewport = new Rectangle (0, 0, 10, 10);
+        var newViewport = new Rectangle (0, 0, 20, 20);
+        Assert.Equal (0, view.OnViewportChangedCallCount);
+        view.Viewport = initialViewport;
+        Assert.Equal (1, view.OnViewportChangedCallCount);
+
+        // Act
+        view.Viewport = newViewport;
+
+        // Assert
+        Assert.Equal (2, view.OnViewportChangedCallCount);
+    }
+
+    [Fact]
+    public void ViewportChanged_Event_Raised_When_Viewport_Changes ()
+    {
+        // Arrange
+        var view = new TestViewportEventsView ();
+        var initialViewport = new Rectangle (0, 0, 10, 10);
+        var newViewport = new Rectangle (0, 0, 20, 20);
+        view.Viewport = initialViewport;
+        Assert.Equal (1, view.ViewportChangedEventCallCount);
+
+        // Act
+        view.Viewport = newViewport;
+
+        // Assert
+        Assert.Equal (2, view.ViewportChangedEventCallCount);
+    }
+
+    [Fact]
+    public void OnViewportChanged_Called_When_Frame_Changes ()
+    {
+        // Arrange
+        var view = new TestViewportEventsView ();
+        var initialFrame = new Rectangle (0, 0, 10, 10);
+        var newFrame = new Rectangle (0, 0, 20, 20);
+        Assert.Equal (0, view.OnViewportChangedCallCount);
+        view.Frame = initialFrame;
+        Assert.Equal (1, view.OnViewportChangedCallCount);
+
+        // Act
+        view.Frame = newFrame;
+
+        // Assert
+        Assert.Equal (2, view.OnViewportChangedCallCount);
+    }
+
+    [Fact]
+    public void ViewportChanged_Event_Raised_When_Frame_Changes ()
+    {
+        // Arrange
+        var view = new TestViewportEventsView ();
+        var initialFrame = new Rectangle (0, 0, 10, 10);
+        var newFrame = new Rectangle (0, 0, 20, 20);
+        view.Frame = initialFrame;
+        Assert.Equal (1, view.ViewportChangedEventCallCount);
+
+        // Act
+        view.Frame = newFrame;
+
+        // Assert
+        Assert.Equal (2, view.ViewportChangedEventCallCount);
     }
 
     //[Theory]

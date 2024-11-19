@@ -132,7 +132,7 @@ public static partial class Application // Keyboard handling
     /// <returns><see langword="true"/> if the key was handled.</returns>
     public static bool RaiseKeyUpEvent (Key key)
     {
-        if (!IsInitialized)
+        if (!Initialized)
         {
             return true;
         }
@@ -218,7 +218,7 @@ public static partial class Application // Keyboard handling
                     Command.Refresh,
                     static () =>
                     {
-                        Refresh ();
+                        LayoutAndDraw ();
 
                         return true;
                     }

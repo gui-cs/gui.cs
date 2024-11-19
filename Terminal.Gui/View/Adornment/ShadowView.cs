@@ -14,42 +14,56 @@ internal class ShadowView : View
     /// <inheritdoc/>
     public override Attribute GetNormalColor ()
     {
-        if (SuperView is Adornment adornment)
+        if (SuperView is not Adornment adornment)
         {
-            var attr = Attribute.Default;
-
-            if (adornment.Parent?.SuperView is { })
-            {
-                attr = adornment.Parent.SuperView.GetNormalColor ();
-            }
-            else if (Application.Top is { })
-            {
-                attr = Application.Top.GetNormalColor ();
-            }
-
-            return new (
-                        new Attribute (
-                                       ShadowStyle == ShadowStyle.Opaque ? Color.Black : attr.Foreground.GetDarkerColor (),
-                                       ShadowStyle == ShadowStyle.Opaque ? attr.Background : attr.Background.GetDarkerColor ()));
+            return base.GetNormalColor ();
         }
 
-        return base.GetNormalColor ();
+        var attr = Attribute.Default;
+
+        if (adornment.Parent?.SuperView is { })
+        {
+            attr = adornment.Parent.SuperView.GetNormalColor ();
+        }
+        else if (Application.Top is { })
+        {
+            attr = Application.Top.GetNormalColor ();
+        }
+
+        return new (
+                    new Attribute (
+                                   ShadowStyle == ShadowStyle.Opaque ? Color.Black : attr.Foreground.GetDarkerColor (),
+                                   ShadowStyle == ShadowStyle.Opaque ? attr.Background : attr.Background.GetDarkerColor ()));
+
+    }
+
+    /// <inheritdoc />
+    /// <inheritdoc />
+    protected override bool OnDrawingText ()
+    {
+        return true;
+    }
+
+    /// <inheritdoc />
+    protected override bool OnClearingViewport ()
+    {
+        // Prevent clearing (so we can have transparency)
+        return true;
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle viewport)
+    protected override bool OnDrawingContent ()
     {
-        //base.OnDrawContent (viewport);
         switch (ShadowStyle)
         {
             case ShadowStyle.Opaque:
                 if (Orientation == Orientation.Vertical)
                 {
-                    DrawVerticalShadowOpaque (viewport);
+                    DrawVerticalShadowOpaque (Viewport);
                 }
                 else
                 {
-                    DrawHorizontalShadowOpaque (viewport);
+                    DrawHorizontalShadowOpaque (Viewport);
                 }
 
                 break;
@@ -57,21 +71,23 @@ internal class ShadowView : View
             case ShadowStyle.Transparent:
                 //Attribute prevAttr = Driver.GetAttribute ();
                 //var attr = new Attribute (prevAttr.Foreground, prevAttr.Background);
-                //Driver.SetAttribute (attr);
+                //SetAttribute (attr);
 
                 if (Orientation == Orientation.Vertical)
                 {
-                    DrawVerticalShadowTransparent (viewport);
+                    DrawVerticalShadowTransparent (Viewport);
                 }
                 else
                 {
-                    DrawHorizontalShadowTransparent (viewport);
+                    DrawHorizontalShadowTransparent (Viewport);
                 }
 
-                //Driver.SetAttribute (prevAttr);
+                //SetAttribute (prevAttr);
 
                 break;
         }
+
+        return true;
     }
 
     /// <summary>
@@ -106,16 +122,18 @@ internal class ShadowView : View
 
     private void DrawHorizontalShadowTransparent (Rectangle viewport)
     {
-        Rectangle screen = ViewportToScreen (viewport);
+        Rectangle screen = ViewportToScreen (Viewport);
 
-        // Fill the rest of the rectangle - note we skip the last since vertical will draw it
-        for (int i = Math.Max(0, screen.X + 1); i < screen.X + screen.Width - 1; i++)
+        for (int r = Math.Max (0, screen.Y); r < screen.Y + screen.Height; r++)
         {
-            Driver.Move (i, screen.Y);
-
-            if (i < Driver.Contents!.GetLength (1) && screen.Y < Driver.Contents.GetLength (0))
+            for (int c = Math.Max (0, screen.X + 1); c < screen.X + screen.Width; c++)
             {
-                Driver.AddRune (Driver.Contents [screen.Y, i].Rune);
+                Driver?.Move (c, r);
+
+                if (c < Driver?.Contents!.GetLength (1) && r < Driver?.Contents?.GetLength (0))
+                {
+                    Driver.AddRune (Driver.Contents [r, c].Rune);
+                }
             }
         }
     }
@@ -126,7 +144,7 @@ internal class ShadowView : View
         AddRune (0, 0, Glyphs.ShadowVerticalStart);
 
         // Fill the rest of the rectangle with the glyph
-        for (var i = 1; i < viewport.Height; i++)
+        for (var i = 1; i < viewport.Height - 1; i++)
         {
             AddRune (0, i, Glyphs.ShadowVertical);
         }
@@ -134,16 +152,19 @@ internal class ShadowView : View
 
     private void DrawVerticalShadowTransparent (Rectangle viewport)
     {
-        Rectangle screen = ViewportToScreen (viewport);
+        Rectangle screen = ViewportToScreen (Viewport);
 
         // Fill the rest of the rectangle
-        for (int i = Math.Max (0, screen.Y); i < screen.Y + viewport.Height; i++)
+        for (int c = Math.Max (0, screen.X); c < screen.X + screen.Width; c++)
         {
-            Driver.Move (screen.X, i);
-
-            if (Driver.Contents is { } && screen.X < Driver.Contents.GetLength (1) && i < Driver.Contents.GetLength (0))
+            for (int r = Math.Max (0, screen.Y); r < screen.Y + viewport.Height; r++)
             {
-                Driver.AddRune (Driver.Contents [i, screen.X].Rune);
+                Driver?.Move (c, r);
+
+                if (Driver?.Contents is { } && screen.X < Driver.Contents.GetLength (1) && r < Driver.Contents.GetLength (0))
+                {
+                    Driver.AddRune (Driver.Contents [r, c].Rune);
+                }
             }
         }
     }

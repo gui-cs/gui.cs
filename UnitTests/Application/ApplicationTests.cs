@@ -13,7 +13,7 @@ public class ApplicationTests
         ConfigurationManager.Locations = ConfigurationManager.ConfigLocations.None;
 
 #if DEBUG_IDISPOSABLE
-        Responder.Instances.Clear ();
+        View.Instances.Clear ();
         RunState.Instances.Clear ();
 #endif
     }
@@ -66,7 +66,7 @@ public class ApplicationTests
         Assert.True (shutdown);
 
 #if DEBUG_IDISPOSABLE
-        Assert.Empty (Responder.Instances);
+        Assert.Empty (View.Instances);
 #endif
         lock (_timeoutLock)
         {
@@ -131,7 +131,7 @@ public class ApplicationTests
             Thread.Sleep ((int)timeoutTime / 10);
 
             // Worst case scenario - something went wrong
-            if (Application.IsInitialized && iteration > 25)
+            if (Application.Initialized && iteration > 25)
             {
                 _output.WriteLine ($"Too many iterations ({iteration}): Calling Application.RequestStop.");
                 Application.RequestStop ();
@@ -279,7 +279,7 @@ public class ApplicationTests
         // Set some values
 
         Application.Init (driverName: driverType.Name);
-        Application.IsInitialized = true;
+       // Application.IsInitialized = true;
 
         // Reset
         Application.ResetState ();
@@ -308,7 +308,7 @@ public class ApplicationTests
             Assert.Equal (Key.Esc, Application.QuitKey);
 
             // Internal properties
-            Assert.False (Application.IsInitialized);
+            Assert.False (Application.Initialized);
             Assert.Equal (Application.GetSupportedCultures (), Application.SupportedCultures);
             Assert.Equal (Application.GetAvailableCulturesFromEmbeddedResources (), Application.SupportedCultures);
             Assert.False (Application._forceFakeConsole);
@@ -343,7 +343,7 @@ public class ApplicationTests
         CheckReset ();
 
         // Set the values that can be set
-        Application.IsInitialized = true;
+        Application.Initialized = true;
         Application._forceFakeConsole = true;
         Application.MainThreadId = 1;
 
@@ -395,7 +395,7 @@ public class ApplicationTests
         // Validate there are no outstanding Responder-based instances 
         // after a scenario was selected to run. This proves the main UI Catalog
         // 'app' closed cleanly.
-        Assert.Empty (Responder.Instances);
+        Assert.Empty (View.Instances);
 #endif
     }
 
@@ -526,7 +526,7 @@ public class ApplicationTests
     [AutoInitShutdown (verifyShutdown: true)]
     public void Internal_Properties_Correct ()
     {
-        Assert.True (Application.IsInitialized);
+        Assert.True (Application.Initialized);
         Assert.Null (Application.Top);
         RunState rs = Application.Begin (new ());
         Assert.Equal (Application.Top, rs.Toplevel);
@@ -548,7 +548,7 @@ public class ApplicationTests
         var actionCalled = 0;
         Application.Invoke (() => { actionCalled++; });
         Application.MainLoop.Running = true;
-        Application.RunIteration (ref rs, ref firstIteration);
+        Application.RunIteration (ref rs, firstIteration);
         Assert.Equal (1, actionCalled);
         top.Dispose ();
         Application.Shutdown ();
@@ -833,7 +833,7 @@ public class ApplicationTests
     }
 
     // TODO: All Toplevel layout tests should be moved to ToplevelTests.cs
-    [Fact (Skip = "#2491 - Changing focus should cause NeedsDisplay = true, so bogus test?")]
+    [Fact (Skip = "#2491 - Changing focus should cause NeedsDraw = true, so bogus test?")]
     public void Run_Toplevel_With_Modal_View_Does_Not_Refresh_If_Not_Dirty ()
     {
         Init ();
@@ -842,7 +842,7 @@ public class ApplicationTests
         // Don't use Dialog here as it has more layout logic. Use Window instead.
         Dialog d = null;
         Toplevel top = new ();
-        top.DrawContent += (s, a) => count++;
+        top.DrawingContent += (s, a) => count++;
         int iteration = -1;
 
         Application.Iteration += (s, a) =>
@@ -853,18 +853,18 @@ public class ApplicationTests
                                      {
                                          // TODO: Don't use Dialog here as it has more layout logic. Use Window instead.
                                          d = new ();
-                                         d.DrawContent += (s, a) => count++;
+                                         d.DrawingContent += (s, a) => count++;
                                          Application.Run (d);
                                      }
                                      else if (iteration < 3)
                                      {
                                          Application.RaiseMouseEvent (new () { Flags = MouseFlags.ReportMousePosition });
-                                         Assert.False (top.NeedsDisplay);
-                                         Assert.False (top.SubViewNeedsDisplay);
-                                         Assert.False (top.LayoutNeeded);
-                                         Assert.False (d.NeedsDisplay);
-                                         Assert.False (d.SubViewNeedsDisplay);
-                                         Assert.False (d.LayoutNeeded);
+                                         Assert.False (top.NeedsDraw);
+                                         Assert.False (top.SubViewNeedsDraw);
+                                         Assert.False (top.NeedsLayout);
+                                         Assert.False (d.NeedsDraw);
+                                         Assert.False (d.SubViewNeedsDraw);
+                                         Assert.False (d.NeedsLayout);
                                      }
                                      else
                                      {

@@ -40,7 +40,7 @@ public class Snake : Scenario
                           if (state.AdvanceState ())
                           {
                               // When updating from a Thread/Task always use Invoke
-                              Application.Invoke (() => { snakeView.SetNeedsDisplay (); });
+                              Application.Invoke (() => { snakeView.SetNeedsDraw (); });
                           }
 
                           long wait = state.SleepAfterAdvancingState - sw.ElapsedMilliseconds;
@@ -314,12 +314,10 @@ public class Snake : Scenario
 
         public SnakeState State { get; }
 
-        public override void OnDrawContent (Rectangle viewport)
+        protected override bool OnDrawingContent ()
         {
-            base.OnDrawContent (viewport);
-
-            Driver.SetAttribute (white);
-            Clear ();
+            SetAttribute (white);
+            ClearViewport ();
 
             var canvas = new LineCanvas ();
 
@@ -351,9 +349,11 @@ public class Snake : Scenario
                 AddRune (p.Key.X, p.Key.Y, p.Value);
             }
 
-            Driver.SetAttribute (red);
+            SetAttribute (red);
             AddRune (State.Apple.X, State.Apple.Y, _appleRune);
-            Driver.SetAttribute (white);
+            SetAttribute (white);
+
+            return true;
         }
 
         // BUGBUG: Should (can) this use key bindings instead.

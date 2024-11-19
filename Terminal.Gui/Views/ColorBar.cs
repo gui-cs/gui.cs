@@ -78,30 +78,30 @@ internal abstract class ColorBar : View, IColorBar
     void IColorBar.SetValueWithoutRaisingEvent (int v)
     {
         _value = v;
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle viewport)
+    protected override bool OnDrawingContent ()
     {
-        base.OnDrawContent (viewport);
-
         var xOffset = 0;
 
         if (!string.IsNullOrWhiteSpace (Text))
         {
             Move (0, 0);
-            Driver.SetAttribute (HasFocus ? GetFocusColor () : GetNormalColor ());
-            Driver.AddStr (Text);
+            SetAttribute (HasFocus ? GetFocusColor () : GetNormalColor ());
+            Driver?.AddStr (Text);
 
             // TODO: is there a better method than this? this is what it is in TableView
             xOffset = Text.EnumerateRunes ().Sum (c => c.GetColumns ());
         }
 
-        _barWidth = viewport.Width - xOffset;
+        _barWidth = Viewport.Width - xOffset;
         _barStartsAt = xOffset;
 
         DrawBar (xOffset, 0, _barWidth);
+
+        return true;
     }
 
     /// <summary>
@@ -198,7 +198,7 @@ internal abstract class ColorBar : View, IColorBar
             if (isSelectedCell)
             {
                 // Draw the triangle at the closest position
-                Application.Driver?.SetAttribute (new (triangleColor, color));
+                SetAttribute (new (triangleColor, color));
                 AddRune (x + xOffset, yOffset, new ('▲'));
 
                 // Record for tests
@@ -206,7 +206,7 @@ internal abstract class ColorBar : View, IColorBar
             }
             else
             {
-                Application.Driver?.SetAttribute (new (color, color));
+                SetAttribute (new (color, color));
                 AddRune (x + xOffset, yOffset, new ('█'));
             }
         }
@@ -215,7 +215,7 @@ internal abstract class ColorBar : View, IColorBar
     private void OnValueChanged ()
     {
         ValueChanged?.Invoke (this, new (in _value));
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
     }
 
     private bool? SetMax ()

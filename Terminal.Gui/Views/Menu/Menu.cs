@@ -70,7 +70,18 @@ internal sealed class Menu : View
     {
         base.BeginInit ();
 
-        Frame = MakeFrame (Frame.X, Frame.Y, _barItems!.Children!, Parent);
+        var frame = MakeFrame (Frame.X, Frame.Y, _barItems!.Children!, Parent);
+
+        if (Frame.X != frame.X)
+        {
+            X = frame.X;
+        }
+        if (Frame.Y != frame.Y)
+        {
+            Y = frame.Y;
+        }
+        Width = frame.Width;
+        Height = frame.Height;
 
         if (_barItems.Children is { })
         {
@@ -148,7 +159,7 @@ internal sealed class Menu : View
     {
         if (Application.Top is { })
         {
-            Application.Top.DrawContentComplete += Current_DrawContentComplete;
+            Application.Top.DrawComplete += Top_DrawComplete;
             Application.Top.SizeChanging += Current_TerminalResized;
         }
 
@@ -279,7 +290,7 @@ internal sealed class Menu : View
 
                 if (!disabled && (_host.UseSubMenusSingleFrame || !CheckSubMenu ()))
                 {
-                    SetNeedsDisplay ();
+                    SetNeedsDraw ();
                     SetParentSetNeedsDisplay ();
 
                     return true;
@@ -382,19 +393,26 @@ internal sealed class Menu : View
         return !item.IsEnabled () ? ColorScheme!.Disabled : GetNormalColor ();
     }
 
-    public override void OnDrawContent (Rectangle viewport)
+    // By doing this we draw last, over everything else.
+    private void Top_DrawComplete (object? sender, DrawEventArgs e)
     {
+        if (!Visible)
+        {
+            return;
+        }
+
         if (_barItems!.Children is null)
         {
             return;
         }
 
-        Rectangle savedClip = Driver.Clip;
-        Driver.Clip = new (0, 0, Driver.Cols, Driver.Rows);
-        Driver.SetAttribute (GetNormalColor ());
+        DrawBorderAndPadding ();
+        RenderLineCanvas ();
 
-        OnDrawAdornments ();
-        OnRenderLineCanvas ();
+        // BUGBUG: Views should not change the clip. Doing so is an indcation of poor design or a bug in the framework.
+        Region? savedClip = View.SetClipToScreen ();
+
+        SetAttribute (GetNormalColor ());
 
         for (int i = Viewport.Y; i < _barItems!.Children.Length; i++)
         {
@@ -410,7 +428,7 @@ internal sealed class Menu : View
 
             MenuItem? item = _barItems.Children [i];
 
-            Driver.SetAttribute (
+            SetAttribute (
                                  // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
                                  item is null ? GetNormalColor () :
                                  i == _currentChild ? GetFocusColor () : GetNormalColor ()
@@ -427,7 +445,7 @@ internal sealed class Menu : View
                 Move (0, i);
             }
 
-            Driver.SetAttribute (DetermineColorSchemeFor (item, i));
+            SetAttribute (DetermineColorSchemeFor (item, i));
 
             for (int p = Viewport.X; p < Frame.Width - 2; p++)
             {
@@ -561,17 +579,7 @@ internal sealed class Menu : View
             }
         }
 
-        Driver.Clip = savedClip;
-
-        // PositionCursor ();
-    }
-
-    private void Current_DrawContentComplete (object? sender, DrawEventArgs e)
-    {
-        if (Visible)
-        {
-            OnDrawContent (Viewport);
-        }
+        View.SetClip (savedClip);
     }
 
     public override Point? PositionCursor ()
@@ -601,7 +609,7 @@ internal sealed class Menu : View
         Application.UngrabMouse ();
         _host.CloseAllMenus ();
         Application.Driver!.ClearContents ();
-        Application.Refresh ();
+        Application.LayoutAndDraw ();
 
         _host.Run (action);
     }
@@ -702,7 +710,7 @@ internal sealed class Menu : View
         }
         while (_barItems?.Children? [_currentChild] is null || disabled);
 
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
         SetParentSetNeedsDisplay ();
 
         if (!_host.UseSubMenusSingleFrame)
@@ -783,7 +791,7 @@ internal sealed class Menu : View
         }
         while (_barItems.Children [_currentChild] is null || disabled);
 
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
         SetParentSetNeedsDisplay ();
 
         if (!_host.UseSubMenusSingleFrame)
@@ -800,12 +808,12 @@ internal sealed class Menu : View
         {
             foreach (Menu menu in _host._openSubMenu)
             {
-                menu.SetNeedsDisplay ();
+                menu.SetNeedsDraw ();
             }
         }
 
-        _host._openMenu?.SetNeedsDisplay ();
-        _host.SetNeedsDisplay ();
+        _host._openMenu?.SetNeedsDraw ();
+        _host.SetNeedsDraw ();
     }
 
     protected override bool OnMouseEvent (MouseEventArgs me)
@@ -888,7 +896,7 @@ internal sealed class Menu : View
 
             if (_host.UseSubMenusSingleFrame || !CheckSubMenu ())
             {
-                SetNeedsDisplay ();
+                SetNeedsDraw ();
                 SetParentSetNeedsDisplay ();
 
                 return me.Handled = true;
@@ -935,7 +943,7 @@ internal sealed class Menu : View
         }
         else
         {
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
             SetParentSetNeedsDisplay ();
         }
 
@@ -948,7 +956,7 @@ internal sealed class Menu : View
 
         if (Application.Top is { })
         {
-            Application.Top.DrawContentComplete -= Current_DrawContentComplete;
+            Application.Top.DrawComplete -= Top_DrawComplete;
             Application.Top.SizeChanging -= Current_TerminalResized;
         }
 

@@ -244,7 +244,7 @@ public class MenuBar : View, IDesignable
             if (value && UseKeysUpDownAsKeysLeftRight)
             {
                 _useKeysUpDownAsKeysLeftRight = false;
-                SetNeedsDisplay ();
+                SetNeedsDraw ();
             }
         }
     }
@@ -297,12 +297,8 @@ public class MenuBar : View, IDesignable
     public event EventHandler<MenuOpeningEventArgs>? MenuOpening;
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle viewport)
+    protected override bool OnDrawingContent ()
     {
-        Driver.SetAttribute (GetNormalColor ());
-
-        Clear ();
-
         var pos = 0;
 
         for (var i = 0; i < Menus.Length; i++)
@@ -338,6 +334,7 @@ public class MenuBar : View, IDesignable
         }
 
         //PositionCursor ();
+        return true;
     }
 
     /// <summary>Virtual method that will invoke the <see cref="MenuAllClosed"/>.</summary>
@@ -381,7 +378,7 @@ public class MenuBar : View, IDesignable
                 mi = parent?.Children?.Length > 0 ? parent.Children [_openMenu!._currentChild] : null;
             }
         }
-
+        
         MenuOpened?.Invoke (this, new (parent, mi));
     }
 
@@ -411,7 +408,7 @@ public class MenuBar : View, IDesignable
         }
 
         _selected = 0;
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
 
         _previousFocused = (SuperView is null ? Application.Top?.Focused : SuperView.Focused)!;
         OpenMenu (_selected);
@@ -478,7 +475,7 @@ public class MenuBar : View, IDesignable
         }
 
         OpenMenu (idx, sIdx, subMenu);
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
     }
 
     internal void CleanUp ()
@@ -500,7 +497,7 @@ public class MenuBar : View, IDesignable
             _lastFocused.SetFocus ();
         }
 
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
 
         if (Application.MouseGrabView is { } && Application.MouseGrabView is MenuBar && Application.MouseGrabView != this)
         {
@@ -593,7 +590,7 @@ public class MenuBar : View, IDesignable
                     Application.Top?.Remove (_openMenu);
                 }
 
-                SetNeedsDisplay ();
+                SetNeedsDraw ();
 
                 if (_previousFocused is Menu && _openMenu is { } && _previousFocused.ToString () != OpenCurrentMenu!.ToString ())
                 {
@@ -655,7 +652,7 @@ public class MenuBar : View, IDesignable
 
             case true:
                 _selectedSub = -1;
-                SetNeedsDisplay ();
+                SetNeedsDraw ();
                 RemoveAllOpensSubMenus ();
                 OpenCurrentMenu!._previousSubFocused!.SetFocus ();
                 _openSubMenu = null;
@@ -773,7 +770,7 @@ public class MenuBar : View, IDesignable
                         return;
                     }
 
-                    SetNeedsDisplay ();
+                    SetNeedsDraw ();
 
                     if (UseKeysUpDownAsKeysLeftRight)
                     {
@@ -861,6 +858,7 @@ public class MenuBar : View, IDesignable
                 if (Application.Top is { })
                 {
                     Application.Top.Add (_openMenu);
+                   // _openMenu.SetRelativeLayout (Application.Screen.Size);
                 }
                 else
                 {
@@ -991,7 +989,7 @@ public class MenuBar : View, IDesignable
                 {
                     _selectedSub--;
                     RemoveSubMenu (_selectedSub, ignoreUseSubMenusSingleFrame);
-                    SetNeedsDisplay ();
+                    SetNeedsDraw ();
                 }
                 else
                 {
@@ -1119,7 +1117,7 @@ public class MenuBar : View, IDesignable
 
         Application.UngrabMouse ();
         CloseAllMenus ();
-        Application.Refresh ();
+        Application.LayoutAndDraw ();
         _openedByAltKey = true;
 
         return Run (item.Action);
@@ -1138,7 +1136,7 @@ public class MenuBar : View, IDesignable
             LastFocused?.SetFocus ();
         }
 
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
     }
 
     private Point GetLocationOffset ()
@@ -1167,14 +1165,14 @@ public class MenuBar : View, IDesignable
         }
 
         OpenMenu (_selected);
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
     }
 
     private void MoveRight ()
     {
         _selected = (_selected + 1) % Menus.Length;
         OpenMenu (_selected);
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
     }
 
     private bool ProcessMenu (int i, MenuBarItem mi)
@@ -1217,7 +1215,7 @@ public class MenuBar : View, IDesignable
             }
         }
 
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
 
         return true;
     }
@@ -1324,7 +1322,7 @@ public class MenuBar : View, IDesignable
             if (value && UseSubMenusSingleFrame)
             {
                 UseSubMenusSingleFrame = false;
-                SetNeedsDisplay ();
+                SetNeedsDraw ();
             }
         }
     }

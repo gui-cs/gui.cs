@@ -72,7 +72,7 @@ public class Text : Scenario
             Height = Dim.Percent (20)
         };
         textView.Text = "TextView with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!";
-        textView.DrawContent += TextView_DrawContent;
+        textView.DrawingContent += TextView_DrawContent;
 
         // This shows how to enable autocomplete in TextView.
         void TextView_DrawContent (object sender, DrawEventArgs e)

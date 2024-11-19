@@ -8,7 +8,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Dialogs")]
 [ScenarioCategory ("Text and Formatting")]
-[ScenarioCategory ("Overlapped")]
+[ScenarioCategory ("Navigation")]
 [ScenarioCategory ("Files and IO")]
 public class HexEditor : Scenario
 {
@@ -41,8 +41,11 @@ public class HexEditor : Scenario
             Title = _fileName ?? "Untitled",
             BorderStyle = LineStyle.Rounded,
         };
+        _hexView.Arrangement = ViewArrangement.Resizable;
         _hexView.Edited += _hexView_Edited;
         _hexView.PositionChanged += _hexView_PositionChanged;
+        _hexView.VerticalScrollBar.AutoShow = false;
+
         app.Add (_hexView);
 
         var menu = new MenuBar
@@ -144,6 +147,9 @@ public class HexEditor : Scenario
             AlignmentModes = AlignmentModes.IgnoreFirstOrLast
         };
         app.Add (_statusBar);
+
+        _hexView.VerticalScrollBar.AutoShow = true;
+        _hexView.HorizontalScrollBar.AutoShow = true;
 
         _hexView.Source = LoadFile ();
 
@@ -249,7 +255,7 @@ public class HexEditor : Scenario
         {
             _fileName = d.FilePaths [0];
             _hexView.Source = LoadFile ();
-            _hexView.DisplayStart = 0;
+            //_hexView.DisplayStart = 0;
         }
 
         d.Dispose ();

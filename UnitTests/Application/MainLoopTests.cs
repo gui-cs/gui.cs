@@ -810,7 +810,7 @@ public class MainLoopTests
 
         btn.Text = "Cancel";
         Interlocked.Increment (ref total);
-        btn.SetNeedsDisplay ();
+        btn.SetNeedsDraw ();
 
         await Task.Run (
                         () =>
@@ -857,7 +857,7 @@ public class MainLoopTests
                             {
                                 btn.Text = "Pew Pew";
                                 Interlocked.Increment (ref total);
-                                btn.SetNeedsDisplay ();
+                                btn.SetNeedsDraw ();
                             }
                            );
     }
@@ -907,7 +907,7 @@ public class MainLoopTests
                             {
                                 btn.Text = "Click Me";
                                 Interlocked.Increment (ref total);
-                                btn.SetNeedsDisplay ();
+                                btn.SetNeedsDraw ();
                             }
                            );
     }

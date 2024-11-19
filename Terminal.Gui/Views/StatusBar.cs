@@ -26,7 +26,7 @@ public class StatusBar : Bar, IDesignable
         BorderStyle = LineStyle.Dashed;
         ColorScheme = Colors.ColorSchemes ["Menu"];
 
-        LayoutStarted += StatusBar_LayoutStarted;
+        SubviewLayout += StatusBar_LayoutStarted;
     }
 
     // StatusBar arranges the items horizontally.

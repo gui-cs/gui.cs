@@ -86,7 +86,7 @@ public class Sliders : Scenario
             AllowEmpty = false
         };
 
-        single.LayoutStarted += (s, e) =>
+        single.SubviewLayout += (s, e) =>
                                 {
                                     if (single.Orientation == Orientation.Horizontal)
                                     {
@@ -219,11 +219,6 @@ public class Sliders : Scenario
                                              }
                                          }
                                      }
-
-                                     if (app.IsInitialized)
-                                     {
-                                         app.LayoutSubviews ();
-                                     }
                                  };
         optionsSlider.SetOption (0); // Legends
         optionsSlider.SetOption (1); // RangeAllowSingle
@@ -326,8 +321,6 @@ public class Sliders : Scenario
                                                                 }
                                                             }
                                                         }
-
-                                                        app.LayoutSubviews ();
                                                     };
 
         #endregion Slider Orientation Slider
@@ -384,7 +377,6 @@ public class Sliders : Scenario
                                                              }
                                                          }
 
-                                                         app.LayoutSubviews ();
                                                      };
 
         #endregion Legends Orientation Slider

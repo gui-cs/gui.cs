@@ -176,7 +176,7 @@ public class VkeyPacketSimulator : Scenario
                                  _outputStarted = true;
                                  tvOutput.ReadOnly = false;
                                  tvOutput.SetFocus ();
-                                 tvOutput.SetNeedsDisplay ();
+                                 tvOutput.SetNeedsDraw ();
 
                                  Task.Run (
                                            () =>
@@ -287,7 +287,7 @@ public class VkeyPacketSimulator : Scenario
                      ..outputVerticalRuler.Viewport.Height];
         }
 
-        win.LayoutComplete += Win_LayoutComplete;
+        win.SubviewsLaidOut += Win_LayoutComplete;
 
         Application.Run (win);
         win.Dispose ();

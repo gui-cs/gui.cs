@@ -182,6 +182,8 @@ public class TreeViewFileSystem : Scenario
         _treeViewFiles = new TreeView<IFileSystemInfo> { X = 0, Y = 0, Width = Dim.Percent (50), Height = Dim.Fill () };
         _treeViewFiles.DrawLine += TreeViewFiles_DrawLine;
 
+        _treeViewFiles.VerticalScrollBar.AutoShow = false;
+
         _detailsFrame = new DetailsFrame (_iconProvider)
         {
             X = Pos.Right (_treeViewFiles), Y = 0, Width = Dim.Fill (), Height = Dim.Fill ()
@@ -199,7 +201,7 @@ public class TreeViewFileSystem : Scenario
         _treeViewFiles.GoToFirst ();
         _treeViewFiles.Expand ();
 
-        SetupScrollBar ();
+        //SetupScrollBar ();
 
         _treeViewFiles.SetFocus ();
 
@@ -217,7 +219,7 @@ public class TreeViewFileSystem : Scenario
         _miInvertSymbols.Checked = !_miInvertSymbols.Checked;
 
         _treeViewFiles.Style.InvertExpandSymbolColors = (bool)_miInvertSymbols.Checked;
-        _treeViewFiles.SetNeedsDisplay ();
+        _treeViewFiles.SetNeedsDraw ();
     }
 
     private void Quit () { Application.RequestStop (); }
@@ -226,7 +228,7 @@ public class TreeViewFileSystem : Scenario
     {
         _treeViewFiles.Style.HighlightModelTextOnly = !_treeViewFiles.Style.HighlightModelTextOnly;
         _miHighlightModelTextOnly.Checked = _treeViewFiles.Style.HighlightModelTextOnly;
-        _treeViewFiles.SetNeedsDisplay ();
+        _treeViewFiles.SetNeedsDraw ();
     }
 
     private void SetCursor ()
@@ -287,7 +289,7 @@ public class TreeViewFileSystem : Scenario
             _treeViewFiles.ColorGetter = null;
         }
 
-        _treeViewFiles.SetNeedsDisplay ();
+        _treeViewFiles.SetNeedsDraw ();
     }
 
     private void SetExpandableSymbols (Rune expand, Rune? collapse)
@@ -298,7 +300,7 @@ public class TreeViewFileSystem : Scenario
 
         _treeViewFiles.Style.ExpandableSymbol = expand;
         _treeViewFiles.Style.CollapseableSymbol = collapse;
-        _treeViewFiles.SetNeedsDisplay ();
+        _treeViewFiles.SetNeedsDraw ();
     }
 
     private void SetFullName ()
@@ -314,7 +316,7 @@ public class TreeViewFileSystem : Scenario
             _treeViewFiles.AspectGetter = f => f.Name;
         }
 
-        _treeViewFiles.SetNeedsDisplay ();
+        _treeViewFiles.SetNeedsDraw ();
     }
 
     private void SetLeaveLastRow ()
@@ -364,53 +366,53 @@ public class TreeViewFileSystem : Scenario
         _iconProvider.IsOpenGetter = _treeViewFiles.IsExpanded;
     }
 
-    private void SetupScrollBar ()
-    {
-        // When using scroll bar leave the last row of the control free (for over-rendering with scroll bar)
-        _treeViewFiles.Style.LeaveLastRow = true;
+    //private void SetupScrollBar ()
+    //{
+    //    // When using scroll bar leave the last row of the control free (for over-rendering with scroll bar)
+    //    _treeViewFiles.Style.LeaveLastRow = true;
 
-        var scrollBar = new ScrollBarView (_treeViewFiles, true);
+    //    var scrollBar = new ScrollBarView (_treeViewFiles, true);
 
-        scrollBar.ChangedPosition += (s, e) =>
-                                     {
-                                         _treeViewFiles.ScrollOffsetVertical = scrollBar.Position;
+    //    scrollBar.ChangedPosition += (s, e) =>
+    //                                 {
+    //                                     _treeViewFiles.ScrollOffsetVertical = scrollBar.Position;
 
-                                         if (_treeViewFiles.ScrollOffsetVertical != scrollBar.Position)
-                                         {
-                                             scrollBar.Position = _treeViewFiles.ScrollOffsetVertical;
-                                         }
+    //                                     if (_treeViewFiles.ScrollOffsetVertical != scrollBar.Position)
+    //                                     {
+    //                                         scrollBar.Position = _treeViewFiles.ScrollOffsetVertical;
+    //                                     }
 
-                                         _treeViewFiles.SetNeedsDisplay ();
-                                     };
+    //                                     _treeViewFiles.SetNeedsDraw ();
+    //                                 };
 
-        scrollBar.OtherScrollBarView.ChangedPosition += (s, e) =>
-                                                        {
-                                                            _treeViewFiles.ScrollOffsetHorizontal = scrollBar.OtherScrollBarView.Position;
+    //    scrollBar.OtherScrollBarView.ChangedPosition += (s, e) =>
+    //                                                    {
+    //                                                        _treeViewFiles.ScrollOffsetHorizontal = scrollBar.OtherScrollBarView.Position;
 
-                                                            if (_treeViewFiles.ScrollOffsetHorizontal != scrollBar.OtherScrollBarView.Position)
-                                                            {
-                                                                scrollBar.OtherScrollBarView.Position = _treeViewFiles.ScrollOffsetHorizontal;
-                                                            }
+    //                                                        if (_treeViewFiles.ScrollOffsetHorizontal != scrollBar.OtherScrollBarView.Position)
+    //                                                        {
+    //                                                            scrollBar.OtherScrollBarView.Position = _treeViewFiles.ScrollOffsetHorizontal;
+    //                                                        }
 
-                                                            _treeViewFiles.SetNeedsDisplay ();
-                                                        };
+    //                                                        _treeViewFiles.SetNeedsDraw ();
+    //                                                    };
 
-        _treeViewFiles.DrawContent += (s, e) =>
-                                      {
-                                          scrollBar.Size = _treeViewFiles.ContentHeight;
-                                          scrollBar.Position = _treeViewFiles.ScrollOffsetVertical;
-                                          scrollBar.OtherScrollBarView.Size = _treeViewFiles.GetContentWidth (true);
-                                          scrollBar.OtherScrollBarView.Position = _treeViewFiles.ScrollOffsetHorizontal;
-                                          scrollBar.Refresh ();
-                                      };
-    }
+    //    _treeViewFiles.DrawingContent += (s, e) =>
+    //                                  {
+    //                                      scrollBar.Size = _treeViewFiles.ContentHeight;
+    //                                      scrollBar.Position = _treeViewFiles.ScrollOffsetVertical;
+    //                                      scrollBar.OtherScrollBarView.Size = _treeViewFiles.GetContentWidth (true);
+    //                                      scrollBar.OtherScrollBarView.Position = _treeViewFiles.ScrollOffsetHorizontal;
+    //                                      scrollBar.Refresh ();
+    //                                  };
+    //}
 
     private void ShowColoredExpandableSymbols ()
     {
         _miColoredSymbols.Checked = !_miColoredSymbols.Checked;
 
         _treeViewFiles.Style.ColorExpandSymbol = (bool)_miColoredSymbols.Checked;
-        _treeViewFiles.SetNeedsDisplay ();
+        _treeViewFiles.SetNeedsDraw ();
     }
 
     private void ShowContextMenu (Point screenPoint, IFileSystemInfo forObject)
@@ -429,7 +431,7 @@ public class TreeViewFileSystem : Scenario
         _miShowLines.Checked = !_miShowLines.Checked;
 
         _treeViewFiles.Style.ShowBranchLines = (bool)_miShowLines.Checked!;
-        _treeViewFiles.SetNeedsDisplay ();
+        _treeViewFiles.SetNeedsDraw ();
     }
 
     private void ShowPropertiesOf (IFileSystemInfo fileSystemInfo) { _detailsFrame.FileInfo = fileSystemInfo; }
@@ -514,7 +516,7 @@ public class TreeViewFileSystem : Scenario
         _miBasicIcons.Checked = !_iconProvider.UseNerdIcons && !_iconProvider.UseUnicodeCharacters;
         _miUnicodeIcons.Checked = _iconProvider.UseUnicodeCharacters;
         _miNerdIcons.Checked = _iconProvider.UseNerdIcons;
-        _treeViewFiles.SetNeedsDisplay ();
+        _treeViewFiles.SetNeedsDraw ();
     }
 
     private class DetailsFrame : FrameView

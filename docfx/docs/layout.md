@@ -2,7 +2,7 @@
 
 Terminal.Gui provides a rich system for how [View](View.md) objects are laid out relative to each other. The layout system also defines how coordinates are specified.
 
-See [View Deep Dive](View.md) and [Arrangement Deep Dive](arrangement.md) for more.
+See [View Deep Dive](View.md), [Arrangement Deep Dive](arrangement.md), [Scrolling Deep Dive](scrolling.md), and [Drawing Deep Dive](drawing.md) for more.
 
 ## Lexicon & Taxonomy
 
@@ -80,10 +80,11 @@ The Viewport (@Terminal.Gui.View.Viewport) is a rectangle describing the portion
 
 To enable scrolling call `View.SetContentSize()` and then set `Viewport.Location` to positive values. Making `Viewport.Location` positive moves the Viewport down and to the right in the content. 
 
-The `View.ViewportSettings` property controls how the Viewport is constrained. By default, the `ViewportSettings` is set to `ViewportSettings.None`. To enable the viewport to be moved up-and-to-the-left of the content, use `ViewportSettings.AllowNegativeX` and or `ViewportSettings.AllowNegativeY`. 
+See the [Scrolling Deep Dive](scrolling.md) for details on how to enable scrolling.
+
+The @Terminal.Gui.View.ViewportSettings property controls how the Viewport is constrained. By default, the `ViewportSettings` is set to `ViewportSettings.None`. To enable the viewport to be moved up-and-to-the-left of the content, use `ViewportSettings.AllowNegativeX` and or `ViewportSettings.AllowNegativeY`. 
 
 The default `ViewportSettings` also constrains the Viewport to the size of the content, ensuring the right-most column or bottom-most row of the content will always be visible (in v1 the equivalent concept was `ScrollBarView.AlwaysKeepContentInViewport`). To allow the Viewport to be smaller than the content, set `ViewportSettings.AllowXGreaterThanContentWidth` and/or `ViewportSettings.AllowXGreaterThanContentHeight`.
-
 
 * *@Terminal.Gui.View.GetContentSize()* - The content area is the area where the view's content is drawn. Content can be any combination of the @Terminal.Gui.View.Text property, `Subviews`, and other content drawn by the View. The @Terminal.Gui.View.GetContentSize method gets the size of the content area of the view. *Content Area* refers to the rectangle with a location of `0,0` with the size returned by @Terminal.Gui.View.GetContentSize. The [Layout Deep Dive](layout.md) has more details on the Content Area.
 

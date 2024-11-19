@@ -63,7 +63,7 @@ public class TextViewAutocompletePopup : Scenario
             Y = 1,
             Width = width, Height = _height, Text = text
         };
-        _textViewTopLeft.DrawContent += TextViewTopLeft_DrawContent;
+        _textViewTopLeft.DrawingContent += TextViewTopLeft_DrawContent;
         appWindow.Add (_textViewTopLeft);
 
         _textViewTopRight = new()
@@ -71,14 +71,14 @@ public class TextViewAutocompletePopup : Scenario
             X = Pos.AnchorEnd (width), Y = 1,
             Width = width, Height = _height, Text = text
         };
-        _textViewTopRight.DrawContent += TextViewTopRight_DrawContent;
+        _textViewTopRight.DrawingContent += TextViewTopRight_DrawContent;
         appWindow.Add (_textViewTopRight);
 
         _textViewBottomLeft = new()
         {
             Y = Pos.AnchorEnd (_height), Width = width, Height = _height, Text = text
         };
-        _textViewBottomLeft.DrawContent += TextViewBottomLeft_DrawContent;
+        _textViewBottomLeft.DrawingContent += TextViewBottomLeft_DrawContent;
         appWindow.Add (_textViewBottomLeft);
 
         _textViewBottomRight = new()
@@ -89,7 +89,7 @@ public class TextViewAutocompletePopup : Scenario
             Height = _height,
             Text = text
         };
-        _textViewBottomRight.DrawContent += TextViewBottomRight_DrawContent;
+        _textViewBottomRight.DrawingContent += TextViewBottomRight_DrawContent;
         appWindow.Add (_textViewBottomRight);
 
         _textViewCentered = new()
@@ -100,7 +100,7 @@ public class TextViewAutocompletePopup : Scenario
             Height = _height,
             Text = text
         };
-        _textViewCentered.DrawContent += TextViewCentered_DrawContent;
+        _textViewCentered.DrawingContent += TextViewCentered_DrawContent;
         appWindow.Add (_textViewCentered);
 
         _miMultiline.Checked = _textViewTopLeft.Multiline;
@@ -120,7 +120,7 @@ public class TextViewAutocompletePopup : Scenario
                                       );
         appWindow.Add (statusBar);
 
-        appWindow.LayoutStarted += Win_LayoutStarted;
+        appWindow.SubviewLayout += Win_LayoutStarted;
 
         // Run - Start the application.
         Application.Run (appWindow);

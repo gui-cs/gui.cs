@@ -64,39 +64,40 @@ public class Line : View, IOrientation
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle viewport)
+    protected override bool OnDrawingContent ()
     {
         LineCanvas lc = LineCanvas;
 
         if (SuperViewRendersLineCanvas)
         {
-            lc = SuperView.LineCanvas;
+            lc = SuperView?.LineCanvas;
         }
 
         if (SuperView is Adornment adornment)
         {
-            lc = adornment.Parent.LineCanvas;
+            lc = adornment.Parent?.LineCanvas;
         }
 
-        Point pos = ViewportToScreen (viewport).Location;
+        Point pos = ViewportToScreen (Viewport).Location;
         int length = Orientation == Orientation.Horizontal ? Frame.Width : Frame.Height;
 
-        if (SuperViewRendersLineCanvas && Orientation == Orientation.Horizontal)
+        if (SuperView is {} && SuperViewRendersLineCanvas && Orientation == Orientation.Horizontal)
         {
             pos.Offset (-SuperView.Border.Thickness.Left, 0);
             length += SuperView.Border.Thickness.Horizontal;
         }
 
-        if (SuperViewRendersLineCanvas && Orientation == Orientation.Vertical)
+        if (SuperView is { } && SuperViewRendersLineCanvas && Orientation == Orientation.Vertical)
         {
             pos.Offset (0, -SuperView.Border.Thickness.Top);
             length += SuperView.Border.Thickness.Vertical;
         }
-        lc.AddLine (
+        lc?.AddLine (
                     pos,
                     length,
                     Orientation,
                     BorderStyle
                    );
+        return true;
     }
 }

@@ -200,8 +200,9 @@ public class DatePicker : View
                 ShowHeaders = true,
                 ShowHorizontalBottomline = true,
                 ShowVerticalCellLines = true,
-                ExpandLastColumn = true
-            }
+                ExpandLastColumn = true,
+            },
+            MultiSelect = false
         };
 
         _dateField = new DateField (DateTime.Now)
@@ -285,6 +286,9 @@ public class DatePicker : View
 
         Add (_dateLabel, _dateField, _calendar, _previousMonthButton, _nextMonthButton);
     }
+
+    /// <inheritdoc />
+    protected override bool OnDrawingText () { return true; }
 
     private static string StandardizeDateFormat (string format)
     {

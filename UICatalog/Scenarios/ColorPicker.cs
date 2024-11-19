@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Color Picker", "Color Picker.")]
+[ScenarioMetadata ("ColorPicker", "Color Picker.")]
 [ScenarioCategory ("Colors")]
 [ScenarioCategory ("Controls")]
 public class ColorPickers : Scenario
@@ -218,7 +219,6 @@ public class ColorPickers : Scenario
         // Set default colors.
         foregroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Foreground.GetClosestNamedColor16 ();
         backgroundColorPicker.SelectedColor = _demoView.SuperView.ColorScheme.Normal.Background.GetClosestNamedColor16 ();
-        app.Initialized += (s, e) => app.LayoutSubviews ();
 
         Application.Run (app);
         app.Dispose ();
@@ -250,7 +250,7 @@ public class ColorPickers : Scenario
     /// <summary>Update a color label from his ColorPicker.</summary>
     private void UpdateColorLabel (Label label, Color color)
     {
-        label.Clear ();
+        label.ClearViewport ();
 
         label.Text =
             $"{color} ({(int)color}) #{color.R:X2}{color.G:X2}{color.B:X2}";
@@ -270,5 +270,41 @@ public class ColorPickers : Scenario
                                         backgroundColorPicker16.SelectedColor
                                    )
         };
+    }
+
+    public override List<Key> GetDemoKeyStrokes ()
+    {
+        var keys = new List<Key> ();
+
+        keys.Add (Key.B.WithAlt);
+
+        for (int i = 0; i < 200; i++)
+        {
+            keys.Add (Key.CursorRight);
+        }
+
+        keys.Add (Key.Tab);
+        keys.Add (Key.Tab);
+
+        for (int i = 0; i < 200; i++)
+        {
+            keys.Add (Key.CursorLeft);
+        }
+
+        keys.Add (Key.Tab);
+        keys.Add (Key.Tab);
+
+        for (int i = 0; i < 200; i++)
+        {
+            keys.Add (Key.CursorLeft);
+        }
+
+        keys.Add (Key.N.WithAlt);
+        keys.Add (Key.R.WithAlt);
+        keys.Add (Key.H.WithAlt);
+        keys.Add (Key.S.WithAlt);
+        keys.Add (Key.D1.WithAlt);
+
+        return keys;
     }
 }

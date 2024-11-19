@@ -14,7 +14,7 @@
   
   * *Parent View* - A view that holds a reference to another view in a parent/child relationship, but is NOT a SuperView of the child. Terminal.Gui uses the terms "Child" and "Parent" sparingly. Generally Subview/SuperView is preferred.
   
-### Layout
+### Layout and Arrangement
 
 See the [Layout Deep Dive](layout.md) and the [Arrangement Deep Dive](arrangement.md).
 
@@ -25,6 +25,11 @@ See the [Drawing Deep Dive](drawing.md).
 ### Navigation
 
 See the [Navigation Deep Dive](navigation.md).
+
+### Scrolling
+
+See the [Scrolling Deep Dive](scrolling.md).
+
 
 ### Application Concepts 
 

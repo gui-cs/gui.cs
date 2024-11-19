@@ -1,4 +1,5 @@
-﻿using Terminal.Gui;
+﻿using System;
+using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -13,7 +14,8 @@ public class Adornments : Scenario
 
         Window app = new ()
         {
-            Title = GetQuitKeyAndName ()
+            Title = GetQuitKeyAndName (),
+            BorderStyle = LineStyle.None
         };
 
         var editor = new AdornmentsEditor
@@ -34,9 +36,8 @@ public class Adornments : Scenario
             Title = "The _Window",
             Arrangement = ViewArrangement.Movable,
 
-            // X = Pos.Center (),
-            Width = Dim.Percent (60),
-            Height = Dim.Percent (90)
+            Width = Dim.Fill (Dim.Func (() => editor.Frame.Width )),
+            Height = Dim.Fill ()
         };
         app.Add (window);
 
@@ -79,17 +80,21 @@ public class Adornments : Scenario
             Width = 40,
             Height = Dim.Percent (20),
             Text = "Label\nY=AnchorEnd(),Height=Dim.Percent(10)",
-            ColorScheme = Colors.ColorSchemes ["Error"]
+            ColorScheme = Colors.ColorSchemes ["Dialog"]
         };
 
         window.Margin.Data = "Margin";
-        window.Margin.Thickness = new (3);
+        window.Margin.Text = "Margin Text";
+        window.Margin.Thickness = new (0);
 
         window.Border.Data = "Border";
-        window.Border.Thickness = new (3);
+        window.Border.Text = "Border Text";
+        window.Border.Thickness = new (0);
 
         window.Padding.Data = "Padding";
+        window.Padding.Text = "Padding Text line 1\nPadding Text line 3\nPadding Text line 3\nPadding Text line 4\nPadding Text line 5";
         window.Padding.Thickness = new (3);
+        window.Padding.ColorScheme = Colors.ColorSchemes ["Error"];
         window.Padding.CanFocus = true;
 
         var longLabel = new Label
@@ -99,18 +104,20 @@ public class Adornments : Scenario
         longLabel.TextFormatter.WordWrap = true;
         window.Add (tf1, color, button, label, btnButtonInWindow, labelAnchorEnd, longLabel);
 
-        editor.Initialized += (s, e) => { editor.ViewToEdit = window; };
-
         window.Initialized += (s, e) =>
                               {
-                                  var labelInPadding = new Label { X = 1, Y = 0, Title = "_Text:" };
+                                  editor.ViewToEdit = window;
+
+                                  editor.ShowViewIdentifier = true;
+
+                                  var labelInPadding = new Label { X = 0, Y = 1, Title = "_Text:" };
                                   window.Padding.Add (labelInPadding);
 
                                   var textFieldInPadding = new TextField
                                   {
                                       X = Pos.Right (labelInPadding) + 1,
-                                      Y = Pos.Top (labelInPadding), Width = 15,
-                                      Text = "some text",
+                                      Y = Pos.Top (labelInPadding), Width = 10,
+                                      Text = "text (Y = 1)",
                                       CanFocus = true
                                   };
                                   textFieldInPadding.Accepting += (s, e) => MessageBox.Query (20, 7, "TextField", textFieldInPadding.Text, "Ok");
@@ -119,9 +126,10 @@ public class Adornments : Scenario
                                   var btnButtonInPadding = new Button
                                   {
                                       X = Pos.Center (),
-                                      Y = 0,
-                                      Text = "_Button in Padding",
-                                      CanFocus = true
+                                      Y = 1,
+                                      Text = "_Button in Padding Y = 1",
+                                      CanFocus = true,
+                                      HighlightStyle = HighlightStyle.None,
                                   };
                                   btnButtonInPadding.Accepting += (s, e) => MessageBox.Query (20, 7, "Hi", "Button in Padding Pressed!", "Ok");
                                   btnButtonInPadding.BorderStyle = LineStyle.Dashed;

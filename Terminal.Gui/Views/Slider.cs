@@ -47,7 +47,7 @@ public class Slider<T> : View, IOrientation
 
         _options = options ?? new List<SliderOption<T>> ();
 
-        _orientationHelper = new (this);
+        _orientationHelper = new (this); // Do not use object initializer!
         _orientationHelper.Orientation = _config._sliderOrientation = orientation;
         _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
         _orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);
@@ -59,7 +59,7 @@ public class Slider<T> : View, IOrientation
         // BUGBUG: This should not be needed - Need to ensure SetRelativeLayout gets called during EndInit
         Initialized += (s, e) => { SetContentSize (); };
 
-        LayoutStarted += (s, e) => { SetContentSize (); };
+        SubviewLayout += (s, e) => { SetContentSize (); };
     }
 
     // TODO: Make configurable via ConfigurationManager
@@ -222,7 +222,7 @@ public class Slider<T> : View, IOrientation
 
             // Todo: Custom logic to preserve options.
             _setOptions.Clear ();
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
     }
 
@@ -353,7 +353,7 @@ public class Slider<T> : View, IOrientation
     public virtual void OnOptionsChanged ()
     {
         OptionsChanged?.Invoke (this, new (GetSetOptionDictionary ()));
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
     }
 
     /// <summary>Event raised When the option is hovered with the keys or the mouse.</summary>
@@ -775,13 +775,13 @@ public class Slider<T> : View, IOrientation
     #region Drawing
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle viewport)
+    protected override bool OnDrawingContent ()
     {
         // TODO: make this more surgical to reduce repaint
 
         if (_options is null || _options.Count == 0)
         {
-            return;
+            return true;
         }
 
         // Draw Slider
@@ -797,6 +797,8 @@ public class Slider<T> : View, IOrientation
         {
             AddRune (_moveRenderPosition.Value.X, _moveRenderPosition.Value.Y, Style.DragChar.Rune);
         }
+
+        return true;
     }
 
     private string AlignText (string text, int width, Alignment alignment)
@@ -839,7 +841,7 @@ public class Slider<T> : View, IOrientation
     private void DrawSlider ()
     {
         // TODO: be more surgical on clear
-        Clear ();
+        ClearViewport ();
 
         // Attributes
 
@@ -848,8 +850,8 @@ public class Slider<T> : View, IOrientation
 
         if (IsInitialized)
         {
-            normalAttr = ColorScheme?.Normal ?? Application.Top.ColorScheme.Normal;
-            setAttr = Style.SetChar.Attribute ?? ColorScheme!.HotNormal;
+            normalAttr = GetNormalColor();
+            setAttr = Style.SetChar.Attribute ?? GetHotNormalColor ();
         }
 
         bool isVertical = _config._sliderOrientation == Orientation.Vertical;
@@ -864,7 +866,7 @@ public class Slider<T> : View, IOrientation
         // Left Spacing
         if (_config._showEndSpacing && _config._startSpacing > 0)
         {
-            Driver?.SetAttribute (
+            SetAttribute (
                                   isSet && _config._type == SliderType.LeftRange
                                       ? Style.RangeChar.Attribute ?? normalAttr
                                       : Style.SpaceChar.Attribute ?? normalAttr
@@ -887,7 +889,7 @@ public class Slider<T> : View, IOrientation
         }
         else
         {
-            Driver?.SetAttribute (Style.EmptyChar.Attribute ?? normalAttr);
+            SetAttribute (Style.EmptyChar.Attribute ?? normalAttr);
 
             for (var i = 0; i < _config._startSpacing; i++)
             {
@@ -940,7 +942,7 @@ public class Slider<T> : View, IOrientation
                 }
 
                 // Draw Option
-                Driver?.SetAttribute (
+                SetAttribute (
                                       isSet && _setOptions.Contains (i) ? Style.SetChar.Attribute ?? setAttr :
                                       drawRange ? Style.RangeChar.Attribute ?? setAttr : Style.OptionChar.Attribute ?? normalAttr
                                      );
@@ -978,7 +980,7 @@ public class Slider<T> : View, IOrientation
                 if (_config._showEndSpacing || i < _options.Count - 1)
                 {
                     // Skip if is the Last Spacing.
-                    Driver?.SetAttribute (
+                    SetAttribute (
                                           drawRange && isSet
                                               ? Style.RangeChar.Attribute ?? setAttr
                                               : Style.SpaceChar.Attribute ?? normalAttr
@@ -1006,7 +1008,7 @@ public class Slider<T> : View, IOrientation
         // Right Spacing
         if (_config._showEndSpacing)
         {
-            Driver?.SetAttribute (
+            SetAttribute (
                                   isSet && _config._type == SliderType.RightRange
                                       ? Style.RangeChar.Attribute ?? normalAttr
                                       : Style.SpaceChar.Attribute ?? normalAttr
@@ -1029,7 +1031,7 @@ public class Slider<T> : View, IOrientation
         }
         else
         {
-            Driver?.SetAttribute (Style.EmptyChar.Attribute ?? normalAttr);
+            SetAttribute (Style.EmptyChar.Attribute ?? normalAttr);
 
             for (var i = 0; i < remaining; i++)
             {
@@ -1056,8 +1058,8 @@ public class Slider<T> : View, IOrientation
 
         if (IsInitialized)
         {
-            normalAttr = Style.LegendAttributes.NormalAttribute ?? ColorScheme?.Normal ?? ColorScheme.Disabled;
-            setAttr = Style.LegendAttributes.SetAttribute ?? ColorScheme?.HotNormal ?? ColorScheme.Normal;
+            normalAttr = Style.LegendAttributes.NormalAttribute ?? GetNormalColor ();
+            setAttr = Style.LegendAttributes.SetAttribute ?? GetHotNormalColor ();
             spaceAttr = Style.LegendAttributes.EmptyAttribute ?? normalAttr;
         }
 
@@ -1221,7 +1223,7 @@ public class Slider<T> : View, IOrientation
             }
 
             // Legend
-            Driver?.SetAttribute (isOptionSet ? setAttr : normalAttr);
+            SetAttribute (isOptionSet ? setAttr : normalAttr);
 
             foreach (Rune c in text.EnumerateRunes ())
             {
@@ -1247,7 +1249,7 @@ public class Slider<T> : View, IOrientation
             }
 
             // Option Right Spacing of Option
-            Driver?.SetAttribute (spaceAttr);
+            SetAttribute (spaceAttr);
 
             if (isTextVertical)
             {
@@ -1309,7 +1311,7 @@ public class Slider<T> : View, IOrientation
                 Application.GrabMouse (this);
             }
 
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
 
             return true;
         }
@@ -1343,7 +1345,7 @@ public class Slider<T> : View, IOrientation
                 }
             }
 
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
 
             return true;
         }
@@ -1377,7 +1379,7 @@ public class Slider<T> : View, IOrientation
                 }
             }
 
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
 
             mouseEvent.Handled = true;
 

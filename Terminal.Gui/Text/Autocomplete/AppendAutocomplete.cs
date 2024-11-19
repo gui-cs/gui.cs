@@ -42,7 +42,7 @@ public class AppendAutocomplete : AutocompleteBase
     public override void ClearSuggestions ()
     {
         base.ClearSuggestions ();
-        textField.SetNeedsDisplay ();
+        textField.SetNeedsDraw ();
     }
 
     /// <inheritdoc/>
@@ -106,12 +106,12 @@ public class AppendAutocomplete : AutocompleteBase
         }
 
         // draw it like it's selected, even though it's not
-        Application.Driver?.SetAttribute (
-                                         new Attribute (
-                                                        ColorScheme.Normal.Foreground,
-                                                        textField.ColorScheme.Focus.Background
-                                                       )
-                                        );
+        textField.SetAttribute (
+                               new Attribute (
+                                              ColorScheme.Normal.Foreground,
+                                              textField.ColorScheme.Focus.Background
+                                             )
+                              );
         textField.Move (textField.Text.Length, 0);
 
         Suggestion suggestion = Suggestions.ElementAt (SelectedIdx);
@@ -183,7 +183,7 @@ public class AppendAutocomplete : AutocompleteBase
             SelectedIdx = Suggestions.Count () - 1;
         }
 
-        textField.SetNeedsDisplay ();
+        textField.SetNeedsDraw ();
 
         return true;
     }

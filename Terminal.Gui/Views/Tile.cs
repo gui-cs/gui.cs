@@ -31,7 +31,7 @@ public class Tile
     ///     The <see cref="ContentView"/> that is contained in this <see cref="TileView"/>. Add new child views to this
     ///     member for multiple <see cref="ContentView"/>s within the <see cref="Tile"/>.
     /// </summary>
-    public View ContentView { get; internal set; }
+    public View? ContentView { get; internal set; }
 
     /// <summary>
     ///     Gets or Sets the minimum size you to allow when splitter resizing along parent

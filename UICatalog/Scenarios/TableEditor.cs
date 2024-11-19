@@ -14,7 +14,6 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Dialogs")]
 [ScenarioCategory ("Text and Formatting")]
-[ScenarioCategory ("Overlapped")]
 public class TableEditor : Scenario
 {
     private readonly HashSet<FileSystemInfo> _checkedFileSystemInfos = new ();
@@ -66,8 +65,8 @@ public class TableEditor : Scenario
              "Cuneiform Numbers and Punctuation"
             ),
         new (
-             (uint)(CharMap.MaxCodePoint - 16),
-             (uint)CharMap.MaxCodePoint,
+             (uint)(UICatalog.Scenarios.UnicodeRange.Ranges.Max (r => r.End) - 16),
+             (uint)UICatalog.Scenarios.UnicodeRange.Ranges.Max (r => r.End),
              "End"
             ),
         new (0x0020, 0x007F, "Basic Latin"),
@@ -344,57 +343,6 @@ public class TableEditor : Scenario
     private ColorScheme _redColorScheme;
     private ColorScheme _redColorSchemeAlt;
     private TableView _tableView;
-
-    /// <summary>
-    ///     Generates a new demo <see cref="DataTable"/> with the given number of <paramref name="cols"/> (min 5) and
-    ///     <paramref name="rows"/>
-    /// </summary>
-    /// <param name="cols"></param>
-    /// <param name="rows"></param>
-    /// <returns></returns>
-    public static DataTable BuildDemoDataTable (int cols, int rows)
-    {
-        var dt = new DataTable ();
-
-        var explicitCols = 6;
-        dt.Columns.Add (new DataColumn ("StrCol", typeof (string)));
-        dt.Columns.Add (new DataColumn ("DateCol", typeof (DateTime)));
-        dt.Columns.Add (new DataColumn ("IntCol", typeof (int)));
-        dt.Columns.Add (new DataColumn ("DoubleCol", typeof (double)));
-        dt.Columns.Add (new DataColumn ("NullsCol", typeof (string)));
-        dt.Columns.Add (new DataColumn ("Unicode", typeof (string)));
-
-        for (var i = 0; i < cols - explicitCols; i++)
-        {
-            dt.Columns.Add ("Column" + (i + explicitCols));
-        }
-
-        var r = new Random (100);
-
-        for (var i = 0; i < rows; i++)
-        {
-            List<object> row = new ()
-            {
-                "Some long text that is super cool",
-                new DateTime (2000 + i, 12, 25),
-                r.Next (i),
-                r.NextDouble () * i - 0.5 /*add some negatives to demo styles*/,
-                DBNull.Value,
-                "Les Mise"
-                + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber))
-                + "rables"
-            };
-
-            for (var j = 0; j < cols - explicitCols; j++)
-            {
-                row.Add ("SomeValue" + r.Next (100));
-            }
-
-            dt.Rows.Add (row.ToArray ());
-        }
-
-        return dt;
-    }
 
     /// <summary>
     ///     Builds a simple table in which cell values contents are the index of the cell.  This helps testing that
@@ -718,7 +666,7 @@ public class TableEditor : Scenario
         _tableView.CellActivated += EditCurrentCell;
         _tableView.KeyDown += TableViewKeyPress;
 
-        SetupScrollBar ();
+        //SetupScrollBar ();
 
         _redColorScheme = new ()
         {
@@ -1007,7 +955,7 @@ public class TableEditor : Scenario
 
     private void OpenExample (bool big)
     {
-        SetTable (BuildDemoDataTable (big ? 30 : 5, big ? 1000 : 5));
+        SetTable (TableView.BuildDemoDataTable (big ? 30 : 5, big ? 1000 : 5));
         SetDemoTableStyles ();
     }
 
@@ -1209,40 +1157,40 @@ public class TableEditor : Scenario
 
     private void SetTable (DataTable dataTable) { _tableView.Table = new DataTableSource (_currentTable = dataTable); }
 
-    private void SetupScrollBar ()
-    {
-        var scrollBar = new ScrollBarView (_tableView, true);
+    //private void SetupScrollBar ()
+    //{
+    //    var scrollBar = new ScrollBarView (_tableView, true);
 
-        scrollBar.ChangedPosition += (s, e) =>
-                                     {
-                                         _tableView.RowOffset = scrollBar.Position;
+    //    scrollBar.ChangedPosition += (s, e) =>
+    //                                 {
+    //                                     _tableView.RowOffset = scrollBar.Position;
 
-                                         if (_tableView.RowOffset != scrollBar.Position)
-                                         {
-                                             scrollBar.Position = _tableView.RowOffset;
-                                         }
+    //                                     if (_tableView.RowOffset != scrollBar.Position)
+    //                                     {
+    //                                         scrollBar.Position = _tableView.RowOffset;
+    //                                     }
 
-                                         _tableView.SetNeedsDisplay ();
-                                     };
-        /*
-        scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
-            tableView.LeftItem = scrollBar.OtherScrollBarView.Position;
-            if (tableView.LeftItem != scrollBar.OtherScrollBarView.Position) {
-                scrollBar.OtherScrollBarView.Position = tableView.LeftItem;
-            }
-            tableView.SetNeedsDisplay ();
-        };*/
+    //                                     _tableView.SetNeedsDraw ();
+    //                                 };
+    //    /*
+    //    scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
+    //        tableView.LeftItem = scrollBar.OtherScrollBarView.Position;
+    //        if (tableView.LeftItem != scrollBar.OtherScrollBarView.Position) {
+    //            scrollBar.OtherScrollBarView.Position = tableView.LeftItem;
+    //        }
+    //        tableView.SetNeedsDraw ();
+    //    };*/
 
-        _tableView.DrawContent += (s, e) =>
-                                  {
-                                      scrollBar.Size = _tableView.Table?.Rows ?? 0;
-                                      scrollBar.Position = _tableView.RowOffset;
+    //    _tableView.DrawingContent += (s, e) =>
+    //                              {
+    //                                  scrollBar.Size = _tableView.Table?.Rows ?? 0;
+    //                                  scrollBar.Position = _tableView.RowOffset;
 
-                                      //scrollBar.OtherScrollBarView.Size = tableView.Maxlength - 1;
-                                      //scrollBar.OtherScrollBarView.Position = tableView.LeftItem;
-                                      scrollBar.Refresh ();
-                                  };
-    }
+    //                                  //scrollBar.OtherScrollBarView.Size = tableView.Maxlength - 1;
+    //                                  //scrollBar.OtherScrollBarView.Position = tableView.LeftItem;
+    //                                  scrollBar.Refresh ();
+    //                              };
+    //}
 
     private void ShowAllColumns ()
     {
@@ -1402,7 +1350,7 @@ public class TableEditor : Scenario
             _tableView.Style.RowColorGetter = null;
         }
 
-        _tableView.SetNeedsDisplay ();
+        _tableView.SetNeedsDraw ();
     }
 
     private void ToggleAlwaysShowHeaders ()
@@ -1520,7 +1468,7 @@ public class TableEditor : Scenario
         //toggle menu item
         _miCursor.Checked = !_miCursor.Checked;
         _tableView.Style.InvertSelectedCellFirstCharacter = (bool)_miCursor.Checked;
-        _tableView.SetNeedsDisplay ();
+        _tableView.SetNeedsDraw ();
     }
 
     private void ToggleNoCellLines ()
@@ -1585,17 +1533,10 @@ public class TableEditor : Scenario
                                   );
     }
 
-    private class UnicodeRange
+    public class UnicodeRange (uint start, uint end, string category)
     {
-        public readonly string Category;
-        public readonly uint End;
-        public readonly uint Start;
-
-        public UnicodeRange (uint start, uint end, string category)
-        {
-            Start = start;
-            End = end;
-            Category = category;
-        }
+        public readonly string Category = category;
+        public readonly uint End = end;
+        public readonly uint Start = start;
     }
 }

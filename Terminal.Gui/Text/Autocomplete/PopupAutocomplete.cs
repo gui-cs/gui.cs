@@ -120,7 +120,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
             if (Visible && Suggestions.Count == 0)
             {
                 Visible = false;
-                HostControl?.SetNeedsDisplay ();
+                HostControl?.SetNeedsDraw ();
 
                 return true;
             }
@@ -128,7 +128,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
             if (!Visible && Suggestions.Count > 0)
             {
                 Visible = true;
-                HostControl?.SetNeedsDisplay ();
+                HostControl?.SetNeedsDraw ();
                 Application.UngrabMouse ();
 
                 return false;
@@ -141,7 +141,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
                 _closed = false;
             }
 
-            HostControl?.SetNeedsDisplay ();
+            HostControl?.SetNeedsDraw ();
 
             return false;
         }
@@ -395,11 +395,11 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         {
             if (i == SelectedIdx - ScrollOffset)
             {
-                Application.Driver?.SetAttribute (ColorScheme.Focus);
+                _popup.SetAttribute (ColorScheme.Focus);
             }
             else
             {
-                Application.Driver?.SetAttribute (ColorScheme.Normal);
+                _popup.SetAttribute (ColorScheme.Normal);
             }
 
             _popup.Move (0, i);
@@ -424,7 +424,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         ClearSuggestions ();
         Visible = false;
         _closed = true;
-        HostControl?.SetNeedsDisplay ();
+        HostControl?.SetNeedsDraw ();
         //RemovePopupFromTop ();
     }
 
@@ -469,7 +469,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         }
 
         EnsureSelectedIdxIsValid ();
-        HostControl?.SetNeedsDisplay ();
+        HostControl?.SetNeedsDraw ();
     }
 
     /// <summary>Moves the selection in the Autocomplete context menu up one</summary>
@@ -483,7 +483,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         }
 
         EnsureSelectedIdxIsValid ();
-        HostControl?.SetNeedsDisplay ();
+        HostControl?.SetNeedsDraw ();
     }
 
     /// <summary>Render the current selection in the Autocomplete context menu by the mouse reporting.</summary>
@@ -512,7 +512,7 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         {
             Visible = true;
             _closed = false;
-            HostControl?.SetNeedsDisplay ();
+            HostControl?.SetNeedsDraw ();
 
             return true;
         }

@@ -16,7 +16,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Dialogs")]
 [ScenarioCategory ("Text and Formatting")]
-[ScenarioCategory ("Overlapped")]
+[ScenarioCategory ("Arrangement")]
 [ScenarioCategory ("Files and IO")]
 [ScenarioCategory ("TextView")]
 [ScenarioCategory ("Menus")]
@@ -31,7 +31,6 @@ public class Editor : Scenario
     private MenuItem _miForceMinimumPosToZero;
     private byte [] _originalText;
     private bool _saved = true;
-    private ScrollBarView _scrollBar;
     private TabView _tabView;
     private string _textToFind;
     private string _textToReplace;
@@ -263,6 +262,7 @@ public class Editor : Scenario
             AlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast
         };
 
+        _textView.VerticalScrollBar.AutoShow = false;
         _textView.UnwrappedCursorPosition += (s, e) =>
                                              {
                                                  siCursorPosition.Title = $"Ln {e.Point.Y + 1}, Col {e.Point.X + 1}";
@@ -270,46 +270,43 @@ public class Editor : Scenario
 
         _appWindow.Add (statusBar);
 
-        _scrollBar = new (_textView, true);
+        //_scrollBar = new (_textView, true);
 
-        _scrollBar.ChangedPosition += (s, e) =>
-                                      {
-                                          _textView.TopRow = _scrollBar.Position;
+        //_scrollBar.ChangedPosition += (s, e) =>
+        //                              {
+        //                                  _textView.TopRow = _scrollBar.Position;
 
-                                          if (_textView.TopRow != _scrollBar.Position)
-                                          {
-                                              _scrollBar.Position = _textView.TopRow;
-                                          }
+        //                                  if (_textView.TopRow != _scrollBar.Position)
+        //                                  {
+        //                                      _scrollBar.Position = _textView.TopRow;
+        //                                  }
 
-                                          _textView.SetNeedsDisplay ();
-                                      };
+        //                                  _textView.SetNeedsDraw ();
+        //                              };
 
-        _scrollBar.OtherScrollBarView.ChangedPosition += (s, e) =>
-                                                         {
-                                                             _textView.LeftColumn = _scrollBar.OtherScrollBarView.Position;
+        //_scrollBar.OtherScrollBarView.ChangedPosition += (s, e) =>
+        //                                                 {
+        //                                                     _textView.LeftColumn = _scrollBar.OtherScrollBarView.Position;
 
-                                                             if (_textView.LeftColumn != _scrollBar.OtherScrollBarView.Position)
-                                                             {
-                                                                 _scrollBar.OtherScrollBarView.Position = _textView.LeftColumn;
-                                                             }
+        //                                                     if (_textView.LeftColumn != _scrollBar.OtherScrollBarView.Position)
+        //                                                     {
+        //                                                         _scrollBar.OtherScrollBarView.Position = _textView.LeftColumn;
+        //                                                     }
 
-                                                             _textView.SetNeedsDisplay ();
-                                                         };
+        //                                                     _textView.SetNeedsDraw ();
+        //                                                 };
 
-        _textView.DrawContent += (s, e) =>
-                                 {
-                                     _scrollBar.Size = _textView.Lines;
-                                     _scrollBar.Position = _textView.TopRow;
+        //_textView.DrawingContent += (s, e) =>
+        //                         {
+        //                             _scrollBar.Size = _textView.Lines;
+        //                             _scrollBar.Position = _textView.TopRow;
 
-                                     if (_scrollBar.OtherScrollBarView != null)
-                                     {
-                                         _scrollBar.OtherScrollBarView.Size = _textView.Maxlength;
-                                         _scrollBar.OtherScrollBarView.Position = _textView.LeftColumn;
-                                     }
-
-                                     _scrollBar.LayoutSubviews ();
-                                     _scrollBar.Refresh ();
-                                 };
+        //                             if (_scrollBar.OtherScrollBarView != null)
+        //                             {
+        //                                 _scrollBar.OtherScrollBarView.Size = _textView.Maxlength;
+        //                                 _scrollBar.OtherScrollBarView.Position = _textView.LeftColumn;
+        //                             }
+        //                         };
 
 
         _appWindow.Closed += (s, e) => Thread.CurrentThread.CurrentUICulture = new ("en-US");
@@ -775,7 +772,7 @@ public class Editor : Scenario
         item.Title = "Keep Content Always In Viewport";
         item.CheckType |= MenuItemCheckStyle.Checked;
         item.Checked = true;
-        item.Action += () => _scrollBar.KeepContentAlwaysInViewport = (bool)(item.Checked = !item.Checked);
+        //item.Action += () => _scrollBar.KeepContentAlwaysInViewport = (bool)(item.Checked = !item.Checked);
 
         return new [] { item };
     }
@@ -821,7 +818,7 @@ public class Editor : Scenario
 
                            if (_textView.WordWrap)
                            {
-                               _scrollBar.OtherScrollBarView.ShowScrollIndicator = false;
+                               //_scrollBar.OtherScrollBarView.ShowScrollIndicator = false;
                            }
                        };
 

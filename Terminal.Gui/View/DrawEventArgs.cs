@@ -1,7 +1,9 @@
-﻿namespace Terminal.Gui;
+﻿using System.ComponentModel;
+
+namespace Terminal.Gui;
 
 /// <summary>Event args for draw events</summary>
-public class DrawEventArgs : EventArgs
+public class DrawEventArgs : CancelEventArgs
 {
     /// <summary>Creates a new instance of the <see cref="DrawEventArgs"/> class.</summary>
     /// <param name="newViewport">
@@ -17,9 +19,6 @@ public class DrawEventArgs : EventArgs
         NewViewport = newViewport;
         OldViewport = oldViewport;
     }
-
-    /// <summary>If set to true, the draw operation will be canceled, if applicable.</summary>
-    public bool Cancel { get; set; }
 
     /// <summary>Gets the Content-relative rectangle describing the old visible viewport into the <see cref="View"/>.</summary>
     public Rectangle OldViewport { get; }

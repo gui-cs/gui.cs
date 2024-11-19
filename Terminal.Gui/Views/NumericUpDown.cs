@@ -64,7 +64,7 @@ public class NumericUpDown<T> : View where T : notnull
             Text = Value?.ToString () ?? "Err",
             X = Pos.Right (_down),
             Y = Pos.Top (_down),
-            Width = Dim.Auto (minimumContentDim: Dim.Func (() => string.Format (Format, Value).Length)),
+            Width = Dim.Auto (minimumContentDim: Dim.Func (() => string.Format (Format, Value).GetColumns())),
             Height = 1,
             TextAlignment = Alignment.Center,
             CanFocus = true,
@@ -92,13 +92,19 @@ public class NumericUpDown<T> : View where T : notnull
         Add (_down, _number, _up);
 
         AddCommand (
-                    Command.ScrollUp,
-                    () =>
+                    Command.Up,
+                    (ctx) =>
                     {
                         if (type == typeof (object))
                         {
                             return false;
                         }
+
+                        // BUGBUG: If this is uncommented, the numericupdown in a shortcut will not work
+                        //if (RaiseSelecting (ctx) is true)
+                        //{
+                        //    return true;
+                        //}
 
                         if (Value is { } && Increment is { })
                         {
@@ -109,13 +115,19 @@ public class NumericUpDown<T> : View where T : notnull
                     });
 
         AddCommand (
-                    Command.ScrollDown,
-                    () =>
+                    Command.Down,
+                    (ctx) =>
                     {
                         if (type == typeof (object))
                         {
                             return false;
                         }
+
+                        // BUGBUG: If this is uncommented, the numericupdown in a shortcut will not work
+                        //if (RaiseSelecting (ctx) is true)
+                        //{
+                        //    return true;
+                        //}
 
                         if (Value is { } && Increment is { })
                         {
@@ -126,8 +138,8 @@ public class NumericUpDown<T> : View where T : notnull
                         return true;
                     });
 
-        KeyBindings.Add (Key.CursorUp, Command.ScrollUp);
-        KeyBindings.Add (Key.CursorDown, Command.ScrollDown);
+        KeyBindings.Add (Key.CursorUp, Command.Up);
+        KeyBindings.Add (Key.CursorDown, Command.Down);
 
         SetText ();
 
@@ -135,13 +147,13 @@ public class NumericUpDown<T> : View where T : notnull
 
         void OnDownButtonOnAccept (object? s, CommandEventArgs e)
         {
-            InvokeCommand (Command.ScrollDown);
+            InvokeCommand (Command.Down);
             e.Cancel = true;
         }
 
         void OnUpButtonOnAccept (object? s, CommandEventArgs e)
         {
-            InvokeCommand (Command.ScrollUp);
+            InvokeCommand (Command.Up);
             e.Cancel = true;
         }
     }
@@ -251,6 +263,10 @@ public class NumericUpDown<T> : View where T : notnull
     ///     Raised when <see cref="Increment"/> has changed.
     /// </summary>
     public event EventHandler<EventArgs<T>>? IncrementChanged;
+
+    // Prevent the drawing of Text
+    /// <inheritdoc />
+    protected override bool OnDrawingText () { return true; }
 }
 
 /// <summary>

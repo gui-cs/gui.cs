@@ -219,7 +219,7 @@ public class MessageBoxTests
                                      }
                                      else if (iterations == 1)
                                      {
-                                         Application.Refresh ();
+                                         Application.LayoutAndDraw ();
 
                                          TestHelpers.AssertDriverContentsWithFrameAre (
                                                                                        @"
@@ -236,7 +236,7 @@ public class MessageBoxTests
                                      }
                                      else if (iterations == 2)
                                      {
-                                         Application.Refresh ();
+                                         Application.LayoutAndDraw ();
 
                                          TestHelpers.AssertDriverContentsWithFrameAre (
                                                                                        @"
@@ -291,7 +291,7 @@ public class MessageBoxTests
                                      }
                                      else if (iterations == 1)
                                      {
-                                         Application.Refresh ();
+                                         Application.LayoutAndDraw ();
 
                                          TestHelpers.AssertDriverContentsWithFrameAre (
                                                                                        @"
@@ -311,7 +311,7 @@ public class MessageBoxTests
                                      }
                                      else if (iterations == 2)
                                      {
-                                         Application.Refresh ();
+                                         Application.LayoutAndDraw ();
 
                                          TestHelpers.AssertDriverContentsWithFrameAre (
                                                                                        @$"
@@ -361,7 +361,7 @@ public class MessageBoxTests
                                      }
                                      else if (iterations == 1)
                                      {
-                                         Application.Refresh ();
+                                         Application.LayoutAndDraw ();
 
                                          Assert.IsType<Dialog> (Application.Top);
                                          Assert.Equal (new (height, width), Application.Top.Frame.Size);
@@ -398,7 +398,7 @@ public class MessageBoxTests
                                      }
                                      else if (iterations == 1)
                                      {
-                                         Application.Refresh ();
+                                         Application.LayoutAndDraw ();
 
                                          Assert.IsType<Dialog> (Application.Top);
                                          Assert.Equal (new (height, width), Application.Top.Frame.Size);
@@ -431,7 +431,7 @@ public class MessageBoxTests
                                      }
                                      else if (iterations == 1)
                                      {
-                                         Application.Refresh ();
+                                         Application.LayoutAndDraw ();
 
                                          Assert.IsType<Dialog> (Application.Top);
                                          Assert.Equal (new (height, width), Application.Top.Frame.Size);
@@ -471,7 +471,7 @@ public class MessageBoxTests
                                      }
                                      else if (iterations == 1)
                                      {
-                                         Application.Refresh ();
+                                         Application.LayoutAndDraw ();
 
                                          string expectedText = """
                                                                ┌────────────────────────────────────────────────────────────────────┐

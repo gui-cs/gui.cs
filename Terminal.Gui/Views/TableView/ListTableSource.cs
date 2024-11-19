@@ -38,7 +38,7 @@ public class ListTableSource : ITableSource
         DataTable = CreateTable (CalculateColumns ());
 
         // TODO: Determine the best event for this
-        tableView.DrawContent += TableView_DrawContent;
+        tableView.DrawingContent += TableView_DrawContent;
     }
 
     /// <inheritdoc/>

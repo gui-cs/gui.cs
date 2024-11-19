@@ -560,7 +560,7 @@ public class TextField : View
             }
 
             Adjust ();
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
     }
 
@@ -583,7 +583,7 @@ public class TextField : View
         _selectedText = null;
         _start = 0;
         SelectedLength = 0;
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
     }
 
     /// <summary>Allows clearing the <see cref="HistoryText.HistoryTextItemEventArgs"/> items updating the original text.</summary>
@@ -625,7 +625,7 @@ public class TextField : View
         _selectedStart = 0;
         MoveEndExtend ();
         DeleteCharLeft (false);
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
     }
 
     /// <summary>Deletes the character to the left.</summary>
@@ -911,7 +911,7 @@ public class TextField : View
             ShowContextMenu (false);
         }
 
-        //SetNeedsDisplay ();
+        //SetNeedsDraw ();
 
         return true;
 
@@ -933,14 +933,14 @@ public class TextField : View
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle viewport)
+    protected override bool OnDrawingContent ()
     {
         _isDrawing = true;
 
         var selColor = new Attribute (GetFocusColor ().Background, GetFocusColor ().Foreground);
         SetSelectedStartSelectedLength ();
 
-        Driver?.SetAttribute (GetNormalColor ());
+        SetAttribute (GetNormalColor ());
         Move (0, 0);
 
         int p = ScrollOffset;
@@ -956,11 +956,11 @@ public class TextField : View
 
             if (idx == _cursorPosition && HasFocus && !Used && SelectedLength == 0 && !ReadOnly)
             {
-                Driver?.SetAttribute (selColor);
+                SetAttribute (selColor);
             }
             else if (ReadOnly)
             {
-                Driver?.SetAttribute (
+                SetAttribute (
                                       idx >= _start && SelectedLength > 0 && idx < _start + SelectedLength
                                           ? selColor
                                           : roc
@@ -968,15 +968,15 @@ public class TextField : View
             }
             else if (!HasFocus && Enabled)
             {
-                Driver?.SetAttribute (GetFocusColor ());
+                SetAttribute (GetFocusColor ());
             }
             else if (!Enabled)
             {
-                Driver?.SetAttribute (roc);
+                SetAttribute (roc);
             }
             else
             {
-                Driver?.SetAttribute (
+                SetAttribute (
                                       idx >= _start && SelectedLength > 0 && idx < _start + SelectedLength
                                           ? selColor
                                           : ColorScheme.Focus
@@ -999,11 +999,11 @@ public class TextField : View
             }
         }
 
-        Driver.SetAttribute (GetFocusColor ());
+        SetAttribute (GetFocusColor ());
 
         for (int i = col; i < width; i++)
         {
-            Driver.AddRune ((Rune)' ');
+            Driver?.AddRune ((Rune)' ');
         }
 
         PositionCursor ();
@@ -1012,6 +1012,8 @@ public class TextField : View
 
         DrawAutocomplete ();
         _isDrawing = false;
+
+        return true;
     }
 
     /// <inheritdoc/>
@@ -1095,7 +1097,7 @@ public class TextField : View
 
         _cursorPosition = Math.Min (selStart + cbTxt.GetRuneCount (), _text.Count);
         ClearAllSelection ();
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
         Adjust ();
     }
 
@@ -1144,7 +1146,7 @@ public class TextField : View
 
         _selectedStart = 0;
         MoveEndExtend ();
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
     }
 
     ///// <summary>
@@ -1193,7 +1195,7 @@ public class TextField : View
         //SetContentSize(new (TextModel.DisplaySize (_text).size, 1));
 
         int offB = OffSetBackground ();
-        bool need = NeedsDisplay || !Used;
+        bool need = NeedsDraw || !Used;
 
         if (_cursorPosition < ScrollOffset)
         {
@@ -1218,7 +1220,7 @@ public class TextField : View
 
         if (need)
         {
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
         else
         {
@@ -1672,7 +1674,7 @@ public class TextField : View
                 _selectedText = null;
             }
 
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
         else if (SelectedLength > 0 || _selectedText is { })
         {
@@ -1728,7 +1730,7 @@ public class TextField : View
         }
 
         var color = new Attribute (CaptionColor, GetNormalColor ().Background);
-        Driver.SetAttribute (color);
+        SetAttribute (color);
 
         Move (0, 0);
         string render = Caption;
@@ -1738,7 +1740,7 @@ public class TextField : View
             render = render [..Viewport.Width];
         }
 
-        Driver.AddStr (render);
+        Driver?.AddStr (render);
     }
 
     private void SetClipboard (IEnumerable<Rune> text)
@@ -1752,7 +1754,7 @@ public class TextField : View
     private void SetOverwrite (bool overwrite)
     {
         Used = overwrite;
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
     }
 
     private void SetSelectedStartSelectedLength ()

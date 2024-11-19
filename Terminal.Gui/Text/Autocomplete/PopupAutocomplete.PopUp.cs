@@ -15,14 +15,16 @@ public abstract partial class PopupAutocomplete
 
         private readonly PopupAutocomplete _autoComplete;
 
-        public override void OnDrawContent (Rectangle viewport)
+        protected override bool OnDrawingContent ()
         {
             if (!_autoComplete.LastPopupPos.HasValue)
             {
-                return;
+                return true;
             }
 
             _autoComplete.RenderOverlay (_autoComplete.LastPopupPos.Value);
+
+            return true;
         }
 
         protected override bool OnMouseEvent (MouseEventArgs mouseEvent) { return _autoComplete.OnMouseEvent (mouseEvent); }

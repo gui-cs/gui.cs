@@ -106,7 +106,7 @@ public class TimeField : TextField
 
             SetText (Text);
             ReadOnly = ro;
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
     }
 

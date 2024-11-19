@@ -9,7 +9,7 @@ using Terminal.Gui;
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Dynamic MenuBar", "Demonstrates how to change a MenuBar dynamically.")]
-[ScenarioCategory ("Overlapped")]
+[ScenarioCategory ("Arrangement")]
 [ScenarioCategory ("Menus")]
 public class DynamicMenuBar : Scenario
 {
@@ -224,7 +224,7 @@ public class DynamicMenuBar : Scenario
                                          if (e.NewValue == CheckState.Checked)
                                          {
                                              CkbSubMenu.CheckedState = CheckState.UnChecked;
-                                             CkbSubMenu.SetNeedsDisplay ();
+                                             CkbSubMenu.SetNeedsDraw ();
                                              TextHelp.Enabled = true;
                                              TextAction.Enabled = true;
                                              TextShortcutKey.Enabled = true;
@@ -234,7 +234,7 @@ public class DynamicMenuBar : Scenario
                                              if ((_menuItem == null && !_hasParent) || _menuItem.Parent == null)
                                              {
                                                  CkbSubMenu.CheckedState = CheckState.Checked;
-                                                 CkbSubMenu.SetNeedsDisplay ();
+                                                 CkbSubMenu.SetNeedsDraw ();
                                                  TextShortcutKey.Enabled = false;
                                              }
 
@@ -252,7 +252,7 @@ public class DynamicMenuBar : Scenario
                                       if (e.CurrentValue == CheckState.Checked)
                                       {
                                           CkbIsTopLevel.CheckedState = CheckState.UnChecked;
-                                          CkbIsTopLevel.SetNeedsDisplay ();
+                                          CkbIsTopLevel.SetNeedsDraw ();
                                           TextHelp.Text = "";
                                           TextHelp.Enabled = false;
                                           TextAction.Text = "";
@@ -265,7 +265,7 @@ public class DynamicMenuBar : Scenario
                                           if (!_hasParent)
                                           {
                                               CkbIsTopLevel.CheckedState = CheckState.Checked;
-                                              CkbIsTopLevel.SetNeedsDisplay ();
+                                              CkbIsTopLevel.SetNeedsDraw ();
                                               TextShortcutKey.Enabled = true;
                                           }
 
@@ -414,7 +414,7 @@ public class DynamicMenuBar : Scenario
                                 };
 
             var dialog = new Dialog
-                { Title = "Enter the menu details.", Buttons = [btnOk, btnCancel], Height = Dim.Auto (DimAutoStyle.Content, 22, Driver.Rows) };
+                { Title = "Enter the menu details.", Buttons = [btnOk, btnCancel], Height = Dim.Auto (DimAutoStyle.Content, 22, Application.Screen.Height) };
 
             Width = Dim.Fill ();
             Height = Dim.Fill () - 1;
@@ -683,7 +683,7 @@ public class DynamicMenuBar : Scenario
                                                 menus [i] = menus [i - 1];
                                                 menus [i - 1] = menuItem;
                                                 _currentSelectedMenuBar = i - 1;
-                                                _menuBar.SetNeedsDisplay ();
+                                                _menuBar.SetNeedsDraw ();
                                             }
                                         }
                                     };
@@ -705,7 +705,7 @@ public class DynamicMenuBar : Scenario
                                                   menus [i] = menus [i + 1];
                                                   menus [i + 1] = menuItem;
                                                   _currentSelectedMenuBar = i + 1;
-                                                  _menuBar.SetNeedsDisplay ();
+                                                  _menuBar.SetNeedsDraw ();
                                               }
                                           }
                                       };
@@ -920,7 +920,7 @@ public class DynamicMenuBar : Scenario
                                             RemoveMenuBar ();
                                         }
 
-                                        _lstMenus.SetNeedsDisplay ();
+                                        _lstMenus.SetNeedsDraw ();
                                         SetFrameDetails ();
                                     }
                                 };
@@ -1012,7 +1012,7 @@ public class DynamicMenuBar : Scenario
                                          lblMenuBar.Text = newMenu.Title;
                                          SetListViewSource (_currentMenuBarItem, true);
                                          SetFrameDetails (_menuBar.Menus [_currentSelectedMenuBar]);
-                                         _menuBar.SetNeedsDisplay ();
+                                         _menuBar.SetNeedsDraw ();
                                      };
 
             btnRemoveMenuBar.Accepting += (s, e) =>

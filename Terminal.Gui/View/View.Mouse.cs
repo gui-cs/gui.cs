@@ -678,17 +678,20 @@ public partial class View // Mouse APIs
 
             Adornment? found = null;
 
-            if (start.Margin.Contains (currentLocation))
+            if (start is not Adornment)
             {
-                found = start.Margin;
-            }
-            else if (start.Border.Contains (currentLocation))
-            {
-                found = start.Border;
-            }
-            else if (start.Padding.Contains (currentLocation))
-            {
-                found = start.Padding;
+                if (start.Margin is {} && start.Margin.Contains (currentLocation))
+                {
+                    found = start.Margin;
+                }
+                else if (start.Border is {} && start.Border.Contains (currentLocation))
+                {
+                    found = start.Border;
+                }
+                else if (start.Padding is { } && start.Padding.Contains(currentLocation))
+                {
+                    found = start.Padding;
+                }
             }
 
             Point viewportOffset = start.GetViewportOffsetFromFrame ();

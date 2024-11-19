@@ -1,85 +1,169 @@
-﻿using Terminal.Gui;
+﻿using System.Text;
+using System.Timers;
+using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Clipping", "Used to test that things clip correctly")]
-[ScenarioCategory ("Tests")]
-[ScenarioCategory ("Drawing")]
+[ScenarioMetadata ("Clipping", "Demonstrates non-rectangular clip region support.")]
 [ScenarioCategory ("Scrolling")]
+[ScenarioCategory ("Layout")]
+[ScenarioCategory ("Arrangement")]
+[ScenarioCategory ("Tests")]
 public class Clipping : Scenario
 {
+    private int _hotkeyCount;
+
     public override void Main ()
     {
         Application.Init ();
-        var win = new Window { Title = GetQuitKeyAndName () };
 
-        var label = new Label
+        Window app = new ()
         {
-            X = 0, Y = 0, Text = "ScrollView (new Rectangle (3, 3, 50, 20)) with a 200, 100 GetContentSize ()..."
-        };
-        win.Add (label);
-
-        var scrollView = new ScrollView { X = 3, Y = 3, Width = 50, Height = 20 };
-        scrollView.ColorScheme = Colors.ColorSchemes ["Menu"];
-        // BUGBUG: set_ContentSize is supposed to be `protected`. 
-        scrollView.SetContentSize (new (200, 100));
-
-        //ContentOffset = Point.Empty,
-        scrollView.AutoHideScrollBars = true;
-        scrollView.ShowVerticalScrollIndicator = true;
-        scrollView.ShowHorizontalScrollIndicator = true;
-
-        var embedded1 = new View
-        {
-            Title = "1",
-            X = 3,
-            Y = 3,
-            Width = Dim.Fill (3),
-            Height = Dim.Fill (3),
-            ColorScheme = Colors.ColorSchemes ["Dialog"],
-            Id = "1",
-            BorderStyle = LineStyle.Rounded,
-            Arrangement = ViewArrangement.Movable
+            Title = GetQuitKeyAndName (),
+            //BorderStyle = LineStyle.None
         };
 
-        var embedded2 = new View
+        app.DrawingContent += (s, e) =>
+                           {
+                               app!.FillRect (app!.Viewport, CM.Glyphs.Dot);
+                               e.Cancel = true;
+                           };
+
+        var arrangementEditor = new ArrangementEditor ()
         {
-            Title = "2",
-            X = 3,
-            Y = 3,
-            Width = Dim.Fill (3),
-            Height = Dim.Fill (3),
-            ColorScheme = Colors.ColorSchemes ["Error"],
-            Id = "2",
-            BorderStyle = LineStyle.Rounded,
-            Arrangement = ViewArrangement.Movable
+            X = Pos.AnchorEnd (),
+            Y = 0,
+            AutoSelectViewToEdit = true,
         };
-        embedded1.Add (embedded2);
+        app.Add (arrangementEditor);
 
-        var embedded3 = new View
+        View tiledView1 = CreateTiledView (1, 0, 0);
+
+        tiledView1.Width = 30;
+
+        ProgressBar tiledProgressBar1 = new ()
         {
-            Title = "3",
-            X = 3,
-            Y = 3,
-            Width = Dim.Fill (3),
-            Height = Dim.Fill (3),
-            ColorScheme = Colors.ColorSchemes ["TopLevel"],
-            Id = "3",
-            BorderStyle = LineStyle.Rounded,
-            Arrangement = ViewArrangement.Movable
+            X = 0,
+            Y = Pos.AnchorEnd (),
+            Width = Dim.Fill (),
+            Id = "tiledProgressBar",
+            BidirectionalMarquee = true,
+        };
+        tiledView1.Add (tiledProgressBar1);
+
+        View tiledView2 = CreateTiledView (2, 4, 2);
+
+        ProgressBar tiledProgressBar2 = new ()
+        {
+            X = 0,
+            Y = Pos.AnchorEnd (),
+            Width = Dim.Fill (),
+            Id = "tiledProgressBar",
+            BidirectionalMarquee = true,
+            ProgressBarStyle = ProgressBarStyle.MarqueeBlocks
+            // BorderStyle = LineStyle.Rounded
+        };
+        tiledView2.Add (tiledProgressBar2);
+
+        app.Add (tiledView1);
+        app.Add (tiledView2);
+
+        View tiledView3 = CreateTiledView (3, 8, 4);
+        app.Add (tiledView3);
+
+        // View overlappedView1 = CreateOverlappedView (1, 30, 2);
+
+        //ProgressBar progressBar = new ()
+        //{
+        //    X = Pos.AnchorEnd (),
+        //    Y = Pos.AnchorEnd (),
+        //    Width = Dim.Fill (),
+        //    Id = "progressBar",
+        //    BorderStyle = LineStyle.Rounded
+        //};
+        //overlappedView1.Add (progressBar);
+
+
+        //View overlappedView2 = CreateOverlappedView (2, 32, 4);
+        //View overlappedView3 = CreateOverlappedView (3, 34, 6);
+
+        //app.Add (overlappedView1);
+        //app.Add (overlappedView2);
+        //app.Add (overlappedView3);
+
+        Timer progressTimer = new Timer (150)
+        {
+            AutoReset = true
         };
 
-        var testButton = new Button { X = 2, Y = 2, Text = "click me" };
-        testButton.Accepting += (s, e) => { MessageBox.Query (10, 5, "Test", "test message", "Ok"); };
-        embedded3.Add (testButton);
-        embedded2.Add (embedded3);
+        progressTimer.Elapsed += (s, e) =>
+                                 {
+                                     tiledProgressBar1.Pulse ();
+                                     tiledProgressBar2.Pulse ();
+                                     Application.Wakeup ();
+                                 };
 
-        scrollView.Add (embedded1);
-
-        win.Add (scrollView);
-
-        Application.Run (win);
-        win.Dispose ();
+        progressTimer.Start ();
+        Application.Run (app);
+        progressTimer.Stop ();
+        app.Dispose ();
         Application.Shutdown ();
+
+        return;
     }
+
+    private View CreateOverlappedView (int id, Pos x, Pos y)
+    {
+        var overlapped = new View
+        {
+            X = x,
+            Y = y,
+            Height = Dim.Auto (minimumContentDim: 4),
+            Width = Dim.Auto (minimumContentDim: 14),
+            Title = $"Overlapped{id} _{GetNextHotKey ()}",
+            ColorScheme = Colors.ColorSchemes ["Toplevel"],
+            Id = $"Overlapped{id}",
+            ShadowStyle = ShadowStyle.Transparent,
+            BorderStyle = LineStyle.Double,
+            CanFocus = true, // Can't drag without this? BUGBUG
+            TabStop = TabBehavior.TabGroup,
+            Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped | ViewArrangement.Resizable
+        };
+        return overlapped;
+    }
+
+    private View CreateTiledView (int id, Pos x, Pos y)
+    {
+        var tiled = new View
+        {
+            X = x,
+            Y = y,
+            Height = Dim.Auto (minimumContentDim: 8),
+            Width = Dim.Auto (minimumContentDim: 15),
+            Title = $"Tiled{id} _{GetNextHotKey ()}",
+            Id = $"Tiled{id}",
+            Text = $"Tiled{id}",
+            BorderStyle = LineStyle.Single,
+            CanFocus = true, // Can't drag without this? BUGBUG
+            TabStop = TabBehavior.TabStop,
+            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
+            ShadowStyle = ShadowStyle.Transparent,
+        };
+        //tiled.Padding.Thickness = new (1);
+        //tiled.Padding.Diagnostics =  ViewDiagnosticFlags.Thickness;
+
+        //tiled.Margin.Thickness = new (1);
+
+        FrameView fv = new ()
+        {
+            Title = "FrameView",
+            Width = 15,
+            Height = 3,
+        };
+        tiled.Add (fv);
+
+        return tiled;
+    }
+
+    private char GetNextHotKey () { return (char)('A' + _hotkeyCount++); }
 }

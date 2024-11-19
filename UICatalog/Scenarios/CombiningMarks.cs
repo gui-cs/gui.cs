@@ -9,24 +9,24 @@ public class CombiningMarks : Scenario
     public override void Main ()
     {
         Application.Init ();
-        var top = new Toplevel { ColorScheme = Colors.ColorSchemes [TopLevelColorScheme] };
+        var top = new Toplevel ();
 
-        top.DrawContentComplete += (s, e) =>
+        top.DrawComplete += (s, e) =>
                                    {
-                                       Application.Driver?.Move (0, 0);
-                                       Application.Driver?.AddStr ("Terminal.Gui only supports combining marks that normalize. See Issue #2616.");
-                                       Application.Driver?.Move (0, 2);
-                                       Application.Driver?.AddStr ("\u0301\u0301\u0328<- \"\\u301\\u301\\u328]\" using AddStr.");
-                                       Application.Driver?.Move (0, 3);
-                                       Application.Driver?.AddStr ("[a\u0301\u0301\u0328]<- \"[a\\u301\\u301\\u328]\" using AddStr.");
-                                       Application.Driver?.Move (0, 4);
-                                       Application.Driver?.AddRune ('[');
-                                       Application.Driver?.AddRune ('a');
-                                       Application.Driver?.AddRune ('\u0301');
-                                       Application.Driver?.AddRune ('\u0301');
-                                       Application.Driver?.AddRune ('\u0328');
-                                       Application.Driver?.AddRune (']');
-                                       Application.Driver?.AddStr ("<- \"[a\\u301\\u301\\u328]\" using AddRune for each.");
+                                       top.Move (0, 0);
+                                       top.AddStr ("Terminal.Gui only supports combining marks that normalize. See Issue #2616.");
+                                       top.Move (0, 2);
+                                       top.AddStr ("\u0301\u0301\u0328<- \"\\u301\\u301\\u328]\" using AddStr.");
+                                       top.Move (0, 3);
+                                       top.AddStr ("[a\u0301\u0301\u0328]<- \"[a\\u301\\u301\\u328]\" using AddStr.");
+                                       top.Move (0, 4);
+                                       top.AddRune ('[');
+                                       top.AddRune ('a');
+                                       top.AddRune ('\u0301');
+                                       top.AddRune ('\u0301');
+                                       top.AddRune ('\u0328');
+                                       top.AddRune (']');
+                                       top.AddStr ("<- \"[a\\u301\\u301\\u328]\" using AddRune for each.");
                                    };
 
         Application.Run (top);

@@ -141,7 +141,7 @@ public class MultiColouredTable : Scenario
             {
                 if (unicorns != -1 && i >= unicorns && i <= unicorns + 8)
                 {
-                    Driver.SetAttribute (new (Color.White, cellColor.Background));
+                    SetAttribute (new (Color.White, cellColor.Background));
                 }
 
                 if (rainbows != -1 && i >= rainbows && i <= rainbows + 8)
@@ -151,11 +151,11 @@ public class MultiColouredTable : Scenario
                     switch (letterOfWord)
                     {
                         case 0:
-                            Driver.SetAttribute (new (Color.Red, cellColor.Background));
+                            SetAttribute (new (Color.Red, cellColor.Background));
 
                             break;
                         case 1:
-                            Driver.SetAttribute (
+                            SetAttribute (
                                                  new (
                                                       Color.BrightRed,
                                                       cellColor.Background
@@ -164,7 +164,7 @@ public class MultiColouredTable : Scenario
 
                             break;
                         case 2:
-                            Driver.SetAttribute (
+                            SetAttribute (
                                                  new (
                                                       Color.BrightYellow,
                                                       cellColor.Background
@@ -173,11 +173,11 @@ public class MultiColouredTable : Scenario
 
                             break;
                         case 3:
-                            Driver.SetAttribute (new (Color.Green, cellColor.Background));
+                            SetAttribute (new (Color.Green, cellColor.Background));
 
                             break;
                         case 4:
-                            Driver.SetAttribute (
+                            SetAttribute (
                                                  new (
                                                       Color.BrightGreen,
                                                       cellColor.Background
@@ -186,7 +186,7 @@ public class MultiColouredTable : Scenario
 
                             break;
                         case 5:
-                            Driver.SetAttribute (
+                            SetAttribute (
                                                  new (
                                                       Color.BrightBlue,
                                                       cellColor.Background
@@ -195,7 +195,7 @@ public class MultiColouredTable : Scenario
 
                             break;
                         case 6:
-                            Driver.SetAttribute (
+                            SetAttribute (
                                                  new (
                                                       Color.BrightCyan,
                                                       cellColor.Background
@@ -204,14 +204,14 @@ public class MultiColouredTable : Scenario
 
                             break;
                         case 7:
-                            Driver.SetAttribute (new (Color.Cyan, cellColor.Background));
+                            SetAttribute (new (Color.Cyan, cellColor.Background));
 
                             break;
                     }
                 }
 
-                Driver.AddRune ((Rune)render [i]);
-                Driver.SetAttribute (cellColor);
+                AddRune ((Rune)render [i]);
+                SetAttribute (cellColor);
             }
         }
     }

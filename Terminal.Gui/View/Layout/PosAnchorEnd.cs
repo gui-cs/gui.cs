@@ -36,7 +36,7 @@ public record PosAnchorEnd : Pos
     public bool UseDimForOffset { get; }
 
     /// <inheritdoc/>
-    public override string ToString () { return UseDimForOffset ? "AnchorEnd()" : $"AnchorEnd({Offset})"; }
+    public override string ToString () { return UseDimForOffset ? "AnchorEnd" : $"AnchorEnd({Offset})"; }
 
     internal override int GetAnchor (int size)
     {

@@ -1,69 +1,8 @@
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui;
-
-/// <summary>Implement <see cref="IListDataSource"/> to provide custom rendering for a <see cref="ListView"/>.</summary>
-public interface IListDataSource : IDisposable
-{
-    /// <summary>
-    /// Event to raise when an item is added, removed, or moved, or the entire list is refreshed.
-    /// </summary>
-    event NotifyCollectionChangedEventHandler CollectionChanged;
-
-    /// <summary>Returns the number of elements to display</summary>
-    int Count { get; }
-
-    /// <summary>Returns the maximum length of elements to display</summary>
-    int Length { get; }
-
-    /// <summary>
-    /// Allow suspending the <see cref="CollectionChanged"/> event from being invoked,
-    /// if <see langword="true"/>, otherwise is <see langword="false"/>.
-    /// </summary>
-    bool SuspendCollectionChangedEvent { get; set; }
-
-    /// <summary>Should return whether the specified item is currently marked.</summary>
-    /// <returns><see langword="true"/>, if marked, <see langword="false"/> otherwise.</returns>
-    /// <param name="item">Item index.</param>
-    bool IsMarked (int item);
-
-    /// <summary>This method is invoked to render a specified item, the method should cover the entire provided width.</summary>
-    /// <returns>The render.</returns>
-    /// <param name="container">The list view to render.</param>
-    /// <param name="driver">The console driver to render.</param>
-    /// <param name="selected">Describes whether the item being rendered is currently selected by the user.</param>
-    /// <param name="item">The index of the item to render, zero for the first item and so on.</param>
-    /// <param name="col">The column where the rendering will start</param>
-    /// <param name="line">The line where the rendering will be done.</param>
-    /// <param name="width">The width that must be filled out.</param>
-    /// <param name="start">The index of the string to be displayed.</param>
-    /// <remarks>
-    ///     The default color will be set before this method is invoked, and will be based on whether the item is selected
-    ///     or not.
-    /// </remarks>
-    void Render (
-        ListView container,
-        ConsoleDriver driver,
-        bool selected,
-        int item,
-        int col,
-        int line,
-        int width,
-        int start = 0
-    );
-
-    /// <summary>Flags the item as marked.</summary>
-    /// <param name="item">Item index.</param>
-    /// <param name="value">If set to <see langword="true"/> value.</param>
-    void SetMark (int item, bool value);
-
-    /// <summary>Return the source as IList.</summary>
-    /// <returns></returns>
-    IList ToList ();
-}
 
 /// <summary>
 ///     ListView <see cref="View"/> renders a scrollable list of data where each item can be activated to perform an
@@ -88,7 +27,7 @@ public interface IListDataSource : IDisposable
 ///     </para>
 ///     <para>
 ///         To change the contents of the ListView, set the <see cref="Source"/> property (when providing custom
-///         rendering via <see cref="IListDataSource"/>) or call <see cref="SetSource"/> an <see cref="IList"/> is being
+///         rendering via <see cref="IListDataSource"/>) or call <see cref="SetSource{T}"/> an <see cref="IList"/> is being
 ///         used.
 ///     </para>
 ///     <para>
@@ -123,11 +62,24 @@ public class ListView : View, IDesignable
 
         // Things this view knows how to do
         // 
-        // BUGBUG: Should return false if selection doesn't change (to support nav to next view)
-        AddCommand (Command.Up, () => MoveUp ());
-        // BUGBUG: Should return false if selection doesn't change (to support nav to next view)
-        AddCommand (Command.Down, () => MoveDown ());
+        AddCommand (Command.Up, (ctx) =>
+                                {
+                                    if (RaiseSelecting (ctx) == true)
+                                    {
+                                        return true;
+                                    }
+                                    return MoveUp ();
+                                });
+        AddCommand (Command.Down, (ctx) =>
+                                  {
+                                      if (RaiseSelecting (ctx) == true)
+                                      {
+                                          return true;
+                                      }
+                                      return MoveDown ();
+                                  });
 
+        // TODO: add RaiseSelecting to all of these
         AddCommand (Command.ScrollUp, () => ScrollVertical (-1));
         AddCommand (Command.ScrollDown, () => ScrollVertical (1));
         AddCommand (Command.PageUp, () => MovePageUp ());
@@ -189,7 +141,7 @@ public class ListView : View, IDesignable
                                         return !SetFocus ();
                                     });
 
-        AddCommand (Command.SelectAll, (ctx) => MarkAll((bool)ctx.KeyBinding?.Context!));
+        AddCommand (Command.SelectAll, (ctx) => MarkAll ((bool)ctx.KeyBinding?.Context!));
 
         // Default keybindings for all ListViews
         KeyBindings.Add (Key.CursorUp, Command.Up);
@@ -215,6 +167,18 @@ public class ListView : View, IDesignable
         KeyBindings.Add (Key.U.WithCtrl, new KeyBinding ([Command.SelectAll], KeyBindingScope.Focused, false));
     }
 
+    /// <inheritdoc />
+    protected override void OnViewportChanged (DrawEventArgs e)
+    {
+        SetContentSize (new Size (MaxLength, _source?.Count ?? Viewport.Height));
+    }
+
+    /// <inheritdoc />
+    protected override void OnFrameChanged (in Rectangle frame)
+    {
+        EnsureSelectedItemVisible ();
+    }
+
     /// <summary>Gets or sets whether this <see cref="ListView"/> allows items to be marked.</summary>
     /// <value>Set to <see langword="true"/> to allow marking elements of the list.</value>
     /// <remarks>
@@ -227,7 +191,7 @@ public class ListView : View, IDesignable
         set
         {
             _allowsMarking = value;
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
     }
 
@@ -254,7 +218,7 @@ public class ListView : View, IDesignable
                 }
             }
 
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
     }
 
@@ -282,7 +246,7 @@ public class ListView : View, IDesignable
             }
 
             Viewport = Viewport with { X = value };
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
     }
 
@@ -313,7 +277,7 @@ public class ListView : View, IDesignable
 
     /// <summary>Gets or sets the <see cref="IListDataSource"/> backing this <see cref="ListView"/>, enabling custom rendering.</summary>
     /// <value>The source.</value>
-    /// <remarks>Use <see cref="SetSource"/> to set a new <see cref="IList"/> source.</remarks>
+    /// <remarks>Use <see cref="SetSource{T}"/> to set a new <see cref="IList"/> source.</remarks>
     public IListDataSource Source
     {
         get => _source;
@@ -335,15 +299,16 @@ public class ListView : View, IDesignable
             SetContentSize (new Size (_source?.Length ?? Viewport.Width, _source?.Count ?? Viewport.Width));
             if (IsInitialized)
             {
-                Viewport = Viewport with { Y = 0 };
+                // Viewport = Viewport with { Y = 0 };
             }
 
             KeystrokeNavigator.Collection = _source?.ToList ();
             _selected = -1;
             _lastSelectedItem = -1;
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
     }
+
 
     private void Source_CollectionChanged (object sender, NotifyCollectionChangedEventArgs e)
     {
@@ -354,7 +319,7 @@ public class ListView : View, IDesignable
             SelectedItem = Source.Count - 1;
         }
 
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
 
         OnCollectionChanged (e);
     }
@@ -434,23 +399,17 @@ public class ListView : View, IDesignable
     /// <summary>Ensures the selected item is always visible on the screen.</summary>
     public void EnsureSelectedItemVisible ()
     {
-        if (SuperView?.IsInitialized == true)
+        if (_selected == -1)
         {
-            if (_selected < Viewport.Y)
-            {
-                // TODO: The Max check here is not needed because, by default, Viewport enforces staying w/in ContentArea (View.ScrollSettings).
-                Viewport = Viewport with { Y = _selected };
-            }
-            else if (Viewport.Height > 0 && _selected >= Viewport.Y + Viewport.Height)
-            {
-                Viewport = Viewport with { Y = _selected - Viewport.Height + 1 };
-            }
-
-            LayoutStarted -= ListView_LayoutStarted;
+            return;
         }
-        else
+        if (_selected < Viewport.Y)
         {
-            LayoutStarted += ListView_LayoutStarted;
+            Viewport = Viewport with { Y = _selected };
+        }
+        else if (Viewport.Height > 0 && _selected >= Viewport.Y + Viewport.Height)
+        {
+            Viewport = Viewport with { Y = _selected - Viewport.Height + 1 };
         }
     }
 
@@ -461,12 +420,12 @@ public class ListView : View, IDesignable
         if (UnmarkAllButSelected ())
         {
             Source.SetMark (SelectedItem, !Source.IsMarked (SelectedItem));
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
 
             return Source.IsMarked (SelectedItem);
         }
 
-        // BUGBUG: Shouldn't this retrn Source.IsMarked (SelectedItem)
+        // BUGBUG: Shouldn't this return Source.IsMarked (SelectedItem)
 
         return false;
     }
@@ -496,7 +455,10 @@ public class ListView : View, IDesignable
 
         if (me.Flags == MouseFlags.WheeledDown)
         {
-            ScrollVertical (1);
+            if (Viewport.Y + Viewport.Height < GetContentSize ().Height)
+            {
+                ScrollVertical (1);
+            }
 
             return true;
         }
@@ -510,7 +472,10 @@ public class ListView : View, IDesignable
 
         if (me.Flags == MouseFlags.WheeledRight)
         {
-            ScrollHorizontal (1);
+            if (Viewport.X + Viewport.Width < GetContentSize ().Width)
+            {
+                ScrollHorizontal (1);
+            }
 
             return true;
         }
@@ -537,7 +502,7 @@ public class ListView : View, IDesignable
         }
 
         OnSelectedChanged ();
-        SetNeedsDisplay ();
+        SetNeedsDraw ();
 
         if (me.Flags == MouseFlags.Button1DoubleClicked)
         {
@@ -564,7 +529,7 @@ public class ListView : View, IDesignable
             // This can occur if the backing data source changes.
             _selected = _source.Count - 1;
             OnSelectedChanged ();
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
         else if (_selected + 1 < _source.Count)
         {
@@ -581,17 +546,17 @@ public class ListView : View, IDesignable
             }
 
             OnSelectedChanged ();
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
         else if (_selected == 0)
         {
             OnSelectedChanged ();
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
         else if (_selected >= Viewport.Y + Viewport.Height)
         {
             Viewport = Viewport with { Y = _source.Count - Viewport.Height };
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
 
         return true;
@@ -616,7 +581,7 @@ public class ListView : View, IDesignable
             }
 
             OnSelectedChanged ();
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
 
         return true;
@@ -631,7 +596,7 @@ public class ListView : View, IDesignable
             _selected = 0;
             Viewport = Viewport with { Y = _selected };
             OnSelectedChanged ();
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
 
         return true;
@@ -670,7 +635,7 @@ public class ListView : View, IDesignable
             }
 
             OnSelectedChanged ();
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
 
         return true;
@@ -692,7 +657,7 @@ public class ListView : View, IDesignable
             _selected = n;
             Viewport = Viewport with { Y = _selected };
             OnSelectedChanged ();
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
 
         return true;
@@ -715,7 +680,7 @@ public class ListView : View, IDesignable
             // This can occur if the backing data source changes.
             _selected = _source.Count - 1;
             OnSelectedChanged ();
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
         else if (_selected > 0)
         {
@@ -736,24 +701,22 @@ public class ListView : View, IDesignable
             }
 
             OnSelectedChanged ();
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
         else if (_selected < Viewport.Y)
         {
             Viewport = Viewport with { Y = _selected };
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
 
         return true;
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle viewport)
+    protected override bool OnDrawingContent ()
     {
-        base.OnDrawContent (viewport);
-
-        Attribute current = ColorScheme.Focus;
-        Driver.SetAttribute (current);
+        Attribute current = ColorScheme?.Focus ?? Attribute.Default;
+        SetAttribute (current);
         Move (0, 0);
         Rectangle f = Viewport;
         int item = Viewport.Y;
@@ -770,7 +733,7 @@ public class ListView : View, IDesignable
 
             if (newcolor != current)
             {
-                Driver.SetAttribute (newcolor);
+                SetAttribute (newcolor);
                 current = newcolor;
             }
 
@@ -780,7 +743,7 @@ public class ListView : View, IDesignable
             {
                 for (var c = 0; c < f.Width; c++)
                 {
-                    Driver.AddRune ((Rune)' ');
+                    Driver?.AddRune ((Rune)' ');
                 }
             }
             else
@@ -791,21 +754,22 @@ public class ListView : View, IDesignable
                 if (rowEventArgs.RowAttribute is { } && current != rowEventArgs.RowAttribute)
                 {
                     current = (Attribute)rowEventArgs.RowAttribute;
-                    Driver.SetAttribute (current);
+                    SetAttribute (current);
                 }
 
                 if (_allowsMarking)
                 {
-                    Driver.AddRune (
+                    Driver?.AddRune (
                                     _source.IsMarked (item) ? AllowsMultipleSelection ? Glyphs.CheckStateChecked : Glyphs.Selected :
                                     AllowsMultipleSelection ? Glyphs.CheckStateUnChecked : Glyphs.UnSelected
                                    );
-                    Driver.AddRune ((Rune)' ');
+                    Driver?.AddRune ((Rune)' ');
                 }
 
-                Source.Render (this, Driver, isSelected, item, col, row, f.Width - col, start);
+                Source.Render (this, isSelected, item, col, row, f.Width - col, start);
             }
         }
+        return true;
     }
 
     /// <inheritdoc/>
@@ -866,7 +830,7 @@ public class ListView : View, IDesignable
             {
                 SelectedItem = (int)newItem;
                 EnsureSelectedItemVisible ();
-                SetNeedsDisplay ();
+                SetNeedsDraw ();
 
                 return true;
             }
@@ -900,20 +864,20 @@ public class ListView : View, IDesignable
     /// <summary>This event is raised when the user Double Clicks on an item or presses ENTER to open the selected item.</summary>
     public event EventHandler<ListViewItemEventArgs> OpenSelectedItem;
 
-    /// <inheritdoc/>
-    public override Point? PositionCursor ()
-    {
-        int x = 0;
-        int y = _selected - Viewport.Y;
-        if (!_allowsMarking)
-        {
-            x = Viewport.Width - 1;
-        }
+    ///// <inheritdoc/>
+    //public override Point? PositionCursor ()
+    //{
+    //    int x = 0;
+    //    int y = _selected - Viewport.Y;
+    //    if (!_allowsMarking)
+    //    {
+    //        x = Viewport.Width - 1;
+    //    }
 
-        Move (x, y);
+    //    Move (x, y);
 
-        return null; // Don't show the cursor
-    }
+    //    return null; // Don't show the cursor
+    //}
 
     /// <summary>This event is invoked when this <see cref="ListView"/> is being drawn before rendering.</summary>
     public event EventHandler<ListViewRowEventArgs> RowRender;
@@ -1096,7 +1060,6 @@ public class ListWrapper<T> : IListDataSource, IDisposable
     /// <inheritdoc/>
     public void Render (
         ListView container,
-        ConsoleDriver driver,
         bool marked,
         int item,
         int col,
@@ -1113,17 +1076,17 @@ public class ListWrapper<T> : IListDataSource, IDisposable
 
             if (t is null)
             {
-                RenderUstr (driver, "", col, line, width);
+                RenderUstr (container, "", col, line, width);
             }
             else
             {
                 if (t is string s)
                 {
-                    RenderUstr (driver, s, col, line, width, start);
+                    RenderUstr (container, s, col, line, width, start);
                 }
                 else
                 {
-                    RenderUstr (driver, t.ToString (), col, line, width, start);
+                    RenderUstr (container, t.ToString (), col, line, width, start);
                 }
             }
         }
@@ -1192,7 +1155,7 @@ public class ListWrapper<T> : IListDataSource, IDisposable
 
         var maxLength = 0;
 
-        for (var i = 0; i < _source.Count; i++)
+        for (var i = 0; i < _source!.Count; i++)
         {
             object t = _source [i];
             int l;
@@ -1219,7 +1182,7 @@ public class ListWrapper<T> : IListDataSource, IDisposable
         return maxLength;
     }
 
-    private void RenderUstr (ConsoleDriver driver, string ustr, int col, int line, int width, int start = 0)
+    private void RenderUstr (View driver, string ustr, int col, int line, int width, int start = 0)
     {
         string str = start > ustr.GetColumns () ? string.Empty : ustr.Substring (Math.Min (start, ustr.ToRunes ().Length - 1));
         string u = TextFormatter.ClipAndJustify (str, width, Alignment.Start);

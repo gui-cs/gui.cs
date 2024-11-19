@@ -89,13 +89,13 @@ public class Dialog : Window
     /// <inheritdoc />
     public override Attribute GetNormalColor ()
     {
-        return ColorScheme.Normal;
+        return ColorScheme!.Normal;
     }
 
     /// <inheritdoc />
     public override Attribute GetFocusColor ()
     {
-        return ColorScheme.Normal;
+        return ColorScheme!.Normal;
     }
 
     private bool _canceled;

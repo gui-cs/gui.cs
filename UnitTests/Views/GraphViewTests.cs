@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using Terminal.Gui.ViewMouseTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -477,7 +478,7 @@ public class SeriesTests
         // Even with a margin the graph should be drawn from 
         // the origin, we just get less visible width/height
         gv.LayoutSubviews ();
-        gv.SetNeedsDisplay ();
+        gv.SetNeedsDraw ();
         gv.Draw ();
         Assert.Equal (new RectangleF (0, 0, 45, 28), fullGraphBounds);
 
@@ -536,7 +537,7 @@ public class SeriesTests
         // Even with a margin the graph should be drawn from 
         // the origin, we just get less visible width/height
         gv.LayoutSubviews ();
-        gv.SetNeedsDisplay ();
+        gv.SetNeedsDraw ();
         gv.Draw ();
         Assert.Equal (new RectangleF (0, 0, 90, 140), fullGraphBounds);
 
@@ -674,7 +675,7 @@ public class MultiBarSeriesTests
         multibarSeries.AddBars ("hey", (Rune)'M', 0.5001f, 0.5001f);
         fakeXAxis.LabelPoints.Clear ();
         gv.LayoutSubviews ();
-        gv.SetNeedsDisplay ();
+        gv.SetNeedsDraw ();
         gv.Draw ();
 
         Assert.Equal (4, fakeXAxis.LabelPoints.Single ());
@@ -683,7 +684,8 @@ public class MultiBarSeriesTests
         multibarSeries.AddBars ("bob", (Rune)'M', 1, 2);
         fakeXAxis.LabelPoints.Clear ();
         gv.LayoutSubviews ();
-        gv.SetNeedsDisplay ();
+        gv.SetNeedsDraw ();
+        View.SetClipToScreen ();
         gv.Draw ();
 
         Assert.Equal (3, fakeXAxis.LabelPoints.Count);
@@ -745,7 +747,7 @@ public class BarSeriesTests
                            );
 
         // redraw graph
-        graph.SetNeedsDisplay ();
+        graph.SetNeedsDraw ();
         graph.Draw ();
 
         // since bars are horizontal all have the same X start cordinates
@@ -809,7 +811,7 @@ public class BarSeriesTests
         barSeries.Orientation = Orientation.Vertical;
 
         // redraw graph
-        graph.SetNeedsDisplay ();
+        graph.SetNeedsDraw ();
         graph.Draw ();
 
         // bar should be drawn at BarEvery 1f + offset 0.5f = 3 screen units
@@ -851,7 +853,7 @@ public class BarSeriesTests
         barSeries.Orientation = Orientation.Vertical;
 
         // redraw graph
-        graph.SetNeedsDisplay ();
+        graph.SetNeedsDraw ();
         graph.Draw ();
 
         // bar should not be drawn
@@ -1151,7 +1153,8 @@ public class TextAnnotationTests
 
         // user scrolls up one unit of graph space
         gv.ScrollOffset = new PointF (0, 1f);
-        gv.SetNeedsDisplay ();
+        gv.SetNeedsDraw ();
+        View.SetClipToScreen ();
         gv.Draw ();
 
         // we expect the text annotation to go down one line since
@@ -1185,7 +1188,7 @@ public class TextAnnotationTests
                            );
 
         gv.LayoutSubviews ();
-        gv.SetNeedsDisplay ();
+        gv.SetNeedsDraw ();
         gv.Draw ();
 
         // long text should get truncated
@@ -1245,6 +1248,7 @@ public class TextAnnotationTests
                             new TextAnnotation { Text = "hey!", ScreenPosition = new Point (3, 1) }
                            );
         gv.LayoutSubviews ();
+        View.SetClipToScreen ();
         gv.Draw ();
 
         var expected =
@@ -1259,7 +1263,8 @@ public class TextAnnotationTests
 
         // user scrolls up one unit of graph space
         gv.ScrollOffset = new PointF (0, 1f);
-        gv.SetNeedsDisplay ();
+        gv.SetNeedsDraw ();
+        View.SetClipToScreen ();
         gv.Draw ();
 
         // we expect no change in the location of the annotation (only the axis label changes)
@@ -1277,7 +1282,8 @@ public class TextAnnotationTests
 
         // user scrolls up one unit of graph space
         gv.ScrollOffset = new PointF (0, 1f);
-        gv.SetNeedsDisplay ();
+        gv.SetNeedsDraw ();
+        View.SetClipToScreen ();
         gv.Draw ();
 
         // we expect no change in the location of the annotation (only the axis label changes)
@@ -1332,6 +1338,7 @@ public class LegendTests
         legend.AddEntry (new GraphCellToRender ((Rune)'B'), "Bat");
 
         gv.Annotations.Add (legend);
+        gv.Layout ();
         gv.Draw ();
 
         var expected =
@@ -1360,6 +1367,7 @@ public class LegendTests
         legend.BorderStyle = LineStyle.None;
 
         gv.Annotations.Add (legend);
+
         gv.Draw ();
 
         var expected =
@@ -1536,7 +1544,7 @@ public class PathAnnotationTests
             // render view
             view.ColorScheme = new ColorScheme ();
             Assert.Equal (1, view.Height);
-            mount.SetNeedsDisplay ();
+            mount.SetNeedsDraw ();
             mount.Draw ();
 
             // should have the initial text
@@ -1544,7 +1552,8 @@ public class PathAnnotationTests
 
             // change the text and redraw
             view.Text = "ff1234";
-            mount.SetNeedsDisplay ();
+            mount.SetNeedsDraw ();
+            View.SetClipToScreen ();
             mount.Draw ();
 
             // should have the new text rendered
@@ -1576,7 +1585,7 @@ public class PathAnnotationTests
         gv.MarginBottom = 1;
 
         gv.LayoutSubviews ();
-        gv.SetNeedsDisplay ();
+        gv.SetNeedsDraw ();
         gv.Draw ();
 
         var expected =
@@ -1615,7 +1624,7 @@ public class PathAnnotationTests
         gv.MarginLeft = 1;
 
         gv.LayoutSubviews ();
-        gv.SetNeedsDisplay ();
+        gv.SetNeedsDraw ();
         gv.Draw ();
 
         var expected =

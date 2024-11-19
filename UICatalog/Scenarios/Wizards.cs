@@ -6,7 +6,6 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Wizards", "Demonstrates the Wizard class")]
 [ScenarioCategory ("Dialogs")]
-[ScenarioCategory ("Overlapped")]
 [ScenarioCategory ("Wizards")]
 [ScenarioCategory ("Runnable")]
 
@@ -312,35 +311,32 @@ public class Wizards : Scenario
                                                                  };
                                            fourthStep.Add (hideHelpBtn);
                                            fourthStep.NextButtonText = "_Go To Last Step";
-                                           var scrollBar = new ScrollBarView (someText, true);
+                                           //var scrollBar = new ScrollBarView (someText, true);
 
-                                           scrollBar.ChangedPosition += (s, e) =>
-                                                                        {
-                                                                            someText.TopRow = scrollBar.Position;
+                                           //scrollBar.ChangedPosition += (s, e) =>
+                                           //                             {
+                                           //                                 someText.TopRow = scrollBar.Position;
 
-                                                                            if (someText.TopRow != scrollBar.Position)
-                                                                            {
-                                                                                scrollBar.Position = someText.TopRow;
-                                                                            }
+                                           //                                 if (someText.TopRow != scrollBar.Position)
+                                           //                                 {
+                                           //                                     scrollBar.Position = someText.TopRow;
+                                           //                                 }
 
-                                                                            someText.SetNeedsDisplay ();
-                                                                        };
+                                           //                                 someText.SetNeedsDraw ();
+                                           //                             };
 
-                                           someText.DrawContent += (s, e) =>
-                                                                   {
-                                                                       scrollBar.Size = someText.Lines;
-                                                                       scrollBar.Position = someText.TopRow;
+                                           //someText.DrawingContent += (s, e) =>
+                                           //                        {
+                                           //                            scrollBar.Size = someText.Lines;
+                                           //                            scrollBar.Position = someText.TopRow;
 
-                                                                       if (scrollBar.OtherScrollBarView != null)
-                                                                       {
-                                                                           scrollBar.OtherScrollBarView.Size = someText.Maxlength;
-                                                                           scrollBar.OtherScrollBarView.Position = someText.LeftColumn;
-                                                                       }
-
-                                                                       scrollBar.LayoutSubviews ();
-                                                                       scrollBar.Refresh ();
-                                                                   };
-                                           fourthStep.Add (scrollBar);
+                                           //                            if (scrollBar.OtherScrollBarView != null)
+                                           //                            {
+                                           //                                scrollBar.OtherScrollBarView.Size = someText.Maxlength;
+                                           //                                scrollBar.OtherScrollBarView.Position = someText.LeftColumn;
+                                           //                            }
+                                           //                        };
+                                           //fourthStep.Add (scrollBar);
 
                                            // Add last step
                                            var lastStep = new WizardStep { Title = "The last step" };

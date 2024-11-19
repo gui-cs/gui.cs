@@ -105,7 +105,7 @@ public class TableViewTests (ITestOutputHelper output)
             style.ColorGetter = e => { return scheme; };
         }
 
-        tv.SetNeedsDisplay ();
+        tv.SetNeedsDraw ();
         tv.Draw ();
 
         expected =
@@ -115,7 +115,7 @@ public class TableViewTests (ITestOutputHelper output)
 00000000000000000000
 01111101101111111110
 ";
-        TestHelpers.AssertDriverAttributesAre (expected, Application.Driver, tv.ColorScheme.Normal, color);
+        TestHelpers.AssertDriverAttributesAre (expected, output, Application.Driver, tv.ColorScheme.Normal, color);
         top.Dispose ();
     }
 
@@ -419,7 +419,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         var top = new Toplevel ();
         top.Add (tableView);
-        Application.Begin (top);
+        RunState rs = Application.Begin (top);
 
         tableView.ColorScheme = Colors.ColorSchemes ["TopLevel"];
 
@@ -461,9 +461,7 @@ public class TableViewTests (ITestOutputHelper output)
         // is to specify a MinAcceptableWidth for the column
         style.MaxWidth = 10;
 
-        tableView.LayoutSubviews ();
-        tableView.SetNeedsDisplay ();
-        tableView.Draw ();
+        Application.RunIteration (ref rs);
 
         expected =
             @"
@@ -481,10 +479,8 @@ public class TableViewTests (ITestOutputHelper output)
         // RepresentationGetter and apply max length there
 
         style.RepresentationGetter = s => { return s.ToString ().Length < 15 ? s.ToString () : s.ToString ().Substring (0, 13) + "..."; };
-
-        tableView.LayoutSubviews ();
-        tableView.SetNeedsDisplay ();
-        tableView.Draw ();
+        tableView.SetNeedsDraw ();
+        Application.RunIteration (ref rs);
 
         expected =
             @"
@@ -509,10 +505,9 @@ public class TableViewTests (ITestOutputHelper output)
         // (Up to MaxWidth) but the renderer can accept using
         // less space down to this limit
         style.MinAcceptableWidth = 5;
+        tableView.SetNeedsDraw ();
 
-        tableView.LayoutSubviews ();
-        tableView.SetNeedsDisplay ();
-        tableView.Draw ();
+        Application.RunIteration (ref rs);
 
         expected =
             @"
@@ -529,8 +524,7 @@ public class TableViewTests (ITestOutputHelper output)
         driver.ClearContents ();
 
         tableView.Viewport = new (0, 0, 9, 5);
-        tableView.LayoutSubviews ();
-        tableView.Draw ();
+        Application.RunIteration (ref rs);
 
         expected =
             @"
@@ -546,8 +540,7 @@ public class TableViewTests (ITestOutputHelper output)
         // meet MinAcceptableWidth of 5.  Column width includes terminator line
         // symbol (e.g. ┤ or │)
         tableView.Viewport = new (0, 0, 10, 5);
-        tableView.LayoutSubviews ();
-        tableView.Draw ();
+        Application.RunIteration (ref rs);
 
         expected =
             @"
@@ -568,8 +561,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.MaxCellWidth = 10;
         tableView.MinCellWidth = 3;
 
-        tableView.LayoutSubviews ();
-        tableView.Draw ();
+        Application.RunIteration (ref rs);
 
         expected =
             @"
@@ -583,10 +575,9 @@ public class TableViewTests (ITestOutputHelper output)
         // MaxCellWidth limits MinCellWidth
         tableView.MaxCellWidth = 5;
         tableView.MinCellWidth = 10;
+        tableView.SetNeedsDraw ();
 
-        tableView.LayoutSubviews ();
-        tableView.SetNeedsDisplay ();
-        tableView.Draw ();
+        Application.RunIteration (ref rs);
 
         expected =
             @"
@@ -732,6 +723,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         // since A is now pushed off screen we get indicator showing
         // that user can scroll left to see first column
+        View.SetClipToScreen ();
         tableView.Draw ();
 
         expected =
@@ -746,6 +738,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorRight });
         tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorRight });
 
+        View.SetClipToScreen ();
         tableView.Draw ();
 
         expected =
@@ -804,7 +797,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         // Scroll right
         tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorRight });
-
+        View.SetClipToScreen ();
         tableView.Draw ();
 
         // Note that with SmoothHorizontalScrolling only a single new column
@@ -852,7 +845,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         // select last visible column
         tableView.SelectedColumn = 2; // column C
-
+        View.SetClipToScreen ();
         tableView.Draw ();
 
         var expected =
@@ -864,7 +857,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         // Scroll right
         tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorRight });
-
+        View.SetClipToScreen ();
         tableView.Draw ();
 
         // notice that without smooth scrolling we just update the first column
@@ -1070,12 +1063,12 @@ public class TableViewTests (ITestOutputHelper output)
 
         var top = new Toplevel ();
         top.Add (tv);
-        Application.Begin (top);
+        RunState rs = Application.Begin (top);
 
         tv.HasFocus = focused;
         Assert.Equal (focused, tv.HasFocus);
 
-        tv.Draw ();
+        Application.RunIteration (ref rs);
 
         var expected = @"
 ┌─┬─┐
@@ -1094,6 +1087,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         TestHelpers.AssertDriverAttributesAre (
                                                expectedColors,
+                                               output,
                                                Application.Driver,
                                                tv.ColorScheme.Normal,
                                                focused ? tv.ColorScheme.Focus : tv.ColorScheme.HotNormal,
@@ -1106,8 +1100,9 @@ public class TableViewTests (ITestOutputHelper output)
         // the value 2)
         dt.Rows [0] [1] = 5;
 
-        tv.SetNeedsDisplay ();
-        tv.Draw ();
+        tv.SetNeedsDraw ();
+        Application.RunIteration (ref rs);
+
 
         expected = @"
 ┌─┬─┐
@@ -1129,6 +1124,7 @@ public class TableViewTests (ITestOutputHelper output)
         // (now that the cell value is 5 - which does not match the conditional)
         TestHelpers.AssertDriverAttributesAre (
                                                expectedColors,
+                                               output,
                                                Application.Driver,
                                                tv.ColorScheme.Normal,
                                                focused ? tv.ColorScheme.Focus : tv.ColorScheme.HotNormal
@@ -1164,7 +1160,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         var top = new Toplevel ();
         top.Add (tv);
-        Application.Begin (top);
+        RunState rs = Application.Begin (top);
 
         tv.HasFocus = focused;
         Assert.Equal (focused, tv.HasFocus);
@@ -1187,6 +1183,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         TestHelpers.AssertDriverAttributesAre (
                                                expectedColors,
+                                               output,
                                                Application.Driver,
                                                tv.ColorScheme.Normal,
                                                focused ? rowHighlight.Focus : rowHighlight.HotNormal,
@@ -1199,8 +1196,8 @@ public class TableViewTests (ITestOutputHelper output)
         // the value 2)
         dt.Rows [0] [1] = 5;
 
-        tv.SetNeedsDisplay ();
-        tv.Draw ();
+        tv.SetNeedsDraw ();
+        Application.RunIteration (ref rs);
 
         expected = @"
 ┌─┬─┐
@@ -1222,6 +1219,7 @@ public class TableViewTests (ITestOutputHelper output)
         // (now that the cell value is 5 - which does not match the conditional)
         TestHelpers.AssertDriverAttributesAre (
                                                expectedColors,
+                                               output,
                                                Application.Driver,
                                                tv.ColorScheme.Normal,
                                                focused ? tv.ColorScheme.Focus : tv.ColorScheme.HotNormal
@@ -1267,6 +1265,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         TestHelpers.AssertDriverAttributesAre (
                                                expectedColors,
+                                               output,
                                                Application.Driver,
                                                tv.ColorScheme.Normal,
                                                focused ? tv.ColorScheme.Focus : tv.ColorScheme.HotNormal
@@ -1312,6 +1311,7 @@ public class TableViewTests (ITestOutputHelper output)
 
         TestHelpers.AssertDriverAttributesAre (
                                                expectedColors,
+                                               output,
                                                Application.Driver,
                                                tv.ColorScheme.Normal,
                                                focused ? invertFocus : invertHotNormal
@@ -1979,7 +1979,8 @@ public class TableViewTests (ITestOutputHelper output)
 │B│C│D│
 ◄─┼─┼─┤
 │2│3│4│";
-        tableView.SetNeedsDisplay ();
+        tableView.SetNeedsDraw ();
+        View.SetClipToScreen ();
         tableView.Draw ();
 
         TestHelpers.AssertDriverContentsAre (expected, output);
@@ -1992,7 +1993,8 @@ public class TableViewTests (ITestOutputHelper output)
 │B│C│D│
 ├─┼─┼─┤
 │2│3│4│";
-        tableView.SetNeedsDisplay ();
+        tableView.SetNeedsDraw ();
+        View.SetClipToScreen ();
         tableView.Draw ();
 
         TestHelpers.AssertDriverContentsAre (expected, output);
@@ -2007,7 +2009,8 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.Style.ShowHorizontalScrollIndicators = true;
         tableView.Style.ShowHorizontalHeaderUnderline = true;
         tableView.LayoutSubviews ();
-        tableView.SetNeedsDisplay ();
+        tableView.SetNeedsDraw ();
+        View.SetClipToScreen ();
         tableView.Draw ();
 
         // normally we should have scroll indicators because DEF are of screen
@@ -2029,7 +2032,8 @@ public class TableViewTests (ITestOutputHelper output)
 │A│B│C│
 ├─┼─┼─┤
 │1│2│3│";
-        tableView.SetNeedsDisplay ();
+        tableView.SetNeedsDraw ();
+        View.SetClipToScreen ();
         tableView.Draw ();
         TestHelpers.AssertDriverContentsAre (expected, output);
     }
@@ -2261,7 +2265,7 @@ public class TableViewTests (ITestOutputHelper output)
         // should select that row
         Assert.Equal (2, tv.SelectedRow);
 
-        tv.OnDrawContent (tv.Viewport);
+        tv.Draw ();
 
         var expected =
             @"
@@ -2291,7 +2295,7 @@ public class TableViewTests (ITestOutputHelper output)
 0101010
 0000000";
 
-        TestHelpers.AssertDriverAttributesAre (expected, Application.Driver, normal, focus);
+        TestHelpers.AssertDriverAttributesAre (expected, output, Application.Driver, normal, focus);
     }
 
     [Fact]
@@ -2344,7 +2348,7 @@ A B C
 000000
 111111";
 
-        TestHelpers.AssertDriverAttributesAre (expected, Application.Driver, normal, focus);
+        TestHelpers.AssertDriverAttributesAre (expected, output, Application.Driver, normal, focus);
     }
 
     [Fact]
@@ -2369,7 +2373,7 @@ A B C
         // should select that row
         Assert.Equal (2, tv.SelectedRow);
 
-        tv.OnDrawContent (tv.Viewport);
+        tv.Draw ();
 
         var expected =
             @"
@@ -2400,7 +2404,7 @@ A B C
 0111110
 0000000";
 
-        TestHelpers.AssertDriverAttributesAre (expected, Application.Driver, normal, focus);
+        TestHelpers.AssertDriverAttributesAre (expected, output, Application.Driver, normal, focus);
     }
 
     [Theory]
@@ -2568,7 +2572,9 @@ A B C
     [SetupFakeDriver]
     public void TestTableViewCheckboxes_ByObject ()
     {
-        Assert.Equal(ConfigurationManager.ConfigLocations.DefaultOnly, ConfigurationManager.Locations);
+        ConfigurationManager.Locations = ConfigurationManager.ConfigLocations.DefaultOnly;
+        ConfigurationManager.Reset();
+
         TableView tv = GetPetTable (out EnumerableTableSource<PickablePet> source);
         tv.LayoutSubviews ();
         IReadOnlyCollection<PickablePet> pets = source.Data;
@@ -2603,6 +2609,7 @@ A B C
 
         Assert.True (pets.First ().IsPicked);
 
+        View.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -2622,7 +2629,7 @@ A B C
         Assert.True (pets.ElementAt (0).IsPicked);
         Assert.True (pets.ElementAt (1).IsPicked);
         Assert.False (pets.ElementAt (2).IsPicked);
-
+        View.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -2642,7 +2649,7 @@ A B C
         Assert.False (pets.ElementAt (0).IsPicked);
         Assert.True (pets.ElementAt (1).IsPicked);
         Assert.False (pets.ElementAt (2).IsPicked);
-
+        View.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -2670,6 +2677,7 @@ A B C
         wrapper.CheckedRows.Add (0);
         wrapper.CheckedRows.Add (2);
 
+        View.SetClipToScreen ();
         tv.Draw ();
 
         var expected =
@@ -2693,6 +2701,7 @@ A B C
         Assert.Contains (2, wrapper.CheckedRows);
         Assert.Equal (3, wrapper.CheckedRows.Count);
 
+        View.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -2708,6 +2717,7 @@ A B C
         // Untoggle the top 2
         tv.NewKeyDownEvent (Key.Space);
 
+        View.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -2736,6 +2746,7 @@ A B C
         tv.NewKeyDownEvent (Key.A.WithCtrl);
         tv.NewKeyDownEvent (Key.Space);
 
+        View.SetClipToScreen ();
         tv.Draw ();
 
         var expected =
@@ -2755,6 +2766,7 @@ A B C
         // Untoggle all again
         tv.NewKeyDownEvent (Key.Space);
 
+        View.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -2795,6 +2807,7 @@ A B C
 
         Assert.True (pets.All (p => p.IsPicked));
 
+        View.SetClipToScreen ();
         tv.Draw ();
 
         var expected =
@@ -2814,6 +2827,7 @@ A B C
         Assert.Empty (pets.Where (p => p.IsPicked));
 #pragma warning restore xUnit2029
 
+        View.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -2840,6 +2854,7 @@ A B C
         var wrapper = new CheckBoxTableSourceWrapperByIndex (tv, tv.Table);
         tv.Table = wrapper;
 
+        View.SetClipToScreen ();
         tv.Draw ();
 
         var expected =
@@ -2859,6 +2874,7 @@ A B C
 
         Assert.Single (wrapper.CheckedRows, 0);
 
+        View.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -2878,6 +2894,7 @@ A B C
         Assert.Contains (1, wrapper.CheckedRows);
         Assert.Equal (2, wrapper.CheckedRows.Count);
 
+        View.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -2896,6 +2913,7 @@ A B C
 
         Assert.Single (wrapper.CheckedRows, 1);
 
+        View.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -2927,6 +2945,7 @@ A B C
         wrapper.UseRadioButtons = true;
 
         tv.Table = wrapper;
+        View.SetClipToScreen ();
         tv.Draw ();
 
         var expected =
@@ -2949,6 +2968,7 @@ A B C
 
         Assert.True (pets.First ().IsPicked);
 
+        View.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -2969,6 +2989,7 @@ A B C
         Assert.True (pets.ElementAt (1).IsPicked);
         Assert.False (pets.ElementAt (2).IsPicked);
 
+        View.SetClipToScreen ();
         tv.Draw ();
 
         expected =
@@ -2989,6 +3010,7 @@ A B C
         Assert.False (pets.ElementAt (1).IsPicked);
         Assert.False (pets.ElementAt (2).IsPicked);
 
+        View.SetClipToScreen ();
         tv.Draw ();
 
         expected =

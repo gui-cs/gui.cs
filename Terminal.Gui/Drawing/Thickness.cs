@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿#nullable enable
+using System.Numerics;
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui;
@@ -15,10 +16,7 @@ namespace Terminal.Gui;
 ///         with the thickness widths subtracted.
 ///     </para>
 ///     <para>
-///         Use the helper API (<see cref="Draw(Rectangle, string)"/> to draw the frame with the specified thickness.
-///     </para>
-///     <para>
-///         Thickness uses <see langword="float"/> intenrally. As a result, there is a potential precision loss for very
+///         Thickness uses <see langword="float"/> internally. As a result, there is a potential precision loss for very
 ///         large numbers. This is typically not an issue for UI dimensions but could be relevant in other contexts.
 ///     </para>
 /// </remarks>
@@ -82,15 +80,16 @@ public record struct Thickness
     /// <summary>Draws the <see cref="Thickness"/> rectangle with an optional diagnostics label.</summary>
     /// <remarks>
     ///     If <see cref="ViewDiagnosticFlags"/> is set to
-    ///     <see cref="ViewDiagnosticFlags.Padding"/> then 'T', 'L', 'R', and 'B' glyphs will be used instead of
+    ///     <see cref="ViewDiagnosticFlags.Thickness"/> then 'T', 'L', 'R', and 'B' glyphs will be used instead of
     ///     space. If <see cref="ViewDiagnosticFlags"/> is set to
     ///     <see cref="ViewDiagnosticFlags.Ruler"/> then a ruler will be drawn on the outer edge of the
     ///     Thickness.
     /// </remarks>
     /// <param name="rect">The location and size of the rectangle that bounds the thickness rectangle, in screen coordinates.</param>
+    /// <param name="diagnosticFlags"></param>
     /// <param name="label">The diagnostics label to draw on the bottom of the <see cref="Bottom"/>.</param>
     /// <returns>The inner rectangle remaining to be drawn.</returns>
-    public Rectangle Draw (Rectangle rect, string label = null)
+    public Rectangle Draw (Rectangle rect, ViewDiagnosticFlags diagnosticFlags = ViewDiagnosticFlags.Off, string? label = null)
     {
         if (rect.Size.Width < 1 || rect.Size.Height < 1)
         {
@@ -103,7 +102,7 @@ public record struct Thickness
         Rune topChar = clearChar;
         Rune bottomChar = clearChar;
 
-        if (View.Diagnostics.HasFlag (ViewDiagnosticFlags.Padding))
+        if (diagnosticFlags.HasFlag (ViewDiagnosticFlags.Thickness))
         {
             leftChar = (Rune)'L';
             rightChar = (Rune)'R';
@@ -133,29 +132,29 @@ public record struct Thickness
         if (Right > 0)
         {
             Application.Driver?.FillRect (
-                                         rect with
-                                         {
-                                             X = Math.Max (0, rect.X + rect.Width - Right),
-                                             Width = Math.Min (rect.Width, Right)
-                                         },
-                                         rightChar
-                                        );
+                                          rect with
+                                          {
+                                              X = Math.Max (0, rect.X + rect.Width - Right),
+                                              Width = Math.Min (rect.Width, Right)
+                                          },
+                                          rightChar
+                                         );
         }
 
         // Draw the Bottom side
         if (Bottom > 0)
         {
             Application.Driver?.FillRect (
-                                         rect with
-                                         {
-                                             Y = rect.Y + Math.Max (0, rect.Height - Bottom),
-                                             Height = Bottom
-                                         },
-                                         bottomChar
-                                        );
+                                          rect with
+                                          {
+                                              Y = rect.Y + Math.Max (0, rect.Height - Bottom),
+                                              Height = Bottom
+                                          },
+                                          bottomChar
+                                         );
         }
 
-        if (View.Diagnostics.HasFlag (ViewDiagnosticFlags.Ruler))
+        if (diagnosticFlags.HasFlag (ViewDiagnosticFlags.Ruler))
         {
             // PERF: This can almost certainly be simplified down to a single point offset and fewer calls to Draw
             // Top
@@ -187,10 +186,11 @@ public record struct Thickness
             }
         }
 
-        if (View.Diagnostics.HasFlag (ViewDiagnosticFlags.Padding))
+        if (diagnosticFlags.HasFlag (ViewDiagnosticFlags.Thickness))
         {
             // Draw the diagnostics label on the bottom
             string text = label is null ? string.Empty : $"{label} {this}";
+
             var tf = new TextFormatter
             {
                 Text = text,
@@ -236,7 +236,7 @@ public record struct Thickness
     }
 
     /// <summary>
-    ///     Gets the total width of the left and right sides of the rectangle. Sets the width of the left and rigth sides
+    ///     Gets the total width of the left and right sides of the rectangle. Sets the width of the left and right sides
     ///     of the rectangle to half the specified value.
     /// </summary>
     public int Horizontal

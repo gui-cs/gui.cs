@@ -823,12 +823,6 @@ internal class NetDriver : ConsoleDriver
     public override bool SupportsTrueColor => Environment.OSVersion.Platform == PlatformID.Unix
                                               || (IsWinPlatform && Environment.OSVersion.Version.Build >= 14931);
 
-    public override void Refresh ()
-    {
-        UpdateScreen ();
-        UpdateCursor ();
-    }
-
     public override void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
     {
         var input = new InputResult
@@ -876,15 +870,16 @@ internal class NetDriver : ConsoleDriver
         StartReportingMouseMoves ();
     }
 
-    public override void UpdateScreen ()
+    public override bool UpdateScreen ()
     {
+        bool updated = false;
         if (RunningUnitTests
             || _winSizeChanging
             || Console.WindowHeight < 1
             || Contents.Length != Rows * Cols
             || Rows != Console.WindowHeight)
         {
-            return;
+            return updated;
         }
 
         var top = 0;
@@ -902,7 +897,7 @@ internal class NetDriver : ConsoleDriver
         {
             if (Console.WindowHeight < 1)
             {
-                return;
+                return updated;
             }
 
             if (!_dirtyLines [row])
@@ -912,9 +907,10 @@ internal class NetDriver : ConsoleDriver
 
             if (!SetCursorPosition (0, row))
             {
-                return;
+                return updated;
             }
 
+            updated = true;
             _dirtyLines [row] = false;
             output.Clear ();
 
@@ -1043,6 +1039,8 @@ internal class NetDriver : ConsoleDriver
             lastCol += outputWidth;
             outputWidth = 0;
         }
+
+        return updated;
     }
 
     internal override void End ()
@@ -1239,12 +1237,12 @@ internal class NetDriver : ConsoleDriver
             catch (IOException)
             {
                 // CONCURRENCY: Unsynchronized access to Clip is not safe.
-                Clip = new (0, 0, Cols, Rows);
+                Clip = new (Screen);
             }
             catch (ArgumentOutOfRangeException)
             {
                 // CONCURRENCY: Unsynchronized access to Clip is not safe.
-                Clip = new (0, 0, Cols, Rows);
+                Clip = new (Screen);
             }
         }
         else
@@ -1253,7 +1251,7 @@ internal class NetDriver : ConsoleDriver
         }
 
         // CONCURRENCY: Unsynchronized access to Clip is not safe.
-        Clip = new (0, 0, Cols, Rows);
+        Clip = new (Screen);
     }
 
     #endregion

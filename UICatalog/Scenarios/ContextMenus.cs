@@ -69,28 +69,28 @@ public class ContextMenus : Scenario
         appWindow.Add (_tfBottomRight);
 
         appWindow.KeyDown += (s, e) =>
-                             {
-                                 if (e.KeyCode == _winContextMenuKey)
-                                 {
-                                     ShowWinContextMenu (Application.GetLastMousePosition ());
-                                     e.Handled = true;
-                                 }
-                             };
+        {
+            if (e.KeyCode == _winContextMenuKey)
+            {
+                ShowWinContextMenu (Application.GetLastMousePosition ());
+                e.Handled = true;
+            }
+        };
 
         appWindow.MouseClick += (s, e) =>
-                                {
-                                    if (e.Flags == MouseFlags.Button3Clicked)
-                                    {
-                                        ShowWinContextMenu (e.ScreenPosition);
-                                        e.Handled = true;
-                                    }
-                                };
+        {
+            if (e.Flags == MouseFlags.Button3Clicked)
+            {
+                ShowWinContextMenu (e.ScreenPosition);
+                e.Handled = true;
+            }
+        };
 
         var originalCulture = Thread.CurrentThread.CurrentUICulture;
         appWindow.Closed += (s, e) =>
-                            {
-                                Thread.CurrentThread.CurrentUICulture = originalCulture;
-                            };
+        {
+            Thread.CurrentThread.CurrentUICulture = originalCulture;
+        };
 
         // Run - Start the application.
         Application.Run (appWindow);
@@ -138,14 +138,14 @@ public class ContextMenus : Scenario
         void CreateAction (List<Shortcut> cultures, Shortcut culture)
         {
             culture.Action += () =>
-                              {
-                                  Thread.CurrentThread.CurrentUICulture = new (culture.HelpText);
+            {
+                Thread.CurrentThread.CurrentUICulture = new (culture.HelpText);
 
-                                  foreach (Shortcut item in cultures)
-                                  {
-                                      ((CheckBox)item.CommandView).CheckedState = Thread.CurrentThread.CurrentUICulture.Name == item.HelpText ? CheckState.Checked : CheckState.UnChecked;
-                                  }
-                              };
+                foreach (Shortcut item in cultures)
+                {
+                    ((CheckBox)item.CommandView).CheckedState = Thread.CurrentThread.CurrentUICulture.Name == item.HelpText ? CheckState.Checked : CheckState.UnChecked;
+                }
+            };
         }
     }
 

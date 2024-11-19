@@ -10,6 +10,7 @@ public class DateFieldTests
     public void Constructors_Defaults ()
     {
         var df = new DateField ();
+        df.Layout ();
         Assert.Equal (DateTime.MinValue, df.Date);
         Assert.Equal (1, df.CursorPosition);
         Assert.Equal (new Rectangle (0, 0, 12, 1), df.Frame);
@@ -17,12 +18,14 @@ public class DateFieldTests
 
         DateTime date = DateTime.Now;
         df = new DateField (date);
+        df.Layout ();
         Assert.Equal (date, df.Date);
         Assert.Equal (1, df.CursorPosition);
         Assert.Equal (new Rectangle (0, 0, 12, 1), df.Frame);
         Assert.Equal ($" {date.ToString (CultureInfo.InvariantCulture.DateTimeFormat.ShortDatePattern)}", df.Text);
 
         df = new DateField (date) { X = 1, Y = 2 };
+        df.Layout ();
         Assert.Equal (date, df.Date);
         Assert.Equal (1, df.CursorPosition);
         Assert.Equal (new Rectangle (1, 2, 12, 1), df.Frame);

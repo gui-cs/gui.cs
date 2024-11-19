@@ -13,7 +13,6 @@ public class SpinnerViewStyles : Scenario
 {
     public override void Main ()
     {
-    
         Application.Init ();
 
         Window app = new ()
@@ -28,7 +27,7 @@ public class SpinnerViewStyles : Scenario
 
         foreach (Type style in typeof (SpinnerStyle).GetNestedTypes ())
         {
-            styleDict.Add (i, new KeyValuePair<string, Type> (style.Name, style));
+            styleDict.Add (i, new (style.Name, style));
             i++;
         }
 
@@ -211,7 +210,6 @@ public class SpinnerViewStyles : Scenario
 
             app.Unloaded -= App_Unloaded;
         }
-
 
         Application.Run (app);
         app.Dispose ();

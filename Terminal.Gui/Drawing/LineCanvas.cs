@@ -1,9 +1,24 @@
 #nullable enable
 namespace Terminal.Gui;
 
-/// <summary>Facilitates box drawing and line intersection detection and rendering.  Does not support diagonal lines.</summary>
+/// <summary>Facilitates box drawing and line intersection detection and rendering. Does not support diagonal lines.</summary>
 public class LineCanvas : IDisposable
 {
+    /// <summary>Creates a new instance.</summary>
+    public LineCanvas ()
+    {
+        // TODO: Refactor ConfigurationManager to not use an event handler for this.
+        // Instead, have it call a method on any class appropriately attributed
+        // to update the cached values. See Issue #2871
+        Applied += ConfigurationManager_Applied;
+    }
+
+    private readonly List<StraightLine> _lines = [];
+
+    /// <summary>Creates a new instance with the given <paramref name="lines"/>.</summary>
+    /// <param name="lines">Initial lines for the canvas.</param>
+    public LineCanvas (IEnumerable<StraightLine> lines) : this () { _lines = lines.ToList (); }
+
     /// <summary>
     ///     Optional <see cref="FillPair"/> which when present overrides the <see cref="StraightLine.Attribute"/>
     ///     (colors) of lines in the canvas. This can be used e.g. to apply a global <see cref="GradientFill"/>
@@ -11,7 +26,321 @@ public class LineCanvas : IDisposable
     /// </summary>
     public FillPair? Fill { get; set; }
 
-    private readonly List<StraightLine> _lines = [];
+    private Rectangle _cachedBounds;
+
+    /// <summary>
+    ///     Gets the rectangle that describes the bounds of the canvas. Location is the coordinates of the line that is
+    ///     the furthest left/top and Size is defined by the line that extends the furthest right/bottom.
+    /// </summary>
+    public Rectangle Bounds
+    {
+        get
+        {
+            if (_cachedBounds.IsEmpty)
+            {
+                if (_lines.Count == 0)
+                {
+                    return _cachedBounds;
+                }
+
+                Rectangle bounds = _lines [0].Bounds;
+
+                for (var i = 1; i < _lines.Count; i++)
+                {
+                    bounds = Rectangle.Union (bounds, _lines [i].Bounds);
+                }
+
+                if (bounds is { Width: 0 } or { Height: 0 })
+                {
+                    bounds = bounds with
+                    {
+                        Width = Math.Clamp (bounds.Width, 1, short.MaxValue),
+                        Height = Math.Clamp (bounds.Height, 1, short.MaxValue)
+                    };
+                }
+
+                _cachedBounds = bounds;
+            }
+
+            return _cachedBounds;
+        }
+    }
+
+    /// <summary>Gets the lines in the canvas.</summary>
+    public IReadOnlyCollection<StraightLine> Lines => _lines.AsReadOnly ();
+
+    /// <summary>
+    ///     <para>Adds a new <paramref name="length"/> long line to the canvas starting at <paramref name="start"/>.</para>
+    ///     <para>
+    ///         Use positive <paramref name="length"/> for the line to extend Right and negative for Left when
+    ///         <see cref="Orientation"/> is <see cref="Orientation.Horizontal"/>.
+    ///     </para>
+    ///     <para>
+    ///         Use positive <paramref name="length"/> for the line to extend Down and negative for Up when
+    ///         <see cref="Orientation"/> is <see cref="Orientation.Vertical"/>.
+    ///     </para>
+    /// </summary>
+    /// <param name="start">Starting point.</param>
+    /// <param name="length">
+    ///     The length of line. 0 for an intersection (cross or T). Positive for Down/Right. Negative for
+    ///     Up/Left.
+    /// </param>
+    /// <param name="orientation">The direction of the line.</param>
+    /// <param name="style">The style of line to use</param>
+    /// <param name="attribute"></param>
+    public void AddLine (
+        Point start,
+        int length,
+        Orientation orientation,
+        LineStyle style,
+        Attribute? attribute = null
+    )
+    {
+        _cachedBounds = Rectangle.Empty;
+        _lines.Add (new (start, length, orientation, style, attribute));
+    }
+
+    /// <summary>Adds a new line to the canvas</summary>
+    /// <param name="line"></param>
+    public void AddLine (StraightLine line)
+    {
+        _cachedBounds = Rectangle.Empty;
+        _lines.Add (line);
+    }
+
+    private Region? _exclusionRegion;
+
+    /// <summary>
+    ///     Causes the provided region to be excluded from <see cref="GetCellMap"/> and <see cref="GetMap()"/>.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Each call to this method will add to the exclusion region. To clear the exclusion region, call
+    ///         <see cref="ClearCache"/>.
+    ///     </para>
+    /// </remarks>
+    public void Exclude (Region region)
+    {
+        _exclusionRegion ??= new ();
+        _exclusionRegion.Union (region);
+    }
+
+    /// <summary>
+    ///     Clears the exclusion region. After calling this method, <see cref="GetCellMap"/> and <see cref="GetMap()"/> will
+    ///     return all points in the canvas.
+    /// </summary>
+    public void ClearExclusions () { _exclusionRegion = null; }
+
+    /// <summary>Clears all lines from the LineCanvas.</summary>
+    public void Clear ()
+    {
+        _cachedBounds = Rectangle.Empty;
+        _lines.Clear ();
+        ClearExclusions ();
+    }
+
+    /// <summary>
+    ///     Clears any cached states from the canvas. Call this method if you make changes to lines that have already been
+    ///     added.
+    /// </summary>
+    public void ClearCache () { _cachedBounds = Rectangle.Empty; }
+
+    /// <summary>
+    ///     Evaluates the lines that have been added to the canvas and returns a map containing the glyphs and their
+    ///     locations. The glyphs are the characters that should be rendered so that all lines connect up with the appropriate
+    ///     intersection symbols.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Only the points within the <see cref="Bounds"/> of the canvas that are not in the exclusion region will be
+    ///         returned. To exclude points from the map, use <see cref="Exclude"/>.
+    ///     </para>
+    /// </remarks>
+    /// <returns>A map of all the points within the canvas.</returns>
+    public Dictionary<Point, Cell?> GetCellMap ()
+    {
+        Dictionary<Point, Cell?> map = new ();
+
+        // walk through each pixel of the bitmap
+        for (int y = Bounds.Y; y < Bounds.Y + Bounds.Height; y++)
+        {
+            for (int x = Bounds.X; x < Bounds.X + Bounds.Width; x++)
+            {
+                IntersectionDefinition? [] intersects = _lines
+                                                        .Select (l => l.Intersects (x, y))
+                                                        .Where (i => i is { })
+                                                        .ToArray ();
+
+                Cell? cell = GetCellForIntersects (Application.Driver, intersects);
+
+                if (cell is { } && _exclusionRegion?.Contains (x, y) is null or false)
+                {
+                    map.Add (new (x, y), cell);
+                }
+            }
+        }
+
+        return map;
+    }
+
+    // TODO: Unless there's an obvious use case for this API we should delete it in favor of the
+    // simpler version that doesn't take an area.
+    /// <summary>
+    ///     Evaluates the lines that have been added to the canvas and returns a map containing the glyphs and their
+    ///     locations. The glyphs are the characters that should be rendered so that all lines connect up with the appropriate
+    ///     intersection symbols.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Only the points within the <paramref name="inArea"/> of the canvas that are not in the exclusion region will be
+    ///         returned. To exclude points from the map, use <see cref="Exclude"/>.
+    ///     </para>
+    /// </remarks>
+    /// <param name="inArea">A rectangle to constrain the search by.</param>
+    /// <returns>A map of the points within the canvas that intersect with <paramref name="inArea"/>.</returns>
+    public Dictionary<Point, Rune> GetMap (Rectangle inArea)
+    {
+        Dictionary<Point, Rune> map = new ();
+
+        // walk through each pixel of the bitmap
+        for (int y = inArea.Y; y < inArea.Y + inArea.Height; y++)
+        {
+            for (int x = inArea.X; x < inArea.X + inArea.Width; x++)
+            {
+                IntersectionDefinition? [] intersects = _lines
+                                                        .Select (l => l.Intersects (x, y))
+                                                        .Where (i => i is { })
+                                                        .ToArray ();
+
+                Rune? rune = GetRuneForIntersects (Application.Driver, intersects);
+
+                if (rune is { } && _exclusionRegion?.Contains (x, y) is null or false)
+                {
+                    map.Add (new (x, y), rune.Value);
+                }
+            }
+        }
+
+        return map;
+    }
+
+    /// <summary>
+    ///     Evaluates the lines that have been added to the canvas and returns a map containing the glyphs and their
+    ///     locations. The glyphs are the characters that should be rendered so that all lines connect up with the appropriate
+    ///     intersection symbols.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Only the points within the <see cref="Bounds"/> of the canvas that are not in the exclusion region will be
+    ///         returned. To exclude points from the map, use <see cref="Exclude"/>.
+    ///     </para>
+    /// </remarks>
+    /// <returns>A map of all the points within the canvas.</returns>
+    public Dictionary<Point, Rune> GetMap () { return GetMap (Bounds); }
+
+    /// <summary>Merges one line canvas into this one.</summary>
+    /// <param name="lineCanvas"></param>
+    public void Merge (LineCanvas lineCanvas)
+    {
+        foreach (StraightLine line in lineCanvas._lines)
+        {
+            AddLine (line);
+        }
+
+        if (lineCanvas._exclusionRegion is { })
+        {
+            _exclusionRegion ??= new ();
+            _exclusionRegion.Union (lineCanvas._exclusionRegion);
+        }
+    }
+
+    /// <summary>Removes the last line added to the canvas</summary>
+    /// <returns></returns>
+    public StraightLine RemoveLastLine ()
+    {
+        StraightLine? l = _lines.LastOrDefault ();
+
+        if (l is { })
+        {
+            _lines.Remove (l);
+        }
+
+        return l!;
+    }
+
+    /// <summary>
+    ///     Returns the contents of the line canvas rendered to a string. The string will include all columns and rows,
+    ///     even if <see cref="Bounds"/> has negative coordinates. For example, if the canvas contains a single line that
+    ///     starts at (-1,-1) with a length of 2, the rendered string will have a length of 2.
+    /// </summary>
+    /// <returns>The canvas rendered to a string.</returns>
+    public override string ToString ()
+    {
+        if (Bounds.IsEmpty)
+        {
+            return string.Empty;
+        }
+
+        // Generate the rune map for the entire canvas
+        Dictionary<Point, Rune> runeMap = GetMap ();
+
+        // Create the rune canvas
+        Rune [,] canvas = new Rune [Bounds.Height, Bounds.Width];
+
+        // Copy the rune map to the canvas, adjusting for any negative coordinates
+        foreach (KeyValuePair<Point, Rune> kvp in runeMap)
+        {
+            int x = kvp.Key.X - Bounds.X;
+            int y = kvp.Key.Y - Bounds.Y;
+            canvas [y, x] = kvp.Value;
+        }
+
+        // Convert the canvas to a string
+        var sb = new StringBuilder ();
+
+        for (var y = 0; y < canvas.GetLength (0); y++)
+        {
+            for (var x = 0; x < canvas.GetLength (1); x++)
+            {
+                Rune r = canvas [y, x];
+                sb.Append (r.Value == 0 ? ' ' : r.ToString ());
+            }
+
+            if (y < canvas.GetLength (0) - 1)
+            {
+                sb.AppendLine ();
+            }
+        }
+
+        return sb.ToString ();
+    }
+
+    private static bool All (IntersectionDefinition? [] intersects, Orientation orientation)
+    {
+        return intersects.All (i => i!.Line.Orientation == orientation);
+    }
+
+    private void ConfigurationManager_Applied (object? sender, ConfigurationManagerEventArgs e)
+    {
+        foreach (KeyValuePair<IntersectionRuneType, IntersectionRuneResolver> irr in _runeResolvers)
+        {
+            irr.Value.SetGlyphs ();
+        }
+    }
+
+    /// <summary>
+    ///     Returns true if all requested <paramref name="types"/> appear in <paramref name="intersects"/> and there are
+    ///     no additional <see cref="IntersectionRuneType"/>
+    /// </summary>
+    /// <param name="intersects"></param>
+    /// <param name="types"></param>
+    /// <returns></returns>
+    private static bool Exactly (HashSet<IntersectionType> intersects, params IntersectionType [] types) { return intersects.SetEquals (types); }
+
+    private Attribute? GetAttributeForIntersects (IntersectionDefinition? [] intersects)
+    {
+        return Fill?.GetAttribute (intersects [0]!.Point) ?? intersects [0]!.Line.Attribute;
+    }
 
     private readonly Dictionary<IntersectionRuneType, IntersectionRuneResolver> _runeResolvers = new ()
     {
@@ -54,287 +383,6 @@ public class LineCanvas : IDisposable
 
         // TODO: Add other resolvers
     };
-
-    private Rectangle _cachedViewport;
-
-    /// <summary>Creates a new instance.</summary>
-    public LineCanvas ()
-    {
-        // TODO: Refactor ConfigurationManager to not use an event handler for this.
-        // Instead, have it call a method on any class appropriately attributed
-        // to update the cached values. See Issue #2871
-        Applied += ConfigurationManager_Applied;
-    }
-
-    /// <summary>Creates a new instance with the given <paramref name="lines"/>.</summary>
-    /// <param name="lines">Initial lines for the canvas.</param>
-    public LineCanvas (IEnumerable<StraightLine> lines) : this () { _lines = lines.ToList (); }
-
-    /// <summary>
-    ///     Gets the rectangle that describes the bounds of the canvas. Location is the coordinates of the line that is
-    ///     furthest left/top and Size is defined by the line that extends the furthest right/bottom.
-    /// </summary>
-    public Rectangle Viewport
-    {
-        get
-        {
-            if (_cachedViewport.IsEmpty)
-            {
-                if (_lines.Count == 0)
-                {
-                    return _cachedViewport;
-                }
-
-                Rectangle viewport = _lines [0].Viewport;
-
-                for (var i = 1; i < _lines.Count; i++)
-                {
-                    viewport = Rectangle.Union (viewport, _lines [i].Viewport);
-                }
-
-                if (viewport is { Width: 0 } or { Height: 0 })
-                {
-                    viewport = viewport with
-                    {
-                        Width = Math.Clamp (viewport.Width, 1, short.MaxValue),
-                        Height = Math.Clamp (viewport.Height, 1, short.MaxValue)
-                    };
-                }
-
-                _cachedViewport = viewport;
-            }
-
-            return _cachedViewport;
-        }
-    }
-
-    /// <summary>Gets the lines in the canvas.</summary>
-    public IReadOnlyCollection<StraightLine> Lines => _lines.AsReadOnly ();
-
-    /// <inheritdoc/>
-    public void Dispose () { Applied -= ConfigurationManager_Applied; }
-
-    /// <summary>
-    ///     <para>Adds a new <paramref name="length"/> long line to the canvas starting at <paramref name="start"/>.</para>
-    ///     <para>
-    ///         Use positive <paramref name="length"/> for the line to extend Right and negative for Left when
-    ///         <see cref="Orientation"/> is <see cref="Orientation.Horizontal"/>.
-    ///     </para>
-    ///     <para>
-    ///         Use positive <paramref name="length"/> for the line to extend Down and negative for Up when
-    ///         <see cref="Orientation"/> is <see cref="Orientation.Vertical"/>.
-    ///     </para>
-    /// </summary>
-    /// <param name="start">Starting point.</param>
-    /// <param name="length">
-    ///     The length of line. 0 for an intersection (cross or T). Positive for Down/Right. Negative for
-    ///     Up/Left.
-    /// </param>
-    /// <param name="orientation">The direction of the line.</param>
-    /// <param name="style">The style of line to use</param>
-    /// <param name="attribute"></param>
-    public void AddLine (
-        Point start,
-        int length,
-        Orientation orientation,
-        LineStyle style,
-        Attribute? attribute = null
-    )
-    {
-        _cachedViewport = Rectangle.Empty;
-        _lines.Add (new (start, length, orientation, style, attribute));
-    }
-
-    /// <summary>Adds a new line to the canvas</summary>
-    /// <param name="line"></param>
-    public void AddLine (StraightLine line)
-    {
-        _cachedViewport = Rectangle.Empty;
-        _lines.Add (line);
-    }
-
-    /// <summary>Clears all lines from the LineCanvas.</summary>
-    public void Clear ()
-    {
-        _cachedViewport = Rectangle.Empty;
-        _lines.Clear ();
-    }
-
-    /// <summary>
-    ///     Clears any cached states from the canvas Call this method if you make changes to lines that have already been
-    ///     added.
-    /// </summary>
-    public void ClearCache () { _cachedViewport = Rectangle.Empty; }
-
-    /// <summary>
-    ///     Evaluates the lines that have been added to the canvas and returns a map containing the glyphs and their
-    ///     locations. The glyphs are the characters that should be rendered so that all lines connect up with the appropriate
-    ///     intersection symbols.
-    /// </summary>
-    /// <returns>A map of all the points within the canvas.</returns>
-    public Dictionary<Point, Cell?> GetCellMap ()
-    {
-        Dictionary<Point, Cell?> map = new ();
-
-        // walk through each pixel of the bitmap
-        for (int y = Viewport.Y; y < Viewport.Y + Viewport.Height; y++)
-        {
-            for (int x = Viewport.X; x < Viewport.X + Viewport.Width; x++)
-            {
-                IntersectionDefinition? [] intersects = _lines
-                                                        .Select (l => l.Intersects (x, y))
-                                                        .Where (i => i is { })
-                                                        .ToArray ();
-
-                Cell? cell = GetCellForIntersects (Application.Driver, intersects);
-
-                if (cell is { })
-                {
-                    map.Add (new (x, y), cell);
-                }
-            }
-        }
-
-        return map;
-    }
-
-    // TODO: Unless there's an obvious use case for this API we should delete it in favor of the
-    // simpler version that doesn't take an area.
-    /// <summary>
-    ///     Evaluates the lines that have been added to the canvas and returns a map containing the glyphs and their
-    ///     locations. The glyphs are the characters that should be rendered so that all lines connect up with the appropriate
-    ///     intersection symbols.
-    /// </summary>
-    /// <param name="inArea">A rectangle to constrain the search by.</param>
-    /// <returns>A map of the points within the canvas that intersect with <paramref name="inArea"/>.</returns>
-    public Dictionary<Point, Rune> GetMap (Rectangle inArea)
-    {
-        Dictionary<Point, Rune> map = new ();
-
-        // walk through each pixel of the bitmap
-        for (int y = inArea.Y; y < inArea.Y + inArea.Height; y++)
-        {
-            for (int x = inArea.X; x < inArea.X + inArea.Width; x++)
-            {
-                IntersectionDefinition? [] intersects = _lines
-                                                        .Select (l => l.Intersects (x, y))
-                                                        .Where (i => i is { })
-                                                        .ToArray ();
-
-                Rune? rune = GetRuneForIntersects (Application.Driver, intersects);
-
-                if (rune is { })
-                {
-                    map.Add (new (x, y), rune.Value);
-                }
-            }
-        }
-
-        return map;
-    }
-
-    /// <summary>
-    ///     Evaluates the lines that have been added to the canvas and returns a map containing the glyphs and their
-    ///     locations. The glyphs are the characters that should be rendered so that all lines connect up with the appropriate
-    ///     intersection symbols.
-    /// </summary>
-    /// <returns>A map of all the points within the canvas.</returns>
-    public Dictionary<Point, Rune> GetMap () { return GetMap (Viewport); }
-
-    /// <summary>Merges one line canvas into this one.</summary>
-    /// <param name="lineCanvas"></param>
-    public void Merge (LineCanvas lineCanvas)
-    {
-        foreach (StraightLine line in lineCanvas._lines)
-        {
-            AddLine (line);
-        }
-    }
-
-    /// <summary>Removes the last line added to the canvas</summary>
-    /// <returns></returns>
-    public StraightLine RemoveLastLine ()
-    {
-        StraightLine? l = _lines.LastOrDefault ();
-
-        if (l is { })
-        {
-            _lines.Remove (l);
-        }
-
-        return l!;
-    }
-
-    /// <summary>
-    ///     Returns the contents of the line canvas rendered to a string. The string will include all columns and rows,
-    ///     even if <see cref="Viewport"/> has negative coordinates. For example, if the canvas contains a single line that
-    ///     starts at (-1,-1) with a length of 2, the rendered string will have a length of 2.
-    /// </summary>
-    /// <returns>The canvas rendered to a string.</returns>
-    public override string ToString ()
-    {
-        if (Viewport.IsEmpty)
-        {
-            return string.Empty;
-        }
-
-        // Generate the rune map for the entire canvas
-        Dictionary<Point, Rune> runeMap = GetMap ();
-
-        // Create the rune canvas
-        Rune [,] canvas = new Rune [Viewport.Height, Viewport.Width];
-
-        // Copy the rune map to the canvas, adjusting for any negative coordinates
-        foreach (KeyValuePair<Point, Rune> kvp in runeMap)
-        {
-            int x = kvp.Key.X - Viewport.X;
-            int y = kvp.Key.Y - Viewport.Y;
-            canvas [y, x] = kvp.Value;
-        }
-
-        // Convert the canvas to a string
-        var sb = new StringBuilder ();
-
-        for (var y = 0; y < canvas.GetLength (0); y++)
-        {
-            for (var x = 0; x < canvas.GetLength (1); x++)
-            {
-                Rune r = canvas [y, x];
-                sb.Append (r.Value == 0 ? ' ' : r.ToString ());
-            }
-
-            if (y < canvas.GetLength (0) - 1)
-            {
-                sb.AppendLine ();
-            }
-        }
-
-        return sb.ToString ();
-    }
-
-    private bool All (IntersectionDefinition? [] intersects, Orientation orientation) { return intersects.All (i => i!.Line.Orientation == orientation); }
-
-    private void ConfigurationManager_Applied (object? sender, ConfigurationManagerEventArgs e)
-    {
-        foreach (KeyValuePair<IntersectionRuneType, IntersectionRuneResolver> irr in _runeResolvers)
-        {
-            irr.Value.SetGlyphs ();
-        }
-    }
-
-    /// <summary>
-    ///     Returns true if all requested <paramref name="types"/> appear in <paramref name="intersects"/> and there are
-    ///     no additional <see cref="IntersectionRuneType"/>
-    /// </summary>
-    /// <param name="intersects"></param>
-    /// <param name="types"></param>
-    /// <returns></returns>
-    private bool Exactly (HashSet<IntersectionType> intersects, params IntersectionType [] types) { return intersects.SetEquals (types); }
-
-    private Attribute? GetAttributeForIntersects (IntersectionDefinition? [] intersects)
-    {
-        return Fill != null ? Fill.GetAttribute (intersects [0]!.Point) : intersects [0]!.Line.Attribute;
-    }
 
     private Cell? GetCellForIntersects (ConsoleDriver? driver, IntersectionDefinition? [] intersects)
     {
@@ -677,7 +725,7 @@ public class LineCanvas : IDisposable
         internal Rune _thickBoth;
         internal Rune _thickH;
         internal Rune _thickV;
-        public IntersectionRuneResolver () { SetGlyphs (); }
+        protected IntersectionRuneResolver () { SetGlyphs (); }
 
         public Rune? GetRuneForIntersects (ConsoleDriver? driver, IntersectionDefinition? [] intersects)
         {
@@ -852,5 +900,12 @@ public class LineCanvas : IDisposable
             _thickBoth = Glyphs.URCornerHv;
             _normal = Glyphs.URCorner;
         }
+    }
+
+    /// <inheritdoc/>
+    public void Dispose ()
+    {
+        Applied -= ConfigurationManager_Applied;
+        GC.SuppressFinalize (this);
     }
 }

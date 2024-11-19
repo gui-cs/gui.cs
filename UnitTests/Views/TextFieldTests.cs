@@ -14,6 +14,7 @@ public class TextFieldTests (ITestOutputHelper output)
     public void Accented_Letter_With_Three_Combining_Unicode_Chars ()
     {
         var tf = new TextField { Width = 3, Text = "ắ" };
+        tf.Layout ();
         tf.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -23,6 +24,7 @@ public class TextFieldTests (ITestOutputHelper output)
                                                      );
 
         tf.Text = "\u1eaf";
+        tf.Layout ();
         tf.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -32,6 +34,7 @@ public class TextFieldTests (ITestOutputHelper output)
                                                      );
 
         tf.Text = "\u0103\u0301";
+        tf.Layout ();
         tf.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -41,6 +44,7 @@ public class TextFieldTests (ITestOutputHelper output)
                                                      );
 
         tf.Text = "\u0061\u0306\u0301";
+        tf.Layout ();
         tf.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -206,11 +210,13 @@ public class TextFieldTests (ITestOutputHelper output)
 
         // Caption should appear when not focused and no text
         Assert.False (tf.HasFocus);
+        View.SetClipToScreen ();
         tf.Draw ();
         TestHelpers.AssertDriverContentsAre ("Enter txt", output);
 
         // but disapear when text is added
         tf.Text = content;
+        View.SetClipToScreen ();
         tf.Draw ();
         TestHelpers.AssertDriverContentsAre (content, output);
         Application.Top.Dispose ();
@@ -228,12 +234,14 @@ public class TextFieldTests (ITestOutputHelper output)
         // Caption has no effect when focused
         tf.Caption = "Enter txt";
         Assert.True (tf.HasFocus);
+        View.SetClipToScreen ();
         tf.Draw ();
         TestHelpers.AssertDriverContentsAre ("", output);
 
         Application.Driver?.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
 
         Assert.False (tf.HasFocus);
+        View.SetClipToScreen ();
         tf.Draw ();
         TestHelpers.AssertDriverContentsAre ("Enter txt", output);
         Application.Top.Dispose ();
@@ -1074,19 +1082,18 @@ public class TextFieldTests (ITestOutputHelper output)
         };
 
         //                                             TAB to jump between text fields.
-        TestHelpers.AssertDriverAttributesAre ("0000000", Application.Driver, attributes);
+        TestHelpers.AssertDriverAttributesAre ("0000000", output, Application.Driver, attributes);
 
         // Cursor is at the end
         Assert.Equal (32, _textField.CursorPosition);
         _textField.CursorPosition = 0;
         _textField.NewKeyDownEvent (Key.CursorRight.WithCtrl.WithShift);
 
-        var first = true;
-        Application.RunIteration (ref rs, ref first);
+        Application.RunIteration (ref rs);
         Assert.Equal (4, _textField.CursorPosition);
 
         //                                             TAB to jump between text fields.
-        TestHelpers.AssertDriverAttributesAre ("1111000", Application.Driver, attributes);
+        TestHelpers.AssertDriverAttributesAre ("1111000", output, Application.Driver, attributes);
         top.Dispose ();
     }
 
@@ -1990,6 +1997,7 @@ Les Misérables",
 
         // incorrect order will result with a wrong accent place
         tf.Text = "Les Mis" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "erables";
+        View.SetClipToScreen ();
         tf.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (

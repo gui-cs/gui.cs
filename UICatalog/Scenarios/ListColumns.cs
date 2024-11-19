@@ -11,7 +11,6 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Dialogs")]
 [ScenarioCategory ("Text and Formatting")]
-[ScenarioCategory ("Overlapped")]
 [ScenarioCategory ("Scrolling")]
 public class ListColumns : Scenario
 {
@@ -237,7 +236,7 @@ public class ListColumns : Scenario
         _listColView.SelectedCellChanged += (s, e) => { selectedCellLabel.Text = $"{_listColView.SelectedRow},{_listColView.SelectedColumn}"; };
         _listColView.KeyDown += TableViewKeyPress;
 
-        SetupScrollBar ();
+        //SetupScrollBar ();
 
         _alternatingColorScheme = new ()
         {
@@ -306,13 +305,13 @@ public class ListColumns : Scenario
     private void SetListMaxWidth ()
     {
         RunListWidthDialog ("MaxCellWidth", (s, v) => s.MaxCellWidth = v, s => s.MaxCellWidth);
-        _listColView.SetNeedsDisplay ();
+        _listColView.SetNeedsDraw ();
     }
 
     private void SetListMinWidth ()
     {
         RunListWidthDialog ("MinCellWidth", (s, v) => s.MinCellWidth = v, s => s.MinCellWidth);
-        _listColView.SetNeedsDisplay ();
+        _listColView.SetNeedsDraw ();
     }
 
     private void SetTable (IList list)
@@ -325,41 +324,41 @@ public class ListColumns : Scenario
         }
     }
 
-    private void SetupScrollBar ()
-    {
-        var scrollBar = new ScrollBarView (_listColView, true); // (listColView, true, true);
+    //private void SetupScrollBar ()
+    //{
+    //    var scrollBar = new ScrollBarView (_listColView, true); // (listColView, true, true);
 
-        scrollBar.ChangedPosition += (s, e) =>
-                                     {
-                                         _listColView.RowOffset = scrollBar.Position;
+    //    scrollBar.ChangedPosition += (s, e) =>
+    //                                 {
+    //                                     _listColView.RowOffset = scrollBar.Position;
 
-                                         if (_listColView.RowOffset != scrollBar.Position)
-                                         {
-                                             scrollBar.Position = _listColView.RowOffset;
-                                         }
+    //                                     if (_listColView.RowOffset != scrollBar.Position)
+    //                                     {
+    //                                         scrollBar.Position = _listColView.RowOffset;
+    //                                     }
 
-                                         _listColView.SetNeedsDisplay ();
-                                     };
-        /*
-        scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
-            listColView.ColumnOffset = scrollBar.OtherScrollBarView.Position;
-            if (listColView.ColumnOffset != scrollBar.OtherScrollBarView.Position) {
-                scrollBar.OtherScrollBarView.Position = listColView.ColumnOffset;
-            }
-            listColView.SetNeedsDisplay ();
-        };
-        */
+    //                                     _listColView.SetNeedsDraw ();
+    //                                 };
+    //    /*
+    //    scrollBar.OtherScrollBarView.ChangedPosition += (s,e) => {
+    //        listColView.ColumnOffset = scrollBar.OtherScrollBarView.Position;
+    //        if (listColView.ColumnOffset != scrollBar.OtherScrollBarView.Position) {
+    //            scrollBar.OtherScrollBarView.Position = listColView.ColumnOffset;
+    //        }
+    //        listColView.SetNeedsDraw ();
+    //    };
+    //    */
 
-        _listColView.DrawContent += (s, e) =>
-                                    {
-                                        scrollBar.Size = _listColView.Table?.Rows ?? 0;
-                                        scrollBar.Position = _listColView.RowOffset;
+    //    _listColView.DrawingContent += (s, e) =>
+    //                                {
+    //                                    scrollBar.Size = _listColView.Table?.Rows ?? 0;
+    //                                    scrollBar.Position = _listColView.RowOffset;
 
-                                        //scrollBar.OtherScrollBarView.Size = listColView.Table?.Columns - 1 ?? 0;
-                                        //scrollBar.OtherScrollBarView.Position = listColView.ColumnOffset;
-                                        scrollBar.Refresh ();
-                                    };
-    }
+    //                                    //scrollBar.OtherScrollBarView.Size = listColView.Table?.Columns - 1 ?? 0;
+    //                                    //scrollBar.OtherScrollBarView.Position = listColView.ColumnOffset;
+    //                                    scrollBar.Refresh ();
+    //                                };
+    //}
 
     private void TableViewKeyPress (object sender, Key e)
     {
@@ -390,7 +389,7 @@ public class ListColumns : Scenario
             _listColView.Style.RowColorGetter = null;
         }
 
-        _listColView.SetNeedsDisplay ();
+        _listColView.SetNeedsDraw ();
     }
 
     private void ToggleAlwaysUseNormalColorForVerticalCellLines ()
@@ -431,7 +430,7 @@ public class ListColumns : Scenario
         //toggle menu item
         _miCursor.Checked = !_miCursor.Checked;
         _listColView.Style.InvertSelectedCellFirstCharacter = (bool)_miCursor.Checked;
-        _listColView.SetNeedsDisplay ();
+        _listColView.SetNeedsDraw ();
     }
 
     private void ToggleScrollParallel ()
@@ -441,7 +440,7 @@ public class ListColumns : Scenario
         if ((ListTableSource)_listColView.Table != null)
         {
             ((ListTableSource)_listColView.Table).Style.ScrollParallel = (bool)_miScrollParallel.Checked;
-            _listColView.SetNeedsDisplay ();
+            _listColView.SetNeedsDraw ();
         }
     }
 
@@ -469,7 +468,7 @@ public class ListColumns : Scenario
             ((ListTableSource)_listColView.Table).Style.Orientation = (bool)_miOrientVertical.Checked
                                                                           ? Orientation.Vertical
                                                                           : Orientation.Horizontal;
-            _listColView.SetNeedsDisplay ();
+            _listColView.SetNeedsDraw ();
         }
     }
 }

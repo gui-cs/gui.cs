@@ -126,7 +126,7 @@ public class GraphViewExample : Scenario
                          {
                              Checked = View.Diagnostics
                                        == (ViewDiagnosticFlags
-                                               .Padding
+                                               .Thickness
                                            | ViewDiagnosticFlags
                                                .Ruler),
                              CheckType = MenuItemCheckStyle.Checked
@@ -211,10 +211,10 @@ public class GraphViewExample : Scenario
         _miDiags.Checked = !_miDiags.Checked;
 
         View.Diagnostics = _miDiags.Checked == true
-                               ? ViewDiagnosticFlags.Padding
+                               ? ViewDiagnosticFlags.Thickness
                                  | ViewDiagnosticFlags.Ruler
                                : ViewDiagnosticFlags.Off;
-        Application.Refresh ();
+        Application.LayoutAndDraw ();
     }
 
     private void Margin (bool left, bool increase)
@@ -228,7 +228,7 @@ public class GraphViewExample : Scenario
             _graphView.MarginBottom = (uint)Math.Max (0, _graphView.MarginBottom + (increase ? 1 : -1));
         }
 
-        _graphView.SetNeedsDisplay ();
+        _graphView.SetNeedsDraw ();
     }
 
     private void MultiBarGraph ()
@@ -264,7 +264,7 @@ public class GraphViewExample : Scenario
 
         _graphView.CellSize = new (0.25f, 1000);
         _graphView.Series.Add (series);
-        _graphView.SetNeedsDisplay ();
+        _graphView.SetNeedsDraw ();
 
         _graphView.MarginLeft = 3;
         _graphView.MarginBottom = 1;
@@ -330,7 +330,7 @@ public class GraphViewExample : Scenario
                                                 );
                                    }
 
-                                   _graphView.SetNeedsDisplay ();
+                                   _graphView.SetNeedsDraw ();
 
                                    // while the equaliser is showing
                                    return _graphView.Series.Contains (series);
@@ -350,7 +350,7 @@ public class GraphViewExample : Scenario
         _graphView.AxisX.Visible = false;
         _graphView.AxisY.Visible = false;
 
-        _graphView.SetNeedsDisplay ();
+        _graphView.SetNeedsDraw ();
     }
     /*
     Country,Both,Male,Female
@@ -522,7 +522,7 @@ public class GraphViewExample : Scenario
             _graphView.ScrollOffset = new (80, 0);
         }
 
-        _graphView.SetNeedsDisplay ();
+        _graphView.SetNeedsDraw ();
     }
 
     private void SetupLineGraph ()
@@ -605,7 +605,7 @@ public class GraphViewExample : Scenario
                                     }
                                    );
 
-        _graphView.SetNeedsDisplay ();
+        _graphView.SetNeedsDraw ();
     }
 
     private void SetupPeriodicTableScatterPlot ()
@@ -760,7 +760,7 @@ public class GraphViewExample : Scenario
         _graphView.AxisY.ShowLabelsEvery = 1;
         _graphView.AxisY.Minimum = 0;
 
-        _graphView.SetNeedsDisplay ();
+        _graphView.SetNeedsDraw ();
     }
 
     private void SetupPopulationPyramid ()
@@ -899,7 +899,7 @@ public class GraphViewExample : Scenario
                                     new TextAnnotation { Text = "F", ScreenPosition = new Point (_graphView.Viewport.Width - 1, 10) }
                                    );
 
-        _graphView.SetNeedsDisplay ();
+        _graphView.SetNeedsDraw ();
     }
 
     private void SetupSineWave ()
@@ -946,7 +946,7 @@ public class GraphViewExample : Scenario
 
         _graphView.ScrollOffset = new (-2.5f, -1);
 
-        _graphView.SetNeedsDisplay ();
+        _graphView.SetNeedsDraw ();
     }
 
     private void ShowBorder ()
@@ -978,7 +978,7 @@ public class GraphViewExample : Scenario
         _graphView.AxisX.Increment *= factor;
         _graphView.AxisY.Increment *= factor;
 
-        _graphView.SetNeedsDisplay ();
+        _graphView.SetNeedsDraw ();
     }
 
     private class DiscoBarSeries : BarSeries
@@ -1010,23 +1010,23 @@ public class GraphViewExample : Scenario
 
                 if (height >= 85)
                 {
-                    driver.SetAttribute (_red);
+                    graph.SetAttribute (_red);
                 }
                 else if (height >= 66)
                 {
-                    driver.SetAttribute (_brightred);
+                    graph.SetAttribute (_brightred);
                 }
                 else if (height >= 45)
                 {
-                    driver.SetAttribute (_brightyellow);
+                    graph.SetAttribute (_brightyellow);
                 }
                 else if (height >= 25)
                 {
-                    driver.SetAttribute (_brightgreen);
+                    graph.SetAttribute (_brightgreen);
                 }
                 else
                 {
-                    driver.SetAttribute (_green);
+                    graph.SetAttribute (_green);
                 }
 
                 graph.AddRune (x, y, beingDrawn.Fill.Rune);

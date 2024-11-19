@@ -237,7 +237,7 @@ internal class Branch<T> where T : class
         };
         tree.OnDrawLine (e);
 
-        if (!e.Handled)
+        if (!e.Handled && driver != null)
         {
             foreach (Cell cell in cells)
             {
@@ -246,7 +246,7 @@ internal class Branch<T> where T : class
             }
         }
 
-        driver.SetAttribute (colorScheme.Normal);
+        driver?.SetAttribute (colorScheme.Normal);
     }
 
     /// <summary>Expands the current branch if possible.</summary>

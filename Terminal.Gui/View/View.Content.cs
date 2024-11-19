@@ -151,10 +151,7 @@ public partial class View
 
         if (e.Cancel != true)
         {
-            OnResizeNeeded ();
-
-            //SetNeedsLayout ();
-            //SetNeedsDisplay ();
+            SetNeedsLayout ();
         }
 
         return e.Cancel;
@@ -173,7 +170,6 @@ public partial class View
     public Point ContentToScreen (in Point location)
     {
         // Subtract the ViewportOffsetFromFrame to get the Viewport-relative location.
-        Point viewportOffset = GetViewportOffsetFromFrame ();
         Point contentRelativeToViewport = location;
         contentRelativeToViewport.Offset (-Viewport.X, -Viewport.Y);
 
@@ -268,7 +264,7 @@ public partial class View
     ///     </para>
     ///     <para>
     ///         Altering the Viewport Size will eventually (when the view is next laid out) cause the
-    ///         <see cref="LayoutSubview(View, Size)"/> and <see cref="OnDrawContent(Rectangle)"/> methods to be called.
+    ///         <see cref="Layout()"/> and <see cref="OnDrawingContent"/> methods to be called.
     ///     </para>
     /// </remarks>
     public virtual Rectangle Viewport
@@ -312,9 +308,11 @@ public partial class View
             {
                 _viewportLocation = viewport.Location;
                 SetNeedsLayout ();
+                //SetNeedsDraw();
+                //SetSubViewNeedsDraw();
             }
 
-            OnViewportChanged (new (IsInitialized ? Viewport : Rectangle.Empty, oldViewport));
+            RaiseViewportChangedEvent (oldViewport);
 
             return;
         }
@@ -326,6 +324,10 @@ public partial class View
         {
             Size = newSize
         };
+
+        // Note, setting the Frame will cause ViewportChanged to be raised.
+
+        return;
 
         void ApplySettings (ref Rectangle newViewport)
         {
@@ -346,11 +348,27 @@ public partial class View
                 }
             }
 
+            if (!ViewportSettings.HasFlag (ViewportSettings.AllowNegativeXWhenWidthGreaterThanContentWidth))
+            {
+                if (Viewport.Width > GetContentSize ().Width)
+                {
+                    newViewport.X = 0;
+                }
+            }
+
             if (!ViewportSettings.HasFlag (ViewportSettings.AllowYGreaterThanContentHeight))
             {
                 if (newViewport.Y >= GetContentSize ().Height)
                 {
                     newViewport.Y = GetContentSize ().Height - 1;
+                }
+            }
+
+            if (!ViewportSettings.HasFlag (ViewportSettings.AllowNegativeYWhenHeightGreaterThanContentHeight))
+            {
+                if (Viewport.Height > GetContentSize ().Height)
+                {
+                    newViewport.Y = 0;
                 }
             }
 
@@ -365,6 +383,13 @@ public partial class View
         }
     }
 
+    private void RaiseViewportChangedEvent (Rectangle oldViewport)
+    {
+        var args = new DrawEventArgs (IsInitialized ? Viewport : Rectangle.Empty, oldViewport);
+        OnViewportChanged (args);
+        ViewportChanged?.Invoke (this, args);
+    }
+
     /// <summary>
     ///     Fired when the <see cref="Viewport"/> changes. This event is fired after the <see cref="Viewport"/> has been
     ///     updated.
@@ -375,7 +400,7 @@ public partial class View
     ///     Called when the <see cref="Viewport"/> changes. Invokes the <see cref="ViewportChanged"/> event.
     /// </summary>
     /// <param name="e"></param>
-    protected virtual void OnViewportChanged (DrawEventArgs e) { ViewportChanged?.Invoke (this, e); }
+    protected virtual void OnViewportChanged (DrawEventArgs e) { }
 
     /// <summary>
     ///     Converts a <see cref="Viewport"/>-relative location and size to a screen-relative location and size.

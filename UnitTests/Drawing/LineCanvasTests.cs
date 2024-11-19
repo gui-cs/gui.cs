@@ -377,7 +377,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
         canvas.AddLine (new (x, y), length, Orientation.Horizontal, LineStyle.Single);
         canvas.AddLine (new (x, y), length, Orientation.Vertical, LineStyle.Single);
 
-        Assert.Equal (new (expectedX, expectedY, expectedWidth, expectedHeight), canvas.Viewport);
+        Assert.Equal (new (expectedX, expectedY, expectedWidth, expectedHeight), canvas.Bounds);
     }
 
     [InlineData (
@@ -458,7 +458,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
         var canvas = new LineCanvas ();
         canvas.AddLine (new (x, y), length, Orientation.Horizontal, LineStyle.Single);
 
-        Assert.Equal (new (expectedX, expectedY, expectedWidth, expectedHeight), canvas.Viewport);
+        Assert.Equal (new (expectedX, expectedY, expectedWidth, expectedHeight), canvas.Bounds);
     }
 
     [Fact]
@@ -480,27 +480,27 @@ public class LineCanvasTests (ITestOutputHelper _output)
 
         // Add a short horiz line for ╔╡
         lc.AddLine (new (x, y), 2, Orientation.Horizontal, LineStyle.Double);
-        Assert.Equal (new (x, y, 2, 1), lc.Viewport);
+        Assert.Equal (new (x, y, 2, 1), lc.Bounds);
 
         //LHS line down
         lc.AddLine (new (x, y), height, Orientation.Vertical, LineStyle.Double);
-        Assert.Equal (new (x, y, 2, 2), lc.Viewport);
+        Assert.Equal (new (x, y, 2, 2), lc.Bounds);
 
         //Vertical line before Title, results in a ╡
         lc.AddLine (new (x + 1, y), 0, Orientation.Vertical, LineStyle.Single);
-        Assert.Equal (new (x, y, 2, 2), lc.Viewport);
+        Assert.Equal (new (x, y, 2, 2), lc.Bounds);
 
         //Vertical line after Title, results in a ╞
         lc.AddLine (new (x + 2, y), 0, Orientation.Vertical, LineStyle.Single);
-        Assert.Equal (new (x, y, 3, 2), lc.Viewport);
+        Assert.Equal (new (x, y, 3, 2), lc.Bounds);
 
         // remainder of top line
         lc.AddLine (new (x + 2, y), width - 1, Orientation.Horizontal, LineStyle.Double);
-        Assert.Equal (new (x, y, 4, 2), lc.Viewport);
+        Assert.Equal (new (x, y, 4, 2), lc.Bounds);
 
         //RHS line down
         lc.AddLine (new (x + width, y), height, Orientation.Vertical, LineStyle.Double);
-        Assert.Equal (new (x, y, 4, 2), lc.Viewport);
+        Assert.Equal (new (x, y, 4, 2), lc.Bounds);
 
         TestHelpers.AssertEqual (
                                  _output,
@@ -530,27 +530,27 @@ public class LineCanvasTests (ITestOutputHelper _output)
 
         // Add a short horiz line for ╔╡
         lc.AddLine (new (x, y), 2, Orientation.Horizontal, LineStyle.Double);
-        Assert.Equal (new (x, y, 2, 1), lc.Viewport);
+        Assert.Equal (new (x, y, 2, 1), lc.Bounds);
 
         //LHS line down
         lc.AddLine (new (x, y), height, Orientation.Vertical, LineStyle.Double);
-        Assert.Equal (new (x, y, 2, 2), lc.Viewport);
+        Assert.Equal (new (x, y, 2, 2), lc.Bounds);
 
         //Vertical line before Title, results in a ╡
         lc.AddLine (new (x + 1, y), 0, Orientation.Vertical, LineStyle.Single);
-        Assert.Equal (new (x, y, 2, 2), lc.Viewport);
+        Assert.Equal (new (x, y, 2, 2), lc.Bounds);
 
         //Vertical line after Title, results in a ╞
         lc.AddLine (new (x + 2, y), 0, Orientation.Vertical, LineStyle.Single);
-        Assert.Equal (new (x, y, 3, 2), lc.Viewport);
+        Assert.Equal (new (x, y, 3, 2), lc.Bounds);
 
         // remainder of top line
         lc.AddLine (new (x + 2, y), width - 1, Orientation.Horizontal, LineStyle.Double);
-        Assert.Equal (new (x, y, 4, 2), lc.Viewport);
+        Assert.Equal (new (x, y, 4, 2), lc.Bounds);
 
         //RHS line down
         lc.AddLine (new (x + width, y), height, Orientation.Vertical, LineStyle.Double);
-        Assert.Equal (new (x, y, 4, 2), lc.Viewport);
+        Assert.Equal (new (x, y, 4, 2), lc.Bounds);
 
         TestHelpers.AssertEqual (
                                  _output,
@@ -567,13 +567,13 @@ public class LineCanvasTests (ITestOutputHelper _output)
     {
         var lc = new LineCanvas ();
 
-        Assert.Equal (Rectangle.Empty, lc.Viewport);
+        Assert.Equal (Rectangle.Empty, lc.Bounds);
 
         lc.AddLine (Point.Empty, 2, Orientation.Horizontal, LineStyle.Double);
-        Assert.NotEqual (Rectangle.Empty, lc.Viewport);
+        Assert.NotEqual (Rectangle.Empty, lc.Bounds);
 
         lc.Clear ();
-        Assert.Equal (Rectangle.Empty, lc.Viewport);
+        Assert.Equal (Rectangle.Empty, lc.Bounds);
     }
 
     [InlineData (0, 0, Orientation.Horizontal, "─")]
@@ -872,7 +872,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
         //// Left Up
         //canvas.AddLine (new Point (0, 3), -3, Orientation.Vertical, LineStyle.Single);
 
-        Assert.Equal (new (0, 0, 2, 2), canvas.Viewport);
+        Assert.Equal (new (0, 0, 2, 2), canvas.Bounds);
 
         Dictionary<Point, Rune> map = canvas.GetMap ();
         Assert.Equal (2, map.Count);
@@ -1392,7 +1392,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
     // TODO: Remove this and make all LineCanvas tests independent of View
     /// <summary>
     ///     Creates a new <see cref="View"/> into which a <see cref="LineCanvas"/> is rendered at
-    ///     <see cref="View.DrawContentComplete"/> time.
+    ///     <see cref="View.DrawComplete"/> time.
     /// </summary>
     /// <param name="canvas">The <see cref="LineCanvas"/> you can draw into.</param>
     /// <param name="offsetX">How far to offset drawing in X</param>
@@ -1404,7 +1404,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
 
         LineCanvas canvasCopy = canvas = new ();
 
-        v.DrawContentComplete += (s, e) =>
+        v.DrawComplete += (s, e) =>
                                  {
                                      v.FillRect (v.Viewport);
 

@@ -24,7 +24,9 @@ public class ViewExperiments : Scenario
         {
             X = 0,
             Y = 0,
-            TabStop = TabBehavior.NoStop
+            TabStop = TabBehavior.NoStop,
+            AutoSelectViewToEdit = true,
+            ShowViewIdentifier = true
         };
         app.Add (editor);
 

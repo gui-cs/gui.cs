@@ -61,7 +61,7 @@ internal class DrawLineTool : ITool
                 _currentLine.Length = length;
                 _currentLine.Orientation = orientation;
                 area.CurrentLayer.ClearCache ();
-                area.SetNeedsDisplay ();
+                area.SetNeedsDraw ();
             }
         }
         else
@@ -93,7 +93,7 @@ internal class DrawLineTool : ITool
 
                 _currentLine = null;
                 area.ClearUndo ();
-                area.SetNeedsDisplay ();
+                area.SetNeedsDraw ();
             }
         }
 
@@ -114,7 +114,7 @@ public class LineDrawing : Scenario
 
         var tools = new ToolsView { Title = "Tools", X = Pos.Right (canvas) - 20, Y = 2 };
 
-        tools.ColorChanged += (s, e) => canvas.SetAttribute (e);
+        tools.ColorChanged += (s, e) => canvas.SetCurrentAttribute (e);
         tools.SetStyle += b => canvas.CurrentTool = new DrawLineTool { LineStyle = b };
         tools.AddLayer += () => canvas.AddLayer ();
 
@@ -253,12 +253,8 @@ public class ToolsView : Window
 
     private void ToolsView_Initialized (object sender, EventArgs e)
     {
-        LayoutSubviews ();
-
         Width = Math.Max (_colors.Frame.Width, _stylePicker.Frame.Width) + GetAdornmentsThickness ().Horizontal;
-
         Height = _colors.Frame.Height + _stylePicker.Frame.Height + _addLayerBtn.Frame.Height + GetAdornmentsThickness ().Vertical;
-        SuperView.LayoutSubviews ();
     }
 }
 
@@ -272,23 +268,27 @@ public class DrawingArea : View
     public ITool CurrentTool { get; set; } = new DrawLineTool ();
     public DrawingArea () { AddLayer (); }
 
-    public override void OnDrawContentComplete (Rectangle viewport)
+    protected override bool OnDrawingContent ()
     {
-        base.OnDrawContentComplete (viewport);
-
         foreach (LineCanvas canvas in Layers)
         {
             foreach (KeyValuePair<Point, Cell?> c in canvas.GetCellMap ())
             {
                 if (c.Value is { })
                 {
-                    Driver.SetAttribute (c.Value.Value.Attribute ?? ColorScheme.Normal);
+                    SetCurrentAttribute (c.Value.Value.Attribute ?? ColorScheme.Normal);
 
                     // TODO: #2616 - Support combining sequences that don't normalize
                     AddRune (c.Key.X, c.Key.Y, c.Value.Value.Rune);
                 }
             }
         }
+
+        // TODO: This is a hack to work around overlapped views not drawing correctly.
+        // without this the toolbox disappears
+        SuperView?.SetNeedsLayout();
+
+        return true;
     }
 
     //// BUGBUG: Why is this not handled by a key binding???
@@ -302,7 +302,7 @@ public class DrawingArea : View
             if (pop != null)
             {
                 _undoHistory.Push (pop);
-                SetNeedsDisplay ();
+                SetNeedsDraw ();
 
                 return true;
             }
@@ -314,7 +314,7 @@ public class DrawingArea : View
             {
                 StraightLine pop = _undoHistory.Pop ();
                 CurrentLayer.AddLine (pop);
-                SetNeedsDisplay ();
+                SetNeedsDraw ();
 
                 return true;
             }
@@ -336,7 +336,7 @@ public class DrawingArea : View
         Layers.Add (CurrentLayer);
     }
 
-    internal void SetAttribute (Attribute a) { CurrentAttribute = a; }
+    internal void SetCurrentAttribute (Attribute a) { CurrentAttribute = a; }
 
     public void ClearUndo () { _undoHistory.Clear (); }
 }
@@ -375,17 +375,15 @@ public class AttributeView : View
     }
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle viewport)
+    protected override bool OnDrawingContent ()
     {
-        base.OnDrawContent (viewport);
-
         Color fg = Value.Foreground;
         Color bg = Value.Background;
 
         bool isTransparentFg = fg == GetNormalColor ().Background;
         bool isTransparentBg = bg == GetNormalColor ().Background;
 
-        Driver.SetAttribute (new (fg, isTransparentFg ? Color.Gray : fg));
+        SetAttribute (new (fg, isTransparentFg ? Color.Gray : fg));
 
         // Square of foreground color
         foreach ((int, int) point in ForegroundPoints)
@@ -407,7 +405,7 @@ public class AttributeView : View
             AddRune (point.Item1, point.Item2, rune);
         }
 
-        Driver.SetAttribute (new (bg, isTransparentBg ? Color.Gray : bg));
+        SetAttribute (new (bg, isTransparentBg ? Color.Gray : bg));
 
         // Square of background color
         foreach ((int, int) point in BackgroundPoints)
@@ -428,6 +426,7 @@ public class AttributeView : View
 
             AddRune (point.Item1, point.Item2, rune);
         }
+        return true;
     }
 
     /// <inheritdoc/>
@@ -459,7 +458,7 @@ public class AttributeView : View
         if (LineDrawing.PromptForColor ("Background", Value.Background, out Color newColor))
         {
             Value = new (Value.Foreground, newColor);
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
     }
 
@@ -468,7 +467,7 @@ public class AttributeView : View
         if (LineDrawing.PromptForColor ("Foreground", Value.Foreground, out Color newColor))
         {
             Value = new (newColor, Value.Background);
-            SetNeedsDisplay ();
+            SetNeedsDraw ();
         }
     }
 }

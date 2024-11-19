@@ -20,13 +20,13 @@
     <DefineConstants>TRACE;DEBUG_IDISPOSABLE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Resources\config.json" />
+    <None Remove="Scenarios\Editors\Resources\config.json" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\config.json" />
+    <EmbeddedResource Include="Scenarios\Editors\Resources\config.json" />
   </ItemGroup>
   <ItemGroup>
-  <None Update="./Scenarios/Spinning_globe_dark_small.gif" CopyToOutputDirectory="PreserveNewest" />
+  <None Update="Scenarios\AnimationScenario\Spinning_globe_dark_small.gif" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" Version="[2024.2.0,)" PrivateAssets="all" />

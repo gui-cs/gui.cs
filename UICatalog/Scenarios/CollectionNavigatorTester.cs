@@ -7,9 +7,9 @@ using Terminal.Gui;
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata (
-                      "Collection Navigator",
-                      "Demonstrates keyboard navigation in ListView & TreeView (CollectionNavigator)."
-                  )]
+                               "Collection Navigator",
+                               "Demonstrates keyboard navigation in ListView & TreeView (CollectionNavigator)."
+                           )]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("ListView")]
 [ScenarioCategory ("TreeView")]

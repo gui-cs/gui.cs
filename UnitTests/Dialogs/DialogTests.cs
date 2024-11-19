@@ -46,13 +46,16 @@ public class DialogTests
         dlg.Border.Thickness = new (1, 0, 1, 0);
         runstate = Begin (dlg);
         var buttonRow = $"{CM.Glyphs.VLine}    {btn1}     {CM.Glyphs.VLine}";
+
+        RunIteration (ref runstate);
+
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
 
         // Now add a second button
         buttonRow = $"{CM.Glyphs.VLine} {btn1} {btn2} {CM.Glyphs.VLine}";
         dlg.AddButton (new () { Text = btn2Text });
-        var first = false;
-        RunIteration (ref runstate, ref first);
+
+        RunIteration (ref runstate);
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -70,14 +73,16 @@ public class DialogTests
         // Create with no top or bottom border to simplify testing button layout (no need to account for title etc..)
         dlg.Border.Thickness = new (1, 0, 1, 0);
         runstate = Begin (dlg);
+
+        RunIteration (ref runstate);
+
         buttonRow = $"{CM.Glyphs.VLine}{btn1}         {CM.Glyphs.VLine}";
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
 
         // Now add a second button
         buttonRow = $"{CM.Glyphs.VLine}{btn1}   {btn2}{CM.Glyphs.VLine}";
         dlg.AddButton (new () { Text = btn2Text });
-        first = false;
-        RunIteration (ref runstate, ref first);
+        RunIteration (ref runstate);
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -95,14 +100,17 @@ public class DialogTests
         // Create with no top or bottom border to simplify testing button layout (no need to account for title etc..)
         dlg.Border.Thickness = new (1, 0, 1, 0);
         runstate = Begin (dlg);
+
+        RunIteration (ref runstate);
+
         buttonRow = $"{CM.Glyphs.VLine}{new (' ', width - btn1.Length - 2)}{btn1}{CM.Glyphs.VLine}";
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
 
         // Now add a second button
         buttonRow = $"{CM.Glyphs.VLine}  {btn1} {btn2}{CM.Glyphs.VLine}";
         dlg.AddButton (new () { Text = btn2Text });
-        first = false;
-        RunIteration (ref runstate, ref first);
+
+        RunIteration (ref runstate);
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -120,14 +128,16 @@ public class DialogTests
         // Create with no top or bottom border to simplify testing button layout (no need to account for title etc..)
         dlg.Border.Thickness = new (1, 0, 1, 0);
         runstate = Begin (dlg);
+        RunIteration (ref runstate);
+
         buttonRow = $"{CM.Glyphs.VLine}{btn1}{new (' ', width - btn1.Length - 2)}{CM.Glyphs.VLine}";
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
 
         // Now add a second button
         buttonRow = $"{CM.Glyphs.VLine}{btn1} {btn2}  {CM.Glyphs.VLine}";
         dlg.AddButton (new () { Text = btn2Text });
-        first = false;
-        RunIteration (ref runstate, ref first);
+
+        RunIteration (ref runstate);
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -160,10 +170,27 @@ public class DialogTests
         d.SetBufferSize (buttonRow.Length, 3);
 
         // Default - Center
-        (runstate, Dialog dlg) = RunButtonTestDialog (
+        (runstate, Dialog dlg) = BeginButtonTestDialog (
+                                                    title,
+                                                    width,
+                                                    Alignment.Center,
+                                                    new Button { Text = btn1Text },
+                                                    new Button { Text = btn2Text },
+                                                    new Button { Text = btn3Text },
+                                                    new Button { Text = btn4Text }
+                                                   );
+        TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
+        End (runstate);
+        dlg.Dispose ();
+
+        // Justify
+        buttonRow = $"{CM.Glyphs.VLine}{btn1}  {btn2}  {btn3} {btn4}{CM.Glyphs.VLine}";
+        Assert.Equal (width, buttonRow.Length);
+
+        (runstate, dlg) = BeginButtonTestDialog (
                                                       title,
                                                       width,
-                                                      Alignment.Center,
+                                                      Alignment.Fill,
                                                       new Button { Text = btn1Text },
                                                       new Button { Text = btn2Text },
                                                       new Button { Text = btn3Text },
@@ -173,36 +200,19 @@ public class DialogTests
         End (runstate);
         dlg.Dispose ();
 
-        // Justify
-        buttonRow = $"{CM.Glyphs.VLine}{btn1}  {btn2}  {btn3} {btn4}{CM.Glyphs.VLine}";
-        Assert.Equal (width, buttonRow.Length);
-
-        (runstate, dlg) = RunButtonTestDialog (
-                                               title,
-                                               width,
-                                               Alignment.Fill,
-                                               new Button { Text = btn1Text },
-                                               new Button { Text = btn2Text },
-                                               new Button { Text = btn3Text },
-                                               new Button { Text = btn4Text }
-                                              );
-        TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
-        End (runstate);
-        dlg.Dispose ();
-
         // Right
         buttonRow = $"{CM.Glyphs.VLine}  {btn1} {btn2} {btn3} {btn4}{CM.Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
-        (runstate, dlg) = RunButtonTestDialog (
-                                               title,
-                                               width,
-                                               Alignment.End,
-                                               new Button { Text = btn1Text },
-                                               new Button { Text = btn2Text },
-                                               new Button { Text = btn3Text },
-                                               new Button { Text = btn4Text }
-                                              );
+        (runstate, dlg) = BeginButtonTestDialog (
+                                                      title,
+                                                      width,
+                                                      Alignment.End,
+                                                      new Button { Text = btn1Text },
+                                                      new Button { Text = btn2Text },
+                                                      new Button { Text = btn3Text },
+                                                      new Button { Text = btn4Text }
+                                                     );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -211,15 +221,15 @@ public class DialogTests
         buttonRow = $"{CM.Glyphs.VLine}{btn1} {btn2} {btn3} {btn4}  {CM.Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
-        (runstate, dlg) = RunButtonTestDialog (
-                                               title,
-                                               width,
-                                               Alignment.Start,
-                                               new Button { Text = btn1Text },
-                                               new Button { Text = btn2Text },
-                                               new Button { Text = btn3Text },
-                                               new Button { Text = btn4Text }
-                                              );
+        (runstate, dlg) = BeginButtonTestDialog (
+                                                      title,
+                                                      width,
+                                                      Alignment.Start,
+                                                      new Button { Text = btn1Text },
+                                                      new Button { Text = btn2Text },
+                                                      new Button { Text = btn3Text },
+                                                      new Button { Text = btn4Text }
+                                                     );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -255,7 +265,7 @@ public class DialogTests
         buttonRow =
             $"{CM.Glyphs.VLine} yes {CM.Glyphs.RightBracket}{btn2}{btn3}{CM.Glyphs.LeftBracket} never{CM.Glyphs.VLine}";
 
-        (runstate, Dialog dlg) = RunButtonTestDialog (
+        (runstate, Dialog dlg) = BeginButtonTestDialog (
                                                       title,
                                                       width,
                                                       Alignment.Center,
@@ -273,15 +283,15 @@ public class DialogTests
         buttonRow =
             $"{CM.Glyphs.VLine}{CM.Glyphs.LeftBracket} yes {CM.Glyphs.LeftBracket} no {CM.Glyphs.LeftBracket} maybe {CM.Glyphs.LeftBracket} never {CM.Glyphs.RightBracket}{CM.Glyphs.VLine}";
 
-        (runstate, dlg) = RunButtonTestDialog (
-                                               title,
-                                               width,
-                                               Alignment.Fill,
-                                               new Button { Text = btn1Text },
-                                               new Button { Text = btn2Text },
-                                               new Button { Text = btn3Text },
-                                               new Button { Text = btn4Text }
-                                              );
+        (runstate, dlg) = BeginButtonTestDialog (
+                                                    title,
+                                                    width,
+                                                    Alignment.Fill,
+                                                    new Button { Text = btn1Text },
+                                                    new Button { Text = btn2Text },
+                                                    new Button { Text = btn3Text },
+                                                    new Button { Text = btn4Text }
+                                                   );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -290,15 +300,15 @@ public class DialogTests
         buttonRow = $"{CM.Glyphs.VLine}es {CM.Glyphs.RightBracket}{btn2}{btn3}{btn4}{CM.Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
-        (runstate, dlg) = RunButtonTestDialog (
-                                               title,
-                                               width,
-                                               Alignment.End,
-                                               new Button { Text = btn1Text },
-                                               new Button { Text = btn2Text },
-                                               new Button { Text = btn3Text },
-                                               new Button { Text = btn4Text }
-                                              );
+        (runstate, dlg) = BeginButtonTestDialog (
+                                                    title,
+                                                    width,
+                                                    Alignment.End,
+                                                    new Button { Text = btn1Text },
+                                                    new Button { Text = btn2Text },
+                                                    new Button { Text = btn3Text },
+                                                    new Button { Text = btn4Text }
+                                                   );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -306,15 +316,15 @@ public class DialogTests
         // Left
         buttonRow = $"{CM.Glyphs.VLine}{btn1}{btn2}{btn3}{CM.Glyphs.LeftBracket} neve{CM.Glyphs.VLine}";
 
-        (runstate, dlg) = RunButtonTestDialog (
-                                               title,
-                                               width,
-                                               Alignment.Start,
-                                               new Button { Text = btn1Text },
-                                               new Button { Text = btn2Text },
-                                               new Button { Text = btn3Text },
-                                               new Button { Text = btn4Text }
-                                              );
+        (runstate, dlg) = BeginButtonTestDialog (
+                                                    title,
+                                                    width,
+                                                    Alignment.Start,
+                                                    new Button { Text = btn1Text },
+                                                    new Button { Text = btn2Text },
+                                                    new Button { Text = btn3Text },
+                                                    new Button { Text = btn4Text }
+                                                   );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -349,15 +359,15 @@ public class DialogTests
         d.SetBufferSize (buttonRow.Length, 1);
 
         // Default - Center
-        (runstate, Dialog dlg) = RunButtonTestDialog (
-                                                      title,
-                                                      width,
-                                                      Alignment.Center,
-                                                      new Button { Text = btn1Text },
-                                                      new Button { Text = btn2Text },
-                                                      new Button { Text = btn3Text },
-                                                      new Button { Text = btn4Text }
-                                                     );
+        (runstate, Dialog dlg) = BeginButtonTestDialog (
+                                                    title,
+                                                    width,
+                                                    Alignment.Center,
+                                                    new Button { Text = btn1Text },
+                                                    new Button { Text = btn2Text },
+                                                    new Button { Text = btn3Text },
+                                                    new Button { Text = btn4Text }
+                                                   );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -366,15 +376,15 @@ public class DialogTests
         buttonRow = $"{CM.Glyphs.VLine}{btn1}     {btn2}     {btn3}     {btn4}{CM.Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
-        (runstate, dlg) = RunButtonTestDialog (
-                                               title,
-                                               width,
-                                               Alignment.Fill,
-                                               new Button { Text = btn1Text },
-                                               new Button { Text = btn2Text },
-                                               new Button { Text = btn3Text },
-                                               new Button { Text = btn4Text }
-                                              );
+        (runstate, dlg) = BeginButtonTestDialog (
+                                                    title,
+                                                    width,
+                                                    Alignment.Fill,
+                                                    new Button { Text = btn1Text },
+                                                    new Button { Text = btn2Text },
+                                                    new Button { Text = btn3Text },
+                                                    new Button { Text = btn4Text }
+                                                   );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -383,15 +393,15 @@ public class DialogTests
         buttonRow = $"{CM.Glyphs.VLine}            {btn1} {btn2} {btn3} {btn4}{CM.Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
-        (runstate, dlg) = RunButtonTestDialog (
-                                               title,
-                                               width,
-                                               Alignment.End,
-                                               new Button { Text = btn1Text },
-                                               new Button { Text = btn2Text },
-                                               new Button { Text = btn3Text },
-                                               new Button { Text = btn4Text }
-                                              );
+        (runstate, dlg) = BeginButtonTestDialog (
+                                                    title,
+                                                    width,
+                                                    Alignment.End,
+                                                    new Button { Text = btn1Text },
+                                                    new Button { Text = btn2Text },
+                                                    new Button { Text = btn3Text },
+                                                    new Button { Text = btn4Text }
+                                                   );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -400,15 +410,15 @@ public class DialogTests
         buttonRow = $"{CM.Glyphs.VLine}{btn1} {btn2} {btn3} {btn4}            {CM.Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
-        (runstate, dlg) = RunButtonTestDialog (
-                                               title,
-                                               width,
-                                               Alignment.Start,
-                                               new Button { Text = btn1Text },
-                                               new Button { Text = btn2Text },
-                                               new Button { Text = btn3Text },
-                                               new Button { Text = btn4Text }
-                                              );
+        (runstate, dlg) = BeginButtonTestDialog (
+                                                    title,
+                                                    width,
+                                                    Alignment.Start,
+                                                    new Button { Text = btn1Text },
+                                                    new Button { Text = btn2Text },
+                                                    new Button { Text = btn3Text },
+                                                    new Button { Text = btn4Text }
+                                                   );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -445,15 +455,15 @@ public class DialogTests
         d.SetBufferSize (width, 3);
 
         // Default - Center
-        (runstate, Dialog dlg) = RunButtonTestDialog (
-                                                      title,
-                                                      width,
-                                                      Alignment.Center,
-                                                      new Button { Text = btn1Text },
-                                                      new Button { Text = btn2Text },
-                                                      new Button { Text = btn3Text },
-                                                      new Button { Text = btn4Text }
-                                                     );
+        (runstate, Dialog dlg) = BeginButtonTestDialog (
+                                                    title,
+                                                    width,
+                                                    Alignment.Center,
+                                                    new Button { Text = btn1Text },
+                                                    new Button { Text = btn2Text },
+                                                    new Button { Text = btn3Text },
+                                                    new Button { Text = btn4Text }
+                                                   );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -462,15 +472,15 @@ public class DialogTests
         buttonRow = $"{CM.Glyphs.VLine}{btn1}     {btn2}     {btn3}     {btn4}{CM.Glyphs.VLine}";
         Assert.Equal (width, buttonRow.GetColumns ());
 
-        (runstate, dlg) = RunButtonTestDialog (
-                                               title,
-                                               width,
-                                               Alignment.Fill,
-                                               new Button { Text = btn1Text },
-                                               new Button { Text = btn2Text },
-                                               new Button { Text = btn3Text },
-                                               new Button { Text = btn4Text }
-                                              );
+        (runstate, dlg) = BeginButtonTestDialog (
+                                                    title,
+                                                    width,
+                                                    Alignment.Fill,
+                                                    new Button { Text = btn1Text },
+                                                    new Button { Text = btn2Text },
+                                                    new Button { Text = btn3Text },
+                                                    new Button { Text = btn4Text }
+                                                   );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -479,15 +489,15 @@ public class DialogTests
         buttonRow = $"{CM.Glyphs.VLine}            {btn1} {btn2} {btn3} {btn4}{CM.Glyphs.VLine}";
         Assert.Equal (width, buttonRow.GetColumns ());
 
-        (runstate, dlg) = RunButtonTestDialog (
-                                               title,
-                                               width,
-                                               Alignment.End,
-                                               new Button { Text = btn1Text },
-                                               new Button { Text = btn2Text },
-                                               new Button { Text = btn3Text },
-                                               new Button { Text = btn4Text }
-                                              );
+        (runstate, dlg) = BeginButtonTestDialog (
+                                                    title,
+                                                    width,
+                                                    Alignment.End,
+                                                    new Button { Text = btn1Text },
+                                                    new Button { Text = btn2Text },
+                                                    new Button { Text = btn3Text },
+                                                    new Button { Text = btn4Text }
+                                                   );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -496,15 +506,15 @@ public class DialogTests
         buttonRow = $"{CM.Glyphs.VLine}{btn1} {btn2} {btn3} {btn4}            {CM.Glyphs.VLine}";
         Assert.Equal (width, buttonRow.GetColumns ());
 
-        (runstate, dlg) = RunButtonTestDialog (
-                                               title,
-                                               width,
-                                               Alignment.Start,
-                                               new Button { Text = btn1Text },
-                                               new Button { Text = btn2Text },
-                                               new Button { Text = btn3Text },
-                                               new Button { Text = btn4Text }
-                                              );
+        (runstate, dlg) = BeginButtonTestDialog (
+                                                    title,
+                                                    width,
+                                                    Alignment.Start,
+                                                    new Button { Text = btn1Text },
+                                                    new Button { Text = btn2Text },
+                                                    new Button { Text = btn3Text },
+                                                    new Button { Text = btn4Text }
+                                                   );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -530,12 +540,12 @@ public class DialogTests
 
         d.SetBufferSize (width, 1);
 
-        (runstate, Dialog dlg) = RunButtonTestDialog (
-                                                      title,
-                                                      width,
-                                                      Alignment.Center,
-                                                      new Button { Text = btnText }
-                                                     );
+        (runstate, Dialog dlg) = BeginButtonTestDialog (
+                                                    title,
+                                                    width,
+                                                    Alignment.Center,
+                                                    new Button { Text = btnText }
+                                                   );
 
         // Center
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
@@ -547,12 +557,12 @@ public class DialogTests
             $"{CM.Glyphs.VLine}{CM.Glyphs.LeftBracket} {btnText} {CM.Glyphs.RightBracket}    {CM.Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
-        (runstate, dlg) = RunButtonTestDialog (
-                                               title,
-                                               width,
-                                               Alignment.Fill,
-                                               new Button { Text = btnText }
-                                              );
+        (runstate, dlg) = BeginButtonTestDialog (
+                                                    title,
+                                                    width,
+                                                    Alignment.Fill,
+                                                    new Button { Text = btnText }
+                                                   );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -562,12 +572,12 @@ public class DialogTests
             $"{CM.Glyphs.VLine}    {CM.Glyphs.LeftBracket} {btnText} {CM.Glyphs.RightBracket}{CM.Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
-        (runstate, dlg) = RunButtonTestDialog (
-                                               title,
-                                               width,
-                                               Alignment.End,
-                                               new Button { Text = btnText }
-                                              );
+        (runstate, dlg) = BeginButtonTestDialog (
+                                                    title,
+                                                    width,
+                                                    Alignment.End,
+                                                    new Button { Text = btnText }
+                                                   );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -577,12 +587,12 @@ public class DialogTests
             $"{CM.Glyphs.VLine}{CM.Glyphs.LeftBracket} {btnText} {CM.Glyphs.RightBracket}    {CM.Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
-        (runstate, dlg) = RunButtonTestDialog (
-                                               title,
-                                               width,
-                                               Alignment.Start,
-                                               new Button { Text = btnText }
-                                              );
+        (runstate, dlg) = BeginButtonTestDialog (
+                                                    title,
+                                                    width,
+                                                    Alignment.Start,
+                                                    new Button { Text = btnText }
+                                                   );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -594,12 +604,12 @@ public class DialogTests
 
         d.SetBufferSize (width, 1);
 
-        (runstate, dlg) = RunButtonTestDialog (
-                                               title,
-                                               width,
-                                               Alignment.Center,
-                                               new Button { Text = btnText }
-                                              );
+        (runstate, dlg) = BeginButtonTestDialog (
+                                                    title,
+                                                    width,
+                                                    Alignment.Center,
+                                                    new Button { Text = btnText }
+                                                   );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -609,12 +619,12 @@ public class DialogTests
             $"{CM.Glyphs.VLine}{CM.Glyphs.LeftBracket} {btnText} {CM.Glyphs.RightBracket}      {CM.Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
-        (runstate, dlg) = RunButtonTestDialog (
-                                               title,
-                                               width,
-                                               Alignment.Fill,
-                                               new Button { Text = btnText }
-                                              );
+        (runstate, dlg) = BeginButtonTestDialog (
+                                                    title,
+                                                    width,
+                                                    Alignment.Fill,
+                                                    new Button { Text = btnText }
+                                                   );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -624,12 +634,12 @@ public class DialogTests
             $"{CM.Glyphs.VLine}      {CM.Glyphs.LeftBracket} {btnText} {CM.Glyphs.RightBracket}{CM.Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
-        (runstate, dlg) = RunButtonTestDialog (
-                                               title,
-                                               width,
-                                               Alignment.End,
-                                               new Button { Text = btnText }
-                                              );
+        (runstate, dlg) = BeginButtonTestDialog (
+                                                    title,
+                                                    width,
+                                                    Alignment.End,
+                                                    new Button { Text = btnText }
+                                                   );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -639,12 +649,12 @@ public class DialogTests
             $"{CM.Glyphs.VLine}{CM.Glyphs.LeftBracket} {btnText} {CM.Glyphs.RightBracket}      {CM.Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
-        (runstate, dlg) = RunButtonTestDialog (
-                                               title,
-                                               width,
-                                               Alignment.Start,
-                                               new Button { Text = btnText }
-                                              );
+        (runstate, dlg) = BeginButtonTestDialog (
+                                                    title,
+                                                    width,
+                                                    Alignment.Start,
+                                                    new Button { Text = btnText }
+                                                   );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -675,14 +685,14 @@ public class DialogTests
 
         d.SetBufferSize (buttonRow.Length, 3);
 
-        (runstate, Dialog dlg) = RunButtonTestDialog (
-                                                      title,
-                                                      width,
-                                                      Alignment.Center,
-                                                      new Button { Text = btn1Text },
-                                                      new Button { Text = btn2Text },
-                                                      new Button { Text = btn3Text }
-                                                     );
+        (runstate, Dialog dlg) = BeginButtonTestDialog (
+                                                    title,
+                                                    width,
+                                                    Alignment.Center,
+                                                    new Button { Text = btn1Text },
+                                                    new Button { Text = btn2Text },
+                                                    new Button { Text = btn3Text }
+                                                   );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -691,14 +701,14 @@ public class DialogTests
         buttonRow = $@"{CM.Glyphs.VLine}{btn1}  {btn2}  {btn3}{CM.Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
-        (runstate, dlg) = RunButtonTestDialog (
-                                               title,
-                                               width,
-                                               Alignment.Fill,
-                                               new Button { Text = btn1Text },
-                                               new Button { Text = btn2Text },
-                                               new Button { Text = btn3Text }
-                                              );
+        (runstate, dlg) = BeginButtonTestDialog (
+                                                    title,
+                                                    width,
+                                                    Alignment.Fill,
+                                                    new Button { Text = btn1Text },
+                                                    new Button { Text = btn2Text },
+                                                    new Button { Text = btn3Text }
+                                                   );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -707,14 +717,14 @@ public class DialogTests
         buttonRow = $@"{CM.Glyphs.VLine}  {btn1} {btn2} {btn3}{CM.Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
-        (runstate, dlg) = RunButtonTestDialog (
-                                               title,
-                                               width,
-                                               Alignment.End,
-                                               new Button { Text = btn1Text },
-                                               new Button { Text = btn2Text },
-                                               new Button { Text = btn3Text }
-                                              );
+        (runstate, dlg) = BeginButtonTestDialog (
+                                                    title,
+                                                    width,
+                                                    Alignment.End,
+                                                    new Button { Text = btn1Text },
+                                                    new Button { Text = btn2Text },
+                                                    new Button { Text = btn3Text }
+                                                   );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -723,14 +733,14 @@ public class DialogTests
         buttonRow = $@"{CM.Glyphs.VLine}{btn1} {btn2} {btn3}  {CM.Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
-        (runstate, dlg) = RunButtonTestDialog (
-                                               title,
-                                               width,
-                                               Alignment.Start,
-                                               new Button { Text = btn1Text },
-                                               new Button { Text = btn2Text },
-                                               new Button { Text = btn3Text }
-                                              );
+        (runstate, dlg) = BeginButtonTestDialog (
+                                                    title,
+                                                    width,
+                                                    Alignment.Start,
+                                                    new Button { Text = btn1Text },
+                                                    new Button { Text = btn2Text },
+                                                    new Button { Text = btn3Text }
+                                                   );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -759,13 +769,13 @@ public class DialogTests
 
         d.SetBufferSize (buttonRow.Length, 3);
 
-        (runstate, Dialog dlg) = RunButtonTestDialog (
-                                                      title,
-                                                      width,
-                                                      Alignment.Center,
-                                                      new Button { Text = btn1Text },
-                                                      new Button { Text = btn2Text }
-                                                     );
+        (runstate, Dialog dlg) = BeginButtonTestDialog (
+                                                    title,
+                                                    width,
+                                                    Alignment.Center,
+                                                    new Button { Text = btn1Text },
+                                                    new Button { Text = btn2Text }
+                                                   );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -774,13 +784,13 @@ public class DialogTests
         buttonRow = $@"{CM.Glyphs.VLine}{btn1}   {btn2}{CM.Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
-        (runstate, dlg) = RunButtonTestDialog (
-                                               title,
-                                               width,
-                                               Alignment.Fill,
-                                               new Button { Text = btn1Text },
-                                               new Button { Text = btn2Text }
-                                              );
+        (runstate, dlg) = BeginButtonTestDialog (
+                                                    title,
+                                                    width,
+                                                    Alignment.Fill,
+                                                    new Button { Text = btn1Text },
+                                                    new Button { Text = btn2Text }
+                                                   );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -789,13 +799,13 @@ public class DialogTests
         buttonRow = $@"{CM.Glyphs.VLine}  {btn1} {btn2}{CM.Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
-        (runstate, dlg) = RunButtonTestDialog (
-                                               title,
-                                               width,
-                                               Alignment.End,
-                                               new Button { Text = btn1Text },
-                                               new Button { Text = btn2Text }
-                                              );
+        (runstate, dlg) = BeginButtonTestDialog (
+                                                    title,
+                                                    width,
+                                                    Alignment.End,
+                                                    new Button { Text = btn1Text },
+                                                    new Button { Text = btn2Text }
+                                                   );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -804,13 +814,13 @@ public class DialogTests
         buttonRow = $@"{CM.Glyphs.VLine}{btn1} {btn2}  {CM.Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
-        (runstate, dlg) = RunButtonTestDialog (
-                                               title,
-                                               width,
-                                               Alignment.Start,
-                                               new Button { Text = btn1Text },
-                                               new Button { Text = btn2Text }
-                                              );
+        (runstate, dlg) = BeginButtonTestDialog (
+                                                    title,
+                                                    width,
+                                                    Alignment.Start,
+                                                    new Button { Text = btn1Text },
+                                                    new Button { Text = btn2Text }
+                                                   );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -844,11 +854,11 @@ public class DialogTests
         Button button1, button2;
 
         // Default (Center)
-        button1 = new() { Text = btn1Text };
-        button2 = new() { Text = btn2Text };
-        (runstate, dlg) = RunButtonTestDialog (title, width, Alignment.Center, button1, button2);
+        button1 = new Button { Text = btn1Text };
+        button2 = new Button { Text = btn2Text };
+        (runstate, dlg) = BeginButtonTestDialog (title, width, Alignment.Center, button1, button2);
         button1.Visible = false;
-        RunIteration (ref runstate, ref firstIteration);
+        RunIteration (ref runstate, firstIteration);
         buttonRow = $@"{CM.Glyphs.VLine}         {btn2} {CM.Glyphs.VLine}";
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
@@ -856,11 +866,11 @@ public class DialogTests
 
         // Justify
         Assert.Equal (width, buttonRow.Length);
-        button1 = new() { Text = btn1Text };
-        button2 = new() { Text = btn2Text };
-        (runstate, dlg) = RunButtonTestDialog (title, width, Alignment.Fill, button1, button2);
+        button1 = new Button { Text = btn1Text };
+        button2 = new Button { Text = btn2Text };
+        (runstate, dlg) = BeginButtonTestDialog (title, width, Alignment.Fill, button1, button2);
         button1.Visible = false;
-        RunIteration (ref runstate, ref firstIteration);
+        RunIteration (ref runstate, firstIteration);
         buttonRow = $@"{CM.Glyphs.VLine}          {btn2}{CM.Glyphs.VLine}";
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
@@ -868,22 +878,22 @@ public class DialogTests
 
         // Right
         Assert.Equal (width, buttonRow.Length);
-        button1 = new() { Text = btn1Text };
-        button2 = new() { Text = btn2Text };
-        (runstate, dlg) = RunButtonTestDialog (title, width, Alignment.End, button1, button2);
+        button1 = new Button { Text = btn1Text };
+        button2 = new Button { Text = btn2Text };
+        (runstate, dlg) = BeginButtonTestDialog (title, width, Alignment.End, button1, button2);
         button1.Visible = false;
-        RunIteration (ref runstate, ref firstIteration);
+        RunIteration (ref runstate, firstIteration);
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
 
         // Left
         Assert.Equal (width, buttonRow.Length);
-        button1 = new() { Text = btn1Text };
-        button2 = new() { Text = btn2Text };
-        (runstate, dlg) = RunButtonTestDialog (title, width, Alignment.Start, button1, button2);
+        button1 = new Button { Text = btn1Text };
+        button2 = new Button { Text = btn2Text };
+        (runstate, dlg) = BeginButtonTestDialog (title, width, Alignment.Start, button1, button2);
         button1.Visible = false;
-        RunIteration (ref runstate, ref firstIteration);
+        RunIteration (ref runstate, firstIteration);
         buttonRow = $@"{CM.Glyphs.VLine}        {btn2}  {CM.Glyphs.VLine}";
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
@@ -922,7 +932,7 @@ public class DialogTests
 
                           dlg.Loaded += (s, a) =>
                                         {
-                                            Refresh ();
+                                            LayoutAndDraw ();
 
                                             var expected = @$"
 ┌──────────────────┐
@@ -1027,6 +1037,8 @@ public class DialogTests
                          }
                          else if (iterations == 1)
                          {
+                             LayoutAndDraw ();
+
                              // BUGBUG: This seems wrong; is it a bug in Dim.Percent(85)?? No
                              _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
                          }
@@ -1092,13 +1104,23 @@ public class DialogTests
                      {
                          iterations++;
 
-                         if (iterations == 0)
+                         switch (iterations)
                          {
-                             Assert.False (btn1.NewKeyDownEvent (Key.Space));
-                         }
-                         else if (iterations == 1)
-                         {
-                             expected = @$"
+                             case 0:
+                                 Top.SetNeedsLayout();
+                                 Top.SetNeedsDraw();
+                                 LayoutAndDraw ();
+
+                                 break;
+
+                             case 1:
+                                 Assert.False (btn1.NewKeyDownEvent (Key.Space));
+
+                                 break;
+                             case 2:
+                                 LayoutAndDraw ();
+
+                                 expected = @$"
   ┌───────────────────────┐
   │                       │
   │                       │
@@ -1107,14 +1129,16 @@ public class DialogTests
   │                       │
   │{CM.Glyphs.LeftBracket} Show Sub {CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Close {CM.Glyphs.RightBracket} │
   └───────────────────────┘";
-                             TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+                                 TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
-                             Assert.False (btn2.NewKeyDownEvent (Key.Space));
-                         }
-                         else if (iterations == 2)
-                         {
-                             TestHelpers.AssertDriverContentsWithFrameAre (
-                                                                           @$"
+                                 Assert.False (btn2.NewKeyDownEvent (Key.Space));
+
+                                 break;
+                             case 3:
+                                 LayoutAndDraw ();
+
+                                 TestHelpers.AssertDriverContentsWithFrameAre (
+                                                                               @$"
   ┌───────────────────────┐
   │  ┌──────────────────┐ │
   │  │ya                │ │
@@ -1123,29 +1147,33 @@ public class DialogTests
   │  └──────────────────┘ │
   │{CM.Glyphs.LeftBracket} Show Sub {CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Close {CM.Glyphs.RightBracket} │
   └───────────────────────┘",
-                                                                           _output
-                                                                          );
+                                                                               _output
+                                                                              );
 
-                             Assert.False (Top.NewKeyDownEvent (Key.Enter));
-                         }
-                         else if (iterations == 3)
-                         {
-                             TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+                                 Assert.False (Top!.NewKeyDownEvent (Key.Enter));
 
-                             Assert.False (btn3.NewKeyDownEvent (Key.Space));
-                         }
-                         else if (iterations == 4)
-                         {
-                             TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
+                                 break;
+                             case 4:
+                                 LayoutAndDraw ();
 
-                             RequestStop ();
+                                 TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+
+                                 Assert.False (btn3.NewKeyDownEvent (Key.Space));
+
+                                 break;
+                             case 5:
+                                 TestHelpers.AssertDriverContentsWithFrameAre ("", _output);
+
+                                 RequestStop ();
+
+                                 break;
                          }
                      };
 
         Run ().Dispose ();
         Shutdown ();
 
-        Assert.Equal (4, iterations);
+        Assert.Equal (5, iterations);
     }
 
     [Fact]
@@ -1243,12 +1271,12 @@ public class DialogTests
         int width = buttonRow.Length;
         d.SetBufferSize (buttonRow.Length, 10);
 
-        (runstate, Dialog dlg) = RunButtonTestDialog (
-                                                      title,
-                                                      width,
-                                                      Alignment.Center,
-                                                      new Button { Text = btnText }
-                                                     );
+        (runstate, Dialog dlg) = BeginButtonTestDialog (
+                                                    title,
+                                                    width,
+                                                    Alignment.Center,
+                                                    new Button { Text = btnText }
+                                                   );
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -1302,14 +1330,15 @@ public class DialogTests
         int width = buttonRow.Length;
         d.SetBufferSize (buttonRow.Length, 3);
 
-        (runstate, Dialog dlg) = RunButtonTestDialog (title, width, Alignment.Center, null);
+        (runstate, Dialog dlg) = BeginButtonTestDialog (title, width, Alignment.Center, null);
+
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
 
         End (runstate);
         dlg.Dispose ();
     }
 
-    private (RunState, Dialog) RunButtonTestDialog (
+    private (RunState, Dialog) BeginButtonTestDialog (
         string title,
         int width,
         Alignment align,
@@ -1336,7 +1365,14 @@ public class DialogTests
         // Create with no top or bottom border to simplify testing button layout (no need to account for title etc..)
         dlg.Border.Thickness = new (1, 0, 1, 0);
 
-        return (Begin (dlg), dlg);
+        RunState runState = Begin (dlg);
+
+        dlg.SetNeedsDraw();
+        dlg.SetNeedsLayout ();
+        dlg.Layout ();
+        dlg.Draw ();
+
+        return (runState, dlg);
     }
 
     [Fact]

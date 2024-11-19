@@ -67,6 +67,51 @@ public class Border : Adornment
 
         HighlightStyle |= HighlightStyle.Pressed;
         Highlight += Border_Highlight;
+
+        ThicknessChanged += OnThicknessChanged;
+    }
+
+    // TODO: Move DrawIndicator out of Border and into View
+
+    private void OnThicknessChanged (object? sender, EventArgs e)
+    {
+        if (IsInitialized)
+        {
+            ShowHideDrawIndicator ();
+        }
+    }
+    private void ShowHideDrawIndicator ()
+    {
+        if (View.Diagnostics.HasFlag (ViewDiagnosticFlags.DrawIndicator) && Thickness != Thickness.Empty)
+        {
+            if (DrawIndicator is null)
+            {
+                DrawIndicator = new SpinnerView ()
+                {
+                    Id = "DrawIndicator",
+                    X = 1,
+                    Style = new SpinnerStyle.Dots2 (),
+                    SpinDelay = 0,
+                    Visible = false
+                };
+                Add (DrawIndicator);
+            }
+        }
+        else if (DrawIndicator is { })
+        {
+            Remove (DrawIndicator);
+            DrawIndicator!.Dispose ();
+            DrawIndicator = null;
+        }
+    }
+
+    internal void AdvanceDrawIndicator ()
+    {
+        if (View.Diagnostics.HasFlag (ViewDiagnosticFlags.DrawIndicator) && DrawIndicator is { })
+        {
+            DrawIndicator.AdvanceAnimation (false);
+            DrawIndicator.Render ();
+        }
     }
 
 #if SUBVIEW_BASED_BORDER
@@ -83,6 +128,7 @@ public class Border : Adornment
     {
         base.BeginInit ();
 
+        ShowHideDrawIndicator ();
 #if SUBVIEW_BASED_BORDER
         if (Parent is { })
         {
@@ -133,19 +179,11 @@ public class Border : Adornment
     /// </summary>
     public override ColorScheme? ColorScheme
     {
-        get
-        {
-            if (base.ColorScheme is { })
-            {
-                return base.ColorScheme;
-            }
-
-            return Parent?.ColorScheme;
-        }
+        get => base.ColorScheme ?? Parent?.ColorScheme;
         set
         {
             base.ColorScheme = value;
-            Parent?.SetNeedsDisplay ();
+            Parent?.SetNeedsDraw ();
         }
     }
 
@@ -194,7 +232,7 @@ public class Border : Adornment
             // TODO: Make Border.LineStyle inherit from the SuperView hierarchy
             // TODO: Right now, Window and FrameView use CM to set BorderStyle, which negates
             // TODO: all this.
-            return Parent!.SuperView?.BorderStyle ?? LineStyle.None;
+            return Parent?.SuperView?.BorderStyle ?? LineStyle.None;
         }
         set => _lineStyle = value;
     }
@@ -216,7 +254,7 @@ public class Border : Adornment
 
             _settings = value;
 
-            Parent?.SetNeedsDisplay ();
+            Parent?.SetNeedsDraw ();
         }
     }
 
@@ -257,7 +295,7 @@ public class Border : Adornment
             ColorScheme = cs;
         }
 
-        Parent?.SetNeedsDisplay ();
+        Parent?.SetNeedsDraw ();
         e.Cancel = true;
     }
 
@@ -269,9 +307,9 @@ public class Border : Adornment
     {
         // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/3312
         if (!_dragPosition.HasValue && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)
-                                    // HACK: Prevents Window from being draggable if it's Top
-                                    //&& Parent is Toplevel { Modal: true }
-                                    )
+                                // HACK: Prevents Window from being draggable if it's Top
+                                //&& Parent is Toplevel { Modal: true }
+                                )
         {
             Parent!.SetFocus ();
 
@@ -439,11 +477,11 @@ public class Border : Adornment
                 if (Parent!.SuperView is null)
                 {
                     // Redraw the entire app window.
-                    Application.Top!.SetNeedsDisplay ();
+                    Application.Top!.SetNeedsDraw ();
                 }
                 else
                 {
-                    Parent.SuperView.SetNeedsDisplay ();
+                    Parent.SuperView.SetNeedsDraw ();
                 }
 
                 _dragPosition = mouseEvent.Position;
@@ -451,8 +489,8 @@ public class Border : Adornment
                 Point parentLoc = Parent.SuperView?.ScreenToViewport (new (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y))
                                   ?? mouseEvent.ScreenPosition;
 
-                int minHeight = Thickness.Vertical + Parent!.Margin.Thickness.Bottom;
-                int minWidth = Thickness.Horizontal + Parent!.Margin.Thickness.Right;
+                int minHeight = Thickness.Vertical + Parent!.Margin!.Thickness.Bottom;
+                int minWidth = Thickness.Horizontal + Parent!.Margin!.Thickness.Right;
 
                 // TODO: This code can be refactored to be more readable and maintainable.
                 switch (_arranging)
@@ -567,7 +605,6 @@ public class Border : Adornment
 
                         break;
                 }
-                Application.Refresh ();
 
                 return true;
             }
@@ -606,19 +643,14 @@ public class Border : Adornment
     #endregion Mouse Support
 
     /// <inheritdoc/>
-    public override void OnDrawContent (Rectangle viewport)
+    protected override bool OnDrawingContent ()
     {
-        base.OnDrawContent (viewport);
-
         if (Thickness == Thickness.Empty)
         {
-            return;
+            return true;
         }
 
-        //Driver.SetAttribute (Colors.ColorSchemes ["Error"].Normal);
-        Rectangle screenBounds = ViewportToScreen (viewport);
-
-        //OnDrawSubviews (bounds); 
+        Rectangle screenBounds = ViewportToScreen (Viewport);
 
         // TODO: v2 - this will eventually be two controls: "BorderView" and "Label" (for the title)
 
@@ -635,12 +667,15 @@ public class Border : Adornment
         int maxTitleWidth = Math.Max (
                                       0,
                                       Math.Min (
-                                                Parent!.TitleTextFormatter.FormatAndGetSize ().Width,
+                                                Parent?.TitleTextFormatter.FormatAndGetSize ().Width ?? 0,
                                                 Math.Min (screenBounds.Width - 4, borderBounds.Width - 4)
                                                )
                                      );
 
-        Parent.TitleTextFormatter.ConstrainToSize = new (maxTitleWidth, 1);
+        if (Parent is { })
+        {
+            Parent.TitleTextFormatter.ConstrainToSize = new (maxTitleWidth, 1);
+        }
 
         int sideLineLength = borderBounds.Height;
         bool canDrawBorder = borderBounds is { Width: > 0, Height: > 0 };
@@ -679,20 +714,22 @@ public class Border : Adornment
             }
         }
 
-        if (canDrawBorder && Thickness.Top > 0 && maxTitleWidth > 0 && Settings.FastHasFlags (BorderSettings.Title) && !string.IsNullOrEmpty (Parent?.Title))
+        if (Parent is { } && canDrawBorder && Thickness.Top > 0 && maxTitleWidth > 0 && Settings.FastHasFlags (BorderSettings.Title) && !string.IsNullOrEmpty (Parent?.Title))
         {
             Attribute focus = Parent.GetNormalColor ();
 
             if (Parent.SuperView is { } && Parent.SuperView?.Subviews!.Count (s => s.CanFocus) > 1)
             {
                 // Only use focus color if there are multiple focusable views
-                focus = Parent.GetFocusColor ();
+                focus = GetFocusColor ();
             }
 
-            Parent.TitleTextFormatter.Draw (
-                                            new (borderBounds.X + 2, titleY, maxTitleWidth, 1),
-                                            Parent.HasFocus ? focus : Parent.GetNormalColor (),
-                                            Parent.HasFocus ? focus : Parent.GetHotNormalColor ());
+            Rectangle titleRect = new (borderBounds.X + 2, titleY, maxTitleWidth, 1);
+            Parent.TitleTextFormatter.Draw (titleRect
+                                           ,
+                                            Parent.HasFocus ? focus : GetNormalColor (),
+                                            Parent.HasFocus ? focus : GetHotNormalColor ());
+            Parent?.LineCanvas.Exclude(new(titleRect));
         }
 
         if (canDrawBorder && LineStyle != LineStyle.None)
@@ -704,15 +741,15 @@ public class Border : Adornment
             bool drawBottom = Thickness.Bottom > 0 && Frame.Width > 1 && Frame.Height > 1;
             bool drawRight = Thickness.Right > 0 && (Frame.Height > 1 || Thickness.Top == 0);
 
-            Attribute prevAttr = Driver.GetAttribute ();
+            Attribute prevAttr = Driver?.GetAttribute () ?? Attribute.Default;
 
             if (ColorScheme is { })
             {
-                Driver.SetAttribute (GetNormalColor ());
+                SetAttribute (GetNormalColor ());
             }
             else
             {
-                Driver.SetAttribute (Parent!.GetNormalColor ());
+                SetAttribute (Parent!.GetNormalColor ());
             }
 
             if (drawTop)
@@ -727,7 +764,7 @@ public class Border : Adornment
                                  borderBounds.Width,
                                  Orientation.Horizontal,
                                  lineStyle,
-                                 Driver.GetAttribute ()
+                                 Driver?.GetAttribute ()
                                 );
                 }
                 else
@@ -742,7 +779,7 @@ public class Border : Adornment
                                      Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                      Orientation.Horizontal,
                                      lineStyle,
-                                     Driver.GetAttribute ()
+                                     Driver?.GetAttribute ()
                                     );
                     }
 
@@ -756,7 +793,7 @@ public class Border : Adornment
                                      Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                      Orientation.Horizontal,
                                      lineStyle,
-                                     Driver.GetAttribute ()
+                                     Driver?.GetAttribute ()
                                     );
 
                         lc?.AddLine (
@@ -764,7 +801,7 @@ public class Border : Adornment
                                      Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                      Orientation.Horizontal,
                                      lineStyle,
-                                     Driver.GetAttribute ()
+                                     Driver?.GetAttribute ()
                                     );
                     }
 
@@ -775,7 +812,7 @@ public class Border : Adornment
                                  2,
                                  Orientation.Horizontal,
                                  lineStyle,
-                                 Driver.GetAttribute ()
+                                 Driver?.GetAttribute ()
                                 );
 
                     // Add a vert line for ╔╡
@@ -784,7 +821,7 @@ public class Border : Adornment
                                  titleBarsLength,
                                  Orientation.Vertical,
                                  LineStyle.Single,
-                                 Driver.GetAttribute ()
+                                 Driver?.GetAttribute ()
                                 );
 
                     // Add a vert line for ╞
@@ -799,7 +836,7 @@ public class Border : Adornment
                                  titleBarsLength,
                                  Orientation.Vertical,
                                  LineStyle.Single,
-                                 Driver.GetAttribute ()
+                                 Driver?.GetAttribute ()
                                 );
 
                     // Add the right hand line for ╞═════╗
@@ -814,7 +851,7 @@ public class Border : Adornment
                                  borderBounds.Width - Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                  Orientation.Horizontal,
                                  lineStyle,
-                                 Driver.GetAttribute ()
+                                 Driver?.GetAttribute ()
                                 );
                 }
             }
@@ -828,7 +865,7 @@ public class Border : Adornment
                              sideLineLength,
                              Orientation.Vertical,
                              lineStyle,
-                             Driver.GetAttribute ()
+                             Driver?.GetAttribute ()
                             );
             }
 #endif
@@ -840,7 +877,7 @@ public class Border : Adornment
                              borderBounds.Width,
                              Orientation.Horizontal,
                              lineStyle,
-                             Driver.GetAttribute ()
+                             Driver?.GetAttribute ()
                             );
             }
 
@@ -851,11 +888,11 @@ public class Border : Adornment
                              sideLineLength,
                              Orientation.Vertical,
                              lineStyle,
-                             Driver.GetAttribute ()
+                             Driver?.GetAttribute ()
                             );
             }
 
-            Driver.SetAttribute (prevAttr);
+            SetAttribute (prevAttr);
 
             // TODO: This should be moved to LineCanvas as a new BorderStyle.Ruler
             if (Diagnostics.HasFlag (ViewDiagnosticFlags.Ruler))
@@ -908,7 +945,14 @@ public class Border : Adornment
                 lc!.Fill = null;
             }
         }
+
+        return true; ;
     }
+
+    /// <summary>
+    ///     Gets the subview used to render <see cref="ViewDiagnosticFlags.DrawIndicator"/>.
+    /// </summary>
+    public SpinnerView? DrawIndicator { get; private set; } = null;
 
     private void SetupGradientLineCanvas (LineCanvas lc, Rectangle rect)
     {
@@ -1036,7 +1080,7 @@ public class Border : Adornment
                 NoPadding = true,
                 ShadowStyle = ShadowStyle.None,
                 Text = $"{Glyphs.SizeVertical}",
-                X = Pos.Center () + Parent!.Margin.Thickness.Horizontal,
+                X = Pos.Center () + Parent!.Margin!.Thickness.Horizontal,
                 Y = 0,
                 Visible = false,
                 Data = ViewArrangement.TopResizable
@@ -1059,7 +1103,7 @@ public class Border : Adornment
                 ShadowStyle = ShadowStyle.None,
                 Text = $"{Glyphs.SizeHorizontal}",
                 X = Pos.AnchorEnd (),
-                Y = Pos.Center () + Parent!.Margin.Thickness.Vertical / 2,
+                Y = Pos.Center () + Parent!.Margin!.Thickness.Vertical / 2,
                 Visible = false,
                 Data = ViewArrangement.RightResizable
             };
@@ -1081,7 +1125,7 @@ public class Border : Adornment
                 ShadowStyle = ShadowStyle.None,
                 Text = $"{Glyphs.SizeHorizontal}",
                 X = 0,
-                Y = Pos.Center () + Parent!.Margin.Thickness.Vertical / 2,
+                Y = Pos.Center () + Parent!.Margin!.Thickness.Vertical / 2,
                 Visible = false,
                 Data = ViewArrangement.LeftResizable
             };
@@ -1102,7 +1146,7 @@ public class Border : Adornment
                 NoPadding = true,
                 ShadowStyle = ShadowStyle.None,
                 Text = $"{Glyphs.SizeVertical}",
-                X = Pos.Center () + Parent!.Margin.Thickness.Horizontal / 2,
+                X = Pos.Center () + Parent!.Margin!.Thickness.Horizontal / 2,
                 Y = Pos.AnchorEnd (),
                 Visible = false,
                 Data = ViewArrangement.BottomResizable
@@ -1251,8 +1295,6 @@ public class Border : Adornment
                             }
                         }
 
-                        Application.Refresh ();
-
                         return true;
                     });
 
@@ -1274,8 +1316,6 @@ public class Border : Adornment
                         {
                             Parent!.Height = Parent.Height! + 1;
                         }
-
-                        Application.Refresh ();
 
                         return true;
                     });
@@ -1302,8 +1342,6 @@ public class Border : Adornment
                             }
                         }
 
-                        Application.Refresh ();
-
                         return true;
                     });
 
@@ -1325,8 +1363,6 @@ public class Border : Adornment
                         {
                             Parent!.Width = Parent.Width! + 1;
                         }
-
-                        Application.Refresh ();
 
                         return true;
                     });

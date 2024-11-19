@@ -22,8 +22,9 @@ public class HexViewTests
     public void BytesPerLine_Calculates_Correctly (int width, int expectedBpl)
     {
         var hv = new HexView (LoadStream (null, out long _)) { Width = width, Height = 10, AddressWidth = 0 };
-        hv.LayoutSubviews ();
+        hv.Layout ();
 
+        Assert.Equal (width, hv.Frame.Width);
         Assert.Equal (expectedBpl, hv.BytesPerLine);
     }
 
@@ -155,24 +156,24 @@ public class HexViewTests
         Assert.Equal (63, hv.Source!.Length);
         Assert.Equal (20, hv.BytesPerLine);
 
-        Assert.Equal (new (0, 0), hv.Position);
+        Assert.Equal (new (0, 0), hv.GetPosition (hv.Address));
 
         Assert.True (Application.RaiseKeyDownEvent (Key.Tab));
-        Assert.Equal (new (0, 0), hv.Position);
+        Assert.Equal (new (0, 0), hv.GetPosition (hv.Address));
 
         Assert.True (Application.RaiseKeyDownEvent (Key.CursorRight.WithCtrl));
-        Assert.Equal (hv.BytesPerLine - 1, hv.Position.X);
+        Assert.Equal (hv.BytesPerLine - 1, hv.GetPosition (hv.Address).X);
 
         Assert.True (Application.RaiseKeyDownEvent (Key.Home));
 
         Assert.True (Application.RaiseKeyDownEvent (Key.CursorRight));
-        Assert.Equal (new (1, 0), hv.Position);
+        Assert.Equal (new (1, 0), hv.GetPosition (hv.Address));
 
         Assert.True (Application.RaiseKeyDownEvent (Key.CursorDown));
-        Assert.Equal (new (1, 1), hv.Position);
+        Assert.Equal (new (1, 1), hv.GetPosition (hv.Address));
 
         Assert.True (Application.RaiseKeyDownEvent (Key.End));
-        Assert.Equal (new (3, 3), hv.Position);
+        Assert.Equal (new (3, 3), hv.GetPosition (hv.Address));
 
         Assert.Equal (hv.Source!.Length, hv.Address);
         Application.Top.Dispose ();
@@ -193,23 +194,23 @@ public class HexViewTests
         Assert.Equal (126, hv.Source!.Length);
         Assert.Equal (20, hv.BytesPerLine);
 
-        Assert.Equal (new (0, 0), hv.Position);
+        Assert.Equal (new (0, 0), hv.GetPosition (hv.Address));
 
         Assert.True (Application.RaiseKeyDownEvent (Key.Tab));
 
         Assert.True (Application.RaiseKeyDownEvent (Key.CursorRight.WithCtrl));
-        Assert.Equal (hv.BytesPerLine - 1, hv.Position.X);
+        Assert.Equal (hv.BytesPerLine - 1, hv.GetPosition (hv.Address).X);
 
         Assert.True (Application.RaiseKeyDownEvent (Key.Home));
 
         Assert.True (Application.RaiseKeyDownEvent (Key.CursorRight));
-        Assert.Equal (new (1, 0), hv.Position);
+        Assert.Equal (new (1, 0), hv.GetPosition (hv.Address));
 
         Assert.True (Application.RaiseKeyDownEvent (Key.CursorDown));
-        Assert.Equal (new (1, 1), hv.Position);
+        Assert.Equal (new (1, 1), hv.GetPosition (hv.Address));
 
         Assert.True (Application.RaiseKeyDownEvent (Key.End));
-        Assert.Equal (new (6, 6), hv.Position);
+        Assert.Equal (new (6, 6), hv.GetPosition (hv.Address));
 
         Assert.Equal (hv.Source!.Length, hv.Address);
         Application.Top.Dispose ();
@@ -233,27 +234,6 @@ public class HexViewTests
 
         hv.DiscardEdits ();
         Assert.Empty (hv.Edits);
-    }
-
-    [Fact]
-    public void DisplayStart_Source ()
-    {
-        var hv = new HexView (LoadStream (null, out _, true)) { Width = 20, Height = 20 };
-
-        // Needed because HexView relies on LayoutComplete to calc sizes
-        hv.LayoutSubviews ();
-
-        Assert.Equal (0, hv.DisplayStart);
-
-        Assert.True (hv.NewKeyDownEvent (Key.PageDown));
-        Assert.Equal (4 * hv.Frame.Height, hv.DisplayStart);
-        Assert.Equal (hv.Source!.Length, hv.Source.Position);
-
-        Assert.True (hv.NewKeyDownEvent (Key.End));
-
-        // already on last page and so the DisplayStart is the same as before
-        Assert.Equal (4 * hv.Frame.Height, hv.DisplayStart);
-        Assert.Equal (hv.Source.Length, hv.Source.Position);
     }
 
     [Fact]
@@ -364,36 +344,34 @@ public class HexViewTests
     }
 
     [Fact]
-    public void Source_Sets_DisplayStart_And_Position_To_Zero_If_Greater_Than_Source_Length ()
+    public void Source_Sets_Address_To_Zero_If_Greater_Than_Source_Length ()
     {
         var hv = new HexView (LoadStream (null, out _)) { Width = 10, Height = 5 };
         Application.Top = new Toplevel ();
         Application.Top.Add (hv);
 
-        hv.LayoutSubviews ();
+        Application.Top.Layout ();
 
         Assert.True (hv.NewKeyDownEvent (Key.End));
-        Assert.Equal (MEM_STRING_LENGTH - 1, hv.DisplayStart);
         Assert.Equal (MEM_STRING_LENGTH, hv.Address);
 
         hv.Source = new MemoryStream ();
-        Assert.Equal (0, hv.DisplayStart);
+        Application.Top.Layout ();
         Assert.Equal (0, hv.Address);
 
         hv.Source = LoadStream (null, out _);
         hv.Width = Dim.Fill ();
         hv.Height = Dim.Fill ();
-        Application.Top.LayoutSubviews ();
-        Assert.Equal (0, hv.DisplayStart);
+        Application.Top.Layout ();
         Assert.Equal (0, hv.Address);
 
         Assert.True (hv.NewKeyDownEvent (Key.End));
-        Assert.Equal (0, hv.DisplayStart);
         Assert.Equal (MEM_STRING_LENGTH, hv.Address);
 
         hv.Source = new MemoryStream ();
-        Assert.Equal (0, hv.DisplayStart);
+        Application.Top.Layout ();
         Assert.Equal (0, hv.Address);
+
         Application.Top.Dispose ();
         Application.ResetState (true);
     }

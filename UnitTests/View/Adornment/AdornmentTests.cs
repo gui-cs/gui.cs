@@ -110,6 +110,18 @@ public class AdornmentTests (ITestOutputHelper output)
     }
 
     [Fact]
+    public void SetAdornmentFrames_Sets_Frames_Correctly ()
+    {
+        var parent = new View { X = 1, Y = 2, Width = 10, Height = 20 };
+        parent.SetAdornmentFrames();
+
+        Assert.Equal (new Rectangle (1, 2, 10, 20), parent.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 20), parent.Viewport);
+        Assert.Equal (new Rectangle (0, 0, 10, 20), parent.Margin.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 20), parent.Margin.Viewport);
+    }
+
+    [Fact]
     public void Frames_are_Parent_SuperView_Relative ()
     {
         var view = new View
@@ -335,13 +347,16 @@ public class AdornmentTests (ITestOutputHelper output)
     [Fact]
     public void Setting_Thickness_Causes_Parent_Layout ()
     {
-        var view = new View ();
+        var parent = new View ();
         var raised = false;
-        view.BeginInit ();
-        view.EndInit ();
+        parent.BeginInit ();
+        parent.EndInit ();
 
-        view.LayoutStarted += LayoutStarted;
-        view.Margin.Thickness = new Thickness (1, 2, 3, 4);
+        parent.SubviewLayout += LayoutStarted;
+        parent.Margin.Thickness = new Thickness (1, 2, 3, 4);
+        Assert.True (parent.NeedsLayout);
+        Assert.True (parent.Margin.NeedsLayout);
+        parent.Layout ();
         Assert.True (raised);
 
         return;
@@ -355,13 +370,16 @@ public class AdornmentTests (ITestOutputHelper output)
     [Fact]
     public void Setting_Thickness_Causes_Adornment_Layout ()
     {
-        var view = new View ();
+        var parent = new View ();
         var raised = false;
-        view.BeginInit ();
-        view.EndInit ();
+        parent.BeginInit ();
+        parent.EndInit ();
 
-        view.Margin.LayoutStarted += LayoutStarted;
-        view.Margin.Thickness = new Thickness (1, 2, 3, 4);
+        parent.Margin.SubviewLayout += LayoutStarted;
+        parent.Margin.Thickness = new Thickness (1, 2, 3, 4);
+        Assert.True (parent.NeedsLayout);
+        Assert.True (parent.Margin.NeedsLayout);
+        parent.Layout ();
         Assert.True (raised);
 
         return;

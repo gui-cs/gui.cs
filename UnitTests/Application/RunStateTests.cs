@@ -8,7 +8,7 @@ public class RunStateTests
     public RunStateTests ()
     {
 #if DEBUG_IDISPOSABLE
-        Responder.Instances.Clear ();
+        View.Instances.Clear ();
         RunState.Instances.Clear ();
 #endif
     }

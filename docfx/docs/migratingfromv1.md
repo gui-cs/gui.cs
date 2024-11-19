@@ -152,12 +152,15 @@ In v2, the `Border`, `Margin`, and `Padding` properties have been added to all v
 
 In v1, scrolling was enabled by using `ScrollView` or `ScrollBarView`. In v2, the base @Terminal.Gui.View class supports scrolling inherently. The area of a view visible to the user at a given moment was previously a rectangle called `Bounds`. `Bounds.Location` was always `Point.Empty`. In v2 the visible area is a rectangle called `Viewport` which is a protal into the Views content, which can be bigger (or smaller) than the area visible to the user. Causing a view to scroll is as simple as changing `View.Viewport.Location`. The View's content is described by @Terminal.Gui.View.GetContentSize. See [Layout](layout.md) for details.
 
+@Terminal.Gui.ScrollBar replaces `ScrollBarView` with a much cleaner implementation of a scrollbar. In addition, @Terminal.Gui.View.VerticalScrollBar and @Terminal.Gui.View.HorizontalScrollBar provide a simple way to enable scroll bars in any View with almost no code. See See [Scrolling Deep Dive](scrolling.md) for more.
+
 ### How to Fix
 
 * Replace `ScrollView` with @Terminal.Gui.View and use `Viewport` and @Terminal.Gui.View.GetContentSize to control scrolling.
 * Update any code that assumed `Bounds.Location` was always `Point.Empty`.
 * Update any code that used `Bounds` to refer to the size of the view's content. Use @Terminal.Gui.View.GetContentSize instead.
 * Update any code that assumed `Bounds.Size` was the same as `Frame.Size`. `Frame.Size` defines the size of the view in the superview's coordinate system, while `Viewport.Size` defines the visible area of the view in its own coordinate system.
+* Replace `ScrollBarView` with @Terminal.Gui.ScrollBar. See [Scrolling Deep Dive](scrolling.md) for more.
 
 ## Updated Keyboard API
 
