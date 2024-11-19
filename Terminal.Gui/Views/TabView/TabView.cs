@@ -12,7 +12,7 @@ public class TabView : View, IDesignable
     public const uint DefaultMaxTabTextWidth = 30;
 
     /// <summary>This SubView is the 2 or 3 line control that represents the actual tabs themselves.</summary>
-    private readonly TabRowView _tabRowView;
+    private readonly TabRow _tabRow;
 
     // private TabToRender []? _tabLocations;
 
@@ -25,9 +25,9 @@ public class TabView : View, IDesignable
         Width = Dim.Fill ();
         Height = Dim.Auto (minimumContentDim: GetTabHeight (!Style.TabsOnBottom));
 
-        _tabRowView = new TabRowView ();
-        _tabRowView.Selecting += _tabRowView_Selecting;
-        base.Add (_tabRowView);
+        _tabRow = new TabRow ();
+        _tabRow.Selecting += _tabRowView_Selecting;
+        base.Add (_tabRow);
 
         ApplyStyleChanges ();
 
@@ -87,8 +87,8 @@ public class TabView : View, IDesignable
 
                                             if (first > 0)
                                             {
-                                                int scroll = -_tabRowView.Tabs.ToArray () [first.Value].Frame.Width;
-                                                _tabRowView.Viewport = _tabRowView.Viewport with { X = _tabRowView.Viewport.X + scroll };
+                                                int scroll = -_tabRow.Tabs.ToArray () [first.Value].Frame.Width;
+                                                _tabRow.Viewport = _tabRow.Viewport with { X = _tabRow.Viewport.X + scroll };
                                                 SetNeedsLayout ();
                                                 FirstVisibleTabIndex--;
                                                 return true;
@@ -104,7 +104,7 @@ public class TabView : View, IDesignable
 
                                              if (last is { })
                                              {
-                                                 _tabRowView.ScrollHorizontal (_tabRowView.Tabs.ToArray () [last.Value + 1].Frame.Width);
+                                                 _tabRow.ScrollHorizontal (_tabRow.Tabs.ToArray () [last.Value + 1].Frame.Width);
                                                  SetNeedsLayout ();
                                                  FirstVisibleTabIndex++;
                                                  return true;
@@ -157,7 +157,7 @@ public class TabView : View, IDesignable
     /// <inheritdoc />
     protected override void OnSubviewLayout (LayoutEventArgs args)
     {
-        _tabRowView.CalcContentSize ();
+        _tabRow.CalcContentSize ();
     }
 
     /// <inheritdoc />
@@ -166,9 +166,9 @@ public class TabView : View, IDesignable
         // hide all that can't fit
         var visibleTabs = GetTabsThatCanBeVisible (Viewport).ToArray ();
 
-        for (var index = 0; index < _tabRowView.Tabs.ToArray ().Length; index++)
+        for (var index = 0; index < _tabRow.Tabs.ToArray ().Length; index++)
         {
-            Tab tab = _tabRowView.Tabs.ToArray () [index];
+            Tab tab = _tabRow.Tabs.ToArray () [index];
             tab.Visible = visibleTabs.Contains (index);
         }
     }
@@ -213,7 +213,7 @@ public class TabView : View, IDesignable
             int? old = _selectedTabIndex;
 
             // Get once to avoid multiple enumerations
-            Tab [] tabs = _tabRowView.Tabs.ToArray ();
+            Tab [] tabs = _tabRow.Tabs.ToArray ();
 
             if (_selectedTabIndex is { } && tabs [_selectedTabIndex.Value].View is { })
             {
@@ -266,7 +266,7 @@ public class TabView : View, IDesignable
 
     /// <summary>All tabs currently hosted by the control.</summary>
     /// <value></value>
-    public IReadOnlyCollection<Tab> Tabs => _tabRowView.Tabs.ToArray ().AsReadOnly ();
+    public IReadOnlyCollection<Tab> Tabs => _tabRow.Tabs.ToArray ().AsReadOnly ();
 
     private int _firstVisibleTabIndex;
 
@@ -294,17 +294,17 @@ public class TabView : View, IDesignable
     public void AddTab (Tab tab, bool andSelect)
     {
         // Ok to use Subviews here instead of Tabs
-        if (_tabRowView.Subviews.Contains (tab))
+        if (_tabRow.Subviews.Contains (tab))
         {
             return;
         }
 
         // Add to the TabRowView as a subview
-        _tabRowView.Add (tab);
+        _tabRow.Add (tab);
 
-        if (_tabRowView.Tabs.Count () == 1 || andSelect)
+        if (_tabRow.Tabs.Count () == 1 || andSelect)
         {
-            SelectedTabIndex = _tabRowView.Tabs.Count () - 1;
+            SelectedTabIndex = _tabRow.Tabs.Count () - 1;
 
             EnsureSelectedTabIsVisible ();
 
@@ -326,21 +326,21 @@ public class TabView : View, IDesignable
     /// <param name="tab"></param>
     public void RemoveTab (Tab? tab)
     {
-        if (tab is null || !_tabRowView.Subviews.Contains (tab))
+        if (tab is null || !_tabRow.Subviews.Contains (tab))
         {
             return;
         }
 
-        int idx = _tabRowView.Tabs.ToArray ().IndexOf (tab);
+        int idx = _tabRow.Tabs.ToArray ().IndexOf (tab);
         if (idx == SelectedTabIndex)
         {
             SelectedTabIndex = null;
         }
 
-        _tabRowView.Remove (tab);
+        _tabRow.Remove (tab);
 
         // Get once to avoid multiple enumerations
-        Tab [] tabs = _tabRowView.Tabs.ToArray ();
+        Tab [] tabs = _tabRow.Tabs.ToArray ();
 
         if (SelectedTabIndex is null)
         {
@@ -377,7 +377,7 @@ public class TabView : View, IDesignable
     public void ApplyStyleChanges ()
     {
         // Get once to avoid multiple enumerations
-        Tab [] tabs = _tabRowView.Tabs.ToArray ();
+        Tab [] tabs = _tabRow.Tabs.ToArray ();
 
         View? selectedView = null;
 
@@ -396,8 +396,8 @@ public class TabView : View, IDesignable
 
         if (Style.TabsOnBottom)
         {
-            _tabRowView.Height = tabHeight;
-            _tabRowView.Y = Pos.AnchorEnd ();
+            _tabRow.Height = tabHeight;
+            _tabRow.Y = Pos.AnchorEnd ();
 
             if (selectedView is { })
             {
@@ -415,8 +415,8 @@ public class TabView : View, IDesignable
         else
         {
             // Tabs are along the top
-            _tabRowView.Height = tabHeight;
-            _tabRowView.Y = 0;
+            _tabRow.Height = tabHeight;
+            _tabRow.Y = 0;
 
             if (selectedView is { })
             {
@@ -427,7 +427,7 @@ public class TabView : View, IDesignable
 
 
                 //move content down to make space for tabs
-                selectedView.Y = Pos.Bottom (_tabRowView);
+                selectedView.Y = Pos.Bottom (_tabRow);
 
                 // Fill client area leaving space at bottom for border
                 selectedView.Height = Dim.Fill ();
@@ -446,7 +446,7 @@ public class TabView : View, IDesignable
         }
 
         // Get once to avoid multiple enumerations
-        Tab [] tabs = _tabRowView.Tabs.ToArray ();
+        Tab [] tabs = _tabRow.Tabs.ToArray ();
         View? selectedView = tabs [SelectedTabIndex.Value].View;
 
         if (selectedView is null)
@@ -475,7 +475,7 @@ public class TabView : View, IDesignable
     {
 
         // Get once to avoid multiple enumerations
-        Tab [] tabs = _tabRowView.Tabs.ToArray ();
+        Tab [] tabs = _tabRow.Tabs.ToArray ();
 
         if (tabs.Length == 0)
         {
@@ -524,7 +524,7 @@ public class TabView : View, IDesignable
         View? prevTab = null;
 
         // Get once to avoid multiple enumerations
-        Tab [] tabs = _tabRowView.Tabs.ToArray ();
+        Tab [] tabs = _tabRow.Tabs.ToArray ();
 
         // Starting at the first or scrolled to tab
         for (int i = FirstVisibleTabIndex; i < tabs.Length; i++)
@@ -570,7 +570,7 @@ public class TabView : View, IDesignable
         if (disposing)
         {
             // Get once to avoid multiple enumerations
-            Tab [] tabs = _tabRowView.Tabs.ToArray ();
+            Tab [] tabs = _tabRow.Tabs.ToArray ();
             if (SelectedTabIndex is { })
             {
                 Remove (tabs [SelectedTabIndex.Value].View);
@@ -584,194 +584,6 @@ public class TabView : View, IDesignable
         base.Dispose (disposing);
     }
 
-    private class TabRowView : View
-    {
-        private readonly View _leftScrollIndicator;
-        private readonly View _rightScrollIndicator;
-
-        public TabRowView ()
-        {
-            Id = "tabRowView";
-
-            CanFocus = true;
-            Height = Dim.Auto ();
-            Width = Dim.Fill ();
-            SuperViewRendersLineCanvas = true;
-
-            _rightScrollIndicator = new View
-            {
-                Id = "rightScrollIndicator",
-                X = Pos.Func (() => Viewport.X + Viewport.Width - 1),
-                Y = Pos.AnchorEnd (),
-                Width = 1,
-                Height = 1,
-                Visible = true,
-                Text = Glyphs.RightArrow.ToString ()
-            };
-
-            _leftScrollIndicator = new View
-            {
-                Id = "leftScrollIndicator",
-                X = Pos.Func (() => Viewport.X),
-                Y = Pos.AnchorEnd (),
-                Width = 1,
-                Height = 1,
-                Visible = true,
-                Text = Glyphs.LeftArrow.ToString ()
-            };
-
-            Add (_rightScrollIndicator, _leftScrollIndicator);
-
-            Initialized += OnInitialized;
-        }
-
-        private void OnInitialized (object? sender, EventArgs e)
-        {
-            if (SuperView is TabView tabView)
-            {
-                _leftScrollIndicator.MouseClick += (o, args) =>
-                                                   {
-                                                       tabView.InvokeCommand (Command.ScrollLeft);
-                                                   };
-                _rightScrollIndicator.MouseClick += (o, args) =>
-                                                    {
-                                                        tabView.InvokeCommand (Command.ScrollRight);
-                                                    };
-                tabView.SelectedTabChanged += TabView_SelectedTabChanged;
-            }
-
-            CalcContentSize ();
-        }
-
-        private void TabView_SelectedTabChanged (object? sender, TabChangedEventArgs e)
-        {
-            _selectedTabIndex = e.NewTabIndex;
-            CalcContentSize ();
-        }
-
-        /// <inheritdoc />
-        public override void OnAdded (SuperViewChangedEventArgs e)
-        {
-            if (e.SubView is Tab tab)
-            {
-                MoveSubviewToEnd (_leftScrollIndicator);
-                MoveSubviewToEnd (_rightScrollIndicator);
-
-                tab.HasFocusChanged += TabOnHasFocusChanged;
-                tab.Selecting += Tab_Selecting;
-            }
-            CalcContentSize ();
-        }
-
-        private void Tab_Selecting (object? sender, CommandEventArgs e)
-        {
-            e.Cancel = RaiseSelecting (new CommandContext (Command.Select, null, data: Tabs.ToArray ().IndexOf (sender))) is true;
-        }
-
-        private void TabOnHasFocusChanged (object? sender, HasFocusEventArgs e)
-        {
-            TabView? host = SuperView as TabView;
-
-            if (host is null)
-            {
-                return;
-            }
 
 
-            //if (e is { NewFocused: Tab tab, NewValue: true })
-            //{
-            //    e.Cancel = RaiseSInvokeCommand (Command.Select, new CommandContext () { Data = tab }) is true;
-            //}
-        }
-
-        public void CalcContentSize ()
-        {
-            TabView? host = SuperView as TabView;
-
-            if (host is null)
-            {
-                return;
-            }
-
-            Tab? selected = null;
-            int topLine = host!.Style.ShowTopLine ? 1 : 0;
-
-            Tab [] tabs = Tabs.ToArray ();
-
-            for (int i = 0; i < tabs.Length; i++)
-            {
-                tabs [i].Height = Dim.Fill ();
-                if (i == 0)
-                {
-                    tabs [i].X = 0;
-                }
-                else
-                {
-                    tabs [i].X = Pos.Right (tabs [i - 1]);
-                }
-
-                if (i == _selectedTabIndex)
-                {
-                    selected = tabs [i];
-
-                    if (host.Style.TabsOnBottom)
-                    {
-                        tabs [i].Border.Thickness = new Thickness (1, 0, 1, topLine);
-                        tabs [i].Margin.Thickness = new Thickness (0, 1, 0, 0);
-                    }
-                    else
-                    {
-                        tabs [i].Border.Thickness = new Thickness (1, topLine, 1, 0);
-                        tabs [i].Margin.Thickness = new Thickness (0, 0, 0, topLine);
-                    }
-                }
-                else if (selected is null)
-                {
-                    if (host.Style.TabsOnBottom)
-                    {
-                        tabs [i].Border.Thickness = new Thickness (1, 1, 0, topLine);
-                        tabs [i].Margin.Thickness = new Thickness (0, 0, 0, 0);
-                    }
-                    else
-                    {
-                        tabs [i].Border.Thickness = new Thickness (1, topLine, 0, 1);
-                        tabs [i].Margin.Thickness = new Thickness (0, 0, 0, 0);
-                    }
-
-                    //tabs [i].Width = Math.Max (tabs [i].Width!.GetAnchor (0) - 1, 1);
-                }
-                else
-                {
-                    if (host.Style.TabsOnBottom)
-                    {
-                        tabs [i].Border.Thickness = new Thickness (0, 1, 1, topLine);
-                        tabs [i].Margin.Thickness = new Thickness (0, 0, 0, 0);
-                    }
-                    else
-                    {
-                        tabs [i].Border.Thickness = new Thickness (0, topLine, 1, 1);
-                        tabs [i].Margin.Thickness = new Thickness (0, 0, 0, 0);
-                    }
-
-                    //tabs [i].Width = Math.Max (tabs [i].Width!.GetAnchor (0) - 1, 1);
-                }
-
-                //tabs [i].Text = toRender.TextToRender;
-            }
-
-            SetContentSize (null);
-            Layout (Application.Screen.Size);
-
-            var width = 0;
-            foreach (Tab t in tabs)
-            {
-                width += t.Frame.Width;
-            }
-            SetContentSize (new (width, Viewport.Height));
-        }
-
-        internal IEnumerable<Tab> Tabs => Subviews.Where (v => v is Tab).Cast<Tab> ();
-
-        private int? _selectedTabIndex = null;
-    }
 }
