@@ -5,15 +5,14 @@ namespace Terminal.Gui;
 
 public partial class View // Layout APIs
 {
+    #region Frame
+
     /// <summary>
     ///     Indicates whether the specified SuperView-relative coordinates are within the View's <see cref="Frame"/>.
     /// </summary>
     /// <param name="location">SuperView-relative coordinate</param>
     /// <returns><see langword="true"/> if the specified SuperView-relative coordinates are within the View.</returns>
     public virtual bool Contains (in Point location) { return Frame.Contains (location); }
-
-
-    #region Frame
 
     private Rectangle? _frame;
 

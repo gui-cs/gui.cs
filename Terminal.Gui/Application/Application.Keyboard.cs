@@ -44,7 +44,7 @@ public static partial class Application // Keyboard handling
         }
         else
         {
-            if (Top.NewKeyDownEvent (key))
+            if (top.NewKeyDownEvent (key))
             {
                 return true;
             }

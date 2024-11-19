@@ -66,32 +66,27 @@ public class Shortcuts : Scenario
             KeyBindingScope = KeyBindingScope.HotKey,
         };
 
+       // ((CheckBox)vShortcut3.CommandView).CheckedStateChanging += (_, args) =>
         ((CheckBox)alignKeysShortcut.CommandView).CheckedStateChanging += (s, e) =>
-                                                                          {
-                                                                              if (alignKeysShortcut.CommandView is CheckBox cb)
-                                                                              {
-                                                                                  eventSource.Add (
-                                                                                                   $"{alignKeysShortcut.Id}.CommandView.CheckedStateChanging: {cb.Text}");
-                                                                                  eventLog.MoveDown ();
-                                                                                  var max = 0;
+        {
+            if (alignKeysShortcut.CommandView is CheckBox cb)
+            {
+                eventSource.Add ($"{alignKeysShortcut.Id}.CommandView.CheckedStateChanging: {cb.Text}");
+                eventLog.MoveDown ();
 
-                                                                                  IEnumerable<View> toAlign =
-                                                                                      Application.Top.Subviews.Where (
-                                                                                           v => v is Shortcut { Width: not DimAbsolute });
-                                                                                  IEnumerable<View> enumerable = toAlign as View [] ?? toAlign.ToArray ();
+                var max = 0;
+                IEnumerable<View> toAlign = Application.Top.Subviews.Where (v => v is Shortcut { Width: not DimAbsolute });
+                IEnumerable<View> enumerable = toAlign as View [] ?? toAlign.ToArray ();
 
-                                                                                  if (e.NewValue == CheckState.Checked)
-                                                                                  {
-                                                                                      max = (from Shortcut? peer in enumerable
-                                                                                             select peer.Key.ToString ().GetColumns ()).Prepend (max)
-                                                                                          .Max ();
-
-                                                                                      foreach (var view in enumerable)
-                                                                                      {
-                                                                                          var peer = (Shortcut)view;
-                                                                                          max = Math.Max (max, peer.KeyView.Text.GetColumns ());
-                                                                                      }
-                                                                                  }
+                if (e.NewValue == CheckState.Checked)
+                {
+                    max = (from Shortcut? peer in enumerable select peer.Key.ToString ().GetColumns ()).Prepend (max).Max ();
+                    foreach (var view in enumerable)
+                    {
+                        var peer = (Shortcut)view;
+                        max = Math.Max (max, peer.KeyView.Text.GetColumns ());
+                    }
+                }
 
                                                                                   foreach (View view in enumerable)
                                                                                   {
@@ -256,7 +251,7 @@ public class Shortcuts : Scenario
             Key = Key.F5,
         };
 
-        ((Slider<string>)sliderShortcut.CommandView).Options = new () { new () { Legend = "A" }, new () { Legend = "B" }, new () { Legend = "C" } };
+        ((Slider<string>)sliderShortcut.CommandView).Options = [new () { Legend = "A" }, new () { Legend = "B" }, new () { Legend = "C" }];
         ((Slider<string>)sliderShortcut.CommandView).SetOption (0);
 
         ((Slider<string>)sliderShortcut.CommandView).OptionsChanged += (o, args) =>

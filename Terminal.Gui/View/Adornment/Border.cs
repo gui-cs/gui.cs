@@ -1,8 +1,5 @@
 #nullable enable
 using System.Diagnostics;
-using Terminal.Gui;
-using Attribute = System.Attribute;
-using Color = System.Drawing.Color;
 
 namespace Terminal.Gui;
 
@@ -322,6 +319,7 @@ public class Border : Adornment
             {
                 return false;
             }
+
             // Only start grabbing if the user clicks in the Thickness area
             // Adornment.Contains takes Parent SuperView=relative coords.
             if (Contains (new (mouseEvent.Position.X + Parent.Frame.X + Frame.X, mouseEvent.Position.Y + Parent.Frame.Y + Frame.Y)))

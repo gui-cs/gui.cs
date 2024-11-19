@@ -304,4 +304,43 @@ public class ContextMenus : Scenario
 
     //    _contextMenu.Show (menuItems);
     //}
+
+
+    public override List<Key> GetDemoKeyStrokes ()
+    {
+        var keys = new List<Key> ();
+
+        keys.Add (Key.F10.WithShift);
+        keys.Add (Key.Esc);
+
+        keys.Add (Key.Space.WithCtrl);
+        keys.Add (Key.CursorDown);
+        keys.Add (Key.Enter);
+
+        keys.Add (Key.F10.WithShift);
+        keys.Add (Key.Esc);
+
+        keys.Add (Key.Tab);
+
+        keys.Add (Key.Space.WithCtrl);
+        keys.Add (Key.CursorDown);
+        keys.Add (Key.CursorDown);
+        keys.Add (Key.Enter);
+
+        keys.Add (Key.F10.WithShift);
+        keys.Add (Key.Esc);
+
+        keys.Add (Key.Tab);
+
+        keys.Add (Key.Space.WithCtrl);
+        keys.Add (Key.CursorDown);
+        keys.Add (Key.CursorDown);
+        keys.Add (Key.CursorDown);
+        keys.Add (Key.Enter);
+
+        keys.Add (Key.F10.WithShift);
+        keys.Add (Key.Esc);
+
+        return keys;
+    }
 }

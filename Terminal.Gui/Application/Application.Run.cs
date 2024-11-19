@@ -509,15 +509,14 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             neededLayout = View.Layout ([Popover], Screen.Size);
         }
 
-
         View.SetClipToScreen ();
         View.Draw (TopLevels, neededLayout || forceDraw);
-        View.SetClipToScreen ();
         if (Popover is { })
         {
-            View.Draw ([Popover], neededLayout || forceDraw);
             View.SetClipToScreen ();
+            View.Draw ([Popover], neededLayout || forceDraw);
         }
+        View.SetClipToScreen ();
 
         if (forceDraw)
         {
