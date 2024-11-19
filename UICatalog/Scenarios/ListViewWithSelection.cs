@@ -80,7 +80,9 @@ public class ListViewWithSelection : Scenario
             Width = Dim.Func (() => _listView?.MaxLength ?? 10),
             Height = Dim.Fill (),
             AllowsMarking = false,
-            AllowsMultipleSelection = false
+            AllowsMultipleSelection = false,
+            BorderStyle = LineStyle.Dotted,
+            Arrangement = ViewArrangement.Resizable
         };
         _listView.RowRender += ListView_RowRender;
         _appWindow.Add (_listView);
@@ -106,6 +108,7 @@ public class ListViewWithSelection : Scenario
         _listView.Accepting += (s, a) => LogEvent (s as View, a, "Accept");
         _listView.Selecting += (s, a) => LogEvent (s as View, a, "Select");
         _listView.VerticalScrollBar.AutoShow = true;
+        _listView.HorizontalScrollBar.AutoShow = true;
 
         bool? LogEvent (View sender, EventArgs args, string message)
         {

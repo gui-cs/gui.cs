@@ -486,6 +486,7 @@ public class Shortcut : View, IOrientation, IDesignable
                     InvokeCommand (Command.Select, new (Command.Select, null, null, this));
                 }
 
+                // BUGBUG: This prevents NumericUpDown on statusbar in HexEditor from working
                 e.Cancel = true;
             }
         }

@@ -134,7 +134,6 @@ public class CharMap : View, IDesignable
         KeyBindings.Add (Key.End, Command.End);
 
         MouseClick += Handle_MouseClick;
-        MouseEvent += Handle_MouseEvent;
 
         SetContentSize (new (COLUMN_WIDTH * 16 + RowLabelWidth, MAX_CODE_POINT / 16 * _rowHeight + HEADER_HEIGHT));
 
@@ -468,37 +467,40 @@ public class CharMap : View, IDesignable
     // TODO: Use this to demonstrate using a popover to show glyph info on hover
     public event EventHandler<ListViewItemEventArgs>? Hover;
 
-    private void Handle_MouseEvent (object? sender, MouseEventArgs e)
+    /// <inheritdoc />
+    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
     {
-        if (e.Flags == MouseFlags.WheeledDown)
+        if (mouseEvent.Flags == MouseFlags.WheeledDown)
         {
-            ScrollVertical (1);
-            e.Handled = true;
-
-            return;
+            if (Viewport.Y + Viewport.Height - HEADER_HEIGHT < GetContentSize ().Height)
+            {
+                ScrollVertical (1);
+            }
+            return mouseEvent.Handled = true;
         }
 
-        if (e.Flags == MouseFlags.WheeledUp)
+        if (mouseEvent.Flags == MouseFlags.WheeledUp)
         {
             ScrollVertical (-1);
-            e.Handled = true;
-
-            return;
+            return mouseEvent.Handled = true;
         }
 
-        if (e.Flags == MouseFlags.WheeledRight)
+        if (mouseEvent.Flags == MouseFlags.WheeledRight)
         {
-            ScrollHorizontal (1);
-            e.Handled = true;
-
-            return;
+            if (Viewport.X + Viewport.Width < GetContentSize ().Width)
+            {
+                ScrollHorizontal (1);
+            }
+            return mouseEvent.Handled = true;
         }
 
-        if (e.Flags == MouseFlags.WheeledLeft)
+        if (mouseEvent.Flags == MouseFlags.WheeledLeft)
         {
             ScrollHorizontal (-1);
-            e.Handled = true;
+            return mouseEvent.Handled = true;
         }
+
+        return false;
     }
 
     private void Handle_MouseClick (object? sender, MouseEventArgs me)

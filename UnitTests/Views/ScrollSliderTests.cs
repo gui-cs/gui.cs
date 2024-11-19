@@ -1007,26 +1007,4 @@ public class ScrollSliderTests (ITestOutputHelper output)
 
         _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
     }
-
-    [Fact]
-    public void ShowPercent_True_ShowsPercentage ()
-    {
-        View super = new ()
-        {
-            Id = "super",
-            Width = 10,
-            Height = 10
-        };
-        ScrollSlider scrollSlider = new ()
-        {
-            Id = "scrollSlider",
-            Height = 10,
-            Width = 10,
-        };
-        super.Add (scrollSlider);
-        scrollSlider.ShowPercent = true;
-        Assert.True (scrollSlider.ShowPercent);
-        super.Draw ();
-        Assert.Contains ("0%", scrollSlider.Text);
-    }
 }

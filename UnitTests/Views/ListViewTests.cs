@@ -790,10 +790,10 @@ Item 6",
         var lv = new ListView
         {
             X = 1,
-            Width = 10,
-            Height = 5,
             Source = new ListWrapper<string> (source)
         };
+        lv.Height = lv.Source.Count;
+        lv.Width = lv.MaxLength;
         var top = new Toplevel ();
         top.Add (lv);
         Application.Begin (top);

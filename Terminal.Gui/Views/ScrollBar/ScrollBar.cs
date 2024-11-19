@@ -17,9 +17,10 @@ namespace Terminal.Gui;
 ///         See the <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/scrolling.html">Scrolling Deep Dive</see>.
 ///     </para>
 ///     <para>
-///         By default, the built-in View scrollbars have both <see cref="View.Visible"/> and <see cref="AutoShow"/> set to
+///         By default, the built-in View scrollbars (<see cref="View.VerticalScrollBar"/>/
+///         <see cref="View.HorizontalScrollBar"/>) have both <see cref="View.Visible"/> and <see cref="AutoShow"/> set to
 ///         <see langword="false"/>.
-///         To enable them, either  set <see cref="AutoShow"/> set to <see langword="true"/> or explictly set
+///         To enable them, either set <see cref="AutoShow"/> set to <see langword="true"/> or explicitly set
 ///         <see cref="View.Visible"/>
 ///         to <see langword="true"/>.
 ///     </para>
@@ -30,7 +31,7 @@ namespace Terminal.Gui;
 public class ScrollBar : View, IOrientation, IDesignable
 {
     private readonly Button _decreaseButton;
-    internal readonly ScrollSlider _slider;
+    private readonly ScrollSlider _slider;
     private readonly Button _increaseButton;
 
     /// <inheritdoc/>
@@ -81,6 +82,8 @@ public class ScrollBar : View, IOrientation, IDesignable
         // This sets the width/height etc...
         OnOrientationChanged (Orientation);
 
+        return;
+
         void OnDecreaseButtonOnAccept (object? s, CommandEventArgs e)
         {
             Position -= Increment;
@@ -104,24 +107,9 @@ public class ScrollBar : View, IOrientation, IDesignable
             Visible = VisibleContentSize < ScrollableContentSize;
         }
 
-        if (Orientation == Orientation.Vertical)
-        {
-            _slider.VisibleContentSize = VisibleContentSize;
-        }
-        else
-        {
-            _slider.VisibleContentSize = VisibleContentSize;
-        }
-
+        _slider.VisibleContentSize = VisibleContentSize;
         _slider.Size = CalculateSliderSize ();
         _sliderPosition = CalculateSliderPositionFromContentPosition (_position);
-
-        // This keeps the position constant while slider is moving
-        if (_sliderPosition.Value != _slider.Position)
-        {
-            //Position = CalculatePositionFromSliderPosition (_sliderPosition.Value);
-        }
-
         _slider.Position = _sliderPosition.Value;
     }
 
@@ -197,7 +185,8 @@ public class ScrollBar : View, IOrientation, IDesignable
     #endregion
 
     /// <summary>
-    ///     Gets or sets the amount each mouse wheel event, or click on the increment/decrement buttons, will incremenet/decrement the <see cref="Position"/>.
+    ///     Gets or sets the amount each mouse wheel event, or click on the increment/decrement buttons, will
+    ///     incremenet/decrement the <see cref="Position"/>.
     /// </summary>
     /// <remarks>
     ///     The default is 1.
@@ -233,16 +222,6 @@ public class ScrollBar : View, IOrientation, IDesignable
                 SetNeedsLayout ();
             }
         }
-    }
-
-    /// <summary>
-    ///     Gets or sets whether the Scroll will show the percentage the slider
-    ///     takes up within the <see cref="ScrollableContentSize"/>.
-    /// </summary>
-    public bool ShowPercent
-    {
-        get => _slider.ShowPercent;
-        set => _slider.ShowPercent = value;
     }
 
     private int? _visibleContentSize;

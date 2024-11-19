@@ -145,7 +145,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     ///     <para>
     ///         Normally Subviews will be disposed when this View is disposed. Removing a Subview causes ownership of the
     ///         Subview's
-    ///         lifecycle to be transferred to the caller; the caller muse call <see cref="Dispose"/>.
+    ///         lifecycle to be transferred to the caller; the caller must call <see cref="Dispose()"/>.
     ///     </para>
     /// </remarks>
     /// <returns>
@@ -214,7 +214,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     ///     <para>
     ///         Normally Subviews will be disposed when this View is disposed. Removing a Subview causes ownership of the
     ///         Subview's
-    ///         lifecycle to be transferred to the caller; the caller must call <see cref="Dispose"/> on any Views that were
+    ///         lifecycle to be transferred to the caller; the caller must call <see cref="Dispose()"/> on any Views that were
     ///         added.
     ///     </para>
     /// </remarks>

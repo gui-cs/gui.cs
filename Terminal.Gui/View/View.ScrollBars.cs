@@ -3,8 +3,29 @@ namespace Terminal.Gui;
 
 public partial class View
 {
-    private Lazy<ScrollBar> _horizontalScrollBar;
-    private Lazy<ScrollBar> _verticalScrollBar;
+    private Lazy<ScrollBar> _horizontalScrollBar = null!;
+
+    /// <summary>
+    ///     Gets the horizontal <see cref="ScrollBar"/>. This property is lazy-loaded and will not be created until it is accessed.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         See <see cref="ScrollBar"/> for more information on how to use the ScrollBar.
+    ///     </para>
+    /// </remarks>
+    public ScrollBar HorizontalScrollBar => _horizontalScrollBar.Value;
+
+    private Lazy<ScrollBar> _verticalScrollBar = null!;
+
+    /// <summary>
+    ///     Gets the vertical <see cref="ScrollBar"/>. This property is lazy-loaded and will not be created until it is accessed.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         See <see cref="ScrollBar"/> for more information on how to use the ScrollBar.
+    ///     </para>
+    /// </remarks>
+    public ScrollBar VerticalScrollBar => _verticalScrollBar.Value;
 
     /// <summary>
     ///     Initializes the ScrollBars of the View. Called by the View constructor.
@@ -150,26 +171,6 @@ public partial class View
                                         };
                                     };
     }
-
-    /// <summary>
-    ///     Gets the horizontal <see cref="ScrollBar"/>. This property is lazy-loaded and will not be created until it is accessed.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         See <see cref="ScrollBar"/> for more information on how to use the ScrollBar.
-    ///     </para>
-    /// </remarks>
-    public ScrollBar HorizontalScrollBar => _horizontalScrollBar.Value;
-
-    /// <summary>
-    ///     Gets the vertical <see cref="ScrollBar"/>. This property is lazy-loaded and will not be created until it is accessed.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         See <see cref="ScrollBar"/> for more information on how to use the ScrollBar.
-    ///     </para>
-    /// </remarks>
-    public ScrollBar VerticalScrollBar => _verticalScrollBar.Value;
 
     /// <summary>
     ///     Clean up the ScrollBars of the View. Called by View.Dispose.

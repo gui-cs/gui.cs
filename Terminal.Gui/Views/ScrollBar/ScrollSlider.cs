@@ -1,8 +1,6 @@
 ﻿#nullable enable
 
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing;
 
 namespace Terminal.Gui;
 
@@ -12,11 +10,6 @@ namespace Terminal.Gui;
 ///     oriented either vertically or horizontally.
 /// </summary>
 /// <remarks>
-///     <para>
-///         If <see cref="View.Text"/> is set, it will be displayed centered within the slider. Set
-///         <see cref="ShowPercent"/> to automatically have the Text
-///         be show what percent the slider is to the Superview's Viewport size.
-///     </para>
 ///     <para>
 ///         Used to represent the proportion of the visible content to the Viewport in a <see cref="Scrolled"/>.
 ///     </para>
@@ -100,28 +93,12 @@ public class ScrollSlider : View, IOrientation, IDesignable
         return true;
     }
 
-    private bool _showPercent;
-
-    /// <summary>
-    ///     Gets or sets whether the ScrollSlider will set <see cref="View.Text"/> to show the percentage the slider
-    ///     takes up within the <see cref="View.SuperView"/>'s Viewport.
-    /// </summary>
-    public bool ShowPercent
-    {
-        get => _showPercent;
-        set
-        {
-            _showPercent = value;
-            SetNeedsDraw ();
-        }
-    }
-
     private int? _size;
 
     /// <summary>
     ///     Gets or sets the size of the ScrollSlider. This is a helper that gets or sets Width or Height depending
     ///     on  <see cref="Orientation"/>. The size will be clamped between 1 and the dimension of
-    ///     the <see cref="View.SuperView"/>'s Viewport. 
+    ///     the <see cref="View.SuperView"/>'s Viewport.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -291,33 +268,6 @@ public class ScrollSlider : View, IOrientation, IDesignable
     public event EventHandler<EventArgs<int>>? Scrolled;
 
     /// <inheritdoc/>
-    protected override bool OnDrawingText ()
-    {
-        if (!ShowPercent)
-        {
-            Text = string.Empty;
-
-            return false;
-        }
-
-        if (SuperView is null)
-        {
-            return false;
-        }
-
-        if (Orientation == Orientation.Vertical)
-        {
-            Text = $"{(int)Math.Round ((double)Viewport.Height / SuperView!.GetContentSize ().Height * 100)}%";
-        }
-        else
-        {
-            Text = $"{(int)Math.Round ((double)Viewport.Width / SuperView!.GetContentSize ().Width * 100)}%";
-        }
-
-        return false;
-    }
-
-    /// <inheritdoc/>
     public override Attribute GetNormalColor () { return base.GetHotNormalColor (); }
 
     ///// <inheritdoc/>
@@ -478,10 +428,8 @@ public class ScrollSlider : View, IOrientation, IDesignable
     /// <inheritdoc/>
     public bool EnableForDesign ()
     {
-        ShowPercent = true;
         Size = 5;
 
         return true;
     }
-
 }

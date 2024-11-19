@@ -1,67 +1,8 @@
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui;
-
-/// <summary>Implement <see cref="IListDataSource"/> to provide custom rendering for a <see cref="ListView"/>.</summary>
-public interface IListDataSource : IDisposable
-{
-    /// <summary>
-    /// Event to raise when an item is added, removed, or moved, or the entire list is refreshed.
-    /// </summary>
-    event NotifyCollectionChangedEventHandler CollectionChanged;
-
-    /// <summary>Returns the number of elements to display</summary>
-    int Count { get; }
-
-    /// <summary>Returns the maximum length of elements to display</summary>
-    int Length { get; }
-
-    /// <summary>
-    /// Allow suspending the <see cref="CollectionChanged"/> event from being invoked,
-    /// if <see langword="true"/>, otherwise is <see langword="false"/>.
-    /// </summary>
-    bool SuspendCollectionChangedEvent { get; set; }
-
-    /// <summary>Should return whether the specified item is currently marked.</summary>
-    /// <returns><see langword="true"/>, if marked, <see langword="false"/> otherwise.</returns>
-    /// <param name="item">Item index.</param>
-    bool IsMarked (int item);
-
-    /// <summary>This method is invoked to render a specified item, the method should cover the entire provided width.</summary>
-    /// <returns>The render.</returns>
-    /// <param name="listView">The list view to render.</param>
-    /// <param name="selected">Describes whether the item being rendered is currently selected by the user.</param>
-    /// <param name="item">The index of the item to render, zero for the first item and so on.</param>
-    /// <param name="col">The column where the rendering will start</param>
-    /// <param name="line">The line where the rendering will be done.</param>
-    /// <param name="width">The width that must be filled out.</param>
-    /// <param name="start">The index of the string to be displayed.</param>
-    /// <remarks>
-    ///     The default color will be set before this method is invoked, and will be based on whether the item is selected
-    ///     or not.
-    /// </remarks>
-    void Render (
-        ListView listView,
-        bool selected,
-        int item,
-        int col,
-        int line,
-        int width,
-        int start = 0
-    );
-
-    /// <summary>Flags the item as marked.</summary>
-    /// <param name="item">Item index.</param>
-    /// <param name="value">If set to <see langword="true"/> value.</param>
-    void SetMark (int item, bool value);
-
-    /// <summary>Return the source as IList.</summary>
-    /// <returns></returns>
-    IList ToList ();
-}
 
 /// <summary>
 ///     ListView <see cref="View"/> renders a scrollable list of data where each item can be activated to perform an
@@ -200,7 +141,7 @@ public class ListView : View, IDesignable
                                         return !SetFocus ();
                                     });
 
-        AddCommand (Command.SelectAll, (ctx) => MarkAll((bool)ctx.KeyBinding?.Context!));
+        AddCommand (Command.SelectAll, (ctx) => MarkAll ((bool)ctx.KeyBinding?.Context!));
 
         // Default keybindings for all ListViews
         KeyBindings.Add (Key.CursorUp, Command.Up);
@@ -224,13 +165,18 @@ public class ListView : View, IDesignable
         // Use the form of Add that lets us pass context to the handler
         KeyBindings.Add (Key.A.WithCtrl, new KeyBinding ([Command.SelectAll], KeyBindingScope.Focused, true));
         KeyBindings.Add (Key.U.WithCtrl, new KeyBinding ([Command.SelectAll], KeyBindingScope.Focused, false));
-
-        SubviewsLaidOut += ListView_LayoutComplete;
     }
 
-    private void ListView_LayoutComplete (object sender, LayoutEventArgs e)
+    /// <inheritdoc />
+    protected override void OnViewportChanged (DrawEventArgs e)
     {
         SetContentSize (new Size (MaxLength, _source?.Count ?? Viewport.Height));
+    }
+
+    /// <inheritdoc />
+    protected override void OnFrameChanged (in Rectangle frame)
+    {
+        EnsureSelectedItemVisible ();
     }
 
     /// <summary>Gets or sets whether this <see cref="ListView"/> allows items to be marked.</summary>
@@ -353,7 +299,7 @@ public class ListView : View, IDesignable
             SetContentSize (new Size (_source?.Length ?? Viewport.Width, _source?.Count ?? Viewport.Width));
             if (IsInitialized)
             {
-               // Viewport = Viewport with { Y = 0 };
+                // Viewport = Viewport with { Y = 0 };
             }
 
             KeystrokeNavigator.Collection = _source?.ToList ();
@@ -453,23 +399,17 @@ public class ListView : View, IDesignable
     /// <summary>Ensures the selected item is always visible on the screen.</summary>
     public void EnsureSelectedItemVisible ()
     {
-        if (SuperView?.IsInitialized == true)
+        if (_selected == -1)
         {
-            if (_selected < Viewport.Y)
-            {
-                // TODO: The Max check here is not needed because, by default, Viewport enforces staying w/in ContentArea (View.ScrollSettings).
-                Viewport = Viewport with { Y = _selected };
-            }
-            else if (Viewport.Height > 0 && _selected >= Viewport.Y + Viewport.Height)
-            {
-                Viewport = Viewport with { Y = _selected - Viewport.Height + 1 };
-            }
-
-            SubviewLayout -= ListView_LayoutStarted;
+            return;
         }
-        else
+        if (_selected < Viewport.Y)
         {
-            SubviewLayout += ListView_LayoutStarted;
+            Viewport = Viewport with { Y = _selected };
+        }
+        else if (Viewport.Height > 0 && _selected >= Viewport.Y + Viewport.Height)
+        {
+            Viewport = Viewport with { Y = _selected - Viewport.Height + 1 };
         }
     }
 
@@ -485,7 +425,7 @@ public class ListView : View, IDesignable
             return Source.IsMarked (SelectedItem);
         }
 
-        // BUGBUG: Shouldn't this retrn Source.IsMarked (SelectedItem)
+        // BUGBUG: Shouldn't this return Source.IsMarked (SelectedItem)
 
         return false;
     }
@@ -515,7 +455,10 @@ public class ListView : View, IDesignable
 
         if (me.Flags == MouseFlags.WheeledDown)
         {
-            ScrollVertical (1);
+            if (Viewport.Y + Viewport.Height < GetContentSize ().Height)
+            {
+                ScrollVertical (1);
+            }
 
             return true;
         }
@@ -529,7 +472,10 @@ public class ListView : View, IDesignable
 
         if (me.Flags == MouseFlags.WheeledRight)
         {
-            ScrollHorizontal (1);
+            if (Viewport.X + Viewport.Width < GetContentSize ().Width)
+            {
+                ScrollHorizontal (1);
+            }
 
             return true;
         }
@@ -1209,7 +1155,7 @@ public class ListWrapper<T> : IListDataSource, IDisposable
 
         var maxLength = 0;
 
-        for (var i = 0; i < _source.Count; i++)
+        for (var i = 0; i < _source!.Count; i++)
         {
             object t = _source [i];
             int l;

@@ -7,9 +7,6 @@ public partial class View
     /// <summary>Moves the drawing cursor to the specified <see cref="Viewport"/>-relative location in the view.</summary>
     /// <remarks>
     ///     <para>
-    ///         If the provided coordinates are outside the visible content area, this method does nothing.
-    ///     </para>
-    ///     <para>
     ///         The top-left corner of the visible content area is <c>ViewPort.Location</c>.
     ///     </para>
     /// </remarks>
@@ -18,11 +15,6 @@ public partial class View
     public bool Move (int col, int row)
     {
         if (Driver is null || Driver?.Rows == 0)
-        {
-            return false;
-        }
-
-        if (col < 0 || row < 0 || col >= Viewport.Width || row >= Viewport.Height)
         {
             return false;
         }

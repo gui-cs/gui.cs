@@ -4,7 +4,8 @@
 ///     Settings for how the <see cref="View.Viewport"/> behaves relative to the View's Content area.
 /// </summary>
 /// <remarks>
-///     See the Layout Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
+///     See the Layout Deep Dive for more information:
+///     <see href="https://gui-cs.github.io/Terminal.GuiV2Docs/docs/layout.html"/>
 /// </remarks>
 [Flags]
 public enum ViewportSettings
@@ -76,7 +77,8 @@ public enum ViewportSettings
     AllowYGreaterThanContentHeight = 8,
 
     /// <summary>
-    ///     If set, <see cref="View.Viewport"/><c>.Size</c> can be set values greater than <see cref="View.GetContentSize ()"/>
+    ///     If set, <see cref="View.Viewport"/><c>.Location</c> can be set values greater than
+    ///     <see cref="View.GetContentSize ()"/>
     ///     enabling scrolling beyond the bottom-right
     ///     of the content area.
     ///     <para>
@@ -88,10 +90,46 @@ public enum ViewportSettings
     AllowLocationGreaterThanContentSize = AllowXGreaterThanContentWidth | AllowYGreaterThanContentHeight,
 
     /// <summary>
+    ///     If set and <see cref="View.Viewport"/><c>.Width</c> is greater than <see cref="View.GetContentSize ()"/>
+    ///     <c>.Width</c> <see cref="View.Viewport"/><c>.X</c> can be negative.
+    ///     <para>
+    ///         When not set, <see cref="View.Viewport"/><c>.X</c> will be constrained to non-negative values when
+    ///         <see cref="View.Viewport"/><c>.Width</c> is greater than <see cref="View.GetContentSize ()"/>
+    ///         <c>.Width</c>, preventing
+    ///         scrolling beyond the left of the Viewport.
+    ///     </para>
+    ///     <para>
+    ///         This can be useful in infinite scrolling scenarios.
+    ///     </para>
+    /// </summary>
+    AllowNegativeXWhenWidthGreaterThanContentWidth = 16,
+
+    /// <summary>
+    ///     If set and <see cref="View.Viewport"/><c>.Height</c> is greater than <see cref="View.GetContentSize ()"/>
+    ///     <c>.Height</c> <see cref="View.Viewport"/><c>.Y</c> can be negative.
+    ///     <para>
+    ///         When not set, <see cref="View.Viewport"/><c>.Y</c> will be constrained to non-negative values when
+    ///         <see cref="View.Viewport"/><c>.Height</c> is greater than <see cref="View.GetContentSize ()"/>
+    ///         <c>.Height</c>, preventing
+    ///         scrolling above the top of the Viewport.
+    ///     </para>
+    ///     <para>
+    ///         This can be useful in infinite scrolling scenarios.
+    ///     </para>
+    /// </summary>
+    AllowNegativeYWhenHeightGreaterThanContentHeight = 32,
+
+    /// <summary>
+    ///     The combination of <see cref="AllowNegativeXWhenWidthGreaterThanContentWidth"/> and
+    ///     <see cref="AllowNegativeYWhenHeightGreaterThanContentHeight"/>.
+    /// </summary>
+    AllowNegativeLocationWhenSizeGreaterThanContentSize = AllowNegativeXWhenWidthGreaterThanContentWidth | AllowNegativeYWhenHeightGreaterThanContentHeight,
+
+    /// <summary>
     ///     By default, clipping is applied to the <see cref="View.Viewport"/>. Setting this flag will cause clipping to be
     ///     applied to the visible content area.
     /// </summary>
-    ClipContentOnly = 16,
+    ClipContentOnly = 64,
 
     /// <summary>
     ///     If set <see cref="View.ClearViewport"/> will clear only the portion of the content
@@ -100,5 +138,5 @@ public enum ViewportSettings
     ///     <see cref="ClipContentOnly"/> must be set for this setting to work (clipping beyond the visible area must be
     ///     disabled).
     /// </summary>
-    ClearContentOnly = 32,
+    ClearContentOnly = 128
 }

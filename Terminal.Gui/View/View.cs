@@ -150,6 +150,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
         //SetupMouse ();
 
         SetupText ();
+
         SetupScrollBars ();
     }
 
@@ -262,7 +263,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
     private bool _enabled = true;
 
-    /// <summary>Gets or sets a value indicating whether this <see cref="Responder"/> can respond to user interaction.</summary>
+    /// <summary>Gets or sets a value indicating whether this <see cref="View"/> can respond to user interaction.</summary>
     public bool Enabled
     {
         get => _enabled;

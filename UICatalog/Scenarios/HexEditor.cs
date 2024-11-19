@@ -148,6 +148,9 @@ public class HexEditor : Scenario
         };
         app.Add (_statusBar);
 
+        _hexView.VerticalScrollBar.AutoShow = true;
+        _hexView.HorizontalScrollBar.AutoShow = true;
+
         _hexView.Source = LoadFile ();
 
         Application.Run (app);
@@ -252,7 +255,7 @@ public class HexEditor : Scenario
         {
             _fileName = d.FilePaths [0];
             _hexView.Source = LoadFile ();
-            _hexView.DisplayStart = 0;
+            //_hexView.DisplayStart = 0;
         }
 
         d.Dispose ();

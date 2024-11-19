@@ -10,7 +10,7 @@ public class DrawTests (ITestOutputHelper _output)
 
     [Fact]
     [SetupFakeDriver]
-    public void Move_Is_Constrained_To_Viewport ()
+    public void Move_Is_Not_Constrained_To_Viewport ()
     {
         var view = new View
         {
@@ -20,16 +20,14 @@ public class DrawTests (ITestOutputHelper _output)
         };
         view.Margin!.Thickness = new (1);
 
-        // Only valid location w/in Viewport is 0, 0 (view) - 2, 2 (screen)
-
         view.Move (0, 0);
         Assert.Equal (new (2, 2), new Point (Application.Driver!.Col, Application.Driver!.Row));
 
         view.Move (-1, -1);
-        Assert.Equal (new (2, 2), new Point (Application.Driver!.Col, Application.Driver!.Row));
+        Assert.Equal (new (1, 1), new Point (Application.Driver!.Col, Application.Driver!.Row));
 
         view.Move (1, 1);
-        Assert.Equal (new (2, 2), new Point (Application.Driver!.Col, Application.Driver!.Row));
+        Assert.Equal (new (3, 3), new Point (Application.Driver!.Col, Application.Driver!.Row));
     }
 
     [Fact]
