@@ -2,13 +2,13 @@
 
 /// <summary>Represents an option in a <see cref="Slider{T}"/> .</summary>
 /// <typeparam name="T">Data type of the option.</typeparam>
-public class SliderOption<T>
+public class RangeSliderOption<T>
 {
-    /// <summary>Creates a new empty instance of the <see cref="SliderOption{T}"/> class.</summary>
-    public SliderOption () { }
+    /// <summary>Creates a new empty instance of the <see cref="RangeSliderOption{T}"/> class.</summary>
+    public RangeSliderOption () { }
 
-    /// <summary>Creates a new instance of the <see cref="SliderOption{T}"/> class with values for each property.</summary>
-    public SliderOption (string legend, Rune legendAbbr, T data)
+    /// <summary>Creates a new instance of the <see cref="RangeSliderOption{T}"/> class with values for each property.</summary>
+    public RangeSliderOption (string legend, Rune legendAbbr, T data)
     {
         Legend = legend;
         LegendAbbr = legendAbbr;
@@ -16,7 +16,7 @@ public class SliderOption<T>
     }
 
     /// <summary>Event fired when an option has changed.</summary>
-    public event EventHandler<SliderOptionEventArgs> Changed;
+    public event EventHandler<RangeSliderOptionEventArgs> Changed;
 
     /// <summary>Custom data of the option.</summary>
     public T Data { get; set; }
@@ -31,13 +31,13 @@ public class SliderOption<T>
     public Rune LegendAbbr { get; set; }
 
     /// <summary>Event Raised when this option is set.</summary>
-    public event EventHandler<SliderOptionEventArgs> Set;
+    public event EventHandler<RangeSliderOptionEventArgs> Set;
 
-    /// <summary>Creates a human-readable string that represents this <see cref="SliderOption{T}"/>.</summary>
+    /// <summary>Creates a human-readable string that represents this <see cref="RangeSliderOption{T}"/>.</summary>
     public override string ToString () { return "{Legend=" + Legend + ", LegendAbbr=" + LegendAbbr + ", Data=" + Data + "}"; }
 
     /// <summary>Event Raised when this option is unset.</summary>
-    public event EventHandler<SliderOptionEventArgs> UnSet;
+    public event EventHandler<RangeSliderOptionEventArgs> UnSet;
 
     /// <summary>To Raise the <see cref="Changed"/> event from the Slider.</summary>
     internal void OnChanged (bool isSet) { Changed?.Invoke (this, new (isSet)); }

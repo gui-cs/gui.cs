@@ -19,37 +19,37 @@ public sealed class ArrangementEditor : EditorBase
 
         _arrangementSlider.Options =
         [
-            new SliderOption<ViewArrangement>
+            new RangeSliderOption<ViewArrangement>
             {
                 Legend = ViewArrangement.Movable.ToString (),
                 Data = ViewArrangement.Movable
             },
 
-            new SliderOption<ViewArrangement>
+            new RangeSliderOption<ViewArrangement>
             {
                 Legend = ViewArrangement.LeftResizable.ToString (),
                 Data = ViewArrangement.LeftResizable
             },
 
-            new SliderOption<ViewArrangement>
+            new RangeSliderOption<ViewArrangement>
             {
                 Legend = ViewArrangement.RightResizable.ToString (),
                 Data = ViewArrangement.RightResizable
             },
 
-            new SliderOption<ViewArrangement>
+            new RangeSliderOption<ViewArrangement>
             {
                 Legend = ViewArrangement.TopResizable.ToString (),
                 Data = ViewArrangement.TopResizable
             },
 
-            new SliderOption<ViewArrangement>
+            new RangeSliderOption<ViewArrangement>
             {
                 Legend = ViewArrangement.BottomResizable.ToString (),
                 Data = ViewArrangement.BottomResizable
             },
 
-            new SliderOption<ViewArrangement>
+            new RangeSliderOption<ViewArrangement>
             {
                 Legend = ViewArrangement.Overlapped.ToString (),
                 Data = ViewArrangement.Overlapped
@@ -63,7 +63,7 @@ public sealed class ArrangementEditor : EditorBase
     {
         Orientation = Orientation.Vertical,
         UseMinimumSize = true,
-        Type = SliderType.Multiple,
+        Type = RangeSliderType.Multiple,
         AllowEmpty = true,
     };
 
@@ -90,14 +90,14 @@ public sealed class ArrangementEditor : EditorBase
 
     private void ArrangementEditor_Initialized (object? sender, EventArgs e) { _arrangementSlider.OptionsChanged += ArrangementSliderOnOptionsChanged; }
 
-    private void ArrangementSliderOnOptionsChanged (object? sender, SliderEventArgs<ViewArrangement> e)
+    private void ArrangementSliderOnOptionsChanged (object? sender, RangeSliderEventArgs<ViewArrangement> e)
     {
         if (ViewToEdit is { })
         {
             // Set the arrangement based on the selected options
             var arrangement = ViewArrangement.Fixed;
 
-            foreach (KeyValuePair<int, SliderOption<ViewArrangement>> option in e.Options)
+            foreach (KeyValuePair<int, RangeSliderOption<ViewArrangement>> option in e.Options)
             {
                 arrangement |= option.Value.Data;
             }

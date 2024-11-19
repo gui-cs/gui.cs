@@ -1,7 +1,7 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary><see cref="Slider{T}"/> Legend Style</summary>
-public class SliderAttributes
+public class RangeSliderAttributes
 {
     /// <summary>Attribute for the Legends Container.</summary>
     public Attribute? EmptyAttribute { get; set; }
