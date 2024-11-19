@@ -11,7 +11,7 @@ public class Tab : View
     /// <summary>Creates a new unnamed tab with no controls inside.</summary>
     public Tab ()
     {
-        BorderStyle = LineStyle.Rounded;
+        BorderStyle = LineStyle.Single;
         CanFocus = true;
         TabStop = TabBehavior.TabStop;
         Width = Dim.Auto (DimAutoStyle.Text);

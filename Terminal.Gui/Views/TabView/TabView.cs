@@ -21,6 +21,7 @@ public class TabView : View, IDesignable
     {
         CanFocus = true;
         TabStop = TabBehavior.TabStop; // Because TabView has focusable subviews, it must be a TabGroup
+        SuperViewRendersLineCanvas = true;
 
         Width = Dim.Fill ();
         Height = Dim.Auto (minimumContentDim: GetTabHeight (!Style.TabsOnBottom));
