@@ -1,10 +1,10 @@
 ﻿namespace Terminal.Gui;
 
-/// <summary><see cref="RangeSlider{T}"/> Style</summary>
-public class RangeSliderStyle
+/// <summary><see cref="LinearRange{T}"/> Style</summary>
+public class LinearRangeStyle
 {
     /// <summary>Constructs a new instance.</summary>
-    public RangeSliderStyle () { LegendAttributes = new (); }
+    public LinearRangeStyle () { LegendAttributes = new (); }
 
     /// <summary>The glyph and the attribute to indicate mouse dragging.</summary>
     public Cell DragChar { get; set; }
@@ -16,7 +16,7 @@ public class RangeSliderStyle
     public Cell EndRangeChar { get; set; }
 
     /// <summary>Legend attributes</summary>
-    public RangeSliderAttributes LegendAttributes { get; set; }
+    public LinearRangeAttributes LegendAttributes { get; set; }
 
     /// <summary>The glyph and the attribute used for each option (tick) on the slider.</summary>
     public Cell OptionChar { get; set; }

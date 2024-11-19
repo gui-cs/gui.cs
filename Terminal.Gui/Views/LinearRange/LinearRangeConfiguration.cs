@@ -1,7 +1,7 @@
 ﻿namespace Terminal.Gui;
 
-/// <summary>All <see cref="RangeSlider{T}"/> configuration are grouped in this class.</summary>
-internal class RangeSliderConfiguration
+/// <summary>All <see cref="LinearRange{T}"/> configuration are grouped in this class.</summary>
+internal class LinearRangeConfiguration
 {
     internal bool _allowEmpty;
     internal int _endSpacing;
@@ -14,6 +14,6 @@ internal class RangeSliderConfiguration
     internal bool _showLegendsAbbr;
     internal Orientation _sliderOrientation = Orientation.Horizontal;
     internal int _startSpacing;
-    internal RangeSliderType _type = RangeSliderType.Single;
+    internal LinearRangeType _type = LinearRangeType.Single;
     internal bool _useMinimumSize;
 }

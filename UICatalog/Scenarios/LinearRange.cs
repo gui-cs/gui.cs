@@ -8,18 +8,18 @@ using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("RangeSliders", "Demonstrates the RangeSlider view.")]
+[ScenarioMetadata ("LinearRanges", "Demonstrates the LinearRange view.")]
 [ScenarioCategory ("Controls")]
-public class RangeSliders : Scenario
+public class LinearRanges : Scenario
 {
     public void MakeSliders (View v, List<object> options)
     {
-        List<RangeSliderType> types = Enum.GetValues (typeof (RangeSliderType)).Cast<RangeSliderType> ().ToList ();
-        RangeSlider prev = null;
+        List<LinearRangeType> types = Enum.GetValues (typeof (LinearRangeType)).Cast<LinearRangeType> ().ToList ();
+        LinearRange prev = null;
 
-        foreach (RangeSliderType type in types)
+        foreach (LinearRangeType type in types)
         {
-            var view = new RangeSlider (options)
+            var view = new LinearRange (options)
             {
                 Title = type.ToString (),
                 X = 0,
@@ -76,12 +76,12 @@ public class RangeSliders : Scenario
             39
         };
 
-        var single = new RangeSlider (singleOptions)
+        var single = new LinearRange (singleOptions)
         {
             Title = "_Continuous",
             X = 0,
             Y = prev == null ? 0 : Pos.Bottom (prev),
-            Type = RangeSliderType.Single,
+            Type = LinearRangeType.Single,
             BorderStyle = LineStyle.Single,
             AllowEmpty = false
         };
@@ -111,12 +111,12 @@ public class RangeSliders : Scenario
 
         List<object> oneOption = new () { "The Only Option" };
 
-        var one = new RangeSlider (oneOption)
+        var one = new LinearRange (oneOption)
         {
             Title = "_One Option",
             X = 0,
             Y = prev == null ? 0 : Pos.Bottom (single),
-            Type = RangeSliderType.Single,
+            Type = LinearRangeType.Single,
             BorderStyle = LineStyle.Single,
             AllowEmpty = false
         };
@@ -163,13 +163,13 @@ public class RangeSliders : Scenario
 
         #region Config Slider
 
-        RangeSlider<string> optionsSlider = new ()
+        LinearRange<string> optionsSlider = new ()
         {
             Title = "Options",
             X = 0,
             Y = 0,
             Width = Dim.Fill (),
-            Type = RangeSliderType.Multiple,
+            Type = LinearRangeType.Multiple,
             AllowEmpty = true,
             BorderStyle = LineStyle.Single
         };
@@ -177,7 +177,7 @@ public class RangeSliders : Scenario
         optionsSlider.Style.SetChar = optionsSlider.Style.SetChar with { Attribute = new Attribute (Color.BrightGreen, Color.Black) };
         optionsSlider.Style.LegendAttributes.SetAttribute = new Attribute (Color.Green, Color.Black);
 
-        optionsSlider.Options = new List<RangeSliderOption<string>>
+        optionsSlider.Options = new List<LinearRangeOption<string>>
         {
             new () { Legend = "Legends" },
             new () { Legend = "RangeAllowSingle" },
@@ -189,7 +189,7 @@ public class RangeSliders : Scenario
 
         optionsSlider.OptionsChanged += (sender, e) =>
                                  {
-                                     foreach (RangeSlider s in app.Subviews.OfType<RangeSlider> ())
+                                     foreach (LinearRange s in app.Subviews.OfType<LinearRange> ())
                                      {
                                          s.ShowLegends = e.Options.ContainsKey (0);
                                          s.RangeAllowSingle = e.Options.ContainsKey (1);
@@ -233,7 +233,7 @@ public class RangeSliders : Scenario
 
         dimAutoUsesMin.CheckedStateChanging += (sender, e) =>
                                   {
-                                      foreach (RangeSlider s in app.Subviews.OfType<RangeSlider> ())
+                                      foreach (LinearRange s in app.Subviews.OfType<LinearRange> ())
                                       {
                                           s.UseMinimumSize = !s.UseMinimumSize;
                                       }
@@ -242,7 +242,7 @@ public class RangeSliders : Scenario
 
         #region Slider Orientation Slider
 
-        RangeSlider<string> orientationSlider = new (new List<string> { "Horizontal", "Vertical" })
+        LinearRange<string> orientationSlider = new (new List<string> { "Horizontal", "Vertical" })
         {
             Title = "Slider Orientation",
             X = 0,
@@ -258,7 +258,7 @@ public class RangeSliders : Scenario
                                                     {
                                                         View prev = null;
 
-                                                        foreach (RangeSlider s in app.Subviews.OfType<RangeSlider> ())
+                                                        foreach (LinearRange s in app.Subviews.OfType<LinearRange> ())
                                                         {
                                                             if (e.Options.ContainsKey (0))
                                                             {
@@ -327,7 +327,7 @@ public class RangeSliders : Scenario
 
         #region Legends Orientation Slider
 
-        RangeSlider<string> legendsOrientationSlider = new (new List<string> { "Horizontal", "Vertical" })
+        LinearRange<string> legendsOrientationSlider = new (new List<string> { "Horizontal", "Vertical" })
         {
             Title = "Legends Orientation",
             X = 0,
@@ -341,7 +341,7 @@ public class RangeSliders : Scenario
 
         legendsOrientationSlider.OptionsChanged += (sender, e) =>
                                                      {
-                                                         foreach (RangeSlider s in app.Subviews.OfType<RangeSlider> ())
+                                                         foreach (LinearRange s in app.Subviews.OfType<LinearRange> ())
                                                          {
                                                              if (e.Options.ContainsKey (0))
                                                              {
@@ -404,7 +404,7 @@ public class RangeSliders : Scenario
             X = Pos.Right (label) + 1
         };
 
-        innerSpacingUpDown.Value = app.Subviews.OfType<RangeSlider> ().First ().MinimumInnerSpacing;
+        innerSpacingUpDown.Value = app.Subviews.OfType<LinearRange> ().First ().MinimumInnerSpacing;
 
         innerSpacingUpDown.ValueChanging += (sender, e) =>
                                             {
@@ -415,7 +415,7 @@ public class RangeSliders : Scenario
                                                     return;
                                                 }
 
-                                                foreach (RangeSlider s in app.Subviews.OfType<RangeSlider> ())
+                                                foreach (LinearRange s in app.Subviews.OfType<LinearRange> ())
                                                 {
                                                     s.MinimumInnerSpacing = e.NewValue;
                                                 }
@@ -430,7 +430,7 @@ public class RangeSliders : Scenario
 
         #region Color Slider
 
-        foreach (RangeSlider s in app.Subviews.OfType<RangeSlider> ())
+        foreach (LinearRange s in app.Subviews.OfType<LinearRange> ())
         {
             s.Style.OptionChar = s.Style.OptionChar with { Attribute = app.GetNormalColor () };
             s.Style.SetChar = s.Style.SetChar with { Attribute = app.GetNormalColor () };
@@ -438,7 +438,7 @@ public class RangeSliders : Scenario
             s.Style.RangeChar = s.Style.RangeChar with { Attribute = app.GetNormalColor () };
         }
 
-        RangeSlider<(Color, Color)> sliderFGColor = new ()
+        LinearRange<(Color, Color)> sliderFGColor = new ()
         {
             Title = "FG Color",
             X = 0,
@@ -446,7 +446,7 @@ public class RangeSliders : Scenario
                             legendsOrientationSlider
                            )
                 + 1,
-            Type = RangeSliderType.Single,
+            Type = LinearRangeType.Single,
             BorderStyle = LineStyle.Single,
             AllowEmpty = false,
             Orientation = Orientation.Vertical,
@@ -458,14 +458,14 @@ public class RangeSliders : Scenario
         sliderFGColor.Style.SetChar = sliderFGColor.Style.SetChar with { Attribute = new Attribute (Color.BrightGreen, Color.Black) };
         sliderFGColor.Style.LegendAttributes.SetAttribute = new Attribute (Color.Green, Color.Blue);
 
-        List<RangeSliderOption<(Color, Color)>> colorOptions = new ();
+        List<LinearRangeOption<(Color, Color)>> colorOptions = new ();
 
         foreach (ColorName16 colorIndex in Enum.GetValues<ColorName16> ())
         {
             var colorName = colorIndex.ToString ();
 
             colorOptions.Add (
-                              new RangeSliderOption<(Color, Color)>
+                              new LinearRangeOption<(Color, Color)>
                               {
                                   Data = (new Color (colorIndex),
                                           new Color (colorIndex)),
@@ -485,7 +485,7 @@ public class RangeSliders : Scenario
                                             {
                                                 (Color, Color) data = e.Options.First ().Value.Data;
 
-                                                foreach (RangeSlider s in app.Subviews.OfType<RangeSlider> ())
+                                                foreach (LinearRange s in app.Subviews.OfType<LinearRange> ())
                                                 {
                                                     s.ColorScheme = new ColorScheme (s.ColorScheme);
 
@@ -528,12 +528,12 @@ public class RangeSliders : Scenario
                                             }
                                         };
 
-        RangeSlider<(Color, Color)> sliderBGColor = new ()
+        LinearRange<(Color, Color)> sliderBGColor = new ()
         {
             Title = "BG Color",
             X = Pos.Right (sliderFGColor),
             Y = Pos.Top (sliderFGColor),
-            Type = RangeSliderType.Single,
+            Type = LinearRangeType.Single,
             BorderStyle = LineStyle.Single,
             AllowEmpty = false,
             Orientation = Orientation.Vertical,
@@ -555,7 +555,7 @@ public class RangeSliders : Scenario
                                             {
                                                 (Color, Color) data = e.Options.First ().Value.Data;
 
-                                                foreach (RangeSlider s in app.Subviews.OfType<RangeSlider> ())
+                                                foreach (LinearRange s in app.Subviews.OfType<LinearRange> ())
                                                 {
                                                     s.ColorScheme = new ColorScheme (s.ColorScheme)
                                                     {
@@ -585,7 +585,7 @@ public class RangeSliders : Scenario
         configView.Add (eventLog);
 
 
-        foreach (RangeSlider slider in app.Subviews.Where (v => v is RangeSlider)!)
+        foreach (LinearRange slider in app.Subviews.Where (v => v is LinearRange)!)
         {
             slider.Accepting += (o, args) =>
                              {

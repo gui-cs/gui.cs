@@ -242,7 +242,7 @@ public class Shortcuts : Scenario
             Width = Dim.Fill () - Dim.Width (eventLog),
             KeyBindingScope = KeyBindingScope.HotKey,
             HelpText = "Sliders work!",
-            CommandView = new RangeSlider<string>
+            CommandView = new LinearRange<string>
             {
                 Orientation = Orientation.Horizontal,
                 AllowEmpty = true
@@ -250,12 +250,12 @@ public class Shortcuts : Scenario
             Key = Key.F5,
         };
 
-        ((RangeSlider<string>)sliderShortcut.CommandView).Options = new () { new () { Legend = "A" }, new () { Legend = "B" }, new () { Legend = "C" } };
-        ((RangeSlider<string>)sliderShortcut.CommandView).SetOption (0);
+        ((LinearRange<string>)sliderShortcut.CommandView).Options = new () { new () { Legend = "A" }, new () { Legend = "B" }, new () { Legend = "C" } };
+        ((LinearRange<string>)sliderShortcut.CommandView).SetOption (0);
 
-        ((RangeSlider<string>)sliderShortcut.CommandView).OptionsChanged += (o, args) =>
+        ((LinearRange<string>)sliderShortcut.CommandView).OptionsChanged += (o, args) =>
         {
-            eventSource.Add ($"OptionsChanged: {o.GetType ().Name} - {string.Join (",", ((RangeSlider<string>)o).GetSetOptions ())}");
+            eventSource.Add ($"OptionsChanged: {o.GetType ().Name} - {string.Join (",", ((LinearRange<string>)o).GetSetOptions ())}");
             eventLog.MoveDown ();
         };
 

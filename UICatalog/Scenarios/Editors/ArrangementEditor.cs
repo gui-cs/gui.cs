@@ -22,37 +22,37 @@ public sealed class ArrangementEditor : EditorBase
 
         _arrangementSlider.Options =
         [
-            new RangeSliderOption<ViewArrangement>
+            new LinearRangeOption<ViewArrangement>
             {
                 Legend = $"{ViewArrangement.Movable}",
                 Data = ViewArrangement.Movable
             },
 
-            new RangeSliderOption<ViewArrangement>
+            new LinearRangeOption<ViewArrangement>
             {
                 Legend = ViewArrangement.LeftResizable.ToString (),
                 Data = ViewArrangement.LeftResizable
             },
 
-            new RangeSliderOption<ViewArrangement>
+            new LinearRangeOption<ViewArrangement>
             {
                 Legend = ViewArrangement.RightResizable.ToString (),
                 Data = ViewArrangement.RightResizable
             },
 
-            new RangeSliderOption<ViewArrangement>
+            new LinearRangeOption<ViewArrangement>
             {
                 Legend = ViewArrangement.TopResizable.ToString (),
                 Data = ViewArrangement.TopResizable
             },
 
-            new RangeSliderOption<ViewArrangement>
+            new LinearRangeOption<ViewArrangement>
             {
                 Legend = ViewArrangement.BottomResizable.ToString (),
                 Data = ViewArrangement.BottomResizable
             },
 
-            new RangeSliderOption<ViewArrangement>
+            new LinearRangeOption<ViewArrangement>
             {
                 Legend = ViewArrangement.Overlapped.ToString (),
                 Data = ViewArrangement.Overlapped
@@ -62,11 +62,11 @@ public sealed class ArrangementEditor : EditorBase
         Add (_arrangementSlider);
     }
 
-    private readonly RangeSlider<ViewArrangement> _arrangementSlider = new()
+    private readonly LinearRange<ViewArrangement> _arrangementSlider = new()
     {
         Orientation = Orientation.Vertical,
         UseMinimumSize = true,
-        Type = RangeSliderType.Multiple,
+        Type = LinearRangeType.Multiple,
         AllowEmpty = true,
     };
 
@@ -104,14 +104,14 @@ public sealed class ArrangementEditor : EditorBase
         _arrangementSlider.Style.DragChar = new Cell { Rune = (Rune)'d', Attribute = GetNormalColor () };
     }
 
-    private void ArrangementSliderOnOptionsChanged (object? sender, RangeSliderEventArgs<ViewArrangement> e)
+    private void ArrangementSliderOnOptionsChanged (object? sender, LinearRangeEventArgs<ViewArrangement> e)
     {
         if (ViewToEdit is { })
         {
             // Set the arrangement based on the selected options
             var arrangement = ViewArrangement.Fixed;
 
-            foreach (KeyValuePair<int, RangeSliderOption<ViewArrangement>> option in e.Options)
+            foreach (KeyValuePair<int, LinearRangeOption<ViewArrangement>> option in e.Options)
             {
                 arrangement |= option.Value.Data;
             }
