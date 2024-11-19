@@ -1,6 +1,6 @@
 ﻿namespace Terminal.Gui;
 
-/// <summary><see cref="Slider{T}"/>  Types</summary>
+/// <summary><see cref="RangeSlider{T}"/>  Types</summary>
 public enum RangeSliderType
 {
     /// <summary>

@@ -144,7 +144,7 @@ public class RangeSliderTests
     public void Constructor_Default ()
     {
         // Arrange & Act
-        Slider<int> slider = new ();
+        RangeSlider<int> slider = new ();
 
         // Assert
         Assert.NotNull (slider);
@@ -168,7 +168,7 @@ public class RangeSliderTests
         List<int> options = new () { 1, 2, 3 };
 
         // Act
-        Slider<int> slider = new (options);
+        RangeSlider<int> slider = new (options);
         slider.SetRelativeLayout (new (100, 100));
 
         // Assert
@@ -186,7 +186,7 @@ public class RangeSliderTests
     public void MovePlus_Should_MoveFocusRight_When_OptionIsAvailable ()
     {
         // Arrange
-        Slider<int> slider = new (new () { 1, 2, 3, 4 });
+        RangeSlider<int> slider = new (new () { 1, 2, 3, 4 });
 
         // Act
         bool result = slider.MovePlus ();
@@ -200,7 +200,7 @@ public class RangeSliderTests
     public void MovePlus_Should_NotMoveFocusRight_When_AtEnd ()
     {
         // Arrange
-        Slider<int> slider = new (new () { 1, 2, 3, 4 });
+        RangeSlider<int> slider = new (new () { 1, 2, 3, 4 });
 
         slider.FocusedOption = 3;
 
@@ -216,7 +216,7 @@ public class RangeSliderTests
     public void OnOptionFocused_Event_Cancelled ()
     {
         // Arrange
-        Slider<int> slider = new (new () { 1, 2, 3 });
+        RangeSlider<int> slider = new (new () { 1, 2, 3 });
         var eventRaised = false;
         var cancel = false;
         slider.OptionFocused += (sender, args) => eventRaised = true;
@@ -256,7 +256,7 @@ public class RangeSliderTests
     public void OnOptionFocused_Event_Raised ()
     {
         // Arrange
-        Slider<int> slider = new (new () { 1, 2, 3 });
+        RangeSlider<int> slider = new (new () { 1, 2, 3 });
         var eventRaised = false;
         slider.OptionFocused += (sender, args) => eventRaised = true;
         var newFocusedOption = 1;
@@ -273,7 +273,7 @@ public class RangeSliderTests
     public void OnOptionsChanged_Event_Raised ()
     {
         // Arrange
-        Slider<int> slider = new ();
+        RangeSlider<int> slider = new ();
         var eventRaised = false;
         slider.OptionsChanged += (sender, args) => eventRaised = true;
 
@@ -288,7 +288,7 @@ public class RangeSliderTests
     public void Set_Should_Not_UnSetFocusedOption_When_EmptyNotAllowed ()
     {
         // Arrange
-        Slider<int> slider = new (new () { 1, 2, 3, 4 }) { AllowEmpty = false };
+        RangeSlider<int> slider = new (new () { 1, 2, 3, 4 }) { AllowEmpty = false };
 
         Assert.NotEmpty (slider.GetSetOptions ());
 
@@ -306,7 +306,7 @@ public class RangeSliderTests
     public void Set_Should_SetFocusedOption ()
     {
         // Arrange
-        Slider<int> slider = new (new () { 1, 2, 3, 4 });
+        RangeSlider<int> slider = new (new () { 1, 2, 3, 4 });
 
         // Act
         slider.FocusedOption = 2;
@@ -322,7 +322,7 @@ public class RangeSliderTests
     public void TryGetOptionByPosition_InvalidPosition_Failure ()
     {
         // Arrange
-        Slider<int> slider = new (new () { 1, 2, 3 });
+        RangeSlider<int> slider = new (new () { 1, 2, 3 });
         var x = 10;
         var y = 10;
         var threshold = 2;
@@ -346,7 +346,7 @@ public class RangeSliderTests
     public void TryGetOptionByPosition_ValidPositionHorizontal_Success (int x, int y, int threshold, int expectedData)
     {
         // Arrange
-        Slider<int> slider = new (new () { 1, 2, 3, 4 });
+        RangeSlider<int> slider = new (new () { 1, 2, 3, 4 });
         // 0123456789
         // 1234
 
@@ -375,7 +375,7 @@ public class RangeSliderTests
     public void TryGetOptionByPosition_ValidPositionVertical_Success (int x, int y, int threshold, int expectedData)
     {
         // Arrange
-        Slider<int> slider = new (new () { 1, 2, 3, 4 });
+        RangeSlider<int> slider = new (new () { 1, 2, 3, 4 });
         slider.Orientation = Orientation.Vertical;
 
         // Set auto size to true to enable testing
@@ -404,7 +404,7 @@ public class RangeSliderTests
     public void TryGetPositionByOption_InvalidOption_Failure ()
     {
         // Arrange
-        Slider<int> slider = new (new () { 1, 2, 3 });
+        RangeSlider<int> slider = new (new () { 1, 2, 3 });
         int option = -1;
         (int, int) expectedPosition = (-1, -1);
 
@@ -423,7 +423,7 @@ public class RangeSliderTests
     public void TryGetPositionByOption_ValidOptionHorizontal_Success (int option, int expectedX, int expectedY)
     {
         // Arrange
-        Slider<int> slider = new (new () { 1, 2, 3, 4 });
+        RangeSlider<int> slider = new (new () { 1, 2, 3, 4 });
 
         // Set auto size to true to enable testing
         slider.MinimumInnerSpacing = 2;
@@ -447,7 +447,7 @@ public class RangeSliderTests
     public void TryGetPositionByOption_ValidOptionVertical_Success (int option, int expectedX, int expectedY)
     {
         // Arrange
-        Slider<int> slider = new (new () { 1, 2, 3, 4 });
+        RangeSlider<int> slider = new (new () { 1, 2, 3, 4 });
         slider.Orientation = Orientation.Vertical;
 
         // Set auto size to true to enable testing
@@ -467,7 +467,7 @@ public class RangeSliderTests
     private void One_Option_Does_Not_Throw ()
     {
         // Arrange
-        Slider<int> slider = new ();
+        RangeSlider<int> slider = new ();
         slider.BeginInit ();
         slider.EndInit ();
 
@@ -479,7 +479,7 @@ public class RangeSliderTests
     private void Set_Options_No_Legend_Throws ()
     {
         // Arrange
-        Slider<int> slider = new ();
+        RangeSlider<int> slider = new ();
 
         // Act/Assert
         Assert.Throws<ArgumentNullException> (() => slider.Options = null);
@@ -489,7 +489,7 @@ public class RangeSliderTests
     private void Set_Options_Throws_If_Null ()
     {
         // Arrange
-        Slider<int> slider = new ();
+        RangeSlider<int> slider = new ();
 
         // Act/Assert
         Assert.Throws<ArgumentNullException> (() => slider.Options = null);

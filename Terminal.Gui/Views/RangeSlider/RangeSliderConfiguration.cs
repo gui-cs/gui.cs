@@ -1,6 +1,6 @@
 ﻿namespace Terminal.Gui;
 
-/// <summary>All <see cref="Slider{T}"/> configuration are grouped in this class.</summary>
+/// <summary>All <see cref="RangeSlider{T}"/> configuration are grouped in this class.</summary>
 internal class RangeSliderConfiguration
 {
     internal bool _allowEmpty;

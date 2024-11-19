@@ -1,6 +1,6 @@
 ﻿namespace Terminal.Gui;
 
-/// <summary><see cref="EventArgs"/> for <see cref="Slider{T}"/> <see cref="RangeSliderOption{T}"/> events.</summary>
+/// <summary><see cref="EventArgs"/> for <see cref="RangeSlider{T}"/> <see cref="RangeSliderOption{T}"/> events.</summary>
 public class RangeSliderOptionEventArgs : EventArgs
 {
     /// <summary>Initializes a new instance of <see cref="RangeSliderOptionEventArgs"/></summary>

@@ -1,6 +1,6 @@
 ﻿namespace Terminal.Gui;
 
-/// <summary><see cref="Slider{T}"/> Style</summary>
+/// <summary><see cref="RangeSlider{T}"/> Style</summary>
 public class RangeSliderStyle
 {
     /// <summary>Constructs a new instance.</summary>

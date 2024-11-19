@@ -19,7 +19,7 @@ public class Mouse : Scenario
             Title = GetQuitKeyAndName ()
         };
 
-        Slider<MouseFlags> filterSlider = new ()
+        RangeSlider<MouseFlags> filterSlider = new ()
         {
             Title = "_Filter",
             X = 0,

@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
+using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
@@ -17,11 +18,13 @@ public sealed class ArrangementEditor : EditorBase
 
         Initialized += ArrangementEditor_Initialized;
 
+        _arrangementSlider.MinimumInnerSpacing = 0;
+
         _arrangementSlider.Options =
         [
             new RangeSliderOption<ViewArrangement>
             {
-                Legend = ViewArrangement.Movable.ToString (),
+                Legend = $"{ViewArrangement.Movable}",
                 Data = ViewArrangement.Movable
             },
 
@@ -59,7 +62,7 @@ public sealed class ArrangementEditor : EditorBase
         Add (_arrangementSlider);
     }
 
-    private readonly Slider<ViewArrangement> _arrangementSlider = new()
+    private readonly RangeSlider<ViewArrangement> _arrangementSlider = new()
     {
         Orientation = Orientation.Vertical,
         UseMinimumSize = true,
@@ -88,7 +91,18 @@ public sealed class ArrangementEditor : EditorBase
         _arrangementSlider.OptionsChanged += ArrangementSliderOnOptionsChanged;
     }
 
-    private void ArrangementEditor_Initialized (object? sender, EventArgs e) { _arrangementSlider.OptionsChanged += ArrangementSliderOnOptionsChanged; }
+    private void ArrangementEditor_Initialized (object? sender, EventArgs e)
+    {
+        _arrangementSlider.OptionsChanged += ArrangementSliderOnOptionsChanged;
+        _arrangementSlider.Style.OptionChar = new Cell { Rune = CM.Glyphs.CheckStateUnChecked, Attribute = GetNormalColor () };
+        _arrangementSlider.Style.SetChar = new Cell { Rune = CM.Glyphs.CheckStateChecked, Attribute = GetNormalColor () };
+        _arrangementSlider.Style.StartRangeChar = new Cell { Rune = CM.Glyphs.CheckStateChecked, Attribute = GetNormalColor () };
+        _arrangementSlider.Style.EndRangeChar = new Cell { Rune = CM.Glyphs.CheckStateChecked, Attribute = GetNormalColor () };
+        _arrangementSlider.Style.EmptyChar = new Cell { Rune = (Rune)'e', Attribute = GetNormalColor () };
+        _arrangementSlider.Style.RangeChar = new Cell { Rune = (Rune)'r', Attribute = GetNormalColor () };
+        _arrangementSlider.Style.SpaceChar = new Cell { Rune = (Rune)'s', Attribute = GetNormalColor () };
+        _arrangementSlider.Style.DragChar = new Cell { Rune = (Rune)'d', Attribute = GetNormalColor () };
+    }
 
     private void ArrangementSliderOnOptionsChanged (object? sender, RangeSliderEventArgs<ViewArrangement> e)
     {

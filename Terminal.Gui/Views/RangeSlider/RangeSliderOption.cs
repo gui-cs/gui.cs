@@ -1,6 +1,6 @@
 ﻿namespace Terminal.Gui;
 
-/// <summary>Represents an option in a <see cref="Slider{T}"/> .</summary>
+/// <summary>Represents an option in a <see cref="RangeSlider{T}"/> .</summary>
 /// <typeparam name="T">Data type of the option.</typeparam>
 public class RangeSliderOption<T>
 {
@@ -25,7 +25,7 @@ public class RangeSliderOption<T>
     public string Legend { get; set; }
 
     /// <summary>
-    ///     Abbreviation of the Legend. When the <see cref="Slider{T}.MinimumInnerSpacing"/> too small to fit
+    ///     Abbreviation of the Legend. When the <see cref="RangeSlider{T}.MinimumInnerSpacing"/> too small to fit
     ///     <see cref="Legend"/>.
     /// </summary>
     public Rune LegendAbbr { get; set; }

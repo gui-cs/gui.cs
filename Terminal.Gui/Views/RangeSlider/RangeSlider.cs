@@ -3,7 +3,7 @@
 namespace Terminal.Gui;
 
 /// <summary>Slider control.</summary>
-public class RangeSlider : Slider<object>
+public class RangeSlider : RangeSlider<object>
 {
     /// <summary>Initializes a new instance of the <see cref="RangeSlider"/> class.</summary>
     public RangeSlider () { }
@@ -21,7 +21,7 @@ public class RangeSlider : Slider<object>
 ///     keyboard or mouse.
 /// </summary>
 /// <typeparam name="T"></typeparam>
-public class Slider<T> : View, IOrientation
+public class RangeSlider<T> : View, IOrientation
 {
     private readonly RangeSliderConfiguration _config = new ();
 
@@ -118,12 +118,12 @@ public class Slider<T> : View, IOrientation
     #region Constructors
 
     /// <summary>Initializes a new instance of the <see cref="RangeSlider"/> class.</summary>
-    public Slider () : this (new ()) { }
+    public RangeSlider () : this (new ()) { }
 
     /// <summary>Initializes a new instance of the <see cref="RangeSlider"/> class.</summary>
     /// <param name="options">Initial slider options.</param>
     /// <param name="orientation">Initial slider orientation.</param>
-    public Slider (List<T> options, Orientation orientation = Orientation.Horizontal)
+    public RangeSlider (List<T> options, Orientation orientation = Orientation.Horizontal)
     {
         if (options is null)
         {
@@ -841,7 +841,7 @@ public class Slider<T> : View, IOrientation
     private void DrawSlider ()
     {
         // TODO: be more surgical on clear
-        ClearViewport ();
+//        ClearViewport ();
 
         // Attributes
 
@@ -1172,7 +1172,7 @@ public class Slider<T> : View, IOrientation
                     switch (_config._legendsOrientation)
                     {
                         case Orientation.Horizontal:
-                            x = 1;
+                            x = 2;
 
                             break;
                         case Orientation.Vertical:

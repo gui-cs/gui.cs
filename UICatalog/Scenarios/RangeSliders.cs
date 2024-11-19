@@ -28,7 +28,7 @@ public class RangeSliders : Scenario
                 Type = type,
                 AllowEmpty = true
             };
-            //view.Padding.Thickness = new (0,1,0,0);
+            view.Style.OptionChar = new Cell { Rune = CM.Glyphs.Cross };
             v.Add (view);
             prev = view;
         }
@@ -163,7 +163,7 @@ public class RangeSliders : Scenario
 
         #region Config Slider
 
-        Slider<string> optionsSlider = new ()
+        RangeSlider<string> optionsSlider = new ()
         {
             Title = "Options",
             X = 0,
@@ -242,7 +242,7 @@ public class RangeSliders : Scenario
 
         #region Slider Orientation Slider
 
-        Slider<string> orientationSlider = new (new List<string> { "Horizontal", "Vertical" })
+        RangeSlider<string> orientationSlider = new (new List<string> { "Horizontal", "Vertical" })
         {
             Title = "Slider Orientation",
             X = 0,
@@ -327,7 +327,7 @@ public class RangeSliders : Scenario
 
         #region Legends Orientation Slider
 
-        Slider<string> legendsOrientationSlider = new (new List<string> { "Horizontal", "Vertical" })
+        RangeSlider<string> legendsOrientationSlider = new (new List<string> { "Horizontal", "Vertical" })
         {
             Title = "Legends Orientation",
             X = 0,
@@ -438,7 +438,7 @@ public class RangeSliders : Scenario
             s.Style.RangeChar = s.Style.RangeChar with { Attribute = app.GetNormalColor () };
         }
 
-        Slider<(Color, Color)> sliderFGColor = new ()
+        RangeSlider<(Color, Color)> sliderFGColor = new ()
         {
             Title = "FG Color",
             X = 0,
@@ -528,7 +528,7 @@ public class RangeSliders : Scenario
                                             }
                                         };
 
-        Slider<(Color, Color)> sliderBGColor = new ()
+        RangeSlider<(Color, Color)> sliderBGColor = new ()
         {
             Title = "BG Color",
             X = Pos.Right (sliderFGColor),
