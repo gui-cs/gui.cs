@@ -40,15 +40,13 @@ These Scenarios illustrate Terminal.Gui scrolling:
 
 ## [Viewport Settings](~/api/Terminal.Gui.ViewportSettings.yml)
 
-Use [View.ViewportSettings](~/api/Terminal.Gui.View.ViewportSettings.yml) to adjust the behavior of scrolling. 
+Use  @Terminal.Gui.ViewporSettings to adjust the behavior of scrolling. 
 
-* [AllowNegativeX/Y](~/api/Terminal.Gui.ViewportSettings.AllowNegativeXyml) - If set, Viewport.Size can be set to negative coordinates enabling scrolling beyond the top-left of the content area.
+* `AllowNegativeX/Y` - If set, Viewport.Size can be set to negative coordinates enabling scrolling beyond the top-left of the content area.
 
-* [AllowX/YGreaterThanContentWidth](~/api/Terminal.Gui.ViewportSettings.AllowXGreaterThanContentWidth) - If set, Viewport.Size can be set values greater than GetContentSize() enabling scrolling beyond the bottom-right of the Content Area. When not set, `Viewport.X/Y` are constrained to the dimension of the content area - 1. This means the last column of the content will remain visible even if there is an attempt to scroll the Viewport past the last column. The practical effect of this is that the last column/row of the content will always be visible.
+* `AllowX/YGreaterThanContentWidth` - If set, Viewport.Size can be set values greater than GetContentSize() enabling scrolling beyond the bottom-right of the Content Area. When not set, `Viewport.X/Y` are constrained to the dimension of the content area - 1. This means the last column of the content will remain visible even if there is an attempt to scroll the Viewport past the last column. The practical effect of this is that the last column/row of the content will always be visible.
 
-* [ClipContentOnly](~/api/Terminal.Gui.ViewportSettings.ClipContentOnly) - By default, clipping is applied to [Viewport](~/api/Terminal.Gui.View.Viewport.yml). Setting this flag will cause clipping to be applied to the visible content area.
+* `ClipContentOnly` - By default, clipping is applied to [Viewport](~/api/Terminal.Gui.View.Viewport.yml). Setting this flag will cause clipping to be applied to the visible content area.
 
-* [ClearContentOnly](~/api/Terminal.Gui.ViewportSettings.ClearContentOnly) - If set [View.Clear()](~/api/Terminal.Gui.View.Clear.yml) will clear only the portion of the content area that is visible within the Viewport. This is useful for views that have a content area larger than the Viewport and want the area outside the content to be visually distinct.
-
-* [EnableHorizontal/VerticalScrollBar](~/api/Terminal.Gui.ViewportSettings.EnableHorizontalScrollBar) - If set, the scroll bar will be enabled and automatically made visible when the corresponding dimension of [View.Viewport](~/api/Terminal.Gui.View.Viewport.yml) is smaller than the dimension of [View.GetContentSize()](~/api/Terminal.Gui.View.GetContentSize.yml).
+* `ClearContentOnly`- If set [View.Clear()](~/api/Terminal.Gui.View.Clear.yml) will clear only the portion of the content area that is visible within the Viewport. This is useful for views that have a content area larger than the Viewport and want the area outside the content to be visually distinct.
 
