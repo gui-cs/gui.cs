@@ -293,11 +293,11 @@ public class Images : Scenario
 
     private void ApplyShowTabViewHack ()
     {
-        // TODO HACK: This hack seems to be required to make tabview actually refresh itself
-        _tabView.SetNeedsDraw ();
-        var orig = _tabView.SelectedTab;
-        _tabView.SelectedTab = _tabView.Tabs.Except (new [] { orig }).ElementAt (0);
-        _tabView.SelectedTab = orig;
+        //// TODO HACK: This hack seems to be required to make tabview actually refresh itself
+        //_tabView.SetNeedsDraw ();
+        //var orig = _tabView.SelectedTabIndex;
+        //_tabView.SelectedTabIndex = _tabView.Tabs.Except (new [] { orig }).ElementAt (0);
+        //_tabView.SelectedTabIndex = orig;
     }
 
     private void BuildBasicTab (Tab tabBasic)
