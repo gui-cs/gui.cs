@@ -28,8 +28,6 @@ public class Bar : View, IOrientation, IDesignable
         Height = Dim.Auto ();
 
         _orientationHelper = new (this);
-        _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
-        _orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);
 
         // Initialized += Bar_Initialized;
         MouseEvent += OnMouseEvent;
@@ -241,7 +239,6 @@ public class Bar : View, IOrientation, IDesignable
                     {
                         View barItem = Subviews [index];
 
-                        barItem.X = 0;
 
                         barItem.ColorScheme = ColorScheme;
 
@@ -252,6 +249,7 @@ public class Bar : View, IOrientation, IDesignable
 
                         if (barItem is Shortcut scBarItem)
                         {
+                            barItem.X = 0;
                             scBarItem.MinimumKeyTextSize = minKeyWidth;
                             scBarItem.Width = scBarItem.GetWidthDimAuto ();
                             barItem.Layout (Application.Screen.Size);
@@ -276,14 +274,20 @@ public class Bar : View, IOrientation, IDesignable
 
                     foreach (var subView in Subviews)
                     {
-                        subView.Width = Dim.Auto (DimAutoStyle.Auto, minimumContentDim: _maxBarItemWidth);
+                        if (subView is not Line)
+                        {
+                            subView.Width = Dim.Auto (DimAutoStyle.Auto, minimumContentDim: _maxBarItemWidth);
+                        }
                     }
                 }
                 else
                 {
                     foreach (var subView in Subviews)
                     {
-                        subView.Width = Dim.Fill();
+                        if (subView is not Line)
+                        {
+                            subView.Width = Dim.Fill ();
+                        }
                     }
                 }
 

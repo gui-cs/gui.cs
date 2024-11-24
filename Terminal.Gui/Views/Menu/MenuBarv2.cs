@@ -20,7 +20,7 @@ public class MenuBarv2 : Bar
         Width = Dim.Fill ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
         BorderStyle = LineStyle.Dashed;
-        ColorScheme = Colors.ColorSchemes ["Menu"];
+        base.ColorScheme = Colors.ColorSchemes ["Menu"];
         Orientation = Orientation.Horizontal;
 
         AddCommand (Command.Context,

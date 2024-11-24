@@ -55,6 +55,13 @@ public partial class View // Drawing APIs
             // Draw the Border and Padding.
             // We clip to the frame to prevent drawing outside the frame.
             saved = ClipFrame ();
+
+            if (SubViewNeedsDraw)
+            {
+                // A Subview may add to the LineCanvas. This ensures any Adornment LineCanvas updates happen.
+                Border?.SetNeedsDraw ();
+                Padding?.SetNeedsDraw();
+            }
             DoDrawBorderAndPadding ();
             SetClip (saved);
 
