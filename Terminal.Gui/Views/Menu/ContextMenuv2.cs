@@ -105,11 +105,8 @@ public class ContextMenuv2 : Menuv2
     {
         if (screenPosition is { })
         {
-            Frame = Frame with
-            {
-                X = screenPosition.Value.X - GetViewportOffsetFromFrame ().X,
-                Y = screenPosition.Value.Y - GetViewportOffsetFromFrame ().Y,
-            };
+            X = screenPosition.Value.X - GetViewportOffsetFromFrame ().X;
+            Y = screenPosition.Value.Y - GetViewportOffsetFromFrame ().Y;
         }
     }
 

@@ -20,6 +20,8 @@ public class ApplicationPopoverTests
 
         // Assert
         Assert.Equal (popover, Application.Popover);
+
+        Application.ResetState (ignoreDisposed: true);
     }
 
     [Fact]
@@ -34,6 +36,8 @@ public class ApplicationPopoverTests
 
         // Assert
         Assert.Null (Application.Popover);
+
+        Application.ResetState (ignoreDisposed: true);
     }
 
     [Fact]
@@ -54,6 +58,8 @@ public class ApplicationPopoverTests
 
         // Assert
         Assert.True (eventTriggered);
+
+        Application.ResetState (ignoreDisposed: true);
     }
 
     [Fact]
@@ -67,6 +73,8 @@ public class ApplicationPopoverTests
 
         // Assert
         Assert.True (popover.IsInitialized);
+
+        Application.ResetState (ignoreDisposed: true);
     }
 
     [Fact]
@@ -82,6 +90,8 @@ public class ApplicationPopoverTests
 
         // Assert
         Assert.Equal (topColorScheme, popover.ColorScheme);
+
+        Application.ResetState (ignoreDisposed: true);
     }
 
     [Fact]
@@ -101,6 +111,37 @@ public class ApplicationPopoverTests
         // Assert
         Assert.True (popover.Visible);
         Assert.True (popover.HasFocus);
+
+        Application.ResetState (ignoreDisposed: true);
+    }
+
+    [Theory]
+    [InlineData(-1, -1)]
+    [InlineData (0, 0)]
+    [InlineData (2048, 2048)]
+    [InlineData (2049, 2049)]
+    public void Popover_VisibleChangedToTrue_Locates_In_Visible_Position (int x, int y)
+    {
+        // Arrange
+        var popover = new View ()
+        {
+            X = x,
+            Y = y,
+            Visible = false,
+            CanFocus = true,
+            Width = 1,
+            Height = 1
+        };
+        Application.Popover = popover;
+
+        // Act
+        popover.Visible = true;
+        Application.LayoutAndDraw();
+
+        // Assert
+        Assert.True (Application.Screen.Contains (popover.Frame));
+
+        Application.ResetState (ignoreDisposed: true);
     }
 
     [Fact]
@@ -121,6 +162,8 @@ public class ApplicationPopoverTests
         // Assert
         Assert.False (popover.Visible);
         Assert.False (popover.HasFocus);
+
+        Application.ResetState (ignoreDisposed: true);
     }
 
     [Fact]
@@ -143,6 +186,8 @@ public class ApplicationPopoverTests
         // Assert
         Assert.False (popover.Visible);
         Assert.False (popover.HasFocus);
+
+        Application.ResetState (ignoreDisposed: true);
     }
 
 
@@ -244,6 +289,73 @@ public class ApplicationPopoverTests
         Assert.Equal (expectedVisible, popover.Visible);
 
         Application.Top.Dispose ();
+        Application.ResetState (ignoreDisposed: true);
+    }
+
+    [Fact]
+    public void Popover_SetAndGet_ReturnsCorrectValue ()
+    {
+        // Arrange
+        var view = new View ();
+
+        // Act
+        Application.Popover = view;
+
+        // Assert
+        Assert.Equal (view, Application.Popover);
+
+        Application.ResetState (ignoreDisposed: true);
+    }
+
+    [Fact]
+    public void Popover_SetToNull_HidesPreviousPopover ()
+    {
+        // Arrange
+        var view = new View { Visible = true };
+        Application.Popover = view;
+
+        // Act
+        Application.Popover = null;
+
+        // Assert
+        Assert.False (view.Visible);
+        Assert.Null (Application.Popover);
+
+        Application.ResetState (ignoreDisposed: true);
+    }
+
+    [Fact]
+    public void Popover_SetNewPopover_HidesPreviousPopover ()
+    {
+        // Arrange
+        var oldView = new View { Visible = true };
+        var newView = new View ();
+        Application.Popover = oldView;
+
+        // Act
+        Application.Popover = newView;
+
+        // Assert
+        Assert.False (oldView.Visible);
+        Assert.Equal (newView, Application.Popover);
+
+        Application.ResetState (ignoreDisposed: true);
+    }
+
+    [Fact]
+    public void Popover_SetNewPopover_InitializesAndSetsProperties ()
+    {
+        // Arrange
+        var view = new View ();
+
+        // Act
+        Application.Popover = view;
+
+        // Assert
+        Assert.True (view.IsInitialized);
+        Assert.True (view.Arrangement.HasFlag (ViewArrangement.Overlapped));
+        Assert.Equal (Application.Top?.ColorScheme, view.ColorScheme);
+
         Application.ResetState (ignoreDisposed: true);
     }
 }
