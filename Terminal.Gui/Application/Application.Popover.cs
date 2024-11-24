@@ -64,6 +64,11 @@ public static partial class Application // Popover handling
 
             Popover.ColorScheme ??= Top?.ColorScheme;
 
+            if (Popover.NeedsLayout)
+            {
+                Popover.SetRelativeLayout (Screen.Size);
+            }
+
             View.GetLocationEnsuringFullVisibility (
                                                     Popover,
                                                     Popover.Frame.X,
