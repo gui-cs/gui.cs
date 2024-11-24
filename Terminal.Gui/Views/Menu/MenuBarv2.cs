@@ -28,6 +28,20 @@ public class MenuBarv2 : Bar
                    {
                        if (ctx.Data is Shortcut { TargetView: { } } shortcut)
                        {
+                           //MenuBarv2? clone = MemberwiseClone () as MenuBarv2;
+                           //clone!.SuperView = null;
+                           //clone.Visible = false;
+
+                           //Rectangle screen = FrameToScreen ();
+                           //Application.Popover = clone;
+                           //clone.X = screen.X;
+                           //clone.Y = screen.Y;
+                           //clone.Width = Dim.Fill (1);
+
+                           //clone.Visible = true;
+                           //clone.SetSubViewNeedsDraw ();
+
+
                            Rectangle screen = shortcut.FrameToScreen ();
                            Application.Popover = shortcut.TargetView;
                            shortcut.TargetView.X = screen.X;
