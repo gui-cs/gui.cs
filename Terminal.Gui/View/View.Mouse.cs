@@ -660,7 +660,7 @@ public partial class View // Mouse APIs
 
         if (Application.Popover is { Visible: true })
         {
-            viewsUnderMouse.AddRange (GetViewsUnderMouse (Application.Popover, location));
+            viewsUnderMouse= GetViewsUnderMouse (Application.Popover, location);
         }
 
         return viewsUnderMouse;

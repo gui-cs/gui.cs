@@ -26,7 +26,7 @@ public class MenuBarv2 : Bar
         AddCommand (Command.Context,
                    (ctx) =>
                    {
-                       if (ctx.Data is Shortcut shortcut)
+                       if (ctx.Data is Shortcut { TargetView: { } } shortcut)
                        {
                            Rectangle screen = shortcut.FrameToScreen ();
                            Application.Popover = shortcut.TargetView;

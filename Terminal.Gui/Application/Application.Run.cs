@@ -502,20 +502,17 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     /// <param name="forceDraw">If <see langword="true"/> the entire View hierarchy will be redrawn. The default is <see langword="false"/> and should only be overriden for testing.</param>
     public static void LayoutAndDraw (bool forceDraw = false)
     {
-        bool neededLayout = View.Layout (TopLevels.Reverse (), Screen.Size);
+        List<View> tops = new (TopLevels);
 
-        if (Popover is { })
+        if (Popover is { Visible: true })
         {
-            neededLayout = View.Layout ([Popover], Screen.Size);
+            tops.Insert(0, Popover);
         }
+
+        bool neededLayout = View.Layout (tops.ToArray ().Reverse (), Screen.Size);
 
         View.SetClipToScreen ();
-        View.Draw (TopLevels, neededLayout || forceDraw);
-        if (Popover is { })
-        {
-            View.SetClipToScreen ();
-            View.Draw ([Popover], neededLayout || forceDraw);
-        }
+        View.Draw (tops, neededLayout || forceDraw);
         View.SetClipToScreen ();
 
         if (forceDraw)

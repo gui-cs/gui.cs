@@ -166,6 +166,7 @@ public static partial class Application // Mouse handling
             return;
         }
 
+        // Dismiss the Popover if the user clicked outside of it
         if (Popover is { Visible: true }
             && View.IsInHierarchy (Popover, deepestViewUnderMouse, includeAdornments: true) is false
             && (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)
@@ -187,10 +188,10 @@ public static partial class Application // Mouse handling
         }
 
         WantContinuousButtonPressedView = deepestViewUnderMouse switch
-                                          {
-                                              { WantContinuousButtonPressed: true } => deepestViewUnderMouse,
-                                              _ => null
-                                          };
+        {
+            { WantContinuousButtonPressed: true } => deepestViewUnderMouse,
+            _ => null
+        };
 
         // May be null before the prior condition or the condition may set it as null.
         // So, the checking must be outside the prior condition.
