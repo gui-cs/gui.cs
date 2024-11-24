@@ -52,7 +52,7 @@ public class Bars : Scenario
             ColorScheme = Colors.ColorSchemes ["Toplevel"],
             Source = new ListWrapper<string> (eventSource)
         };
-        eventLog.Border.Thickness = new (0, 1, 0, 0);
+        eventLog.Border!.Thickness = new (0, 1, 0, 0);
         Application.Top.Add (eventLog);
 
         FrameView menuBarLikeExamples = new ()
@@ -290,12 +290,12 @@ public class Bars : Scenario
                 {
                     menuv2.ShortcutCommandInvoked += (o, args) =>
                                                      {
-                                                         Shortcut? sc = args.Context.Data as Shortcut;
+                                                         if (args.Context.Data is Shortcut { } sc)
+                                                         {
+                                                             eventSource.Add ($"Invoked: {sc.Id} {args.Context.Command}");
+                                                         }
 
-                                                         eventSource.Add ($"Invoked: {sc.Id} {args.Context.Command}");
                                                          eventLog.MoveDown ();
-                                                         //args.Cancel = true;
-
                                                      };
 
                 }

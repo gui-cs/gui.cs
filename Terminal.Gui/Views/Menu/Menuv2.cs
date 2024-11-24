@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.ComponentModel;
 using System.Reflection;
 
@@ -21,7 +22,7 @@ public class Menuv2 : Bar
         VisibleChanged += OnVisibleChanged;
     }
 
-    private void OnVisibleChanged (object sender, EventArgs e)
+    private void OnVisibleChanged (object? sender, EventArgs e)
     {
         if (Visible)
         {
@@ -36,15 +37,19 @@ public class Menuv2 : Bar
         }
     }
 
-    private void Menuv2_Initialized (object sender, EventArgs e)
+    private void Menuv2_Initialized (object? sender, EventArgs e)
     {
-        Border.Thickness = new Thickness (1, 1, 1, 1);
-        Border.LineStyle = LineStyle.Single;
+        if (Border is { })
+        {
+            Border.Thickness = new Thickness (1, 1, 1, 1);
+            Border.LineStyle = LineStyle.Single;
+        }
+
         ColorScheme = Colors.ColorSchemes ["Menu"];
     }
 
     /// <inheritdoc/>
-    public override View Add (View view)
+    public override View? Add (View? view)
     {
         base.Add (view);
 
@@ -62,7 +67,7 @@ public class Menuv2 : Bar
                                           });
 
 
-            void ShortcutOnAccepting (object sender, CommandEventArgs e)
+            void ShortcutOnAccepting (object? sender, CommandEventArgs e)
             {
                 if (Arrangement.HasFlag (ViewArrangement.Overlapped) && Visible)
                 {
@@ -78,6 +83,11 @@ public class Menuv2 : Bar
     }
 
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="ctx"></param>
+    /// <returns></returns>
     protected bool? RaiseShortcutCommandInvoked (CommandContext ctx)
     {
         CommandEventArgs args = new () { Context = ctx };
