@@ -532,6 +532,10 @@ public class KeyTests
         Key a = Key.A;
         Key b = Key.A;
         Assert.True (a.Equals (b));
+
+        b.Handled = true;
+        Assert.False (a.Equals (b));
+
     }
 
     [Fact]

@@ -86,11 +86,13 @@ public static partial class Application // Initialization (Init/Shutdown)
                 // We're running unit tests. Disable loading config files other than default
                 if (Locations == ConfigLocations.All)
                 {
-                    Locations = ConfigLocations.DefaultOnly;
+                    Locations = ConfigLocations.Default;
                     Reset ();
                 }
             }
         }
+
+        AddApplicationKeyBindings ();
 
         // Start the process of configuration management.
         // Note that we end up calling LoadConfigurationFromAllSources
@@ -105,8 +107,6 @@ public static partial class Application // Initialization (Init/Shutdown)
             ThemeManager.SelectedTheme = previousTheme;
         }
         Apply ();
-
-        AddApplicationKeyBindings ();
 
         // Ignore Configuration for ForceDriver if driverName is specified
         if (!string.IsNullOrEmpty (driverName))

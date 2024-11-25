@@ -8525,7 +8525,7 @@ line.
     {
         public static string Txt = "TAB to jump between text fields.";
 
-        public TextViewTestsAutoInitShutdown () : base (configLocation: ConfigurationManager.ConfigLocations.DefaultOnly) { }
+        public TextViewTestsAutoInitShutdown () : base (configLocation: ConfigLocations.Default) { }
 
         public override void After (MethodInfo methodUnderTest)
         {
@@ -8947,7 +8947,7 @@ line.  ",
     }
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.DefaultOnly)]
+    [AutoInitShutdown (configLocation: ConfigLocations.Default)]
     public void Cell_LoadCells_InheritsPreviousAttribute ()
     {
         List<Cell> cells = [];

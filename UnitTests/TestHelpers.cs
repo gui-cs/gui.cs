@@ -49,7 +49,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         bool useFakeClipboard = true,
         bool fakeClipboardAlwaysThrowsNotSupportedException = false,
         bool fakeClipboardIsSupportedAlwaysTrue = false,
-        ConfigLocations configLocation = ConfigLocations.None,
+        ConfigLocations configLocation = ConfigLocations.Default, // DefaultOnly is the default for tests
         bool verifyShutdown = false
     )
     {
@@ -110,8 +110,11 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         }
 
         // Reset to defaults
-        Locations = ConfigLocations.DefaultOnly;
-        Reset();
+        Locations = ConfigLocations.Default;
+        Reset ();
+
+        // Enable subsequent tests that call Init to get all config files (the default).
+        //Locations = ConfigLocations.All;
     }
 
     public override void Before (MethodInfo methodUnderTest)
@@ -193,6 +196,11 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
 
         // Turn off diagnostic flags in case some test left them on
         View.Diagnostics = ViewDiagnosticFlags.Off;
+
+        if (Application.Driver is { })
+        {
+            ((FakeDriver)Application.Driver).End ();
+        }
 
         Application.Driver = null;
         base.After (methodUnderTest);

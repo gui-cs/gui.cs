@@ -308,7 +308,15 @@ public static partial class Application // Keyboard handling
         }
         else
         {
-            KeyBindings.ReplaceKey (oldKey, newKey);
+            if (KeyBindings.TryGet(oldKey, out KeyBinding binding))
+            {
+                KeyBindings.Remove (oldKey);
+                KeyBindings.Add (newKey, binding);
+            }
+            else
+            {
+                KeyBindings.Add (newKey, binding);
+            }
         }
     }
 

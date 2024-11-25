@@ -69,11 +69,15 @@ public class MenuBarv2 : Bar
     }
 
     /// <inheritdoc/>
-    public override View Add (View view)
+    public override View? Add (View? view)
     {
         // Call base first, because otherwise it resets CanFocus to true
         base.Add (view);
 
+        if (view is null)
+        {
+            return null;
+        }
         view.CanFocus = true;
 
         if (view is Shortcut shortcut)
@@ -81,15 +85,9 @@ public class MenuBarv2 : Bar
             shortcut.KeyView.Visible = false;
             shortcut.HelpView.Visible = false;
 
-            shortcut.Selecting += (sender, args) =>
-                                  {
-                                      args.Cancel = InvokeCommand (Command.Context, args.Context) == true;
-                                  };
+            shortcut.Selecting += (sender, args) => { args.Cancel = InvokeCommand (Command.Context, args.Context) == true; };
 
-            shortcut.Accepting += (sender, args) =>
-                                  {
-                                      args.Cancel = InvokeCommand (Command.Context, args.Context) == true;
-                                  };
+            shortcut.Accepting += (sender, args) => { args.Cancel = InvokeCommand (Command.Context, args.Context) == true; };
         }
 
         return view;

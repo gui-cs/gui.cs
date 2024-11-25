@@ -1,4 +1,5 @@
 ﻿using Xunit.Abstractions;
+using static Terminal.Gui.ConfigurationManager;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
@@ -10,7 +11,7 @@ public class ApplicationTests
     {
         _output = output;
         ConsoleDriver.RunningUnitTests = true;
-        ConfigurationManager.Locations = ConfigurationManager.ConfigLocations.None;
+        Locations = ConfigLocations.Default;
 
 #if DEBUG_IDISPOSABLE
         View.Instances.Clear ();
@@ -272,14 +273,15 @@ public class ApplicationTests
     [InlineData (typeof (CursesDriver))]
     public void Init_ResetState_Resets_Properties (Type driverType)
     {
-        ConfigurationManager.ThrowOnJsonErrors = true;
+        ThrowOnJsonErrors = true;
 
         // For all the fields/properties of Application, check that they are reset to their default values
 
         // Set some values
 
         Application.Init (driverName: driverType.Name);
-       // Application.IsInitialized = true;
+
+        // Application.IsInitialized = true;
 
         // Reset
         Application.ResetState ();
@@ -372,7 +374,7 @@ public class ApplicationTests
         Application.ResetState ();
         CheckReset ();
 
-        ConfigurationManager.ThrowOnJsonErrors = false;
+        ThrowOnJsonErrors = false;
     }
 
     [Fact]
@@ -400,10 +402,7 @@ public class ApplicationTests
     }
 
     [Fact]
-    public void Shutdown_Alone_Does_Nothing ()
-    {
-        Application.Shutdown ();
-    }
+    public void Shutdown_Alone_Does_Nothing () { Application.Shutdown (); }
 
     [Theory]
     [InlineData (typeof (FakeDriver))]
@@ -520,6 +519,48 @@ public class ApplicationTests
         Application.Init ();
         Assert.IsType<FakeDriver> (Application.Driver);
         Application.ResetState ();
+    }
+
+    [Fact]
+    public void Init_KeyBindings_Set_To_Defaults ()
+    {
+        // arrange
+        Locations = ConfigLocations.All;
+        ThrowOnJsonErrors = true;
+
+        Application.QuitKey = Key.Q;
+
+        Application.Init (new FakeDriver ());
+
+        Assert.Equal (Key.Esc, Application.QuitKey);
+
+        Application.Shutdown ();
+    }
+
+    [Fact]
+    public void Init_KeyBindings_Set_To_Custom ()
+    {
+        // arrange
+        Locations = ConfigLocations.Runtime;
+        ThrowOnJsonErrors = true;
+
+        RuntimeConfig = """
+                         {
+                               "Application.QuitKey": "Ctrl-Q"
+                         }
+                 """;
+
+        Assert.Equal (Key.Esc, Application.QuitKey);
+
+        // Act
+        Application.Init (new FakeDriver ());
+
+        Assert.Equal (Key.Q.WithCtrl, Application.QuitKey);
+
+        Assert.Contains (Key.Q.WithCtrl, Application.KeyBindings.Bindings);
+
+        Application.Shutdown ();
+        Locations = ConfigLocations.Default;
     }
 
     [Fact]

@@ -8,6 +8,8 @@ public class AllViewsDrawTests (ITestOutputHelper _output) : TestsAllViews
     [MemberData (nameof (AllViewTypes))]
     public void AllViews_Draw_Does_Not_Layout (Type viewType)
     {
+        Application.ResetState (true);
+
         var view = (View)CreateInstanceIfNotGeneric (viewType);
 
         if (view == null)

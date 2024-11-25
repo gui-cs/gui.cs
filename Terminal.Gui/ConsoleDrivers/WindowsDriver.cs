@@ -1725,8 +1725,13 @@ internal class WindowsDriver : ConsoleDriver
                 }
             }
 
-            // Return the Key (not KeyChar!)
-            return (KeyCode)keyInfo.Key;
+            // If KeyInfo.Key is A...Z and KeyInfo.KeyChar is not a...z then we have an accent.
+            // See https://github.com/gui-cs/Terminal.Gui/issues/3807#issuecomment-2455997595
+            if (keyInfo.KeyChar <= (char)'z')
+            {
+                return (KeyCode)keyInfo.Key;
+            }
+            return (KeyCode)keyInfo.KeyChar;
         }
 
         // Handle control keys whose VK codes match the related ASCII value (those below ASCII 33) like ESC

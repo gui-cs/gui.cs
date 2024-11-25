@@ -12,17 +12,19 @@ Settings that will apply to all applications (global settings) reside in files n
 
 Settings are applied using the following precedence (higher precedence settings overwrite lower precedence settings):
 
-1. App-specific settings in the users's home directory (`~/.tui/appname.config.json`). -- Highest precedence.
+1. @Terminal.Gui.ConfigLocations.Default - Default settings in the Terminal.Gui assembly -- Lowest precedence.
 
-2. App-specific settings in the directory the app was launched from (`./.tui/appname.config.json`).
+2. @Terminal.Gui.ConfigLocations.Runtime - Settings stored in the @Terminal.Gui.ConfigurationManager.RuntimeConfig static property.
 
-3. App settings in app resources (`Resources/config.json`).
+3. @Terminal.Gui.ConfigLocations.AppResources - App settings in app resources (`Resources/config.json`).
 
-4. Global settings in the the user's home directory (`~/.tui/config.json`).
+4. @Terminal.Gui.ConfigLocations.AppHome - App-specific settings in the users's home directory (`~/.tui/appname.config.json`). 
 
-5. Global settings in the directory the app was launched from (`./.tui/config.json`).
+5. @Terminal.Gui.ConfigLocations.AppCurrent - App-specific settings in the directory the app was launched from (`./.tui/appname.config.json`).
 
-6. Default settings in the Terminal.Gui assembly -- Lowest precedence.
+6. @Terminal.Gui.ConfigLocations.GlobalHome - Global settings in the the user's home directory (`~/.tui/config.json`).
+
+7. @Terminal.Gui.ConfigLocations.GlobalCurrent - Global settings in the directory the app was launched from (`./.tui/config.json`) --- Hightest precedence.
 
 The `UI Catalog` application provides an example of how to use the [`ConfigurationManager`](~/api/Terminal.Gui.ConfigurationManager.yml) class to load and save configuration files. The `Configuration Editor` scenario provides an editor that allows users to edit the configuration files. UI Catalog also uses a file system watcher to detect changes to the configuration files to tell [`ConfigurationManager`](~/api/Terminal.Gui.ConfigurationManager.yml) to reload them; allowing users to change settings without having to restart the application.
 
@@ -67,71 +69,25 @@ A Theme is a named collection of settings that impact the visual style of Termin
 
 Themes support defining ColorSchemes as well as various default settings for Views. Both the default color schemes and user-defined color schemes can be configured. See [ColorSchemes](~/api/Terminal.Gui.Colors.yml) for more information.
 
-# Example Configuration File
-
-```json
-{
-  "$schema": "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
-  "Application.QuitKey": {
-    "Key": "Esc"
-  },
-  "AppSettings": {
-    "UICatalog.StatusBar": false
-  },
-  "Theme": "UI Catalog Theme",
-  "Themes": [
-    {
-      "UI Catalog Theme": {
-        "ColorSchemes": [
-          {
-            "UI Catalog Scheme": {
-              "Normal": {
-                "Foreground": "White",
-                "Background": "Green"
-              },
-              "Focus": {
-                "Foreground": "Green",
-                "Background": "White"
-              },
-              "HotNormal": {
-                "Foreground": "Blue",
-                "Background": "Green"
-              },
-              "HotFocus": {
-                "Foreground": "BrightRed",
-                "Background": "White"
-              },
-              "Disabled": {
-                "Foreground": "BrightGreen",
-                "Background": "Gray"
-              }
-            }
-          },
-          {
-            "TopLevel": {
-              "Normal": {
-                "Foreground": "DarkGray",
-                "Background": "White"
-              ...
-              }
-            }
-          }
-        ],
-        "Dialog.DefaultEffect3D": false
-      }
-    }
-  ]
-}
-```
 
 # Key Bindings
 
 Key bindings are defined in the `KeyBindings` property of the configuration file. The value is an array of objects, each object defining a key binding. The key binding object has the following properties:
 
-- `Key`: The key to bind to. The format is a string describing the key (e.g. "q", "Q,  "Ctrl-Q"). Function keys are specified as "F1", "F2", etc. 
+- `Key`: The key to bind to. The format is a string describing the key (e.g. "q", "Q,  "Ctrl+Q"). Function keys are specified as "F1", "F2", etc. 
 
 # Configuration File Schema
 
-Settings are defined in JSON format, according to the schema found here: 
+Settings are defined in JSON format, according to the schema found here:
 
 https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json
+
+## Schema
+
+[!code-json[tui-config-schema.json](../schemas/tui-config-schema.json)]
+
+# The Default Config File
+
+To illustrate the syntax, the below is the `config.json` file found in `Terminal.Gui.dll`:
+
+[!code-json[config.json](../../Terminal.Gui/Resources/config.json)]

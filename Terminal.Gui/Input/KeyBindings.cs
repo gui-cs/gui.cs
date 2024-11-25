@@ -44,9 +44,20 @@ public class KeyBindings
             //Bindings [key] = binding;
         }
 
-        binding.BoundView = boundViewForAppScope;
+        if (BoundView is { })
+        {
+            binding.BoundView = BoundView;
+        }
+        else
+        {
+            binding.BoundView = boundViewForAppScope;
+        }
 
-        Bindings.Add (key, binding);
+        // IMPORTANT: Add a COPY of the key. This is needed because ConfigurationManager.Apply uses DeepMemberWiseCopy 
+        // IMPORTANT: update the memory referenced by the key, and Dictionary uses caching for performance, and thus 
+        // IMPORTANT: Apply will update the Dictionary with the new key, but the old key will still be in the dictionary.
+        // IMPORTANT: See the ConfigurationManager.Illustrate_DeepMemberWiseCopy_Breaks_Dictionary test for details.
+        Bindings.Add (new (key), binding);
     }
 
     /// <summary>
@@ -220,7 +231,7 @@ public class KeyBindings
     // TODO: Add a dictionary comparer that ignores Scope
     // TODO: This should not be public!
     /// <summary>The collection of <see cref="KeyBinding"/> objects.</summary>
-    public Dictionary<Key, KeyBinding> Bindings { get; } = new ();
+    public Dictionary<Key, KeyBinding> Bindings { get; } = new (new KeyEqualityComparer ());
 
     /// <summary>
     ///     Gets the keys that are bound.
@@ -408,19 +419,27 @@ public class KeyBindings
     /// <returns><see langword="true"/> if the Key is bound; otherwise <see langword="false"/>.</returns>
     public bool TryGet (Key key, KeyBindingScope scope, out KeyBinding binding)
     {
+        if (!key.IsValid)
+        {
         //if (BoundView is null)
         //{
         //    throw new InvalidOperationException ("KeyBindings must be bound to a View to use this method.");
         //}
 
-        binding = new (Array.Empty<Command> (), KeyBindingScope.Disabled, null);
+            binding = new (Array.Empty<Command> (), KeyBindingScope.Disabled, null);
+            return false;
+        }
 
-        if (key.IsValid && Bindings.TryGetValue (key, out binding))
+        if (Bindings.TryGetValue (key, out binding))
         {
             if (scope.HasFlag (binding.Scope))
             {
                 return true;
             }
+        }
+        else
+        {
+            binding = new (Array.Empty<Command> (), KeyBindingScope.Disabled, null);
         }
 
         return false;

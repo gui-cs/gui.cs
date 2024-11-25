@@ -18,6 +18,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
 using Terminal.Gui;
 using UICatalog.Scenarios;
 using static Terminal.Gui.ConfigurationManager;
@@ -438,6 +440,7 @@ public class UICatalogApp
         }
 
         scenario.Dispose ();
+
 
         // TODO: Throw if shutdown was not called already
         Application.Shutdown ();

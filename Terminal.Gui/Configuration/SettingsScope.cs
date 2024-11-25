@@ -27,7 +27,7 @@ namespace Terminal.Gui;
 public class SettingsScope : Scope<SettingsScope>
 {
     /// <summary>The list of paths to the configuration files.</summary>
-    public List<string> Sources = new ();
+    public Dictionary<ConfigLocations, string> Sources { get; } = new ();
 
     /// <summary>Points to our JSON schema.</summary>
     [JsonInclude]
@@ -37,9 +37,10 @@ public class SettingsScope : Scope<SettingsScope>
     /// <summary>Updates the <see cref="SettingsScope"/> with the settings in a JSON string.</summary>
     /// <param name="stream">Json document to update the settings with.</param>
     /// <param name="source">The source (filename/resource name) the Json document was read from.</param>
+    /// <param name="location">Location</param>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public SettingsScope? Update (Stream stream, string source)
+    public SettingsScope? Update (Stream stream, string source, ConfigLocations location)
     {
         // Update the existing settings with the new settings.
         try
@@ -47,9 +48,9 @@ public class SettingsScope : Scope<SettingsScope>
             Update ((SettingsScope)JsonSerializer.Deserialize (stream, typeof (SettingsScope), _serializerOptions)!);
             OnUpdated ();
             Debug.WriteLine ($"ConfigurationManager: Read configuration from \"{source}\"");
-            if (!Sources.Contains (source))
+            if (!Sources.ContainsValue (source))
             {
-                Sources.Add (source);
+                Sources.Add (location, source);
             }
 
             return this;
@@ -68,19 +69,20 @@ public class SettingsScope : Scope<SettingsScope>
     }
 
     /// <summary>Updates the <see cref="SettingsScope"/> with the settings in a JSON file.</summary>
-    /// <param name="filePath"></param>
+    /// <param name="filePath">Path to the file.</param>
+    /// <param name="location">The location</param>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public SettingsScope? Update (string filePath)
+    public SettingsScope? Update (string filePath, ConfigLocations location)
     {
         string realPath = filePath.Replace ("~", Environment.GetFolderPath (Environment.SpecialFolder.UserProfile));
 
         if (!File.Exists (realPath))
         {
             Debug.WriteLine ($"ConfigurationManager: Configuration file \"{realPath}\" does not exist.");
-            if (!Sources.Contains (filePath))
+            if (!Sources.ContainsValue (filePath))
             {
-                Sources.Add (filePath);
+                Sources.Add (location, filePath);
             }
 
             return this;
@@ -95,7 +97,7 @@ public class SettingsScope : Scope<SettingsScope>
             try
             {
                 FileStream? stream = File.OpenRead (realPath);
-                SettingsScope? s = Update (stream, filePath);
+                SettingsScope? s = Update (stream, filePath, location);
                 stream.Close ();
                 stream.Dispose ();
 
@@ -103,7 +105,7 @@ public class SettingsScope : Scope<SettingsScope>
             }
             catch (IOException ioe)
             {
-                Debug.WriteLine($"Couldn't open {filePath}. Retrying...: {ioe}");
+                Debug.WriteLine ($"Couldn't open {filePath}. Retrying...: {ioe}");
                 Task.Delay (100);
                 retryCount++;
             }
@@ -115,27 +117,33 @@ public class SettingsScope : Scope<SettingsScope>
     /// <summary>Updates the <see cref="SettingsScope"/> with the settings in a JSON string.</summary>
     /// <param name="json">Json document to update the settings with.</param>
     /// <param name="source">The source (filename/resource name) the Json document was read from.</param>
+    /// <param name="location">The location.</param>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public SettingsScope? Update (string json, string source)
+    public SettingsScope? Update (string? json, string source, ConfigLocations location)
     {
+        if (string.IsNullOrEmpty (json))
+        {
+            return null;
+        }
         var stream = new MemoryStream ();
         var writer = new StreamWriter (stream);
         writer.Write (json);
         writer.Flush ();
         stream.Position = 0;
 
-        return Update (stream, source);
+        return Update (stream, source, location);
     }
 
     /// <summary>Updates the <see cref="SettingsScope"/> with the settings from a Json resource.</summary>
     /// <param name="assembly"></param>
     /// <param name="resourceName"></param>
+    /// <param name="location"></param>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public SettingsScope? UpdateFromResource (Assembly assembly, string resourceName)
+    public SettingsScope? UpdateFromResource (Assembly assembly, string resourceName, ConfigLocations location)
     {
-        if (resourceName is null || string.IsNullOrEmpty (resourceName))
+        if (string.IsNullOrEmpty (resourceName))
         {
             Debug.WriteLine (
                              $"ConfigurationManager: Resource \"{resourceName}\" does not exist in \"{assembly.GetName ().Name}\"."
@@ -144,20 +152,13 @@ public class SettingsScope : Scope<SettingsScope>
             return this;
         }
 
-        // BUG: Not trim-compatible
-        // Not a bug, per se, but it's easily fixable by just loading the file.
-        // Defaults can just be field initializers for involved types.
-        using Stream? stream = assembly.GetManifestResourceStream (resourceName)!;
+        using Stream? stream = assembly.GetManifestResourceStream (resourceName);
 
         if (stream is null)
         {
-            Debug.WriteLine (
-                             $"ConfigurationManager: Failed to read resource \"{resourceName}\" from \"{assembly.GetName ().Name}\"."
-                            );
-
-            return this;
+            return null;
         }
 
-        return Update (stream, $"resource://[{assembly.GetName ().Name}]/{resourceName}");
+        return Update (stream, $"resource://[{assembly.GetName ().Name}]/{resourceName}", location);
     }
 }

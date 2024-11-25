@@ -22,7 +22,7 @@ public class Tab : View
         set
         {
             _displayText = value;
-            SetNeedsDraw ();
+            SetNeedsLayout ();
         }
     }
 

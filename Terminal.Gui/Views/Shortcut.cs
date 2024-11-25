@@ -280,8 +280,14 @@ public class Shortcut : View, IOrientation, IDesignable
 
     private readonly View? _targetView; // If set, _command will be invoked
 
+    /// <summary>
+    ///     Gets the target <see cref="View"/> that the <see cref="Command"/> will be invoked on.
+    /// </summary>
     public View? TargetView => _targetView;
 
+    /// <summary>
+    ///     Gets the <see cref="Command"/> that will be invoked on <see cref="TargetView"/> when the Shortcut is activated.
+    /// </summary>
     public Command Command { get; }
 
     private void AddCommands ()

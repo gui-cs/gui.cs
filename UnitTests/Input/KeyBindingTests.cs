@@ -350,6 +350,19 @@ public class KeyBindingTests
 
     // TryGet
     [Fact]
+    public void TryGet_Succeeds ()
+    {
+        var keyBindings = new KeyBindings ();
+        keyBindings.Add (Key.Q.WithCtrl, KeyBindingScope.Application, Command.HotKey);
+        var key = new Key (Key.Q.WithCtrl);
+        bool result = keyBindings.TryGet (key, out KeyBinding _);
+        Assert.True (result);;
+
+        result = keyBindings.Bindings.TryGetValue (key, out KeyBinding _);
+        Assert.True (result);
+    }
+
+    [Fact]
     public void TryGet_Unknown_ReturnsFalse ()
     {
         var keyBindings = new KeyBindings ();

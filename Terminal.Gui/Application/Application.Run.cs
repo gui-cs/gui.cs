@@ -1,6 +1,7 @@
 #nullable enable
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Terminal.Gui;

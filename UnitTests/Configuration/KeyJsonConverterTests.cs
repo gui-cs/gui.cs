@@ -53,6 +53,20 @@ public class KeyJsonConverterTests
     }
 
     [Fact]
+    public void Deserialized_Key_Equals ()
+    {
+        // Arrange
+        Key key = Key.Q.WithCtrl;
+
+        // Act
+        string json = "\"Ctrl+Q\"";
+        Key deserializedKey = JsonSerializer.Deserialize<Key> (json, ConfigurationManager._serializerOptions);
+
+        // Assert
+        Assert.Equal (key, deserializedKey);
+
+    }
+    [Fact]
     public void Separator_Property_Serializes_As_Glyph ()
     {
         // Act

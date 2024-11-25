@@ -393,24 +393,31 @@ public class Key : EventArgs, IEquatable<Key>
     public static implicit operator string (Key key) { return key.ToString (); }
 
     /// <inheritdoc/>
-    public override bool Equals (object obj) { return obj is Key k && k.KeyCode == KeyCode && k.Handled == Handled; }
+    public override bool Equals (object obj)
+    {
+        if (obj is Key other)
+        {
+            return other._keyCode == _keyCode && other.Handled == Handled;
+        }
+        return false;
+    }
 
     bool IEquatable<Key>.Equals (Key other) { return Equals (other); }
 
     /// <inheritdoc/>
-    public override int GetHashCode () { return (int)KeyCode; }
+    public override int GetHashCode () { return _keyCode.GetHashCode (); }
 
     /// <summary>Compares two <see cref="Key"/>s for equality.</summary>
     /// <param name="a"></param>
     /// <param name="b"></param>
     /// <returns></returns>
-    public static bool operator == (Key a, Key b) { return a?.KeyCode == b?.KeyCode; }
+    public static bool operator == (Key a, Key b) { return a!.Equals (b); }
 
     /// <summary>Compares two <see cref="Key"/>s for not equality.</summary>
     /// <param name="a"></param>
     /// <param name="b"></param>
     /// <returns></returns>
-    public static bool operator != (Key a, Key b) { return a?.KeyCode != b?.KeyCode; }
+    public static bool operator != (Key a, Key b) { return !a!.Equals (b); }
 
     /// <summary>Compares two <see cref="Key"/>s for less-than.</summary>
     /// <param name="a"></param>

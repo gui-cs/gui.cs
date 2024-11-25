@@ -552,7 +552,7 @@ public class Bars : Scenario
         var line = new Line ()
         {
             X = -1,
-            Width = Dim.Fill() + 1
+            Width = Dim.Fill()! + 1
         };
 
         var shortcut4 = new Shortcut

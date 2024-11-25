@@ -1,4 +1,4 @@
-![Terminal.Gui](https://socialify.git.ci/gui-cs/Terminal.Gui/image?description=1&font=Rokkitt&forks=1&language=1&logo=https%3A%2F%2Fraw.githubusercontent.com%2Fgui-cs%2FTerminal.Gui%2Fdevelop%2Fdocfx%2Fimages%2Flogo.png&name=1&owner=1&pattern=Circuit%20Board&stargazers=1&theme=Auto)
+![Terminal.Gui](https://socialify.git.ci/gui-cs/Terminal.Gui/image?description=1&descriptionEditable=Cross%20Platform%20Terminal%20UI%20Toolkit&font=KoHo&forks=1&logo=https%3A%2F%2Fgithub.com%2Fgui-cs%2FTerminal.Gui%2Fblob%2Fv2_develop%2Fdocfx%2Fimages%2Flogo.png%3Fraw%3Dtrue&pattern=Circuit%20Board&stargazers=1&theme=Dark)
 ![.NET Core](https://github.com/gui-cs/Terminal.Gui/workflows/.NET%20Core/badge.svg?branch=develop)
 [![Version](https://img.shields.io/nuget/v/Terminal.Gui.svg)](https://www.nuget.org/packages/Terminal.Gui)
 ![Code Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/migueldeicaza/90ef67a684cb71db1817921a970f8d27/raw/code-coverage.json)
@@ -11,7 +11,7 @@
 * Developers starting new TUI projects are encouraged to target `v2`. The API is significantly changed, and significantly improved. There will be breaking changes in the API before Beta, but the core API is stable.
 * `v1` is in maintenance mode and we will only accept PRs for issues impacting existing functionality.
  
-**Terminal.Gui**: A toolkit for building rich console apps for .NET, .NET Core, and Mono that works on Windows, the Mac, and Linux/Unix.
+**Terminal.Gui**: A toolkit for building rich console apps for Windows, the Mac, and Linux/Unix.
 
 ![Sample app](docfx/images/sample.gif)
 
