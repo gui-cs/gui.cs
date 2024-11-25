@@ -589,7 +589,7 @@ public class TabViewTests (ITestOutputHelper output)
         TabView tv = GetTabView (out _, out _);
         tv.Width = 3;
         tv.Height = 5;
-        tv.Style = new () { ShowTopLine = false };
+        tv.Style = new () { ShowInitialLine = false };
         tv.ApplyStyleChanges ();
         tv.Layout ();
 
@@ -613,7 +613,7 @@ public class TabViewTests (ITestOutputHelper output)
         TabView tv = GetTabView (out _, out _);
         tv.Width = 4;
         tv.Height = 5;
-        tv.Style = new () { ShowTopLine = false };
+        tv.Style = new () { ShowInitialLine = false };
         tv.ApplyStyleChanges ();
         tv.Layout ();
 
@@ -637,7 +637,7 @@ public class TabViewTests (ITestOutputHelper output)
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
         tv.Width = 10;
         tv.Height = 5;
-        tv.Style = new () { ShowTopLine = false };
+        tv.Style = new () { ShowInitialLine = false };
         tv.ApplyStyleChanges ();
 
         // Test two tab names that fit
@@ -736,7 +736,7 @@ public class TabViewTests (ITestOutputHelper output)
         TabView tv = GetTabView (out _, out _);
         tv.Width = 3;
         tv.Height = 5;
-        tv.Style = new () { ShowTopLine = false, TabsSide = TabSide.Bottom };
+        tv.Style = new () { ShowInitialLine = false, TabsSide = TabSide.Bottom };
         tv.ApplyStyleChanges ();
         tv.Layout ();
 
@@ -760,7 +760,7 @@ public class TabViewTests (ITestOutputHelper output)
         TabView tv = GetTabView (out _, out _);
         tv.Width = 4;
         tv.Height = 5;
-        tv.Style = new () { ShowTopLine = false, TabsSide = TabSide.Bottom };
+        tv.Style = new () { ShowInitialLine = false, TabsSide = TabSide.Bottom };
         tv.ApplyStyleChanges ();
         tv.Layout ();
 
@@ -784,7 +784,7 @@ public class TabViewTests (ITestOutputHelper output)
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
         tv.Width = 10;
         tv.Height = 5;
-        tv.Style = new () { ShowTopLine = false, TabsSide = TabSide.Bottom };
+        tv.Style = new () { ShowInitialLine = false, TabsSide = TabSide.Bottom };
         tv.ApplyStyleChanges ();
         tv.Layout ();
 
