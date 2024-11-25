@@ -20,7 +20,14 @@ public static partial class Application // Keyboard handling
             return true;
         }
 
-        if (Top is null)
+        View? top = Top;
+
+        if (Popover is { Visible: true })
+        {
+            top = Popover;
+        }
+
+        if (top is null)
         {
             foreach (Toplevel topLevel in TopLevels.ToList ())
             {
@@ -37,7 +44,7 @@ public static partial class Application // Keyboard handling
         }
         else
         {
-            if (Top.NewKeyDownEvent (key))
+            if (top.NewKeyDownEvent (key))
             {
                 return true;
             }
@@ -49,6 +56,11 @@ public static partial class Application // Keyboard handling
         {
             if (binding.Value.BoundView is { })
             {
+                if (!binding.Value.BoundView.Enabled)
+                {
+                    return false;
+                }
+
                 bool? handled = binding.Value.BoundView?.InvokeCommands (binding.Value.Commands, binding.Key, binding.Value);
 
                 if (handled != null && (bool)handled)
@@ -164,6 +176,12 @@ public static partial class Application // Keyboard handling
                     Command.Quit,
                     static () =>
                     {
+                        if (Popover is {Visible: true})
+                        {
+                            Popover.Visible = false;
+
+                            return true;
+                        }
                         RequestStop ();
 
                         return true;

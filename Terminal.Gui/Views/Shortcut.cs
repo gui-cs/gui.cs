@@ -67,7 +67,7 @@ public class Shortcut : View, IOrientation, IDesignable
     /// </param>
     /// <param name="commandText">The text to display for the command.</param>
     /// <param name="helpText">The help text to display.</param>
-    public Shortcut (View targetView, Command command, string commandText, string helpText)
+    public Shortcut (View targetView, Command command, string commandText, string? helpText = null)
         : this (
                 targetView?.KeyBindings.GetKeyFromCommands (command)!,
                 commandText,
@@ -75,7 +75,7 @@ public class Shortcut : View, IOrientation, IDesignable
                 helpText)
     {
         _targetView = targetView;
-        _command = command;
+        Command = command;
     }
 
     /// <summary>
@@ -92,7 +92,7 @@ public class Shortcut : View, IOrientation, IDesignable
     /// <param name="helpText">The help text to display.</param>
     public Shortcut (Key key, string? commandText, Action? action, string? helpText = null)
     {
-        Id = "_shortcut";
+        Id = $"shortcut:{commandText}";
 
         HighlightStyle = HighlightStyle.None;
         CanFocus = true;
@@ -280,7 +280,15 @@ public class Shortcut : View, IOrientation, IDesignable
 
     private readonly View? _targetView; // If set, _command will be invoked
 
-    private readonly Command _command; // Used when _targetView is set
+    /// <summary>
+    ///     Gets the target <see cref="View"/> that the <see cref="Command"/> will be invoked on.
+    /// </summary>
+    public View? TargetView => _targetView;
+
+    /// <summary>
+    ///     Gets the <see cref="Command"/> that will be invoked on <see cref="TargetView"/> when the Shortcut is activated.
+    /// </summary>
+    public Command Command { get; }
 
     private void AddCommands ()
     {
@@ -319,6 +327,11 @@ public class Shortcut : View, IOrientation, IDesignable
             return true;
         }
 
+        if (ctx.Command != Command.Accept)
+        {
+           // return false;
+        }
+
         if (Action is { })
         {
             Action.Invoke ();
@@ -329,7 +342,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
         if (_targetView is { })
         {
-            _targetView.InvokeCommand (_command);
+            _targetView.InvokeCommand (Command);
         }
 
         return cancel;
@@ -616,7 +629,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
             if (_keyBindingScope == KeyBindingScope.Application)
             {
-                Application.KeyBindings.Remove (Key);
+                Application.KeyBindings.Remove (Key, this);
             }
 
             if (_keyBindingScope is KeyBindingScope.HotKey or KeyBindingScope.Focused)
@@ -691,10 +704,10 @@ public class Shortcut : View, IOrientation, IDesignable
             {
                 if (oldKey != Key.Empty)
                 {
-                    Application.KeyBindings.Remove (oldKey);
+                    Application.KeyBindings.Remove (oldKey, this);
                 }
 
-                Application.KeyBindings.Remove (Key);
+                Application.KeyBindings.Remove (Key, this);
                 Application.KeyBindings.Add (Key, this, Command.HotKey);
             }
             else

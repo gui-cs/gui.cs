@@ -55,6 +55,7 @@ public partial class View // Drawing APIs
             // Draw the Border and Padding.
             // We clip to the frame to prevent drawing outside the frame.
             saved = ClipFrame ();
+
             DoDrawBorderAndPadding ();
             SetClip (saved);
 
@@ -71,7 +72,7 @@ public partial class View // Drawing APIs
             DoSetAttribute ();
             DoClearViewport ();
 
-            // Draw the subviews
+            // Draw the subviews only if needed
             if (SubViewNeedsDraw)
             {
                 DoSetAttribute ();
@@ -166,6 +167,13 @@ public partial class View // Drawing APIs
 
     private void DoDrawBorderAndPadding ()
     {
+        if (SubViewNeedsDraw)
+        {
+            // A Subview may add to the LineCanvas. This ensures any Adornment LineCanvas updates happen.
+            Border?.SetNeedsDraw ();
+            Padding?.SetNeedsDraw ();
+        }
+
         if (OnDrawingBorderAndPadding ())
         {
             return;

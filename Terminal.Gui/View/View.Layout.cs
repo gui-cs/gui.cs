@@ -5,7 +5,7 @@ namespace Terminal.Gui;
 
 public partial class View // Layout APIs
 {
-    #region Frame/Position/Dimension
+    #region Frame
 
     /// <summary>
     ///     Indicates whether the specified SuperView-relative coordinates are within the View's <see cref="Frame"/>.
@@ -794,7 +794,7 @@ public partial class View // Layout APIs
         {
             foreach (Toplevel tl in Application.TopLevels)
             {
-               // tl.SetNeedsDraw ();
+                // tl.SetNeedsDraw ();
             }
         }
 
@@ -1039,6 +1039,15 @@ public partial class View // Layout APIs
     {
         int maxDimension;
         View? superView;
+
+
+        //if (Application.Driver is null)
+        //{
+        //    nx = targetX;
+        //    ny = targetY;
+        //    return null;
+        //}
+
 
         if (viewToMove is not Toplevel || viewToMove?.SuperView is null || viewToMove == Application.Top || viewToMove?.SuperView == Application.Top)
         {
