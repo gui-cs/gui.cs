@@ -16,7 +16,7 @@ public class TabView : View
     private readonly List<Tab> _tabs = new ();
 
     /// <summary>This sub view is the 2 or 3 line control that represents the actual tabs themselves.</summary>
-    private readonly TabRowView _tabsBar;
+    private readonly TabRow _tabsBar;
 
     private Tab? _selectedTab;
 
@@ -28,7 +28,7 @@ public class TabView : View
     {
         CanFocus = true;
         TabStop = TabBehavior.TabStop; // Because TabView has focusable subviews, it must be a TabGroup
-        _tabsBar = new TabRowView (this);
+        _tabsBar = new TabRow (this);
         _containerView = new ();
         ApplyStyleChanges ();
 
@@ -517,6 +517,10 @@ public class TabView : View
         if (TabCanSetFocus ())
         {
             SelectedTab?.SetFocus ();
+        }
+        else
+        {
+            SelectedTab?.View?.SetFocus ();
         }
     }
 
