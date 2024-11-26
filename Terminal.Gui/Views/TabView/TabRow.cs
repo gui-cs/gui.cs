@@ -1,18 +1,19 @@
 #nullable enable
 namespace Terminal.Gui;
 
-internal class TabRowView : View
+internal class TabRow : View
 {
     private readonly TabView _host;
     private readonly View _leftScrollIndicator;
     private readonly View _rightScrollIndicator;
 
-    public TabRowView (TabView host)
+    public TabRow (TabView host)
     {
         _host = host;
-        Id = "tabRowView";
+        Id = "tabRow";
 
         CanFocus = true;
+        TabStop = TabBehavior.TabGroup;
         Width = Dim.Fill ();
 
         _rightScrollIndicator = new View
@@ -59,25 +60,25 @@ internal class TabRowView : View
             }
         }
 
-        if (!me.IsSingleDoubleOrTripleClicked)
-        {
-            return false;
-        }
-
-        if (!HasFocus && CanFocus)
+        if (me.IsWheel && !HasFocus && CanFocus)
         {
             SetFocus ();
         }
 
-        if (me.IsSingleDoubleOrTripleClicked)
+        if (me is { IsSingleDoubleOrTripleClicked: false, IsWheel: false })
+        {
+            return false;
+        }
+
+        if (me.IsSingleDoubleOrTripleClicked || me.IsWheel)
         {
             var scrollIndicatorHit = 0;
 
-            if (me.View is { Id: "rightScrollIndicator" })
+            if (me.View is { Id: "rightScrollIndicator" } || me.Flags.HasFlag (MouseFlags.WheeledDown) || me.Flags.HasFlag (MouseFlags.WheeledRight))
             {
                 scrollIndicatorHit = 1;
             }
-            else if (me.View is { Id: "leftScrollIndicator" })
+            else if (me.View is { Id: "leftScrollIndicator" } || me.Flags.HasFlag (MouseFlags.WheeledUp) || me.Flags.HasFlag (MouseFlags.WheeledLeft))
             {
                 scrollIndicatorHit = -1;
             }
