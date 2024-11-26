@@ -278,16 +278,6 @@ public class ScrollBarDemo : Scenario
         autoShow.CheckedStateChanging += (s, e) => scrollBar.AutoShow = e.NewValue == CheckState.Checked;
         demoFrame.Add (autoShow);
 
-        var ckbShowPercent = new CheckBox
-        {
-            Y = Pos.Top (lblOptions),
-            X = Pos.Right (autoShow) + 1,
-            Text = "ShowP_ercent",
-            CheckedState = scrollBar.ShowPercent ? CheckState.Checked : CheckState.UnChecked
-        };
-        ckbShowPercent.CheckedStateChanging += (s, e) => scrollBar.ShowPercent = e.NewValue == CheckState.Checked;
-        demoFrame.Add (ckbShowPercent);
-
         var lblSliderPosition = new Label
         {
             Text = "SliderPosition:",

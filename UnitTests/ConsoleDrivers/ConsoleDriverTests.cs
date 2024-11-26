@@ -25,7 +25,7 @@ public class ConsoleDriverTests
     [InlineData (typeof (CursesDriver))]
     public void End_Cleans_Up (Type driverType)
     {
-        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         driver.Init ();
         driver.End ();
     }
@@ -34,7 +34,7 @@ public class ConsoleDriverTests
     [InlineData (typeof (FakeDriver))]
     public void FakeDriver_MockKeyPresses (Type driverType)
     {
-        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         Application.Init (driver);
 
         var text = "MockKeyPresses";
@@ -85,7 +85,7 @@ public class ConsoleDriverTests
     [InlineData (typeof (FakeDriver))]
     public void FakeDriver_Only_Sends_Keystrokes_Through_MockKeyPresses (Type driverType)
     {
-        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         Application.Init (driver);
 
         Toplevel top = new ();
@@ -124,7 +124,7 @@ public class ConsoleDriverTests
     [InlineData (typeof (CursesDriver))]
     public void Init_Inits (Type driverType)
     {
-        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         MainLoop ml = driver.Init ();
         Assert.NotNull (ml);
         Assert.NotNull (driver.Clipboard);
@@ -140,7 +140,7 @@ public class ConsoleDriverTests
     //[InlineData (typeof (FakeDriver))]
     //public void FakeDriver_MockKeyPresses_Press_AfterTimeOut (Type driverType)
     //{
-    //	var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+    //	var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
     //	Application.Init (driver);
 
     //	// Simulating pressing of QuitKey after a short period of time
@@ -201,7 +201,7 @@ public class ConsoleDriverTests
     [InlineData (typeof (CursesDriver))]
     public void TerminalResized_Simulation (Type driverType)
     {
-        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         driver?.Init ();
         driver.Cols = 80;
         driver.Rows = 25;

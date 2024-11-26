@@ -1,3 +1,4 @@
+#nullable enable
 //
 // mainloop.cs: Linux/Curses MainLoop implementation.
 //
@@ -36,21 +37,22 @@ internal class UnixMainLoop : IMainLoopDriver
         PollNval = 32
     }
 
-    public const int KEY_RESIZE = unchecked ((int)0xffffffffffffffff);
+    public const int KEY_RESIZE = unchecked((int)0xffffffffffffffff);
     private static readonly nint _ignore = Marshal.AllocHGlobal (1);
 
     private readonly CursesDriver _cursesDriver;
     private readonly Dictionary<int, Watch> _descriptorWatchers = new ();
     private readonly int [] _wakeUpPipes = new int [2];
-    private MainLoop _mainLoop;
+    private MainLoop? _mainLoop;
     private bool _pollDirty = true;
-    private Pollfd [] _pollMap;
+    private Pollfd []? _pollMap;
     private bool _winChanged;
 
-    public UnixMainLoop (ConsoleDriver consoleDriver = null)
+    public UnixMainLoop (IConsoleDriver IConsoleDriver)
     {
-        // UnixDriver doesn't use the consoleDriver parameter, but the WindowsDriver does.
-        _cursesDriver = (CursesDriver)Application.Driver;
+        ArgumentNullException.ThrowIfNull (IConsoleDriver);
+
+        _cursesDriver = (CursesDriver)IConsoleDriver;
     }
 
     void IMainLoopDriver.Wakeup ()
@@ -77,7 +79,7 @@ internal class UnixMainLoop : IMainLoopDriver
             AddWatch (
                       _wakeUpPipes [0],
                       Condition.PollIn,
-                      ml =>
+                      _ =>
                       {
                           read (_wakeUpPipes [0], _ignore, 1);
 
@@ -93,11 +95,16 @@ internal class UnixMainLoop : IMainLoopDriver
 
     bool IMainLoopDriver.EventsPending ()
     {
+        if (ConsoleDriver.RunningUnitTests)
+        {
+            return true;
+        }
+
         UpdatePollMap ();
 
-        bool checkTimersResult = _mainLoop.CheckTimersAndIdleHandlers (out int pollTimeout);
+        bool checkTimersResult = _mainLoop!.CheckTimersAndIdleHandlers (out int pollTimeout);
 
-        int n = poll (_pollMap, (uint)_pollMap.Length, pollTimeout);
+        int n = poll (_pollMap!, (uint)_pollMap!.Length, pollTimeout);
 
         if (n == KEY_RESIZE)
         {
@@ -109,6 +116,11 @@ internal class UnixMainLoop : IMainLoopDriver
 
     void IMainLoopDriver.Iteration ()
     {
+        if (ConsoleDriver.RunningUnitTests)
+        {
+            return;
+        }
+
         if (_winChanged)
         {
             _winChanged = false;
@@ -125,19 +137,17 @@ internal class UnixMainLoop : IMainLoopDriver
 
         foreach (Pollfd p in _pollMap)
         {
-            Watch watch;
-
             if (p.revents == 0)
             {
                 continue;
             }
 
-            if (!_descriptorWatchers.TryGetValue (p.fd, out watch))
+            if (!_descriptorWatchers.TryGetValue (p.fd, out Watch? watch))
             {
                 continue;
             }
 
-            if (!watch.Callback (_mainLoop))
+            if (!watch.Callback (_mainLoop!))
             {
                 _descriptorWatchers.Remove (p.fd);
             }
@@ -146,7 +156,7 @@ internal class UnixMainLoop : IMainLoopDriver
 
     void IMainLoopDriver.TearDown ()
     {
-        _descriptorWatchers?.Clear ();
+        _descriptorWatchers.Clear ();
 
         _mainLoop = null;
     }
@@ -159,10 +169,7 @@ internal class UnixMainLoop : IMainLoopDriver
     /// </remarks>
     internal object AddWatch (int fileDescriptor, Condition condition, Func<MainLoop, bool> callback)
     {
-        if (callback is null)
-        {
-            throw new ArgumentNullException (nameof (callback));
-        }
+        ArgumentNullException.ThrowIfNull (callback);
 
         var watch = new Watch { Condition = condition, Callback = callback, File = fileDescriptor };
         _descriptorWatchers [fileDescriptor] = watch;
@@ -186,15 +193,6 @@ internal class UnixMainLoop : IMainLoopDriver
         }
     }
 
-    [DllImport ("libc")]
-    private static extern int pipe ([In] [Out] int [] pipes);
-
-    [DllImport ("libc")]
-    private static extern int poll ([In] [Out] Pollfd [] ufds, uint nfds, int timeout);
-
-    [DllImport ("libc")]
-    private static extern int read (int fd, nint buf, nint n);
-
     private void UpdatePollMap ()
     {
         if (!_pollDirty)
@@ -215,8 +213,29 @@ internal class UnixMainLoop : IMainLoopDriver
         }
     }
 
+    internal void WriteRaw (string ansiRequest)
+    {
+        // Write to stdout (fd 1)
+        write (STDOUT_FILENO, ansiRequest, ansiRequest.Length);
+    }
+
+    [DllImport ("libc")]
+    private static extern int pipe ([In][Out] int [] pipes);
+
+    [DllImport ("libc")]
+    private static extern int poll ([In] [Out] Pollfd [] ufds, uint nfds, int timeout);
+
+    [DllImport ("libc")]
+    private static extern int read (int fd, nint buf, nint n);
+
     [DllImport ("libc")]
     private static extern int write (int fd, nint buf, nint n);
+
+    // File descriptor for stdout
+    private const int STDOUT_FILENO = 1;
+
+    [DllImport ("libc")]
+    private static extern int write (int fd, string buf, int n);
 
     [StructLayout (LayoutKind.Sequential)]
     private struct Pollfd

@@ -24,7 +24,7 @@ public class ContentsTests
     //[InlineData (typeof (WindowsDriver))] // TODO: Uncomment when #2610 is fixed
     public void AddStr_Combining_Character_1st_Column (Type driverType)
     {
-        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         driver.Init ();
         var expected = "\u0301!";
         driver.AddStr ("\u0301!"); // acute accent + exclamation mark
@@ -42,7 +42,7 @@ public class ContentsTests
     //[InlineData (typeof (WindowsDriver))] // TODO: Uncomment when #2610 is fixed
     public void AddStr_With_Combining_Characters (Type driverType)
     {
-        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         driver.Init ();
 
         var acuteaccent = new Rune (0x0301); // Combining acute accent (é)
@@ -98,7 +98,7 @@ public class ContentsTests
     [InlineData (typeof (CursesDriver))]
     public void Move_Bad_Coordinates (Type driverType)
     {
-        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         driver.Init ();
 
         Assert.Equal (0, driver.Col);

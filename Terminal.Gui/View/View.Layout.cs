@@ -557,7 +557,14 @@ public partial class View // Layout APIs
                 SetTitleTextFormatterSize ();
             }
 
-            SuperView?.SetNeedsDraw ();
+            if (SuperView is { })
+            {
+                SuperView?.SetNeedsDraw ();
+            }
+            else
+            {
+                Application.ClearScreenNextIteration = true;
+            }
         }
 
         if (TextFormatter.ConstrainToWidth is null)

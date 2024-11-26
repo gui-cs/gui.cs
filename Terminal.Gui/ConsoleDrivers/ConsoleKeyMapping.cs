@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Terminal.Gui.ConsoleDrivers;
 
+// QUESTION: This class combines Windows specific code with cross-platform code. Should this be split into two classes?
 /// <summary>Helper class to handle the scan code and virtual key from a <see cref="ConsoleKey"/>.</summary>
 public static class ConsoleKeyMapping
 {
@@ -249,7 +250,7 @@ public static class ConsoleKeyMapping
     {
         var modifiers = new ConsoleModifiers ();
 
-        if (key.HasFlag (KeyCode.ShiftMask))
+        if (key.HasFlag (KeyCode.ShiftMask) || char.IsUpper ((char)key))
         {
             modifiers |= ConsoleModifiers.Shift;
         }
@@ -590,7 +591,8 @@ public static class ConsoleKeyMapping
 
                 if (uc != UnicodeCategory.NonSpacingMark && uc != UnicodeCategory.OtherLetter)
                 {
-                    consoleKey = char.ToUpper (stFormD [i]);
+                    char ck = char.ToUpper (stFormD [i]);
+                    consoleKey = (uint)(ck > 0 && ck <= 255 ? char.ToUpper (stFormD [i]) : 0);
                     scode = GetScanCode ("VirtualKey", char.ToUpper (stFormD [i]), 0);
 
                     if (scode is { })
@@ -704,6 +706,32 @@ public static class ConsoleKeyMapping
                 return (uint)ConsoleKey.F24;
             case KeyCode.Tab | KeyCode.ShiftMask:
                 return (uint)ConsoleKey.Tab;
+            case KeyCode.Space:
+                return (uint)ConsoleKey.Spacebar;
+            default:
+                uint c = (char)keyValue;
+
+                if (c is >= (char)ConsoleKey.A and <= (char)ConsoleKey.Z)
+                {
+                    return c;
+                }
+
+                if ((c - 32) is >= (char)ConsoleKey.A and <= (char)ConsoleKey.Z)
+                {
+                    return (c - 32);
+                }
+
+                if (Enum.IsDefined (typeof (ConsoleKey), keyValue.ToString ()))
+                {
+                    return (uint)keyValue;
+                }
+
+                // DEL
+                if ((uint)keyValue == 127)
+                {
+                    return (uint)ConsoleKey.Backspace;
+                }
+                break;
         }
 
         isConsoleKey = false;
@@ -866,6 +894,14 @@ public static class ConsoleKeyMapping
                 break;
             case ConsoleKey.Tab:
                 keyCode = KeyCode.Tab;
+
+                break;
+            case ConsoleKey.Spacebar:
+                keyCode = KeyCode.Space;
+
+                break;
+            case ConsoleKey.Backspace:
+                keyCode = KeyCode.Backspace;
 
                 break;
             default:

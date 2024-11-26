@@ -31,8 +31,8 @@ public class ScenarioTests : TestsAllViews
         _timeoutLock = new ();
 
         // Disable any UIConfig settings
-        ConfigurationManager.ConfigLocations savedConfigLocations = ConfigurationManager.Locations;
-        ConfigurationManager.Locations = ConfigurationManager.ConfigLocations.DefaultOnly;
+        ConfigLocations savedConfigLocations = ConfigurationManager.Locations;
+        ConfigurationManager.Locations = ConfigLocations.Default;
 
         // If a previous test failed, this will ensure that the Application is in a clean state
         Application.ResetState (true);
@@ -148,8 +148,8 @@ public class ScenarioTests : TestsAllViews
         _timeoutLock = new ();
 
         // Disable any UIConfig settings
-        ConfigurationManager.ConfigLocations savedConfigLocations = ConfigurationManager.Locations;
-        ConfigurationManager.Locations = ConfigurationManager.ConfigLocations.DefaultOnly;
+        ConfigLocations savedConfigLocations = ConfigurationManager.Locations;
+        ConfigurationManager.Locations = ConfigLocations.Default;
 
         // If a previous test failed, this will ensure that the Application is in a clean state
         Application.ResetState (true);
@@ -305,8 +305,8 @@ public class ScenarioTests : TestsAllViews
     public void Run_All_Views_Tester_Scenario ()
     {
         // Disable any UIConfig settings
-        ConfigurationManager.ConfigLocations savedConfigLocations = ConfigurationManager.Locations;
-        ConfigurationManager.Locations = ConfigurationManager.ConfigLocations.DefaultOnly;
+        ConfigLocations savedConfigLocations = ConfigurationManager.Locations;
+        ConfigurationManager.Locations = ConfigLocations.Default;
 
         Window _leftPane;
         ListView _classListView;
@@ -764,8 +764,8 @@ public class ScenarioTests : TestsAllViews
     public void Run_Generic ()
     {
         // Disable any UIConfig settings
-        ConfigurationManager.ConfigLocations savedConfigLocations = ConfigurationManager.Locations;
-        ConfigurationManager.Locations = ConfigurationManager.ConfigLocations.DefaultOnly;
+        ConfigLocations savedConfigLocations = ConfigurationManager.Locations;
+        ConfigurationManager.Locations = ConfigLocations.Default;
 
         ObservableCollection<Scenario> scenarios = Scenario.GetScenarios ();
         Assert.NotEmpty (scenarios);

@@ -25,7 +25,7 @@ public class AddRuneTests
     [InlineData (typeof (CursesDriver))]
     public void AddRune (Type driverType)
     {
-        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         driver.Init ();
 
         driver.Rows = 25;

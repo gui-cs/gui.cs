@@ -9,7 +9,7 @@ namespace SelfContained;
 
 public static class Program
 {
-    [RequiresUnreferencedCode ("Calls Terminal.Gui.Application.Run<T>(Func<Exception, Boolean>, ConsoleDriver)")]
+    [RequiresUnreferencedCode ("Calls Terminal.Gui.Application.Run<T>(Func<Exception, Boolean>, IConsoleDriver)")]
     private static void Main (string [] args)
     {
         Application.Init ();

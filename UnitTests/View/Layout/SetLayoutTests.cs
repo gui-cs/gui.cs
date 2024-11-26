@@ -812,6 +812,4 @@ public class SetLayoutTests (ITestOutputHelper output)
         Assert.Equal (19, v2.Frame.Height);
         t.Dispose ();
     }
-
-
 }

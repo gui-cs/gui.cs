@@ -91,7 +91,7 @@ var button = new Button () {
     Width = Dim.Fill (),
     Height = Dim.Fill () - 1
 };
-button.Clicked += () => {
+button.Accepting += () => {
     MessageBox.Query (50, 5, "Hi", "Hello World! This is a message box", "Ok");
 };
 
@@ -143,26 +143,7 @@ Views can either be Modal or Non-modal. Modal views take over all user input unt
 To run any View (but especially Dialogs, Windows, or Toplevels) modally, invoke the `Application.Run` method on a Toplevel. Use the `Application.RequestStop()` method to terminate the modal execution.
 
 ```csharp
-bool okpressed = false;
-var ok = new Button(3, 14, "Ok") { 
-    Clicked = () => { Application.RequestStop (); okpressed = true; }
-};
-var cancel = new Button(10, 14, "Cancel") {
-    Clicked = () => Application.RequestStop () 
-};
-var dialog = new Dialog ("Login", 60, 18, ok, cancel);
 
-var entry = new TextField () {
-    X = 1, 
-    Y = 1,
-    Width = Dim.Fill (),
-    Height = 1
-};
-dialog.Add (entry);
-Application.Run (dialog);
-if (okpressed)
-    Console.WriteLine ("The user entered: " + entry.Text);
-dialog.Dispose ();
 ```
 
 There is no return value from running modally, so the modal view must have a mechanism to indicate the reason the modal was closed. In the case above, the `okpressed` value is set to true if the user pressed or selected the `Ok` button.

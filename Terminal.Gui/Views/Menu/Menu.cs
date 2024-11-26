@@ -608,8 +608,7 @@ internal sealed class Menu : View
 
         Application.UngrabMouse ();
         _host.CloseAllMenus ();
-        Application.Driver!.ClearContents ();
-        Application.LayoutAndDraw ();
+        Application.LayoutAndDraw (true);
 
         _host.Run (action);
     }

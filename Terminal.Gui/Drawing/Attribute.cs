@@ -17,7 +17,7 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     [JsonIgnore]
     public static Attribute Default => new (Color.White, Color.Black);
 
-    /// <summary>The <see cref="ConsoleDriver"/>-specific color value.</summary>
+    /// <summary>The <see cref="IConsoleDriver"/>-specific color value.</summary>
     [JsonIgnore (Condition = JsonIgnoreCondition.Always)]
     internal int PlatformColor { get; init; }
 

@@ -1,6 +1,6 @@
 ﻿using Color = Terminal.Gui.Color;
 
-namespace UnitTests.Drawing;
+namespace Terminal.Gui.DrawingTests;
 
 public class SixelEncoderTests
 {

@@ -92,7 +92,7 @@ public class NumericUpDown<T> : View where T : notnull
         Add (_down, _number, _up);
 
         AddCommand (
-                    Command.ScrollUp,
+                    Command.Up,
                     (ctx) =>
                     {
                         if (type == typeof (object))
@@ -100,10 +100,11 @@ public class NumericUpDown<T> : View where T : notnull
                             return false;
                         }
 
-                        if (RaiseSelecting (ctx) is true)
-                        {
-                            return true;
-                        }
+                        // BUGBUG: If this is uncommented, the numericupdown in a shortcut will not work
+                        //if (RaiseSelecting (ctx) is true)
+                        //{
+                        //    return true;
+                        //}
 
                         if (Value is { } && Increment is { })
                         {
@@ -114,7 +115,7 @@ public class NumericUpDown<T> : View where T : notnull
                     });
 
         AddCommand (
-                    Command.ScrollDown,
+                    Command.Down,
                     (ctx) =>
                     {
                         if (type == typeof (object))
@@ -122,10 +123,11 @@ public class NumericUpDown<T> : View where T : notnull
                             return false;
                         }
 
-                        if (RaiseSelecting (ctx) is true)
-                        {
-                            return true;
-                        }
+                        // BUGBUG: If this is uncommented, the numericupdown in a shortcut will not work
+                        //if (RaiseSelecting (ctx) is true)
+                        //{
+                        //    return true;
+                        //}
 
                         if (Value is { } && Increment is { })
                         {
@@ -136,8 +138,8 @@ public class NumericUpDown<T> : View where T : notnull
                         return true;
                     });
 
-        KeyBindings.Add (Key.CursorUp, Command.ScrollUp);
-        KeyBindings.Add (Key.CursorDown, Command.ScrollDown);
+        KeyBindings.Add (Key.CursorUp, Command.Up);
+        KeyBindings.Add (Key.CursorDown, Command.Down);
 
         SetText ();
 
@@ -145,13 +147,13 @@ public class NumericUpDown<T> : View where T : notnull
 
         void OnDownButtonOnAccept (object? s, CommandEventArgs e)
         {
-            InvokeCommand (Command.ScrollDown);
+            InvokeCommand (Command.Down);
             e.Cancel = true;
         }
 
         void OnUpButtonOnAccept (object? s, CommandEventArgs e)
         {
-            InvokeCommand (Command.ScrollUp);
+            InvokeCommand (Command.Up);
             e.Cancel = true;
         }
     }

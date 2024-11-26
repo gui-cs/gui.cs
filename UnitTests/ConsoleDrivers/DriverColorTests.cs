@@ -17,7 +17,7 @@ public class DriverColorTests
     [InlineData (typeof (CursesDriver))]
     public void Force16Colors_Sets (Type driverType)
     {
-        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         driver.Init ();
 
         driver.Force16Colors = true;
@@ -35,7 +35,7 @@ public class DriverColorTests
     [InlineData (typeof (CursesDriver))]
     public void SetColors_Changes_Colors (Type driverType)
     {
-        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         driver.Init ();
 
         Assert.Equal (ConsoleColor.Gray, Console.ForegroundColor);
@@ -63,7 +63,7 @@ public class DriverColorTests
     [InlineData (typeof (CursesDriver), true)]
     public void SupportsTrueColor_Defaults (Type driverType, bool expectedSetting)
     {
-        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         driver.Init ();
 
         Assert.Equal (expectedSetting, driver.SupportsTrueColor);

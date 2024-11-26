@@ -348,11 +348,27 @@ public partial class View
                 }
             }
 
+            if (!ViewportSettings.HasFlag (ViewportSettings.AllowNegativeXWhenWidthGreaterThanContentWidth))
+            {
+                if (Viewport.Width > GetContentSize ().Width)
+                {
+                    newViewport.X = 0;
+                }
+            }
+
             if (!ViewportSettings.HasFlag (ViewportSettings.AllowYGreaterThanContentHeight))
             {
                 if (newViewport.Y >= GetContentSize ().Height)
                 {
                     newViewport.Y = GetContentSize ().Height - 1;
+                }
+            }
+
+            if (!ViewportSettings.HasFlag (ViewportSettings.AllowNegativeYWhenHeightGreaterThanContentHeight))
+            {
+                if (Viewport.Height > GetContentSize ().Height)
+                {
+                    newViewport.Y = 0;
                 }
             }
 

@@ -2,7 +2,7 @@
 
 /// <summary>
 ///     Represents a single row/column in a Terminal.Gui rendering surface (e.g. <see cref="LineCanvas"/> and
-///     <see cref="ConsoleDriver"/>).
+///     <see cref="IConsoleDriver"/>).
 /// </summary>
 public record struct Cell (Attribute? Attribute = null, bool IsDirty = false, Rune Rune = default)
 {

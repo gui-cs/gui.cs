@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -21,9 +22,9 @@ public class ConfigurationEditor : Scenario
         HotNormal = new Attribute (Color.Magenta, Color.White)
     };
 
-    private static Action _editorColorSchemeChanged;
-    private Shortcut _lenShortcut;
-    private TileView _tileView;
+    private static Action? _editorColorSchemeChanged;
+    private TabView? _tabView;
+    private Shortcut? _lenShortcut;
 
     [SerializableConfigurationProperty (Scope = typeof (AppScope))]
     public static ColorScheme EditorColorScheme
@@ -42,26 +43,15 @@ public class ConfigurationEditor : Scenario
 
         Toplevel top = new ();
 
-        _tileView = new TileView (0)
-        {
-            Width = Dim.Fill (),
-            Height = Dim.Fill (1),
-            Orientation = Orientation.Vertical,
-            LineStyle = LineStyle.Single,
-            TabStop = TabBehavior.TabGroup
-        };
-
-        top.Add (_tileView);
-
         _lenShortcut = new Shortcut ()
         {
-            Title = "Len: ",
+            Title = "",
         };
 
         var quitShortcut = new Shortcut ()
         {
             Key = Application.QuitKey,
-            Title = $"{Application.QuitKey} Quit",
+            Title = $"Quit",
             Action = Quit
         };
 
@@ -81,35 +71,44 @@ public class ConfigurationEditor : Scenario
 
         var statusBar = new StatusBar ([quitShortcut, reloadShortcut, saveShortcut, _lenShortcut]);
 
-        top.Add (statusBar);
+        _tabView = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (Dim.Func (() => statusBar.Frame.Height))
+        };
+
+        top.Add (_tabView, statusBar);
 
         top.Loaded += (s, a) =>
                       {
                           Open ();
-                          //_tileView.AdvanceFocus (NavigationDirection.Forward, null);
+                          _editorColorSchemeChanged?.Invoke ();
                       };
 
-        _editorColorSchemeChanged += () =>
-                                     {
-                                         foreach (Tile t in _tileView.Tiles)
-                                         {
-                                             t.ContentView.ColorScheme = EditorColorScheme;
-                                             t.ContentView.SetNeedsDraw ();
-                                         }
+        void OnEditorColorSchemeChanged ()
+        {
+            if (Application.Top is { })
+            {
+                return;
+            }
 
-                                         ;
-                                     };
+            foreach (ConfigTextView t in _tabView.Subviews.Where (v => v is ConfigTextView).Cast<ConfigTextView> ())
+            {
+                t.ColorScheme = EditorColorScheme;
+            }
+        }
 
-        _editorColorSchemeChanged.Invoke ();
+        _editorColorSchemeChanged += OnEditorColorSchemeChanged;
 
         Application.Run (top);
+        _editorColorSchemeChanged -= OnEditorColorSchemeChanged;
         top.Dispose ();
 
         Application.Shutdown ();
     }
     public void Save ()
     {
-        if (_tileView.MostFocused is ConfigTextView editor)
+        if (Application.Navigation?.GetFocused () is ConfigTextView editor)
         {
             editor.Save ();
         }
@@ -117,56 +116,65 @@ public class ConfigurationEditor : Scenario
 
     private void Open ()
     {
-        var subMenu = new MenuBarItem { Title = "_View" };
-
-        foreach (string configFile in ConfigurationManager.Settings.Sources)
+        foreach (var config in ConfigurationManager.Settings!.Sources)
         {
             var homeDir = $"{Environment.GetFolderPath (Environment.SpecialFolder.UserProfile)}";
-            var fileInfo = new FileInfo (configFile.Replace ("~", homeDir));
+            var fileInfo = new FileInfo (config.Value.Replace ("~", homeDir));
 
-            Tile tile = _tileView.InsertTile (_tileView.Tiles.Count);
-            tile.Title = configFile.StartsWith ("resource://") ? fileInfo.Name : configFile;
-
-            var textView = new ConfigTextView
+            var editor = new ConfigTextView
             {
-                X = 0,
-                Y = 0,
+                Title = config.Value.StartsWith ("resource://") ? fileInfo.Name : config.Value,
                 Width = Dim.Fill (),
-                Height = Dim.Fill (),
+                Height = Dim.Fill(),
                 FileInfo = fileInfo,
-                Tile = tile
             };
 
-            tile.ContentView.Add (textView);
+            Tab tab = new Tab ()
+            {
+                View = editor,
+                DisplayText = config.Key.ToString ()
+            };
 
-            textView.Read ();
+            _tabView!.AddTab (tab, false);
 
-            textView.HasFocusChanged += (s, e) =>
-                                        {
-                                            if (e.NewValue)
-                                            {
-                                                _lenShortcut.Title = $"Len:{textView.Text.Length}";
-                                            }
-                                        };
+            editor.Read ();
+
+            editor.ContentsChanged += (sender, args) =>
+                                      {
+                                          _lenShortcut!.Title = _lenShortcut!.Title.Replace ("*", "");
+                                          if (editor.IsDirty)
+                                          {
+                                              _lenShortcut!.Title += "*";
+                                          }
+                                      };
+
+            _lenShortcut!.Title = $"{editor.Title}";
         }
 
-        if (_tileView.Tiles.Count > 2)
-        {
-            _tileView.Tiles.ToArray () [1].ContentView.SetFocus ();
-        }
+        _tabView!.SelectedTabChanged += (sender, args) =>
+                                       {
+                                           _lenShortcut!.Title = $"{args.NewTab.View!.Title}";
+                                       };
+
     }
 
     private void Quit ()
     {
-        foreach (Tile tile in _tileView.Tiles)
-        {
-            var editor = tile.ContentView.Subviews [0] as ConfigTextView;
+        foreach (ConfigTextView editor in _tabView!.Tabs.Select(v =>
+                                                                {
+                                                                    if (v.View is ConfigTextView ctv)
+                                                                    {
+                                                                        return ctv;
+                                                                    }
 
+                                                                    return null;
+                                                                }).Cast<ConfigTextView> ())
+        {
             if (editor.IsDirty)
             {
                 int result = MessageBox.Query (
                                                "Save Changes",
-                                               $"Save changes to {editor.FileInfo.FullName}",
+                                               $"Save changes to {editor.FileInfo!.Name}",
                                                "_Yes",
                                                "_No",
                                                "_Cancel"
@@ -189,7 +197,7 @@ public class ConfigurationEditor : Scenario
 
     private void Reload ()
     {
-        if (_tileView.MostFocused is ConfigTextView editor)
+        if (Application.Navigation?.GetFocused () is ConfigTextView editor)
         {
             editor.Read ();
         }
@@ -199,32 +207,16 @@ public class ConfigurationEditor : Scenario
     {
         internal ConfigTextView ()
         {
-            ContentsChanged += (s, obj) =>
-                               {
-                                   if (IsDirty)
-                                   {
-                                       if (!Tile.Title.EndsWith ('*'))
-                                       {
-                                           Tile.Title += '*';
-                                       }
-                                       else
-                                       {
-                                           Tile.Title = Tile.Title.TrimEnd ('*');
-                                       }
-                                   }
-                               };
             TabStop = TabBehavior.TabGroup;
-
         }
 
-        internal FileInfo FileInfo { get; set; }
-        internal Tile Tile { get; set; }
+        internal FileInfo? FileInfo { get; set; }
 
         internal void Read ()
         {
-            Assembly assembly = null;
+            Assembly? assembly = null;
 
-            if (FileInfo.FullName.Contains ("[Terminal.Gui]"))
+            if (FileInfo!.FullName.Contains ("[Terminal.Gui]"))
             {
                 // Library resources
                 assembly = typeof (ConfigurationManager).Assembly;
@@ -236,19 +228,27 @@ public class ConfigurationEditor : Scenario
 
             if (assembly != null)
             {
-                string name = assembly
-                              .GetManifestResourceNames ()
-                              .FirstOrDefault (x => x.EndsWith ("config.json"));
-                using Stream stream = assembly.GetManifestResourceStream (name);
-                using var reader = new StreamReader (stream);
-                Text = reader.ReadToEnd ();
-                ReadOnly = true;
-                Enabled = true;
+                string? name = assembly
+                               .GetManifestResourceNames ()
+                               .FirstOrDefault (x => x.EndsWith ("config.json"));
+                if (!string.IsNullOrEmpty (name))
+                {
+
+                    using Stream? stream = assembly.GetManifestResourceStream (name);
+                    using var reader = new StreamReader (stream!);
+                    Text = reader.ReadToEnd ();
+                    ReadOnly = true;
+                    Enabled = true;
+                }
 
                 return;
             }
 
-            if (!FileInfo.Exists)
+            if (FileInfo!.FullName.Contains ("RuntimeConfig"))
+            {
+                Text = ConfigurationManager.RuntimeConfig!;
+
+            } else if (!FileInfo.Exists)
             {
                 // Create empty config file
                 Text = ConfigurationManager.GetEmptyJson ();
@@ -257,12 +257,17 @@ public class ConfigurationEditor : Scenario
             {
                 Text = File.ReadAllText (FileInfo.FullName);
             }
-
-            Tile.Title = Tile.Title.TrimEnd ('*');
         }
 
         internal void Save ()
         {
+            if (FileInfo!.FullName.Contains ("RuntimeConfig"))
+            {
+                ConfigurationManager.RuntimeConfig = Text;
+                IsDirty = false;
+                return;
+            }
+
             if (!Directory.Exists (FileInfo.DirectoryName))
             {
                 // Create dir
@@ -272,7 +277,6 @@ public class ConfigurationEditor : Scenario
             using StreamWriter writer = File.CreateText (FileInfo.FullName);
             writer.Write (Text);
             writer.Close ();
-            Tile.Title = Tile.Title.TrimEnd ('*');
             IsDirty = false;
         }
     }

@@ -29,7 +29,6 @@ public class Scrolling : Scenario
             Width = 60,
             Height = 20
         };
-        demoView.SetContentSize (new (80, 25));
 
         label.Text =
             $"{demoView}\nContentSize: {demoView.GetContentSize ()}\nViewport.Location: {demoView.Viewport.Location}";
@@ -149,6 +148,8 @@ public class DemoView : View
 
     private void OnInitialized (object sender, EventArgs e)
     {
+        SetContentSize (new (80, 25));
+
         var rulerView = new View
         {
             Height = Dim.Fill (),
@@ -160,6 +161,16 @@ public class DemoView : View
         rulerView.Border.ColorScheme = Colors.ColorSchemes ["Error"];
 
         Add (rulerView);
+
+        var centeredLabel = new Label ()
+        {
+            X = Pos.Center (),
+            Y = Pos.Center (),
+            TextAlignment = Alignment.Center,
+            VerticalTextAlignment = Alignment.Center,
+            Text = $"This label is centred.\nContentSize is {GetContentSize ()}"
+        };
+        Add (centeredLabel);
 
         var pressMeButton = new Button
         {
@@ -209,7 +220,7 @@ public class DemoView : View
                  Y = 40,
                  Width = 50,
                  ColorScheme = Colors.ColorSchemes ["Error"],
-                 Text = "Last line"
+                 Text = "Last line - Beyond content area @ Y = 40"
              }
             );
 
@@ -228,5 +239,34 @@ public class DemoView : View
                                       anchorButton.Text += "!";
                                   };
         Add (anchorButton);
+    }
+
+    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
+    {
+        if (mouseEvent.Flags == MouseFlags.WheeledDown)
+        {
+            ScrollVertical (1);
+            return mouseEvent.Handled = true;
+        }
+
+        if (mouseEvent.Flags == MouseFlags.WheeledUp)
+        {
+            ScrollVertical (-1);
+            return mouseEvent.Handled = true;
+        }
+
+        if (mouseEvent.Flags == MouseFlags.WheeledRight)
+        {
+            ScrollHorizontal (1);
+            return mouseEvent.Handled = true;
+        }
+
+        if (mouseEvent.Flags == MouseFlags.WheeledLeft)
+        {
+            ScrollHorizontal (-1);
+            return mouseEvent.Handled = true;
+        }
+
+        return false;
     }
 }

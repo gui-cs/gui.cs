@@ -315,7 +315,7 @@ public class MenuBarTests (ITestOutputHelper output)
     }
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.DefaultOnly)]
+    [AutoInitShutdown (configLocation: ConfigLocations.Default)]
     public void Disabled_MenuBar_Is_Never_Opened ()
     {
         Toplevel top = new ();
@@ -341,7 +341,7 @@ public class MenuBarTests (ITestOutputHelper output)
     }
 
     [Fact (Skip = "#3798 Broke. Will fix in #2975")]
-    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.DefaultOnly)]
+    [AutoInitShutdown (configLocation: ConfigLocations.Default)]
     public void Disabled_MenuItem_Is_Never_Selected ()
     {
         var menu = new MenuBar

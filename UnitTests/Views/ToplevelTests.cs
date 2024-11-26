@@ -1,8 +1,6 @@
-﻿using Xunit.Abstractions;
+﻿namespace Terminal.Gui.ViewsTests;
 
-namespace Terminal.Gui.ViewsTests;
-
-public partial class ToplevelTests (ITestOutputHelper output)
+public partial class ToplevelTests ()
 {
     [Fact]
     public void Constructor_Default ()

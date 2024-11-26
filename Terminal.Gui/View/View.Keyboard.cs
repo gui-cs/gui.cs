@@ -690,7 +690,7 @@ public partial class View // Keyboard APIs
 
 #if DEBUG
 
-        if (Application.KeyBindings.TryGet (key, KeyBindingScope.Focused | KeyBindingScope.HotKey, out KeyBinding b))
+        if (Application.KeyBindings.TryGet (key, out KeyBinding b))
         {
             Debug.WriteLine (
                              $"WARNING: InvokeKeyBindings ({key}) - An Application scope binding exists for this key. The registered view will not invoke Command.");

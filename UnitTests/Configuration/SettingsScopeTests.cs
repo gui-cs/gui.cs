@@ -5,9 +5,39 @@ namespace Terminal.Gui.ConfigurationTests;
 public class SettingsScopeTests
 {
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigLocations.DefaultOnly)]
+    public void Update_Overrides_Defaults ()
+    {
+        // arrange
+        Locations = ConfigLocations.Default;
+        Load (true);
+
+        Assert.Equal (Key.Esc, (Key)Settings ["Application.QuitKey"].PropertyValue);
+
+        ThrowOnJsonErrors = true;
+
+        // act
+        var json = """
+                   
+                           {
+                                 "Application.QuitKey": "Ctrl-Q"
+                           }
+                   """;
+
+        Settings!.Update (json, "test", ConfigLocations.Runtime);
+
+        // assert
+        Assert.Equal (Key.Q.WithCtrl, (Key)Settings ["Application.QuitKey"].PropertyValue);
+
+        // clean up
+        Locations = ConfigLocations.All;
+    }
+
+    [Fact]
     public void Apply_ShouldApplyProperties ()
     {
+        Locations = ConfigLocations.Default;
+        Reset();
+
         // arrange
         Assert.Equal (Key.Esc, (Key)Settings ["Application.QuitKey"].PropertyValue);
 
@@ -18,7 +48,7 @@ public class SettingsScopeTests
 
         Assert.Equal (
                       Key.F6.WithShift,
-                      (Key)Settings["Application.PrevTabGroupKey"].PropertyValue
+                      (Key)Settings ["Application.PrevTabGroupKey"].PropertyValue
                      );
 
         // act
@@ -32,6 +62,10 @@ public class SettingsScopeTests
         Assert.Equal (Key.Q, Application.QuitKey);
         Assert.Equal (Key.F, Application.NextTabGroupKey);
         Assert.Equal (Key.B, Application.PrevTabGroupKey);
+
+        Locations = ConfigLocations.Default;
+        Reset ();
+
     }
 
     [Fact]
@@ -56,7 +90,7 @@ public class SettingsScopeTests
     public void GetHardCodedDefaults_ShouldSetProperties ()
     {
         ConfigLocations savedLocations = Locations;
-        Locations = ConfigLocations.DefaultOnly;
+        Locations = ConfigLocations.Default;
         Reset ();
 
         Assert.Equal (5, ((Dictionary<string, ThemeScope>)Settings ["Themes"].PropertyValue).Count);

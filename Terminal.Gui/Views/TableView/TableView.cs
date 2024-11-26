@@ -1277,7 +1277,7 @@ public class TableView : View, IDesignable
 
     /// <summary>
     ///     Override to provide custom multi colouring to cells.  Use <see cref="View.Driver"/> to with
-    ///     <see cref="ConsoleDriver.AddStr(string)"/>.  The driver will already be in the correct place when rendering and you
+    ///     <see cref="IConsoleDriver.AddStr(string)"/>.  The driver will already be in the correct place when rendering and you
     ///     must render the full <paramref name="render"/> or the view will not look right.  For simpler provision of color use
     ///     <see cref="ColumnStyle.ColorGetter"/> For changing the content that is rendered use
     ///     <see cref="ColumnStyle.RepresentationGetter"/>
@@ -1335,7 +1335,7 @@ public class TableView : View, IDesignable
     /// <returns></returns>
     internal int GetHeaderHeightIfAny () { return ShouldRenderHeaders () ? GetHeaderHeight () : 0; }
 
-    private void AddRuneAt (ConsoleDriver d, int col, int row, Rune ch)
+    private void AddRuneAt (IConsoleDriver d, int col, int row, Rune ch)
     {
         Move (col, row);
         d?.AddRune (ch);
