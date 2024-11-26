@@ -31,44 +31,42 @@ public class ConfigProperty
     /// </remarks>
     public object? PropertyValue { get; set; }
 
-    /// <summary>Applies the <see cref="PropertyValue"/> to the property described by <see cref="PropertyInfo"/>.</summary>
+    /// <summary>Applies the <see cref="PropertyValue"/> to the static property described by <see cref="PropertyInfo"/>.</summary>
     /// <returns></returns>
     public bool Apply ()
     {
-        if (PropertyValue is { })
+        try
         {
-            try
+            if (PropertyInfo?.GetValue (null) is { })
             {
-                if (PropertyInfo?.GetValue (null) is { })
-                {
-                    PropertyInfo?.SetValue (null, DeepMemberWiseCopy (PropertyValue, PropertyInfo?.GetValue (null)));
-                }
+                var val = DeepMemberWiseCopy (PropertyValue, PropertyInfo?.GetValue (null));
+                PropertyInfo?.SetValue (null, val);
             }
-            catch (TargetInvocationException tie)
+        }
+        catch (TargetInvocationException tie)
+        {
+            // Check if there is an inner exception
+            if (tie.InnerException is { })
             {
-                // Check if there is an inner exception
-                if (tie.InnerException is { })
-                {
-                    // Handle the inner exception separately without catching the outer exception
-                    Exception? innerException = tie.InnerException;
+                // Handle the inner exception separately without catching the outer exception
+                Exception? innerException = tie.InnerException;
 
-                    // Handle the inner exception here
-                    throw new JsonException (
-                                             $"Error Applying Configuration Change: {innerException.Message}",
-                                             innerException
-                                            );
-                }
-
-                // Handle the outer exception or rethrow it if needed
-                throw new JsonException ($"Error Applying Configuration Change: {tie.Message}", tie);
-            }
-            catch (ArgumentException ae)
-            {
+                // Handle the inner exception here
                 throw new JsonException (
-                                         $"Error Applying Configuration Change ({PropertyInfo?.Name}): {ae.Message}",
-                                         ae
+                                         $"Error Applying Configuration Change: {innerException.Message}",
+                                         innerException
                                         );
             }
+
+            // Handle the outer exception or rethrow it if needed
+            throw new JsonException ($"Error Applying Configuration Change: {tie.Message}", tie);
+        }
+        catch (ArgumentException ae)
+        {
+            throw new JsonException (
+                                     $"Error Applying Configuration Change ({PropertyInfo?.Name}): {ae.Message}",
+                                     ae
+                                    );
         }
 
         return PropertyValue != null;
@@ -94,6 +92,12 @@ public class ConfigProperty
     /// <returns></returns>
     public object? RetrieveValue () { return PropertyValue = PropertyInfo!.GetValue (null); }
 
+    /// <summary>
+    ///     Updates (using reflection) <see cref="PropertyValue"/> with the value in <paramref name="source"/> using a deep memberwise copy.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
     internal object? UpdateValueFrom (object source)
     {
         if (source is null)

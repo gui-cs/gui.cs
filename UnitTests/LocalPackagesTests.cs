@@ -1,4 +1,5 @@
-﻿namespace Terminal.Gui;
+﻿
+namespace Terminal.Gui.BuildAndDeployTests;
 
 public class LocalPackagesTests
 {

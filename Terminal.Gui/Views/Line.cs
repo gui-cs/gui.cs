@@ -1,6 +1,10 @@
 ﻿namespace Terminal.Gui;
 
-/// <summary>Draws a single line using the <see cref="LineStyle"/> specified by <see cref="View.BorderStyle"/>.</summary>
+/// <summary>
+///     Draws a single line using the <see cref="LineStyle"/> specified by <see cref="View.BorderStyle"/>.
+/// </summary>
+/// <remarks>
+/// </remarks>
 public class Line : View, IOrientation
 {
     private readonly OrientationHelper _orientationHelper;
@@ -8,14 +12,13 @@ public class Line : View, IOrientation
     /// <summary>Constructs a Line object.</summary>
     public Line ()
     {
-        BorderStyle = LineStyle.Single;
-        Border.Thickness = new Thickness (0);
-        SuperViewRendersLineCanvas = true;
+        CanFocus = false;
+
+        base.SuperViewRendersLineCanvas = true;
 
         _orientationHelper = new (this);
         _orientationHelper.Orientation = Orientation.Horizontal;
-        _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
-        _orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);
+        OnOrientationChanged(Orientation);
     }
 
 
@@ -45,10 +48,12 @@ public class Line : View, IOrientation
         {
             case Orientation.Horizontal:
                 Height = 1;
+                Width = Dim.Fill ();
 
                 break;
             case Orientation.Vertical:
                 Width = 1;
+                Height = Dim.Fill ();
 
                 break;
 
@@ -57,47 +62,19 @@ public class Line : View, IOrientation
     #endregion
 
     /// <inheritdoc/>
-    public override void SetBorderStyle (LineStyle value)
-    {
-        // The default changes the thickness. We don't want that. We just set the style.
-        Border.LineStyle = value;
-    }
-
-    /// <inheritdoc/>
     protected override bool OnDrawingContent ()
     {
-        LineCanvas lc = LineCanvas;
-
-        if (SuperViewRendersLineCanvas)
-        {
-            lc = SuperView?.LineCanvas;
-        }
-
-        if (SuperView is Adornment adornment)
-        {
-            lc = adornment.Parent?.LineCanvas;
-        }
-
         Point pos = ViewportToScreen (Viewport).Location;
         int length = Orientation == Orientation.Horizontal ? Frame.Width : Frame.Height;
 
-        if (SuperView is {} && SuperViewRendersLineCanvas && Orientation == Orientation.Horizontal)
-        {
-            pos.Offset (-SuperView.Border.Thickness.Left, 0);
-            length += SuperView.Border.Thickness.Horizontal;
-        }
-
-        if (SuperView is { } && SuperViewRendersLineCanvas && Orientation == Orientation.Vertical)
-        {
-            pos.Offset (0, -SuperView.Border.Thickness.Top);
-            length += SuperView.Border.Thickness.Vertical;
-        }
-        lc?.AddLine (
+        LineCanvas?.AddLine (
                     pos,
                     length,
                     Orientation,
                     BorderStyle
                    );
+
+        //SuperView?.SetNeedsDraw ();
         return true;
     }
 }

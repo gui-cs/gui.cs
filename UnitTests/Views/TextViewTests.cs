@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -5137,7 +5136,7 @@ This is the second line.
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
         Assert.False (tv.IsSelecting);
-        Assert.True (tv.NewKeyDownEvent (Key.A.WithCtrl));
+        Assert.True (tv.NewKeyDownEvent (Key.Home));
         Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.SelectedLength);
         Assert.Equal ("", tv.SelectedText);
@@ -5474,7 +5473,7 @@ This is the second line.
         Assert.Equal (Environment.NewLine.Length, tv.SelectedLength);
         Assert.Equal ($"{Environment.NewLine}", tv.SelectedText);
         Assert.True (tv.IsSelecting);
-        Assert.True (tv.NewKeyDownEvent (Key.T.WithCtrl));
+        Assert.True (tv.NewKeyDownEvent (Key.A.WithCtrl));
 
         Assert.Equal (
                       $"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third ",
@@ -8333,7 +8332,7 @@ Line 2.",
 
         var top = new Toplevel ();
         top.Add (tv);
-        top.Layout();
+        top.Layout ();
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -8525,7 +8524,7 @@ line.
     {
         public static string Txt = "TAB to jump between text fields.";
 
-        public TextViewTestsAutoInitShutdown () : base (configLocation: ConfigurationManager.ConfigLocations.DefaultOnly) { }
+        public TextViewTestsAutoInitShutdown () : base (configLocation: ConfigLocations.Default) { }
 
         public override void After (MethodInfo methodUnderTest)
         {
@@ -8810,7 +8809,7 @@ line.
         tv.SetFocus ();
 
         tv.NewKeyDownEvent (Key.End.WithShift);
-        Assert.Equal (5,tv.CursorPosition.X);
+        Assert.Equal (5, tv.CursorPosition.X);
 
         // When there is selected text and the cursor is at the end of the text field
         Assert.Equal ("Hello", tv.SelectedText);
@@ -8834,7 +8833,7 @@ line.
         tv.NewKeyDownEvent (Key.CursorRight);
         tv.NewKeyDownEvent (Key.CursorRight);
 
-        Assert.Equal (2,tv.CursorPosition.X);
+        Assert.Equal (2, tv.CursorPosition.X);
 
         Assert.True (tv.NewKeyDownEvent (Key.CursorLeft.WithShift));
         Assert.True (tv.NewKeyDownEvent (Key.CursorLeft.WithShift));
@@ -8947,7 +8946,7 @@ line.  ",
     }
 
     [Fact]
-    [AutoInitShutdown (configLocation: ConfigurationManager.ConfigLocations.DefaultOnly)]
+    [AutoInitShutdown (configLocation: ConfigLocations.Default)]
     public void Cell_LoadCells_InheritsPreviousAttribute ()
     {
         List<Cell> cells = [];

@@ -1,4 +1,5 @@
-﻿//
+﻿#nullable enable
+//
 // MainLoop.cs: IMainLoopDriver and MainLoop for Terminal.Gui
 //
 // Authors:
@@ -36,7 +37,7 @@ internal interface IMainLoopDriver
 ///     Monitoring of file descriptors is only available on Unix, there does not seem to be a way of supporting this
 ///     on Windows.
 /// </remarks>
-internal class MainLoop : IDisposable
+public class MainLoop : IDisposable
 {
     internal List<Func<bool>> _idleHandlers = new ();
     internal SortedList<long, Timeout> _timeouts = new ();
@@ -49,7 +50,7 @@ internal class MainLoop : IDisposable
     /// <summary>Creates a new MainLoop.</summary>
     /// <remarks>Use <see cref="Dispose"/> to release resources.</remarks>
     /// <param name="driver">
-    ///     The <see cref="ConsoleDriver"/> instance (one of the implementations FakeMainLoop, UnixMainLoop,
+    ///     The <see cref="IConsoleDriver"/> instance (one of the implementations FakeMainLoop, UnixMainLoop,
     ///     NetMainLoop or WindowsMainLoop).
     /// </param>
     internal MainLoop (IMainLoopDriver driver)
@@ -72,7 +73,7 @@ internal class MainLoop : IDisposable
 
     /// <summary>The current <see cref="IMainLoopDriver"/> in use.</summary>
     /// <value>The main loop driver.</value>
-    internal IMainLoopDriver MainLoopDriver { get; private set; }
+    internal IMainLoopDriver? MainLoopDriver { get; private set; }
 
     /// <summary>Used for unit tests.</summary>
     internal bool Running { get; set; }
@@ -117,7 +118,7 @@ internal class MainLoop : IDisposable
             _idleHandlers.Add (idleHandler);
         }
 
-        MainLoopDriver.Wakeup ();
+        MainLoopDriver?.Wakeup ();
 
         return idleHandler;
     }
@@ -130,10 +131,7 @@ internal class MainLoop : IDisposable
     /// </remarks>
     internal object AddTimeout (TimeSpan time, Func<bool> callback)
     {
-        if (callback is null)
-        {
-            throw new ArgumentNullException (nameof (callback));
-        }
+        ArgumentNullException.ThrowIfNull (callback);
 
         var timeout = new Timeout { Span = time, Callback = callback };
         AddTimeout (time, timeout);
@@ -156,7 +154,7 @@ internal class MainLoop : IDisposable
 
         waitTimeout = 0;
 
-        lock (_timeouts)
+        lock (_timeoutsLockToken)
         {
             if (_timeouts.Count > 0)
             {
@@ -191,7 +189,7 @@ internal class MainLoop : IDisposable
     ///     You can use this method if you want to probe if events are pending. Typically used if you need to flush the
     ///     input queue while still running some of your own code in your main thread.
     /// </remarks>
-    internal bool EventsPending () { return MainLoopDriver.EventsPending (); }
+    internal bool EventsPending () { return MainLoopDriver!.EventsPending (); }
 
     /// <summary>Removes an idle handler added with <see cref="AddIdle(Func{bool})"/> from processing.</summary>
     /// <param name="token">A token returned by <see cref="AddIdle(Func{bool})"/></param>
@@ -225,7 +223,7 @@ internal class MainLoop : IDisposable
     {
         lock (_timeoutsLockToken)
         {
-            int idx = _timeouts.IndexOfValue (token as Timeout);
+            int idx = _timeouts.IndexOfValue ((token as Timeout)!);
 
             if (idx == -1)
             {
@@ -262,7 +260,7 @@ internal class MainLoop : IDisposable
     /// </remarks>
     internal void RunIteration ()
     {
-        lock (_timeouts)
+        lock (_timeoutsLockToken)
         {
             if (_timeouts.Count > 0)
             {
@@ -270,9 +268,9 @@ internal class MainLoop : IDisposable
             }
         }
 
-        MainLoopDriver.Iteration ();
+        MainLoopDriver?.Iteration ();
 
-        var runIdle = false;
+        bool runIdle;
 
         lock (_idleHandlersLock)
         {
@@ -296,8 +294,7 @@ internal class MainLoop : IDisposable
     ///     Invoked when a new timeout is added. To be used in the case when
     ///     <see cref="Application.EndAfterFirstIteration"/> is <see langword="true"/>.
     /// </summary>
-    [CanBeNull]
-    internal event EventHandler<TimeoutEventArgs> TimeoutAdded;
+    internal event EventHandler<TimeoutEventArgs>? TimeoutAdded;
 
     /// <summary>Wakes up the <see cref="MainLoop"/> that might be waiting on input.</summary>
     internal void Wakeup () { MainLoopDriver?.Wakeup (); }

@@ -9,8 +9,8 @@ All files required to build the **Terminal.Gui** library (and NuGet package).
 	- `Application\` - The core `Application` logic, including `Application.cs`, which is is a `static` class that provides the base 'application engine', `RunState`, and `MainLoop`.
 
 - `ConsoleDrivers\`
-	- `ConsoleDriver.cs` - Definition for the Console Driver API.
-	- Source files for the three `ConsoleDriver`-based drivers: .NET: `NetDriver`, Unix & Mac: `UnixDriver`, and Windows: `WindowsDriver`.
+	- `IConsoleDriver.cs` - Definition for the Console Driver API.
+	- Source files for the three `IConsoleDriver`-based drivers: .NET: `NetDriver`, Unix & Mac: `UnixDriver`, and Windows: `WindowsDriver`.
 
 - `Configuration\` - Classes related the `ConfigurationManager`.
 

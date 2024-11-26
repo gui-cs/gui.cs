@@ -3,7 +3,6 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-#if foo
 public class TabViewTests (ITestOutputHelper output)
 {
     [Fact]
@@ -113,8 +112,6 @@ public class TabViewTests (ITestOutputHelper output)
         tv.Width = 20;
         tv.Height = 5;
 
-        tv.Layout ();
-
         tv.Draw ();
 
         View tabRow = tv.Subviews [0];
@@ -146,21 +143,21 @@ public class TabViewTests (ITestOutputHelper output)
         {
             args = new () { ScreenPosition = new (i, 1), Flags = MouseFlags.ReportMousePosition };
             Application.RaiseMouseEvent (args);
-            Application.LayoutAndDrawToplevels ();
+            Application.LayoutAndDraw ();
             Assert.Null (clicked);
             Assert.Equal (tab1, tv.SelectedTab);
         }
 
         args = new () { ScreenPosition = new (3, 1), Flags = MouseFlags.Button1Clicked };
         Application.RaiseMouseEvent (args);
-        Application.LayoutAndDrawToplevels ();
+        Application.LayoutAndDraw ();
         Assert.Equal (tab1, clicked);
         Assert.Equal (tab1, tv.SelectedTab);
 
         // Click to tab2
         args = new () { ScreenPosition = new (6, 1), Flags = MouseFlags.Button1Clicked };
         Application.RaiseMouseEvent (args);
-        Application.LayoutAndDrawToplevels ();
+        Application.LayoutAndDraw ();
         Assert.Equal (tab2, clicked);
         Assert.Equal (tab2, tv.SelectedTab);
 
@@ -173,7 +170,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         args = new () { ScreenPosition = new (3, 1), Flags = MouseFlags.Button1Clicked };
         Application.RaiseMouseEvent (args);
-        Application.LayoutAndDrawToplevels ();
+        Application.LayoutAndDraw ();
 
         // Tab 1 was clicked but event handler blocked navigation
         Assert.Equal (tab1, clicked);
@@ -181,7 +178,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         args = new () { ScreenPosition = new (12, 1), Flags = MouseFlags.Button1Clicked };
         Application.RaiseMouseEvent (args);
-        Application.LayoutAndDrawToplevels ();
+        Application.LayoutAndDraw ();
 
         // Clicking beyond last tab should raise event with null Tab
         Assert.Null (clicked);
@@ -197,8 +194,6 @@ public class TabViewTests (ITestOutputHelper output)
 
         tv.Width = 7;
         tv.Height = 5;
-
-        tv.LayoutSubviews ();
 
         tv.Draw ();
 
@@ -236,7 +231,7 @@ public class TabViewTests (ITestOutputHelper output)
         // Click the right arrow
         var args = new MouseEventArgs { ScreenPosition = new (6, 2), Flags = MouseFlags.Button1Clicked };
         Application.RaiseMouseEvent (args);
-        Application.LayoutAndDrawToplevels ();
+        Application.LayoutAndDraw ();
         Assert.Null (clicked);
         Assert.Equal (tab1, oldChanged);
         Assert.Equal (tab2, newChanged);
@@ -256,7 +251,7 @@ public class TabViewTests (ITestOutputHelper output)
         // Click the left arrow
         args = new () { ScreenPosition = new (0, 2), Flags = MouseFlags.Button1Clicked };
         Application.RaiseMouseEvent (args);
-        Application.LayoutAndDrawToplevels ();
+        Application.LayoutAndDraw ();
         Assert.Null (clicked);
         Assert.Equal (tab2, oldChanged);
         Assert.Equal (tab1, newChanged);
@@ -286,8 +281,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         Assert.Equal (LineStyle.None, tv.BorderStyle);
         tv.BorderStyle = LineStyle.Single;
-
-        tv.LayoutSubviews ();
+        tv.Layout ();
 
         tv.Draw ();
 
@@ -327,7 +321,7 @@ public class TabViewTests (ITestOutputHelper output)
         // Click the right arrow
         var args = new MouseEventArgs { ScreenPosition = new (7, 3), Flags = MouseFlags.Button1Clicked };
         Application.RaiseMouseEvent (args);
-        Application.LayoutAndDrawToplevels ();
+        Application.LayoutAndDraw ();
         Assert.Null (clicked);
         Assert.Equal (tab1, oldChanged);
         Assert.Equal (tab2, newChanged);
@@ -349,7 +343,7 @@ public class TabViewTests (ITestOutputHelper output)
         // Click the left arrow
         args = new () { ScreenPosition = new (1, 3), Flags = MouseFlags.Button1Clicked };
         Application.RaiseMouseEvent (args);
-        Application.LayoutAndDrawToplevels ();
+        Application.LayoutAndDraw ();
         Assert.Null (clicked);
         Assert.Equal (tab2, oldChanged);
         Assert.Equal (tab1, newChanged);
@@ -400,7 +394,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         // Press the cursor up key to focus the selected tab
         Application.RaiseKeyDownEvent (Key.CursorUp);
-        Application.LayoutAndDrawToplevels ();
+        Application.LayoutAndDraw ();
 
         // Is the selected tab focused
         Assert.Equal (tab1, tv.SelectedTab);
@@ -418,7 +412,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         // Press the cursor right key to select the next tab
         Application.RaiseKeyDownEvent (Key.CursorRight);
-        Application.LayoutAndDrawToplevels ();
+        Application.LayoutAndDraw ();
         Assert.Equal (tab1, oldChanged);
         Assert.Equal (tab2, newChanged);
         Assert.Equal (tab2, tv.SelectedTab);
@@ -476,7 +470,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         // Press the cursor left key to select the previous tab
         Application.RaiseKeyDownEvent (Key.CursorLeft);
-        Application.LayoutAndDrawToplevels ();
+        Application.LayoutAndDraw ();
         Assert.Equal (tab2, oldChanged);
         Assert.Equal (tab1, newChanged);
         Assert.Equal (tab1, tv.SelectedTab);
@@ -486,7 +480,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         // Press the end key to select the last tab
         Application.RaiseKeyDownEvent (Key.End);
-        Application.LayoutAndDrawToplevels ();
+        Application.LayoutAndDraw ();
         Assert.Equal (tab1, oldChanged);
         Assert.Equal (tab2, newChanged);
         Assert.Equal (tab2, tv.SelectedTab);
@@ -495,7 +489,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         // Press the home key to select the first tab
         Application.RaiseKeyDownEvent (Key.Home);
-        Application.LayoutAndDrawToplevels ();
+        Application.LayoutAndDraw ();
         Assert.Equal (tab2, oldChanged);
         Assert.Equal (tab1, newChanged);
         Assert.Equal (tab1, tv.SelectedTab);
@@ -504,7 +498,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         // Press the page down key to select the next set of tabs
         Application.RaiseKeyDownEvent (Key.PageDown);
-        Application.LayoutAndDrawToplevels ();
+        Application.LayoutAndDraw ();
         Assert.Equal (tab1, oldChanged);
         Assert.Equal (tab2, newChanged);
         Assert.Equal (tab2, tv.SelectedTab);
@@ -513,7 +507,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         // Press the page up key to select the previous set of tabs
         Application.RaiseKeyDownEvent (Key.PageUp);
-        Application.LayoutAndDrawToplevels ();
+        Application.LayoutAndDraw ();
         Assert.Equal (tab2, oldChanged);
         Assert.Equal (tab1, newChanged);
         Assert.Equal (tab1, tv.SelectedTab);
@@ -610,7 +604,6 @@ public class TabViewTests (ITestOutputHelper output)
         tv.ApplyStyleChanges ();
         tv.Layout ();
 
-        View.ClipToScreen ();
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -633,7 +626,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.Height = 5;
         tv.Style = new () { ShowTopLine = false };
         tv.ApplyStyleChanges ();
-        tv.LayoutSubviews ();
+        tv.Layout ();
 
         tv.Draw ();
 
@@ -658,12 +651,12 @@ public class TabViewTests (ITestOutputHelper output)
         tv.Style = new () { ShowTopLine = false };
         tv.ApplyStyleChanges ();
 
-        // Ensures that the tab bar subview gets the bounds of the parent TabView
-        tv.LayoutSubviews ();
-
-        // Test two tab names that fit 
+        // Test two tab names that fit
         tab1.DisplayText = "12";
         tab2.DisplayText = "13";
+
+        // Ensures that the tab bar subview gets the bounds of the parent TabView
+        tv.Layout ();
 
         tv.Draw ();
 
@@ -678,8 +671,10 @@ public class TabViewTests (ITestOutputHelper output)
                                                      );
 
         tv.SelectedTab = tab2;
+        Assert.Equal (tab2, tv.Subviews.First (v => v.Id.Contains ("tabRowView")).MostFocused);
 
-        View.ClipToScreen ();
+        tv.Layout ();
+        View.SetClipToScreen ();
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -697,8 +692,8 @@ public class TabViewTests (ITestOutputHelper output)
         // Test first tab name too long
         tab1.DisplayText = "12345678910";
         tab2.DisplayText = "13";
-
-        View.ClipToScreen ();
+        tv.Layout ();
+        View.SetClipToScreen ();
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -713,9 +708,10 @@ public class TabViewTests (ITestOutputHelper output)
 
         //switch to tab2
         tv.SelectedTab = tab2;
-        View.ClipToScreen ();
-        tv.Draw ();
 
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 │13│      
@@ -730,9 +726,9 @@ public class TabViewTests (ITestOutputHelper output)
         tab1.DisplayText = "12345678910";
         tab2.DisplayText = "abcdefghijklmnopq";
 
-        View.ClipToScreen ();
+        tv.Layout ();
+        View.SetClipToScreen ();
         tv.Draw ();
-
         TestHelpers.AssertDriverContentsWithFrameAre (
                                                       @"
 │abcdefg│ 
@@ -753,9 +749,8 @@ public class TabViewTests (ITestOutputHelper output)
         tv.Height = 5;
         tv.Style = new () { ShowTopLine = false, TabsOnBottom = true };
         tv.ApplyStyleChanges ();
-        tv.LayoutSubviews ();
+        tv.Layout ();
 
-        View.ClipToScreen ();
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -778,7 +773,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.Height = 5;
         tv.Style = new () { ShowTopLine = false, TabsOnBottom = true };
         tv.ApplyStyleChanges ();
-        tv.LayoutSubviews ();
+        tv.Layout ();
 
         tv.Draw ();
 
@@ -802,15 +797,13 @@ public class TabViewTests (ITestOutputHelper output)
         tv.Height = 5;
         tv.Style = new () { ShowTopLine = false, TabsOnBottom = true };
         tv.ApplyStyleChanges ();
+        tv.Layout ();
 
-        // Ensures that the tab bar subview gets the bounds of the parent TabView
-        tv.LayoutSubviews ();
-
-        // Test two tab names that fit 
+        // Test two tab names that fit
         tab1.DisplayText = "12";
         tab2.DisplayText = "13";
-        View.ClipToScreen ();
 
+        tv.Layout ();
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -824,8 +817,10 @@ public class TabViewTests (ITestOutputHelper output)
                                                      );
 
         tv.SelectedTab = tab2;
+        Assert.Equal (tab2, tv.Subviews.First (v => v.Id.Contains ("tabRowView")).MostFocused);
 
-        View.ClipToScreen ();
+        tv.Layout ();
+        View.SetClipToScreen ();
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -844,7 +839,8 @@ public class TabViewTests (ITestOutputHelper output)
         tab1.DisplayText = "12345678910";
         tab2.DisplayText = "13";
 
-        View.ClipToScreen ();
+        tv.Layout ();
+        View.SetClipToScreen ();
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -859,7 +855,9 @@ public class TabViewTests (ITestOutputHelper output)
 
         //switch to tab2
         tv.SelectedTab = tab2;
-        View.ClipToScreen ();
+
+        tv.Layout ();
+        View.SetClipToScreen ();
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -876,7 +874,8 @@ public class TabViewTests (ITestOutputHelper output)
         tab1.DisplayText = "12345678910";
         tab2.DisplayText = "abcdefghijklmnopq";
 
-        View.ClipToScreen ();
+        tv.Layout ();
+        View.SetClipToScreen ();
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -899,7 +898,6 @@ public class TabViewTests (ITestOutputHelper output)
         tv.Height = 5;
         tv.Layout ();
 
-        View.ClipToScreen ();
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -922,7 +920,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.Height = 5;
         tv.Layout ();
 
-        View.ClipToScreen ();
+        View.SetClipToScreen ();
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -944,14 +942,11 @@ public class TabViewTests (ITestOutputHelper output)
         tv.Width = 10;
         tv.Height = 5;
 
-        // Ensures that the tab bar subview gets the bounds of the parent TabView
-        tv.LayoutSubviews ();
-
-        // Test two tab names that fit 
+        // Test two tab names that fit
         tab1.DisplayText = "12";
         tab2.DisplayText = "13";
 
-        View.ClipToScreen ();
+        tv.Layout ();
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -966,7 +961,8 @@ public class TabViewTests (ITestOutputHelper output)
 
         tv.SelectedTab = tab2;
 
-        View.ClipToScreen ();
+        tv.Layout ();
+        View.SetClipToScreen ();
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -985,7 +981,8 @@ public class TabViewTests (ITestOutputHelper output)
         tab1.DisplayText = "12345678910";
         tab2.DisplayText = "13";
 
-        View.ClipToScreen ();
+        tv.Layout ();
+        View.SetClipToScreen ();
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -1000,7 +997,9 @@ public class TabViewTests (ITestOutputHelper output)
 
         //switch to tab2
         tv.SelectedTab = tab2;
-        View.ClipToScreen ();
+
+        tv.Layout ();
+        View.SetClipToScreen ();
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -1017,7 +1016,8 @@ public class TabViewTests (ITestOutputHelper output)
         tab1.DisplayText = "12345678910";
         tab2.DisplayText = "abcdefghijklmnopq";
 
-        View.ClipToScreen ();
+        tv.Layout ();
+        View.SetClipToScreen ();
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -1039,13 +1039,11 @@ public class TabViewTests (ITestOutputHelper output)
         tv.Width = 20;
         tv.Height = 5;
 
-        tv.LayoutSubviews ();
-
         tab1.DisplayText = "Tab0";
 
         tab2.DisplayText = "Les Mise" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "rables";
 
-        View.ClipToScreen ();
+        tv.Layout ();
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -1060,7 +1058,8 @@ public class TabViewTests (ITestOutputHelper output)
 
         tv.SelectedTab = tab2;
 
-        View.ClipToScreen ();
+        tv.Layout ();
+        View.SetClipToScreen ();
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -1083,7 +1082,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.Height = 5;
         tv.Style = new () { TabsOnBottom = true };
         tv.ApplyStyleChanges ();
-        tv.LayoutSubviews ();
+        tv.Layout ();
 
         tv.Draw ();
 
@@ -1107,7 +1106,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.Height = 5;
         tv.Style = new () { TabsOnBottom = true };
         tv.ApplyStyleChanges ();
-        tv.LayoutSubviews ();
+        tv.Layout ();
 
         tv.Draw ();
 
@@ -1131,15 +1130,13 @@ public class TabViewTests (ITestOutputHelper output)
         tv.Height = 5;
         tv.Style = new () { TabsOnBottom = true };
         tv.ApplyStyleChanges ();
+        tv.Layout ();
 
-        // Ensures that the tab bar subview gets the bounds of the parent TabView
-        tv.LayoutSubviews ();
-
-        // Test two tab names that fit 
+        // Test two tab names that fit
         tab1.DisplayText = "12";
         tab2.DisplayText = "13";
-        View.ClipToScreen ();
 
+        tv.Layout ();
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -1156,7 +1153,8 @@ public class TabViewTests (ITestOutputHelper output)
         tab1.DisplayText = "12345678910";
         tab2.DisplayText = "13";
 
-        View.ClipToScreen ();
+        tv.Layout ();
+        View.SetClipToScreen ();
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -1171,7 +1169,9 @@ public class TabViewTests (ITestOutputHelper output)
 
         //switch to tab2
         tv.SelectedTab = tab2;
-        View.ClipToScreen ();
+
+        tv.Layout ();
+        View.SetClipToScreen ();
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -1188,7 +1188,8 @@ public class TabViewTests (ITestOutputHelper output)
         tab1.DisplayText = "12345678910";
         tab2.DisplayText = "abcdefghijklmnopq";
 
-        View.ClipToScreen ();
+        tv.Layout ();
+        View.SetClipToScreen ();
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -1212,12 +1213,11 @@ public class TabViewTests (ITestOutputHelper output)
         tv.Style = new () { TabsOnBottom = true };
         tv.ApplyStyleChanges ();
 
-        tv.LayoutSubviews ();
-
         tab1.DisplayText = "Tab0";
 
         tab2.DisplayText = "Les Mise" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "rables";
 
+        tv.Layout ();
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -1232,7 +1232,8 @@ public class TabViewTests (ITestOutputHelper output)
 
         tv.SelectedTab = tab2;
 
-        View.ClipToScreen ();
+        tv.Layout ();
+        View.SetClipToScreen ();
         tv.Draw ();
 
         TestHelpers.AssertDriverContentsWithFrameAre (
@@ -1322,6 +1323,138 @@ public class TabViewTests (ITestOutputHelper output)
         Application.Shutdown ();
     }
 
+    [Fact]
+    [SetupFakeDriver]
+    public void Add_Three_TabsOnTop_ChangesTab ()
+    {
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2, false);
+        Tab tab3;
+
+        tv.AddTab (
+                   tab3 = new () { Id = "tab3", DisplayText = "Tab3", View = new TextView { Id = "tab3.TextView", Width = 3, Height = 1, Text = "hi3" } },
+                   false);
+
+        tv.Width = 20;
+        tv.Height = 5;
+
+        tv.Layout ();
+        tv.Draw ();
+
+        Assert.Equal (tab1, tv.SelectedTab);
+
+        TestHelpers.AssertDriverContentsAre (
+                                             @"
+╭────┬────┬────╮
+│Tab1│Tab2│Tab3│
+│    ╰────┴────┴───╮
+│hi                │
+└──────────────────┘
+",
+                                             output
+                                            );
+
+        tv.SelectedTab = tab2;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+╭────┬────┬────╮    
+│Tab1│Tab2│Tab3│    
+├────╯    ╰────┴───╮
+│hi2               │
+└──────────────────┘
+",
+                                                      output
+                                                     );
+
+        tv.SelectedTab = tab3;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+╭────┬────┬────╮    
+│Tab1│Tab2│Tab3│    
+├────┴────╯    ╰───╮
+│hi3               │
+└──────────────────┘
+",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void Add_Three_TabsOnBottom_ChangesTab ()
+    {
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2, false);
+        Tab tab3;
+
+        tv.AddTab (
+                   tab3 = new () { Id = "tab3", DisplayText = "Tab3", View = new TextView { Id = "tab3.TextView", Width = 3, Height = 1, Text = "hi3" } },
+                   false);
+
+        tv.Width = 20;
+        tv.Height = 5;
+        tv.Style = new () { TabsOnBottom = true };
+        tv.ApplyStyleChanges ();
+
+        tv.Layout ();
+        tv.Draw ();
+
+        Assert.Equal (tab1, tv.SelectedTab);
+
+        TestHelpers.AssertDriverContentsAre (
+                                             @"
+┌──────────────────┐
+│hi                │
+│    ╭────┬────┬───╯
+│Tab1│Tab2│Tab3│
+╰────┴────┴────╯
+",
+                                             output
+                                            );
+
+        tv.SelectedTab = tab2;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌──────────────────┐
+│hi2               │
+├────╮    ╭────┬───╯
+│Tab1│Tab2│Tab3│    
+╰────┴────┴────╯    
+",
+                                                      output
+                                                     );
+
+        tv.SelectedTab = tab3;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌──────────────────┐
+│hi3               │
+├────┬────╮    ╭───╯
+│Tab1│Tab2│Tab3│    
+╰────┴────┴────╯    
+",
+                                                      output
+                                                     );
+    }
+
     private TabView GetTabView () { return GetTabView (out _, out _); }
 
     private TabView GetTabView (out Tab tab1, out Tab tab2, bool initFakeDriver = true)
@@ -1347,7 +1480,7 @@ public class TabViewTests (ITestOutputHelper output)
 
     private void InitFakeDriver ()
     {
-        ConfigurationManager.Locations = ConfigurationManager.ConfigLocations.DefaultOnly;
+        ConfigurationManager.Locations = ConfigLocations.Default;
         ConfigurationManager.Reset ();
 
         var driver = new FakeDriver ();
@@ -1355,4 +1488,3 @@ public class TabViewTests (ITestOutputHelper output)
         driver.Init ();
     }
 }
-#endif

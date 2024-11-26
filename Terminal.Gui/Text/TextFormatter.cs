@@ -43,7 +43,7 @@ public class TextFormatter
         set => _textDirection = EnableNeedsFormat (value);
     }
 
-    /// <summary>Draws the text held by <see cref="TextFormatter"/> to <see cref="ConsoleDriver"/> using the colors specified.</summary>
+    /// <summary>Draws the text held by <see cref="TextFormatter"/> to <see cref="IConsoleDriver"/> using the colors specified.</summary>
     /// <remarks>
     ///     Causes the text to be formatted (references <see cref="GetLines"/>). Sets <see cref="NeedsFormat"/> to
     ///     <c>false</c>.
@@ -59,7 +59,7 @@ public class TextFormatter
         Attribute normalColor,
         Attribute hotColor,
         Rectangle maximum = default,
-        ConsoleDriver? driver = null
+        IConsoleDriver? driver = null
     )
     {
         // With this check, we protect against subclasses with overrides of Text (like Button)

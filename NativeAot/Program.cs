@@ -9,8 +9,8 @@ namespace NativeAot;
 
 public static class Program
 {
-    [RequiresUnreferencedCode ("Calls Terminal.Gui.Application.Init(ConsoleDriver, String)")]
-    [RequiresDynamicCode ("Calls Terminal.Gui.Application.Init(ConsoleDriver, String)")]
+    [RequiresUnreferencedCode ("Calls Terminal.Gui.Application.Init(IConsoleDriver, String)")]
+    [RequiresDynamicCode ("Calls Terminal.Gui.Application.Init(IConsoleDriver, String)")]
     private static void Main (string [] args)
     {
         Application.Init ();

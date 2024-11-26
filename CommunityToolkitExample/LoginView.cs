@@ -59,6 +59,7 @@ internal partial class LoginView : IRecipient<Message<LoginActions>>
                 }
         }
         SetText();
+        // BUGBUG: This should not be needed:
         Application.LayoutAndDraw ();
     }
 

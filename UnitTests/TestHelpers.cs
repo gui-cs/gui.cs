@@ -25,21 +25,21 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     /// </summary>
     /// <param name="autoInit">If true, Application.Init will be called Before the test runs.</param>
     /// <param name="consoleDriverType">
-    ///     Determines which ConsoleDriver (FakeDriver, WindowsDriver, CursesDriver, NetDriver)
+    ///     Determines which IConsoleDriver (FakeDriver, WindowsDriver, CursesDriver, NetDriver)
     ///     will be used when Application.Init is called. If null FakeDriver will be used. Only valid if
     ///     <paramref name="autoInit"/> is true.
     /// </param>
     /// <param name="useFakeClipboard">
     ///     If true, will force the use of <see cref="FakeDriver.FakeClipboard"/>. Only valid if
-    ///     <see cref="ConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
+    ///     <see cref="IConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
     /// </param>
     /// <param name="fakeClipboardAlwaysThrowsNotSupportedException">
     ///     Only valid if <paramref name="autoInit"/> is true. Only
-    ///     valid if <see cref="ConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
+    ///     valid if <see cref="IConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
     /// </param>
     /// <param name="fakeClipboardIsSupportedAlwaysTrue">
     ///     Only valid if <paramref name="autoInit"/> is true. Only valid if
-    ///     <see cref="ConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
+    ///     <see cref="IConsoleDriver"/> == <see cref="FakeDriver"/> and <paramref name="autoInit"/> is true.
     /// </param>
     /// <param name="configLocation">Determines what config file locations <see cref="ConfigurationManager"/> will load from.</param>
     /// <param name="verifyShutdown">If true and <see cref="Application.Initialized"/> is true, the test will fail.</param>
@@ -49,7 +49,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         bool useFakeClipboard = true,
         bool fakeClipboardAlwaysThrowsNotSupportedException = false,
         bool fakeClipboardIsSupportedAlwaysTrue = false,
-        ConfigLocations configLocation = ConfigLocations.None,
+        ConfigLocations configLocation = ConfigLocations.Default, // DefaultOnly is the default for tests
         bool verifyShutdown = false
     )
     {
@@ -110,7 +110,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         }
 
         // Reset to defaults
-        Locations = ConfigLocations.DefaultOnly;
+        Locations = ConfigLocations.Default;
         Reset ();
 
         // Enable subsequent tests that call Init to get all config files (the default).
@@ -135,7 +135,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
                 View.Instances.Clear ();
             }
 #endif
-            Application.Init ((ConsoleDriver)Activator.CreateInstance (_driverType));
+            Application.Init ((IConsoleDriver)Activator.CreateInstance (_driverType));
         }
     }
 
@@ -197,6 +197,13 @@ public class SetupFakeDriverAttribute : BeforeAfterTestAttribute
         // Turn off diagnostic flags in case some test left them on
         View.Diagnostics = ViewDiagnosticFlags.Off;
 
+        if (Application.Driver is { })
+        {
+            ((FakeDriver)Application.Driver).Rows = 25;
+            ((FakeDriver)Application.Driver).Cols = 25;
+            ((FakeDriver)Application.Driver).End ();
+        }
+
         Application.Driver = null;
         base.After (methodUnderTest);
     }
@@ -244,12 +251,12 @@ internal partial class TestHelpers
     ///     <paramref name="expectedAttributes"/>.
     /// </param>
     /// <param name="output"></param>
-    /// <param name="driver">The ConsoleDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
+    /// <param name="driver">The IConsoleDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
     /// <param name="expectedAttributes"></param>
     public static void AssertDriverAttributesAre (
         string expectedLook,
         ITestOutputHelper output,
-        ConsoleDriver driver = null,
+        IConsoleDriver driver = null,
         params Attribute [] expectedAttributes
     )
     {
@@ -314,12 +321,12 @@ internal partial class TestHelpers
     /// <summary>Asserts that the driver contents match the expected contents, optionally ignoring any trailing whitespace.</summary>
     /// <param name="expectedLook"></param>
     /// <param name="output"></param>
-    /// <param name="driver">The ConsoleDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
+    /// <param name="driver">The IConsoleDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
     /// <param name="ignoreLeadingWhitespace"></param>
     public static void AssertDriverContentsAre (
         string expectedLook,
         ITestOutputHelper output,
-        ConsoleDriver driver = null,
+        IConsoleDriver driver = null,
         bool ignoreLeadingWhitespace = false
     )
     {
@@ -360,12 +367,12 @@ internal partial class TestHelpers
     /// </summary>
     /// <param name="expectedLook"></param>
     /// <param name="output"></param>
-    /// <param name="driver">The ConsoleDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
+    /// <param name="driver">The IConsoleDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
     /// <returns></returns>
     public static Rectangle AssertDriverContentsWithFrameAre (
         string expectedLook,
         ITestOutputHelper output,
-        ConsoleDriver driver = null
+        IConsoleDriver driver = null
     )
     {
         List<List<Rune>> lines = new ();
@@ -618,7 +625,7 @@ internal partial class TestHelpers
     /// </summary>
     /// <param name="driver">if null uses <see cref="Application.Driver"/></param>
     /// <param name="expectedColors"></param>
-    internal static void AssertDriverUsedColors (ConsoleDriver driver = null, params Attribute [] expectedColors)
+    internal static void AssertDriverUsedColors (IConsoleDriver driver = null, params Attribute [] expectedColors)
     {
         driver ??= Application.Driver;
         Cell [,] contents = driver.Contents;

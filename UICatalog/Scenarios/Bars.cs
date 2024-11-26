@@ -467,13 +467,9 @@ public class Bars : Scenario
 
         var line = new Line ()
         {
-            BorderStyle = LineStyle.Dotted,
-            Orientation = Orientation.Horizontal,
-            CanFocus = false,
+            X = -1,
+            Width = Dim.Fill ()! + 1
         };
-        // HACK: Bug in Line
-        line.Orientation = Orientation.Vertical;
-        line.Orientation = Orientation.Horizontal;
 
         var shortcut4 = new Shortcut
         {
@@ -482,6 +478,16 @@ public class Bars : Scenario
             Key = Key.D3.WithAlt,
             HighlightStyle = HighlightStyle.Hover
         };
+
+        shortcut4.CommandView = new CheckBox ()
+        {
+            Title = shortcut4.Title,
+            HighlightStyle = HighlightStyle.None,
+            CanFocus = false
+        };
+        // This ensures the checkbox state toggles when the hotkey of Title is pressed.
+        shortcut4.Accepting += (sender, args) => args.Cancel = true;
+
         bar.Add (shortcut1, shortcut2, shortcut3, line, shortcut4);
     }
 

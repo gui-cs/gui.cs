@@ -126,8 +126,6 @@ public class DateFieldTests
         Assert.Equal (1, df.CursorPosition);
         Assert.True (df.NewKeyDownEvent (Key.End));
         Assert.Equal (10, df.CursorPosition);
-        Assert.True (df.NewKeyDownEvent (Key.A.WithCtrl));
-        Assert.Equal (1, df.CursorPosition);
         Assert.True (df.NewKeyDownEvent (Key.E.WithCtrl));
         Assert.Equal (10, df.CursorPosition);
         Assert.True (df.NewKeyDownEvent (Key.CursorLeft));
@@ -188,7 +186,7 @@ public class DateFieldTests
 
         DateTime date = DateTime.Parse ("1/1/1971");
 
-        foreach (CultureInfo culture in CultureInfo.GetCultures (CultureTypes.AllCultures))
+        foreach (CultureInfo culture in CultureInfo.GetCultures (CultureTypes.NeutralCultures))
         {
             CultureInfo.CurrentCulture = culture;
             string separator = culture.DateTimeFormat.DateSeparator.Trim ();

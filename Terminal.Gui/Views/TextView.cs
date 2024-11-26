@@ -2347,7 +2347,6 @@ public class TextView : View
         KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
 
         KeyBindings.Add (Key.Home, Command.LeftStart);
-        KeyBindings.Add (Key.A.WithCtrl, Command.LeftStart);
 
         KeyBindings.Add (Key.Home.WithShift, Command.LeftStartExtend);
 
@@ -2387,7 +2386,7 @@ public class TextView : View
         KeyBindings.Add (Key.End.WithCtrl.WithShift, Command.EndExtend);
         KeyBindings.Add (Key.Home.WithCtrl, Command.Start);
         KeyBindings.Add (Key.Home.WithCtrl.WithShift, Command.StartExtend);
-        KeyBindings.Add (Key.T.WithCtrl, Command.SelectAll);
+        KeyBindings.Add (Key.A.WithCtrl, Command.SelectAll);
         KeyBindings.Add (Key.InsertChar, Command.ToggleOverwrite);
         KeyBindings.Add (Key.Tab, Command.Tab);
         KeyBindings.Add (Key.Tab.WithShift, Command.BackTab);
