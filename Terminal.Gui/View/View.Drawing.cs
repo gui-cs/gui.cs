@@ -137,7 +137,7 @@ public partial class View // Drawing APIs
         if (Border?.Subviews is { } && Border.Thickness != Thickness.Empty)
         {
             // PERFORMANCE: Get the check for DrawIndicator out of this somehow.
-            foreach (View subview in Border.Subviews.Where (v => v.Visible || v.Id == "DrawIndicator"))
+            foreach (View subview in Border.Subviews.Where (v => (v.Visible || v.Id == "DrawIndicator") && v.SuperViewRendersLineCanvas == false))
             {
                 if (subview.Id != "DrawIndicator")
                 {
@@ -562,12 +562,12 @@ public partial class View // Drawing APIs
     /// </summary>
     public void RenderLineCanvas ()
     {
-        if (Driver is null)
+        if (Driver is null || LineCanvas.Bounds == Rectangle.Empty)
         {
             return;
         }
 
-        if (!SuperViewRendersLineCanvas && LineCanvas.Bounds != Rectangle.Empty)
+        if (!SuperViewRendersLineCanvas)
         {
             foreach (KeyValuePair<Point, Cell?> p in LineCanvas.GetCellMap ())
             {
@@ -583,6 +583,11 @@ public partial class View // Drawing APIs
             }
 
             LineCanvas.Clear ();
+        }
+        else
+        {
+            //SuperView?.LineCanvas.Merge (LineCanvas);
+            //LineCanvas.Clear ();
         }
     }
 

@@ -111,64 +111,126 @@ public class Border : Adornment
         }
     }
 
-#if SUBVIEW_BASED_BORDER
-    private Line _left;
+    public Line TopLeft { get; internal set; }
+    public Line TopRight { get; internal set; }
+    public Line Left { get; internal set; }
+    public Line Right { get; internal set; }
+    public Line Bottom { get; internal set; }
+    public View TitleLabel { get; internal set; }
 
     /// <summary>
     ///    The close button for the border. Set to <see cref="View.Visible"/>, to <see langword="true"/> to enable.
     /// </summary>
     public Button CloseButton { get; internal set; }
-#endif
 
     /// <inheritdoc/>
     public override void BeginInit ()
     {
         base.BeginInit ();
 
-        ShowHideDrawIndicator ();
-#if SUBVIEW_BASED_BORDER
-        if (Parent is { })
+       //SuperViewRendersLineCanvas = true;
+
+        if (Thickness == Thickness.Empty)
         {
-            // Left
-            _left = new ()
-            {
-                Orientation = Orientation.Vertical,
-            };
-            Add (_left);
+            return;
+        }
+        ShowHideDrawIndicator ();
 
-            CloseButton = new Button ()
-            {
-                Text = "X",
-                CanFocus = true,
-                Visible = false,
-            };
-            CloseButton.Accept += (s, e) =>
-            {
-                e.Cancel = Parent.InvokeCommand (Command.QuitToplevel) == true;
-            };
-            Add (CloseButton);
+        TopLeft = new ()
+        {
+            Id = "TopLeft",
+            Orientation = Orientation.Horizontal,
+        };
+        Add (TopLeft);
 
-            LayoutStarted += OnLayoutStarted;
+        TopRight = new ()
+        {
+            Id = "TopRight",
+            Orientation = Orientation.Horizontal,
+        };
+        Add (TopRight);
+
+        Left = new ()
+        {
+            Id = "Left",
+            Orientation = Orientation.Vertical,
+        };
+        Add (Left);
+
+        Right = new ()
+        {
+            Id = "Right",
+            Orientation = Orientation.Vertical,
+        };
+
+        Add (Right);
+
+        Bottom = new ()
+        {
+            Id = "Bottom",
+            Orientation = Orientation.Horizontal,
+        };
+        Add (Bottom);
+
+        TitleLabel = new View ()
+        {
+            Id = "TitleLabel",
+            Text = Parent.Title,
+            CanFocus = false,
+            TextAlignment = Alignment.Center,
+            VerticalTextAlignment = Alignment.Center,
+        };
+        Add (TitleLabel);
+
+        SetSubviewLayout ();
     }
-#endif
-    }
 
-#if SUBVIEW_BASED_BORDER
-    private void OnLayoutStarted (object sender, LayoutEventArgs e)
+    private void SetSubviewLayout ()
     {
-        _left.Border.LineStyle = LineStyle;
+        TopLeft.X = Pos.Func (() => Thickness.Left / 2);
+        TopLeft.Y = Pos.Func (() => Thickness.Top / 2);
+        TopLeft.Width = 2;
+        TopLeft.Height = 1;
+        TopLeft.Visible = Thickness.Top > 0;
 
-        _left.X = Thickness.Left - 1;
-        _left.Y = Thickness.Top - 1;
-        _left.Width = 1;
-        _left.Height = Height;
+        TopRight.X = Pos.Right (TitleLabel);
+        TopRight.Y = Pos.Func (() => Thickness.Top / 2);
+        TopRight.Width = Dim.Fill () - Dim.Func (() => Thickness.Right / 2);
+        TopRight.Height = 1;
+        TopRight.Visible = Thickness.Top > 0;
 
-        CloseButton.X = Pos.AnchorEnd (Thickness.Right / 2 + 1) -
-                        (Pos.Right (CloseButton) -
-                         Pos.Left (CloseButton));
-        CloseButton.Y = 0;
-}
-#endif
+        Left.X = Pos.Func (() => Thickness.Left / 2);
+        Left.Y = Pos.Top (TopRight);
+        Left.Height = Dim.Fill () - Dim.Func (() => Thickness.Bottom / 2);
+        Left.Width = 1;
+        Left.Visible = Thickness.Left > 0;
+
+        Right.X = Pos.Right (TopRight) - 1;
+        Right.Y = Pos.Top (TopRight);
+        Right.Height = Dim.Fill () - Dim.Func (() => Thickness.Bottom / 2);
+        Right.Width = 1;
+        Right.Visible = Thickness.Right > 0;
+
+        Bottom.X = Pos.Func (() => Thickness.Left / 2);
+        Bottom.Y = Pos.Bottom (Left) - 1;
+        Bottom.Width = Dim.Fill () - Dim.Func (() => Thickness.Right / 2);
+        Bottom.Height = 1;
+        Bottom.Visible = Thickness.Bottom > 0;
+
+        TitleLabel.X = Pos.Right (TopLeft);
+        TitleLabel.Y = Pos.Func (() => Thickness.Top / 2 - TitleLabel.Frame.Height / 2);
+        TitleLabel.Height = _settings.FastHasFlags (BorderSettings.Title) ? Thickness.Top : 0;
+        TitleLabel.Width = Dim.Func (() => _settings.FastHasFlags (BorderSettings.Title) ? TitleLabel.TextFormatter.FormatAndGetSize ().Width + TitleLabel.GetAdornmentsThickness ().Horizontal : 0);
+        //TitleLabel.Border.Thickness = new (1, 0, 1, 0);
+        //TitleLabel.Border.LineStyle = LineStyle.Dotted;
+        //TitleLabel.SuperViewRendersLineCanvas = true;
+
+        //CloseButton.X = Pos.Left (Right) - 1;
+        //CloseButton.Y = Pos.Func (() => Thickness.Top / 2);
+        //CloseButton.Width = 1;
+        //CloseButton.Height = 1;
+        //CloseButton.Visible = false;
+    }
 
     /// <summary>
     ///     The color scheme for the Border. If set to <see langword="null"/>, gets the <see cref="Adornment.Parent"/>
@@ -640,6 +702,13 @@ public class Border : Adornment
 
     #endregion Mouse Support
 
+    /// <inheritdoc />
+    protected override bool OnDrawingSubviews ()
+    {
+        return base.OnDrawingSubviews ();
+
+    }
+
     /// <inheritdoc/>
     protected override bool OnDrawingContent ()
     {
@@ -647,6 +716,8 @@ public class Border : Adornment
         {
             return true;
         }
+
+        return true;
 
         Rectangle screenBounds = ViewportToScreen (Viewport);
 
@@ -727,7 +798,7 @@ public class Border : Adornment
                                            ,
                                             Parent.HasFocus ? focus : GetNormalColor (),
                                             Parent.HasFocus ? focus : GetHotNormalColor ());
-            Parent?.LineCanvas.Exclude(new(titleRect));
+            Parent?.LineCanvas.Exclude (new (titleRect));
         }
 
         if (canDrawBorder && LineStyle != LineStyle.None)
