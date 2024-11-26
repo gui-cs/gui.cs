@@ -341,7 +341,6 @@ public class TextField : View
 
         KeyBindings.Add (Key.Home, Command.LeftStart);
         KeyBindings.Add (Key.Home.WithCtrl, Command.LeftStart);
-        KeyBindings.Add (Key.A.WithCtrl, Command.LeftStart);
 
         KeyBindings.Add (Key.CursorLeft.WithShift, Command.LeftExtend);
         KeyBindings.Add (Key.CursorUp.WithShift, Command.LeftExtend);
@@ -393,7 +392,7 @@ public class TextField : View
         KeyBindings.Add (Key.C.WithCtrl, Command.Copy);
         KeyBindings.Add (Key.X.WithCtrl, Command.Cut);
         KeyBindings.Add (Key.V.WithCtrl, Command.Paste);
-        KeyBindings.Add (Key.T.WithCtrl, Command.SelectAll);
+        KeyBindings.Add (Key.A.WithCtrl, Command.SelectAll);
 
         KeyBindings.Add (Key.R.WithCtrl, Command.DeleteAll);
         KeyBindings.Add (Key.D.WithCtrl.WithShift, Command.DeleteAll);

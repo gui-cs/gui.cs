@@ -24,7 +24,7 @@ public class ClipRegionTests
     [InlineData (typeof (CursesDriver))]
     public void AddRune_Is_Clipped (Type driverType)
     {
-        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         Application.Init (driver);
         Application.Driver!.Rows = 25;
         Application.Driver!.Cols = 80;
@@ -62,7 +62,7 @@ public class ClipRegionTests
     [InlineData (typeof (CursesDriver))]
     public void Clip_Set_To_Empty_AllInvalid (Type driverType)
     {
-        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         Application.Init (driver);
 
         // Define a clip rectangle
@@ -92,7 +92,7 @@ public class ClipRegionTests
     [InlineData (typeof (CursesDriver))]
     public void IsValidLocation (Type driverType)
     {
-        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         Application.Init (driver);
         Application.Driver!.Rows = 10;
         Application.Driver!.Cols = 10;

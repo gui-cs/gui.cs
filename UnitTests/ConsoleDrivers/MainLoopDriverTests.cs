@@ -17,7 +17,7 @@ public class MainLoopDriverTests
     //[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
     public void MainLoop_AddIdle_ValidIdleHandler_ReturnsToken (Type driverType, Type mainLoopDriverType)
     {
-        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, driver);
         var mainLoop = new MainLoop (mainLoopDriver);
         var idleHandlerInvoked = false;
@@ -47,7 +47,7 @@ public class MainLoopDriverTests
     //[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
     public void MainLoop_AddTimeout_ValidParameters_ReturnsToken (Type driverType, Type mainLoopDriverType)
     {
-        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, driver);
         var mainLoop = new MainLoop (mainLoopDriver);
         var callbackInvoked = false;
@@ -83,7 +83,7 @@ public class MainLoopDriverTests
         Type mainLoopDriverType
     )
     {
-        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, driver);
         var mainLoop = new MainLoop (mainLoopDriver);
 
@@ -107,7 +107,7 @@ public class MainLoopDriverTests
         Type mainLoopDriverType
     )
     {
-        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, driver);
         var mainLoop = new MainLoop (mainLoopDriver);
 
@@ -130,7 +130,7 @@ public class MainLoopDriverTests
         Type mainLoopDriverType
     )
     {
-        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, driver);
         var mainLoop = new MainLoop (mainLoopDriver);
 
@@ -151,7 +151,7 @@ public class MainLoopDriverTests
     //[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
     public void MainLoop_Constructs_Disposes (Type driverType, Type mainLoopDriverType)
     {
-        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, driver);
         var mainLoop = new MainLoop (mainLoopDriver);
 
@@ -182,7 +182,7 @@ public class MainLoopDriverTests
     //[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
     public void MainLoop_RemoveIdle_InvalidToken_ReturnsFalse (Type driverType, Type mainLoopDriverType)
     {
-        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, driver);
         var mainLoop = new MainLoop (mainLoopDriver);
 
@@ -201,7 +201,7 @@ public class MainLoopDriverTests
     //[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
     public void MainLoop_RemoveIdle_ValidToken_ReturnsTrue (Type driverType, Type mainLoopDriverType)
     {
-        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, driver);
         var mainLoop = new MainLoop (mainLoopDriver);
 
@@ -223,7 +223,7 @@ public class MainLoopDriverTests
     //[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
     public void MainLoop_RemoveTimeout_InvalidToken_ReturnsFalse (Type driverType, Type mainLoopDriverType)
     {
-        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, driver);
         var mainLoop = new MainLoop (mainLoopDriver);
 
@@ -241,7 +241,7 @@ public class MainLoopDriverTests
     //[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
     public void MainLoop_RemoveTimeout_ValidToken_ReturnsTrue (Type driverType, Type mainLoopDriverType)
     {
-        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, driver);
         var mainLoop = new MainLoop (mainLoopDriver);
 
@@ -261,7 +261,7 @@ public class MainLoopDriverTests
     //[InlineData (typeof (ANSIDriver), typeof (AnsiMainLoopDriver))]
     public void MainLoop_RunIteration_ValidIdleHandler_CallsIdleHandler (Type driverType, Type mainLoopDriverType)
     {
-        var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+        var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
         var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, driver);
         var mainLoop = new MainLoop (mainLoopDriver);
         var idleHandlerInvoked = false;
@@ -287,7 +287,7 @@ public class MainLoopDriverTests
     //[InlineData (typeof (WindowsDriver), typeof (WindowsMainLoop))]
     //public void MainLoop_Invoke_ValidAction_RunsAction (Type driverType, Type mainLoopDriverType)
     //{
-    //	var driver = (ConsoleDriver)Activator.CreateInstance (driverType);
+    //	var driver = (IConsoleDriver)Activator.CreateInstance (driverType);
     //	var mainLoopDriver = (IMainLoopDriver)Activator.CreateInstance (mainLoopDriverType, new object [] { driver });
     //	var mainLoop = new MainLoop (mainLoopDriver);
     //	var actionInvoked = false;

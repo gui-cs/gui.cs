@@ -73,7 +73,7 @@ internal class Branch<T> where T : class
     /// <param name="colorScheme"></param>
     /// <param name="y"></param>
     /// <param name="availableWidth"></param>
-    public virtual void Draw (ConsoleDriver driver, ColorScheme colorScheme, int y, int availableWidth)
+    public virtual void Draw (IConsoleDriver driver, ColorScheme colorScheme, int y, int availableWidth)
     {
         List<Cell> cells = new ();
         int? indexOfExpandCollapseSymbol = null;
@@ -291,7 +291,7 @@ internal class Branch<T> where T : class
     /// </summary>
     /// <param name="driver"></param>
     /// <returns></returns>
-    public Rune GetExpandableSymbol (ConsoleDriver driver)
+    public Rune GetExpandableSymbol (IConsoleDriver driver)
     {
         Rune leafSymbol = tree.Style.ShowBranchLines ? Glyphs.HLine : (Rune)' ';
 
@@ -313,7 +313,7 @@ internal class Branch<T> where T : class
     ///     line body).
     /// </summary>
     /// <returns></returns>
-    public virtual int GetWidth (ConsoleDriver driver)
+    public virtual int GetWidth (IConsoleDriver driver)
     {
         return
             GetLinePrefix (driver).Sum (r => r.GetColumns ()) + GetExpandableSymbol (driver).GetColumns () + (tree.AspectGetter (Model) ?? "").Length;
@@ -408,7 +408,7 @@ internal class Branch<T> where T : class
     /// </summary>
     /// <param name="driver"></param>
     /// <returns></returns>
-    internal IEnumerable<Rune> GetLinePrefix (ConsoleDriver driver)
+    internal IEnumerable<Rune> GetLinePrefix (IConsoleDriver driver)
     {
         // If not showing line branches or this is a root object.
         if (!tree.Style.ShowBranchLines)
@@ -453,7 +453,7 @@ internal class Branch<T> where T : class
     /// <param name="driver"></param>
     /// <param name="x"></param>
     /// <returns></returns>
-    internal bool IsHitOnExpandableSymbol (ConsoleDriver driver, int x)
+    internal bool IsHitOnExpandableSymbol (IConsoleDriver driver, int x)
     {
         // if leaf node then we cannot expand
         if (!CanExpand ())

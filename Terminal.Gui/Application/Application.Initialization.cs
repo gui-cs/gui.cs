@@ -10,7 +10,7 @@ public static partial class Application // Initialization (Init/Shutdown)
     /// <summary>Initializes a new instance of <see cref="Terminal.Gui"/> Application.</summary>
     /// <para>Call this method once per instance (or after <see cref="Shutdown"/> has been called).</para>
     /// <para>
-    ///     This function loads the right <see cref="ConsoleDriver"/> for the platform, Creates a <see cref="Toplevel"/>. and
+    ///     This function loads the right <see cref="IConsoleDriver"/> for the platform, Creates a <see cref="Toplevel"/>. and
     ///     assigns it to <see cref="Top"/>
     /// </para>
     /// <para>
@@ -21,23 +21,23 @@ public static partial class Application // Initialization (Init/Shutdown)
     /// </para>
     /// <para>
     ///     The <see cref="Run{T}"/> function combines
-    ///     <see cref="Init(Terminal.Gui.ConsoleDriver,string)"/> and <see cref="Run(Toplevel, Func{Exception, bool})"/>
+    ///     <see cref="Init(Terminal.Gui.IConsoleDriver,string)"/> and <see cref="Run(Toplevel, Func{Exception, bool})"/>
     ///     into a single
     ///     call. An application cam use <see cref="Run{T}"/> without explicitly calling
-    ///     <see cref="Init(Terminal.Gui.ConsoleDriver,string)"/>.
+    ///     <see cref="Init(Terminal.Gui.IConsoleDriver,string)"/>.
     /// </para>
     /// <param name="driver">
-    ///     The <see cref="ConsoleDriver"/> to use. If neither <paramref name="driver"/> or
+    ///     The <see cref="IConsoleDriver"/> to use. If neither <paramref name="driver"/> or
     ///     <paramref name="driverName"/> are specified the default driver for the platform will be used.
     /// </param>
     /// <param name="driverName">
     ///     The short name (e.g. "net", "windows", "ansi", "fake", or "curses") of the
-    ///     <see cref="ConsoleDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are
+    ///     <see cref="IConsoleDriver"/> to use. If neither <paramref name="driver"/> or <paramref name="driverName"/> are
     ///     specified the default driver for the platform will be used.
     /// </param>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public static void Init (ConsoleDriver? driver = null, string? driverName = null) { InternalInit (driver, driverName); }
+    public static void Init (IConsoleDriver? driver = null, string? driverName = null) { InternalInit (driver, driverName); }
 
     internal static int MainThreadId { get; set; } = -1;
 
@@ -53,7 +53,7 @@ public static partial class Application // Initialization (Init/Shutdown)
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     internal static void InternalInit (
-        ConsoleDriver? driver = null,
+        IConsoleDriver? driver = null,
         string? driverName = null,
         bool calledViaRunT = false
     )
@@ -136,7 +136,7 @@ public static partial class Application // Initialization (Init/Shutdown)
 
                 if (driverType is { })
                 {
-                    Driver = (ConsoleDriver)Activator.CreateInstance (driverType)!;
+                    Driver = (IConsoleDriver)Activator.CreateInstance (driverType)!;
                 }
                 else
                 {
@@ -181,7 +181,7 @@ public static partial class Application // Initialization (Init/Shutdown)
     private static void Driver_KeyUp (object? sender, Key e) { RaiseKeyUpEvent (e); }
     private static void Driver_MouseEvent (object? sender, MouseEventArgs e) { RaiseMouseEvent (e); }
 
-    /// <summary>Gets of list of <see cref="ConsoleDriver"/> types that are available.</summary>
+    /// <summary>Gets of list of <see cref="IConsoleDriver"/> types that are available.</summary>
     /// <returns></returns>
     [RequiresUnreferencedCode ("AOT")]
     public static List<Type?> GetDriverTypes ()
@@ -193,7 +193,7 @@ public static partial class Application // Initialization (Init/Shutdown)
         {
             foreach (Type? type in asm.GetTypes ())
             {
-                if (type.IsSubclassOf (typeof (ConsoleDriver)) && !type.IsAbstract)
+                if (typeof (IConsoleDriver).IsAssignableFrom (type) && !type.IsAbstract && type.IsClass)
                 {
                     driverTypes.Add (type);
                 }

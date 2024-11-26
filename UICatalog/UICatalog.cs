@@ -136,7 +136,7 @@ public class UICatalogApp
         // Process command line args
         // "UICatalog [--driver <driver>] [--benchmark] [scenario name]"
         // If no driver is provided, the default driver is used.
-        Option<string> driverOption = new Option<string> ("--driver", "The ConsoleDriver to use.").FromAmong (
+        Option<string> driverOption = new Option<string> ("--driver", "The IConsoleDriver to use.").FromAmong (
              Application.GetDriverTypes ()
                         .Select (d => d!.Name)
                         .ToArray ()

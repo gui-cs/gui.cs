@@ -384,7 +384,7 @@ public class LineCanvas : IDisposable
         // TODO: Add other resolvers
     };
 
-    private Cell? GetCellForIntersects (ConsoleDriver? driver, IntersectionDefinition? [] intersects)
+    private Cell? GetCellForIntersects (IConsoleDriver? driver, IntersectionDefinition? [] intersects)
     {
         if (!intersects.Any ())
         {
@@ -404,7 +404,7 @@ public class LineCanvas : IDisposable
         return cell;
     }
 
-    private Rune? GetRuneForIntersects (ConsoleDriver? driver, IntersectionDefinition? [] intersects)
+    private Rune? GetRuneForIntersects (IConsoleDriver? driver, IntersectionDefinition? [] intersects)
     {
         if (!intersects.Any ())
         {
@@ -727,7 +727,7 @@ public class LineCanvas : IDisposable
         internal Rune _thickV;
         protected IntersectionRuneResolver () { SetGlyphs (); }
 
-        public Rune? GetRuneForIntersects (ConsoleDriver? driver, IntersectionDefinition? [] intersects)
+        public Rune? GetRuneForIntersects (IConsoleDriver? driver, IntersectionDefinition? [] intersects)
         {
             bool useRounded = intersects.Any (
                                               i => i?.Line.Length != 0

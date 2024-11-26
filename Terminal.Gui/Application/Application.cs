@@ -32,7 +32,7 @@ public static partial class Application
     /// <returns>A string representation of the Application </returns>
     public new static string ToString ()
     {
-        ConsoleDriver? driver = Driver;
+        IConsoleDriver? driver = Driver;
 
         if (driver is null)
         {
@@ -43,11 +43,11 @@ public static partial class Application
     }
 
     /// <summary>
-    ///     Gets a string representation of the Application rendered by the provided <see cref="ConsoleDriver"/>.
+    ///     Gets a string representation of the Application rendered by the provided <see cref="IConsoleDriver"/>.
     /// </summary>
     /// <param name="driver">The driver to use to render the contents.</param>
     /// <returns>A string representation of the Application </returns>
-    public static string ToString (ConsoleDriver? driver)
+    public static string ToString (IConsoleDriver? driver)
     {
         if (driver is null)
         {
@@ -216,6 +216,8 @@ public static partial class Application
         SizeChanging = null;
 
         Navigation = null;
+
+        ClearScreenNextIteration = false;
 
         AddApplicationKeyBindings ();
 

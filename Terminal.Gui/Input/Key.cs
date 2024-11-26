@@ -713,7 +713,7 @@ public class Key : EventArgs, IEquatable<Key>
 
             if (GetIsKeyCodeAtoZ (keyCode) && (keyCode & KeyCode.Space) != 0)
             {
-                keyCode = keyCode & ~KeyCode.Space;
+                keyCode &= ~KeyCode.Space;
             }
 
             key = new (keyCode | modifiers);

@@ -111,7 +111,7 @@ public static class Clipboard
 
 /// <summary>
 ///     Helper class for console drivers to invoke shell commands to interact with the clipboard. Used primarily by
-///     CursesDriver, but also used in Unit tests which is why it is in ConsoleDriver.cs.
+///     CursesDriver, but also used in Unit tests which is why it is in IConsoleDriver.cs.
 /// </summary>
 internal static class ClipboardProcessRunner
 {

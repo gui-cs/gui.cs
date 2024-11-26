@@ -1000,7 +1000,7 @@ public class GraphViewExample : Scenario
 
         protected override void DrawBarLine (GraphView graph, Point start, Point end, BarSeriesBar beingDrawn)
         {
-            ConsoleDriver driver = Application.Driver;
+            IConsoleDriver driver = Application.Driver;
 
             int x = start.X;
 

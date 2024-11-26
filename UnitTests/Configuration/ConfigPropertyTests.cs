@@ -5,6 +5,8 @@ using System.Text.Json.Serialization;
 using Terminal.Gui;
 using Xunit;
 
+namespace Terminal.Gui.ConfigurationTests;
+
 public class ConfigPropertyTests
 {
     [Fact]

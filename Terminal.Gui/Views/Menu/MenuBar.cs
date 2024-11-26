@@ -667,7 +667,7 @@ public class MenuBar : View, IDesignable
         return true;
     }
 
-    /// <summary>Gets the superview location offset relative to the <see cref="ConsoleDriver"/> location.</summary>
+    /// <summary>Gets the superview location offset relative to the <see cref="IConsoleDriver"/> location.</summary>
     /// <returns>The location offset.</returns>
     internal Point GetScreenOffset ()
     {
@@ -1117,7 +1117,7 @@ public class MenuBar : View, IDesignable
 
         Application.UngrabMouse ();
         CloseAllMenus ();
-        Application.LayoutAndDraw ();
+        Application.LayoutAndDraw (true);
         _openedByAltKey = true;
 
         return Run (item.Action);

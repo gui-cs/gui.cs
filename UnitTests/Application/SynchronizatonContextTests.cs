@@ -4,9 +4,10 @@ namespace Terminal.Gui.ApplicationTests;
 
 public class SyncrhonizationContextTests
 {
-    [Fact(Skip = "Causes ubuntu to crash in github action.")]
+    [Fact]
     public void SynchronizationContext_CreateCopy ()
     {
+        ConsoleDriver.RunningUnitTests = true;
         Application.Init ();
         SynchronizationContext context = SynchronizationContext.Current;
         Assert.NotNull (context);
@@ -20,11 +21,12 @@ public class SyncrhonizationContextTests
 
     [Theory]
     [InlineData (typeof (FakeDriver))]
-    //[InlineData (typeof (NetDriver))]
+    [InlineData (typeof (NetDriver))]
     [InlineData (typeof (WindowsDriver))]
-    //[InlineData (typeof (CursesDriver))]
+    [InlineData (typeof (CursesDriver))]
     public void SynchronizationContext_Post (Type driverType)
     {
+        ConsoleDriver.RunningUnitTests = true;
         Application.Init (driverName: driverType.Name);
         SynchronizationContext context = SynchronizationContext.Current;
 
@@ -60,6 +62,7 @@ public class SyncrhonizationContextTests
     [AutoInitShutdown]
     public void SynchronizationContext_Send ()
     {
+        ConsoleDriver.RunningUnitTests = true;
         Application.Init ();
         SynchronizationContext context = SynchronizationContext.Current;
 

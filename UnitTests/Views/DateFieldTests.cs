@@ -126,8 +126,6 @@ public class DateFieldTests
         Assert.Equal (1, df.CursorPosition);
         Assert.True (df.NewKeyDownEvent (Key.End));
         Assert.Equal (10, df.CursorPosition);
-        Assert.True (df.NewKeyDownEvent (Key.A.WithCtrl));
-        Assert.Equal (1, df.CursorPosition);
         Assert.True (df.NewKeyDownEvent (Key.E.WithCtrl));
         Assert.Equal (10, df.CursorPosition);
         Assert.True (df.NewKeyDownEvent (Key.CursorLeft));

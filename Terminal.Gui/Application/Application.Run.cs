@@ -305,7 +305,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     /// <returns>The created <see cref="Toplevel"/> object. The caller is responsible for disposing this object.</returns>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public static Toplevel Run (Func<Exception, bool>? errorHandler = null, ConsoleDriver? driver = null) { return Run<Toplevel> (errorHandler, driver); }
+    public static Toplevel Run (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null) { return Run<Toplevel> (errorHandler, driver); }
 
     /// <summary>
     ///     Runs the application by creating a <see cref="Toplevel"/>-derived object of type <c>T</c> and calling
@@ -323,14 +323,14 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     /// </remarks>
     /// <param name="errorHandler"></param>
     /// <param name="driver">
-    ///     The <see cref="ConsoleDriver"/> to use. If not specified the default driver for the platform will
+    ///     The <see cref="IConsoleDriver"/> to use. If not specified the default driver for the platform will
     ///     be used ( <see cref="WindowsDriver"/>, <see cref="CursesDriver"/>, or <see cref="NetDriver"/>). Must be
     ///     <see langword="null"/> if <see cref="Init"/> has already been called.
     /// </param>
     /// <returns>The created T object. The caller is responsible for disposing this object.</returns>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public static T Run<T> (Func<Exception, bool>? errorHandler = null, ConsoleDriver? driver = null)
+    public static T Run<T> (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null)
         where T : Toplevel, new()
     {
         if (!Initialized)
@@ -369,7 +369,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     ///         return control immediately.
     ///     </para>
     ///     <para>When using <see cref="Run{T}"/> or
-    ///         <see cref="Run(System.Func{System.Exception,bool},Terminal.Gui.ConsoleDriver)"/>
+    ///         <see cref="Run(System.Func{System.Exception,bool},Terminal.Gui.IConsoleDriver)"/>
     ///         <see cref="Init"/> will be called automatically.
     ///     </para>
     ///     <para>
@@ -516,6 +516,11 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         View.Draw (tops, neededLayout || forceDraw);
         View.SetClipToScreen ();
 
+        if (ClearScreenNextIteration)
+        {
+            forceDraw = true;
+            ClearScreenNextIteration = false;
+        }
         if (forceDraw)
         {
             Driver?.ClearContents ();
@@ -700,6 +705,6 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         runState.Toplevel = null;
         runState.Dispose ();
 
-        LayoutAndDraw ();
+        LayoutAndDraw (true);
     }
 }

@@ -6,11 +6,11 @@ public static partial class Application // Screen related stuff
     private static Rectangle? _screen;
 
     /// <summary>
-    ///     Gets or sets the size of the screen. By default, this is the size of the screen as reported by the <see cref="ConsoleDriver"/>.
+    ///     Gets or sets the size of the screen. By default, this is the size of the screen as reported by the <see cref="IConsoleDriver"/>.
     /// </summary>
     /// <remarks>
     /// <para>
-    ///     If the <see cref="ConsoleDriver"/> has not been initialized, this will return a default size of 2048x2048; useful for unit tests.
+    ///     If the <see cref="IConsoleDriver"/> has not been initialized, this will return a default size of 2048x2048; useful for unit tests.
     /// </para>
     /// </remarks>
     public static Rectangle Screen
@@ -63,8 +63,17 @@ public static partial class Application // Screen related stuff
             t.SetNeedsLayout ();
         }
 
-        LayoutAndDraw ();
+        LayoutAndDraw (true);
 
         return true;
     }
+
+    /// <summary>
+    ///     Gets or sets whether the screen will be cleared, and all Views redrawn, during the next Application iteration.
+    /// </summary>
+    /// <remarks>
+    ///     This is typicall set to true when a View's <see cref="View.Frame"/> changes and that view has no
+    ///     SuperView (e.g. when <see cref="Application.Top"/> is moved or resized.
+    /// </remarks>
+    public static bool ClearScreenNextIteration { get; set; }
 }

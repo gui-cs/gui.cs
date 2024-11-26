@@ -114,7 +114,7 @@ public class DateField : TextField
     }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent  (MouseEventArgs ev)
+    protected override bool OnMouseEvent (MouseEventArgs ev)
     {
         if (base.OnMouseEvent (ev) || ev.Handled)
         {
@@ -410,7 +410,7 @@ public class DateField : TextField
         KeyBindings.ReplaceCommands (Key.Backspace, Command.DeleteCharLeft);
 
         KeyBindings.ReplaceCommands (Key.Home, Command.LeftStart);
-        KeyBindings.ReplaceCommands (Key.A.WithCtrl, Command.LeftStart);
+        KeyBindings.ReplaceCommands (Key.Home.WithCtrl, Command.LeftStart);
 
         KeyBindings.ReplaceCommands (Key.CursorLeft, Command.Left);
         KeyBindings.ReplaceCommands (Key.B.WithCtrl, Command.Left);
@@ -551,35 +551,35 @@ public class DateField : TextField
     private static string StandardizeDateFormat (string format)
     {
         return format switch
-               {
-                   "MM/dd/yyyy" => "MM/dd/yyyy",
-                   "yyyy-MM-dd" => "yyyy-MM-dd",
-                   "yyyy/MM/dd" => "yyyy/MM/dd",
-                   "dd/MM/yyyy" => "dd/MM/yyyy",
-                   "d?/M?/yyyy" => "dd/MM/yyyy",
-                   "dd.MM.yyyy" => "dd.MM.yyyy",
-                   "dd-MM-yyyy" => "dd-MM-yyyy",
-                   "dd/MM yyyy" => "dd/MM/yyyy",
-                   "d. M. yyyy" => "dd.MM.yyyy",
-                   "yyyy.MM.dd" => "yyyy.MM.dd",
-                   "g yyyy/M/d" => "yyyy/MM/dd",
-                   "d/M/yyyy" => "dd/MM/yyyy",
-                   "d?/M?/yyyy g" => "dd/MM/yyyy",
-                   "d-M-yyyy" => "dd-MM-yyyy",
-                   "d.MM.yyyy" => "dd.MM.yyyy",
-                   "d.MM.yyyy '?'." => "dd.MM.yyyy",
-                   "M/d/yyyy" => "MM/dd/yyyy",
-                   "d. M. yyyy." => "dd.MM.yyyy",
-                   "d.M.yyyy." => "dd.MM.yyyy",
-                   "g yyyy-MM-dd" => "yyyy-MM-dd",
-                   "d.M.yyyy" => "dd.MM.yyyy",
-                   "d/MM/yyyy" => "dd/MM/yyyy",
-                   "yyyy/M/d" => "yyyy/MM/dd",
-                   "dd. MM. yyyy." => "dd.MM.yyyy",
-                   "yyyy. MM. dd." => "yyyy.MM.dd",
-                   "yyyy. M. d." => "yyyy.MM.dd",
-                   "d. MM. yyyy" => "dd.MM.yyyy",
-                   _ => "dd/MM/yyyy"
-               };
+        {
+            "MM/dd/yyyy" => "MM/dd/yyyy",
+            "yyyy-MM-dd" => "yyyy-MM-dd",
+            "yyyy/MM/dd" => "yyyy/MM/dd",
+            "dd/MM/yyyy" => "dd/MM/yyyy",
+            "d?/M?/yyyy" => "dd/MM/yyyy",
+            "dd.MM.yyyy" => "dd.MM.yyyy",
+            "dd-MM-yyyy" => "dd-MM-yyyy",
+            "dd/MM yyyy" => "dd/MM/yyyy",
+            "d. M. yyyy" => "dd.MM.yyyy",
+            "yyyy.MM.dd" => "yyyy.MM.dd",
+            "g yyyy/M/d" => "yyyy/MM/dd",
+            "d/M/yyyy" => "dd/MM/yyyy",
+            "d?/M?/yyyy g" => "dd/MM/yyyy",
+            "d-M-yyyy" => "dd-MM-yyyy",
+            "d.MM.yyyy" => "dd.MM.yyyy",
+            "d.MM.yyyy '?'." => "dd.MM.yyyy",
+            "M/d/yyyy" => "MM/dd/yyyy",
+            "d. M. yyyy." => "dd.MM.yyyy",
+            "d.M.yyyy." => "dd.MM.yyyy",
+            "g yyyy-MM-dd" => "yyyy-MM-dd",
+            "d.M.yyyy" => "dd.MM.yyyy",
+            "d/MM/yyyy" => "dd/MM/yyyy",
+            "yyyy/M/d" => "yyyy/MM/dd",
+            "dd. MM. yyyy." => "dd.MM.yyyy",
+            "yyyy. MM. dd." => "yyyy.MM.dd",
+            "yyyy. M. d." => "yyyy.MM.dd",
+            "d. MM. yyyy" => "dd.MM.yyyy",
+            _ => "dd/MM/yyyy"
+        };
     }
 }

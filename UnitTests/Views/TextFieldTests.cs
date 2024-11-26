@@ -651,7 +651,7 @@ public class TextFieldTests (ITestOutputHelper output)
         Assert.Null (tf.SelectedText);
         Assert.True (tf.NewKeyDownEvent (Key.A.WithCtrl));
         Assert.Equal ("is is a test.", tf.Text);
-        Assert.Equal (0, tf.CursorPosition);
+        Assert.Equal (tf.Text.Length, tf.CursorPosition);
         tf.CursorPosition = 5;
         tf.SelectedStart = -1;
         Assert.Null (tf.SelectedText);
@@ -804,7 +804,7 @@ public class TextFieldTests (ITestOutputHelper output)
         tf.CursorPosition = tf.Text.Length;
         Assert.True (tf.NewKeyDownEvent (Key.Backspace.WithCtrl));
         Assert.Equal ("to jump between text fields", tf.Text);
-        Assert.True (tf.NewKeyDownEvent (Key.T.WithCtrl));
+        Assert.True (tf.NewKeyDownEvent (Key.A.WithCtrl));
         Assert.Equal ("to jump between text fields", tf.SelectedText);
         Assert.True (tf.NewKeyDownEvent (Key.D.WithCtrl.WithShift));
         Assert.Equal ("", tf.Text);
@@ -2109,10 +2109,10 @@ Les Miśerables",
         tf.CursorPosition = 5;
 
         // When there is selected text and the cursor is at the end of the text field
-        Assert.Equal ("Hello",tf.SelectedText);
+        Assert.Equal ("Hello", tf.SelectedText);
 
         // Pressing right should not move focus, instead it should clear selection
-        Assert.True(tf.NewKeyDownEvent (Key.CursorRight));
+        Assert.True (tf.NewKeyDownEvent (Key.CursorRight));
         Assert.Null (tf.SelectedText);
 
         // Now that the selection is cleared another right keypress should move focus
@@ -2139,7 +2139,7 @@ Les Miśerables",
         Assert.Null (tf.SelectedText);
 
         // When clearing selected text with left the cursor should be at the start of the selection
-        Assert.Equal (0,tf.CursorPosition);
+        Assert.Equal (0, tf.CursorPosition);
 
         // Now that the selection is cleared another left keypress should move focus
         Assert.False (tf.NewKeyDownEvent (Key.CursorLeft));

@@ -26,7 +26,7 @@
 
 - **[Muse](https://github.com/MaciekWin3/Muse)** - Muse is terminal music player built with Terminal.Gui and NAudio on .NET platform.
   ![Muse](https://github.com/user-attachments/assets/94aeb559-a889-4b52-bb0d-453b3e19b290)
-z
+
 - **[Whale](https://github.com/MaciekWin3/Whale)** - Lightweight terminal user interface application that helps software engineers manage Docker containers.
   ![Whale](https://github.com/user-attachments/assets/7ef6e348-c36b-4aee-a63c-4e5c60c3aad2)
 
