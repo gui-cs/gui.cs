@@ -19,16 +19,12 @@ public class TabViewTests (ITestOutputHelper output)
         tv.AddTab (tab1, false);
 
         Assert.Equal (2, tv.Tabs.Count);
-
-        // Shutdown must be called to safely clean up Application if Init has been called
-        Application.Shutdown ();
     }
 
     [Fact]
+    [SetupFakeDriver]
     public void AddTwoTabs_SecondIsSelected ()
     {
-        InitFakeDriver ();
-
         var tv = new TabView ();
         Tab tab1;
         Tab tab2;
@@ -37,8 +33,6 @@ public class TabViewTests (ITestOutputHelper output)
 
         Assert.Equal (2, tv.Tabs.Count);
         Assert.Equal (tab2, tv.SelectedTab);
-
-        Application.Shutdown ();
     }
 
     [Fact]
@@ -57,9 +51,6 @@ public class TabViewTests (ITestOutputHelper output)
         // Asking to show tab2 should automatically move scroll offset accordingly
         tv.SelectedTab = tab2;
         Assert.Equal (1, tv.TabScrollOffset);
-
-        // Shutdown must be called to safely clean up Application if Init has been called
-        Application.Shutdown ();
     }
 
     [Fact]
@@ -76,8 +67,6 @@ public class TabViewTests (ITestOutputHelper output)
 
         Assert.Null (tv.SelectedTab);
         Assert.Equal (0, tv.TabScrollOffset);
-
-        Application.Shutdown ();
     }
 
     [Fact]
@@ -98,16 +87,13 @@ public class TabViewTests (ITestOutputHelper output)
         tv.TabScrollOffset = -1;
         tv.SelectedTab = tab1;
         Assert.Equal (0, tv.TabScrollOffset);
-
-        // Shutdown must be called to safely clean up Application if Init has been called
-        Application.Shutdown ();
     }
 
     [Fact]
     [AutoInitShutdown]
     public void MouseClick_ChangesTab ()
     {
-        TabView tv = GetTabView (out Tab tab1, out Tab tab2, false);
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
 
         tv.Width = 20;
         tv.Height = 5;
@@ -115,7 +101,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.Draw ();
 
         View tabRow = tv.Subviews [0];
-        Assert.Equal ("TabRowView", tabRow.GetType ().Name);
+        Assert.Equal ("TabRow", tabRow.GetType ().Name);
 
         TestHelpers.AssertDriverContentsAre (
                                              @"
@@ -190,7 +176,7 @@ public class TabViewTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void MouseClick_Right_Left_Arrows_ChangesTab ()
     {
-        TabView tv = GetTabView (out Tab tab1, out Tab tab2, false);
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
 
         tv.Width = 7;
         tv.Height = 5;
@@ -198,7 +184,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.Draw ();
 
         View tabRow = tv.Subviews [0];
-        Assert.Equal ("TabRowView", tabRow.GetType ().Name);
+        Assert.Equal ("TabRow", tabRow.GetType ().Name);
 
         TestHelpers.AssertDriverContentsAre (
                                              @"
@@ -274,7 +260,7 @@ public class TabViewTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void MouseClick_Right_Left_Arrows_ChangesTab_With_Border ()
     {
-        TabView tv = GetTabView (out Tab tab1, out Tab tab2, false);
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
 
         tv.Width = 9;
         tv.Height = 7;
@@ -286,7 +272,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.Draw ();
 
         View tabRow = tv.Subviews [0];
-        Assert.Equal ("TabRowView", tabRow.GetType ().Name);
+        Assert.Equal ("TabRow", tabRow.GetType ().Name);
 
         TestHelpers.AssertDriverContentsAre (
                                              @"
@@ -366,9 +352,9 @@ public class TabViewTests (ITestOutputHelper output)
 
     [Fact]
     [AutoInitShutdown]
-    public void ProcessKey_Down_Up_Right_Left_Home_End_PageDown_PageUp ()
+    public void ProcessKey_Down_Up_Right_Left_Home_End_PageDown_PageUp_F6 ()
     {
-        TabView tv = GetTabView (out Tab tab1, out Tab tab2, false);
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
 
         tv.Width = 7;
         tv.Height = 5;
@@ -393,7 +379,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tv.SelectedTab.View, top.Focused.MostFocused);
 
         // Press the cursor up key to focus the selected tab
-        Application.RaiseKeyDownEvent (Key.CursorUp);
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorUp));
         Application.LayoutAndDraw ();
 
         // Is the selected tab focused
@@ -411,7 +397,7 @@ public class TabViewTests (ITestOutputHelper output)
                                  };
 
         // Press the cursor right key to select the next tab
-        Application.RaiseKeyDownEvent (Key.CursorRight);
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorRight));
         Application.LayoutAndDraw ();
         Assert.Equal (tab1, oldChanged);
         Assert.Equal (tab2, newChanged);
@@ -420,7 +406,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the cursor down key. Since the selected tab has no focusable views, the focus should move to the next view in the toplevel
-        Application.RaiseKeyDownEvent (Key.CursorDown);
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorDown));
         Assert.Equal (tab2, tv.SelectedTab);
         Assert.Equal (btn, top.MostFocused);
 
@@ -436,40 +422,55 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.False (tv.SelectedTab.View.CanFocus);
 
         // Press cursor up. Should focus the subview in the selected tab.
-        Application.RaiseKeyDownEvent (Key.CursorUp);
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorUp));
         Assert.Equal (tab2, tv.SelectedTab);
         Assert.NotEqual (btnSubView, top.MostFocused);
         Assert.Equal (tab2, top.MostFocused);
 
         tv.SelectedTab.View.CanFocus = true;
-        Application.RaiseKeyDownEvent (Key.CursorDown);
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorDown));
         Assert.Equal (tab2, tv.SelectedTab);
         Assert.Equal (btnSubView, top.MostFocused);
 
-        Application.RaiseKeyDownEvent (Key.CursorUp);
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorUp));
+        // TabRow now has TabGroup which only F6 is allowed
+        Assert.NotEqual (tab2, top.MostFocused);
+        Assert.Equal (btn, top.MostFocused);
+
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorUp));
+        Assert.Equal (btnSubView, top.MostFocused);
+
+        Assert.True (Application.RaiseKeyDownEvent (Key.F6));
         Assert.Equal (tab2, top.MostFocused);
 
         // Press the cursor down key twice.
-        Application.RaiseKeyDownEvent (Key.CursorDown);
-        Application.RaiseKeyDownEvent (Key.CursorDown);
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorDown));
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorDown));
         Assert.Equal (btn, top.MostFocused);
 
         // Press the cursor down key again will focus next view in the toplevel, which is the TabView
-        Application.RaiseKeyDownEvent (Key.CursorDown);
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorDown));
         Assert.Equal (tab2, tv.SelectedTab);
         Assert.Equal (tv, top.Focused);
         // Due to the RestoreFocus method prioritize the _previouslyFocused, so btnSubView will be focused again
         Assert.Equal (btnSubView, tv.MostFocused);
 
         // Press the cursor up key to focus the selected tab which it's the only way to do that
-        Application.RaiseKeyDownEvent (Key.CursorUp);
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorUp));
         Assert.Equal (tab2, tv.SelectedTab);
+        Assert.Equal (btn, top.Focused);
+
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorUp));
+        Assert.Equal (tv, top.Focused);
+        Assert.Equal (btnSubView, top.MostFocused);
+
+        Assert.True (Application.RaiseKeyDownEvent (Key.F6));
         Assert.Equal (tv, top.Focused);
         Assert.Equal (tab2, top.Focused.MostFocused);
         Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the cursor left key to select the previous tab
-        Application.RaiseKeyDownEvent (Key.CursorLeft);
+        Assert.True (Application.RaiseKeyDownEvent (Key.CursorLeft));
         Application.LayoutAndDraw ();
         Assert.Equal (tab2, oldChanged);
         Assert.Equal (tab1, newChanged);
@@ -479,7 +480,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tab1, top.Focused.MostFocused);
 
         // Press the end key to select the last tab
-        Application.RaiseKeyDownEvent (Key.End);
+        Assert.True (Application.RaiseKeyDownEvent (Key.End));
         Application.LayoutAndDraw ();
         Assert.Equal (tab1, oldChanged);
         Assert.Equal (tab2, newChanged);
@@ -488,7 +489,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the home key to select the first tab
-        Application.RaiseKeyDownEvent (Key.Home);
+        Assert.True (Application.RaiseKeyDownEvent (Key.Home));
         Application.LayoutAndDraw ();
         Assert.Equal (tab2, oldChanged);
         Assert.Equal (tab1, newChanged);
@@ -497,7 +498,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the page down key to select the next set of tabs
-        Application.RaiseKeyDownEvent (Key.PageDown);
+        Assert.True (Application.RaiseKeyDownEvent (Key.PageDown));
         Application.LayoutAndDraw ();
         Assert.Equal (tab1, oldChanged);
         Assert.Equal (tab2, newChanged);
@@ -506,7 +507,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
 
         // Press the page up key to select the previous set of tabs
-        Application.RaiseKeyDownEvent (Key.PageUp);
+        Assert.True (Application.RaiseKeyDownEvent (Key.PageUp));
         Application.LayoutAndDraw ();
         Assert.Equal (tab2, oldChanged);
         Assert.Equal (tab1, newChanged);
@@ -526,9 +527,6 @@ public class TabViewTests (ITestOutputHelper output)
         tv.RemoveTab (tab2);
 
         Assert.Null (tv.SelectedTab);
-
-        // Shutdown must be called to safely clean up Application if Init has been called
-        Application.Shutdown ();
     }
 
     [Fact]
@@ -540,9 +538,6 @@ public class TabViewTests (ITestOutputHelper output)
         tv.RemoveTab (tab1);
 
         Assert.Equal (tab2, tv.SelectedTab);
-
-        // Shutdown must be called to safely clean up Application if Init has been called
-        Application.Shutdown ();
     }
 
     [Fact]
@@ -560,9 +555,6 @@ public class TabViewTests (ITestOutputHelper output)
         tv.RemoveTab (tab1);
 
         Assert.Equal (tab2, tv.SelectedTab);
-
-        // Shutdown must be called to safely clean up Application if Init has been called
-        Application.Shutdown ();
     }
 
     [Fact]
@@ -588,16 +580,13 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (1, called);
         Assert.Equal (tab1, oldTab);
         Assert.Equal (tab2, newTab);
-
-        // Shutdown must be called to safely clean up Application if Init has been called
-        Application.Shutdown ();
     }
 
     [Fact]
     [SetupFakeDriver]
     public void ShowTopLine_False_TabsOnBottom_False_TestTabView_Width3 ()
     {
-        TabView tv = GetTabView (out _, out _, false);
+        TabView tv = GetTabView (out _, out _);
         tv.Width = 3;
         tv.Height = 5;
         tv.Style = new () { ShowTopLine = false };
@@ -621,7 +610,7 @@ public class TabViewTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void ShowTopLine_False_TabsOnBottom_False_TestTabView_Width4 ()
     {
-        TabView tv = GetTabView (out _, out _, false);
+        TabView tv = GetTabView (out _, out _);
         tv.Width = 4;
         tv.Height = 5;
         tv.Style = new () { ShowTopLine = false };
@@ -645,7 +634,7 @@ public class TabViewTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void ShowTopLine_False_TabsOnBottom_False_TestThinTabView_WithLongNames ()
     {
-        TabView tv = GetTabView (out Tab tab1, out Tab tab2, false);
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
         tv.Width = 10;
         tv.Height = 5;
         tv.Style = new () { ShowTopLine = false };
@@ -671,7 +660,7 @@ public class TabViewTests (ITestOutputHelper output)
                                                      );
 
         tv.SelectedTab = tab2;
-        Assert.Equal (tab2, tv.Subviews.First (v => v.Id.Contains ("tabRowView")).MostFocused);
+        Assert.Equal (tab2, tv.Subviews.First (v => v.Id.Contains ("tabRow")).MostFocused);
 
         tv.Layout ();
         View.SetClipToScreen ();
@@ -744,7 +733,7 @@ public class TabViewTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void ShowTopLine_False_TabsOnBottom_True_TestTabView_Width3 ()
     {
-        TabView tv = GetTabView (out _, out _, false);
+        TabView tv = GetTabView (out _, out _);
         tv.Width = 3;
         tv.Height = 5;
         tv.Style = new () { ShowTopLine = false, TabsOnBottom = true };
@@ -768,7 +757,7 @@ public class TabViewTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void ShowTopLine_False_TabsOnBottom_True_TestTabView_Width4 ()
     {
-        TabView tv = GetTabView (out _, out _, false);
+        TabView tv = GetTabView (out _, out _);
         tv.Width = 4;
         tv.Height = 5;
         tv.Style = new () { ShowTopLine = false, TabsOnBottom = true };
@@ -792,7 +781,7 @@ public class TabViewTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void ShowTopLine_False_TabsOnBottom_True_TestThinTabView_WithLongNames ()
     {
-        TabView tv = GetTabView (out Tab tab1, out Tab tab2, false);
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
         tv.Width = 10;
         tv.Height = 5;
         tv.Style = new () { ShowTopLine = false, TabsOnBottom = true };
@@ -817,7 +806,7 @@ public class TabViewTests (ITestOutputHelper output)
                                                      );
 
         tv.SelectedTab = tab2;
-        Assert.Equal (tab2, tv.Subviews.First (v => v.Id.Contains ("tabRowView")).MostFocused);
+        Assert.Equal (tab2, tv.Subviews.First (v => v.Id.Contains ("tabRow")).MostFocused);
 
         tv.Layout ();
         View.SetClipToScreen ();
@@ -893,7 +882,7 @@ public class TabViewTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void ShowTopLine_True_TabsOnBottom_False_TestTabView_Width3 ()
     {
-        TabView tv = GetTabView (out _, out _, false);
+        TabView tv = GetTabView (out _, out _);
         tv.Width = 3;
         tv.Height = 5;
         tv.Layout ();
@@ -915,7 +904,7 @@ public class TabViewTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void ShowTopLine_True_TabsOnBottom_False_TestTabView_Width4 ()
     {
-        TabView tv = GetTabView (out _, out _, false);
+        TabView tv = GetTabView (out _, out _);
         tv.Width = 4;
         tv.Height = 5;
         tv.Layout ();
@@ -938,7 +927,7 @@ public class TabViewTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void ShowTopLine_True_TabsOnBottom_False_TestThinTabView_WithLongNames ()
     {
-        TabView tv = GetTabView (out Tab tab1, out Tab tab2, false);
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
         tv.Width = 10;
         tv.Height = 5;
 
@@ -1035,7 +1024,7 @@ public class TabViewTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void ShowTopLine_True_TabsOnBottom_False_With_Unicode ()
     {
-        TabView tv = GetTabView (out Tab tab1, out Tab tab2, false);
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
         tv.Width = 20;
         tv.Height = 5;
 
@@ -1077,7 +1066,7 @@ public class TabViewTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void ShowTopLine_True_TabsOnBottom_True_TestTabView_Width3 ()
     {
-        TabView tv = GetTabView (out _, out _, false);
+        TabView tv = GetTabView (out _, out _);
         tv.Width = 3;
         tv.Height = 5;
         tv.Style = new () { TabsOnBottom = true };
@@ -1101,7 +1090,7 @@ public class TabViewTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void ShowTopLine_True_TabsOnBottom_True_TestTabView_Width4 ()
     {
-        TabView tv = GetTabView (out _, out _, false);
+        TabView tv = GetTabView (out _, out _);
         tv.Width = 4;
         tv.Height = 5;
         tv.Style = new () { TabsOnBottom = true };
@@ -1125,7 +1114,7 @@ public class TabViewTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void ShowTopLine_True_TabsOnBottom_True_TestThinTabView_WithLongNames ()
     {
-        TabView tv = GetTabView (out Tab tab1, out Tab tab2, false);
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
         tv.Width = 10;
         tv.Height = 5;
         tv.Style = new () { TabsOnBottom = true };
@@ -1207,7 +1196,7 @@ public class TabViewTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void ShowTopLine_True_TabsOnBottom_True_With_Unicode ()
     {
-        TabView tv = GetTabView (out Tab tab1, out Tab tab2, false);
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
         tv.Width = 20;
         tv.Height = 5;
         tv.Style = new () { TabsOnBottom = true };
@@ -1279,9 +1268,6 @@ public class TabViewTests (ITestOutputHelper output)
         // even though we go right 2 indexes the event should only be called once
         Assert.Equal (1, called);
         Assert.Equal (tab4, tv.SelectedTab);
-
-        // Shutdown must be called to safely clean up Application if Init has been called
-        Application.Shutdown ();
     }
 
     [Fact]
@@ -1297,9 +1283,6 @@ public class TabViewTests (ITestOutputHelper output)
         tv.SwitchTabBy (-500);
 
         Assert.Equal (tab1, tv.SelectedTab);
-
-        // Shutdown must be called to safely clean up Application if Init has been called
-        Application.Shutdown ();
     }
 
     [Fact]
@@ -1318,16 +1301,13 @@ public class TabViewTests (ITestOutputHelper output)
         }
 
         Assert.Empty (tv.Tabs);
-
-        // Shutdown must be called to safely clean up Application if Init has been called
-        Application.Shutdown ();
     }
 
     [Fact]
     [SetupFakeDriver]
     public void Add_Three_TabsOnTop_ChangesTab ()
     {
-        TabView tv = GetTabView (out Tab tab1, out Tab tab2, false);
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
         Tab tab3;
 
         tv.AddTab (
@@ -1392,7 +1372,7 @@ public class TabViewTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void Add_Three_TabsOnBottom_ChangesTab ()
     {
-        TabView tv = GetTabView (out Tab tab1, out Tab tab2, false);
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
         Tab tab3;
 
         tv.AddTab (
@@ -1455,15 +1435,59 @@ public class TabViewTests (ITestOutputHelper output)
                                                      );
     }
 
+    [Fact]
+    [AutoInitShutdown]
+    public void Tab_Get_Focus_By_Press_F6 ()
+    {
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
+
+        tv.Width = 20;
+        tv.Height = 5;
+
+        Toplevel top = new ();
+        top.Add (tv);
+        Application.Begin (top);
+
+        Assert.False (tab1.HasFocus);
+
+        Assert.True (Application.RaiseKeyDownEvent (Key.F6));
+        Assert.True (tab1.HasFocus);
+        top.Dispose ();
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void Mouse_Wheel_Changes_Tab ()
+    {
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
+
+        tv.Width = 20;
+        tv.Height = 5;
+
+        Toplevel top = new ();
+        top.Add (tv);
+        Application.Begin (top);
+
+        Assert.False (tab1.HasFocus);
+
+        Application.RaiseMouseEvent (new () { Position = new (1, 1), Flags = MouseFlags.WheeledDown });
+        Assert.True (tab2.HasFocus);
+
+        Application.RaiseMouseEvent (new () { Position = new (1, 1), Flags = MouseFlags.WheeledUp });
+        Assert.True (tab1.HasFocus);
+
+        Application.RaiseMouseEvent (new () { Position = new (1, 1), Flags = MouseFlags.WheeledRight });
+        Assert.True (tab2.HasFocus);
+
+        Application.RaiseMouseEvent (new () { Position = new (1, 1), Flags = MouseFlags.WheeledLeft });
+        Assert.True (tab1.HasFocus);
+        top.Dispose ();
+    }
+
     private TabView GetTabView () { return GetTabView (out _, out _); }
 
-    private TabView GetTabView (out Tab tab1, out Tab tab2, bool initFakeDriver = true)
+    private TabView GetTabView (out Tab tab1, out Tab tab2)
     {
-        if (initFakeDriver)
-        {
-            InitFakeDriver ();
-        }
-
         var tv = new TabView () { Id = "tv " };
         tv.BeginInit ();
         tv.EndInit ();
@@ -1476,15 +1500,5 @@ public class TabViewTests (ITestOutputHelper output)
         tv.AddTab (tab2 = new () { Id = "tab2", DisplayText = "Tab2", View = new Label { Id = "tab1.Label", Text = "hi2" } }, false);
 
         return tv;
-    }
-
-    private void InitFakeDriver ()
-    {
-        ConfigurationManager.Locations = ConfigLocations.Default;
-        ConfigurationManager.Reset ();
-
-        var driver = new FakeDriver ();
-        Application.Init (driver);
-        driver.Init ();
     }
 }
