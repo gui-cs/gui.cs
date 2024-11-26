@@ -79,16 +79,29 @@ public class ScrollSlider : View, IOrientation, IDesignable
 
     #endregion
 
+    public string Segment { get; set; } = Glyphs.ContinuousMeterSegment.ToString();
+
     /// <inheritdoc/>
     protected override bool OnClearingViewport ()
     {
         if (Orientation == Orientation.Vertical)
         {
-            FillRect (Viewport with { Height = Size }, Glyphs.ContinuousMeterSegment);
+            for (int y = 0; y < Viewport.Height; y++)
+            {
+                for (int x = 0; x < Viewport.Width; x += Segment.GetColumns())
+                {
+                    Move (x, y);
+                    AddStr (Segment);
+                }
+            }
         }
         else
         {
-            FillRect (Viewport with { Width = Size }, Glyphs.ContinuousMeterSegment);
+            for (int x = 0; x < Viewport.Width; x++)
+            {
+                Move (x, 0);
+                AddStr (Segment);
+            }
         }
         return true;
     }

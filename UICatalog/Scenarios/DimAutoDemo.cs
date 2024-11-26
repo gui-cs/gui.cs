@@ -184,11 +184,11 @@ public class DimAutoDemo : Scenario
         };
 
         List<object> options = new () { "One", "Two", "Three", "Four" };
-        Slider slider = new (options)
+        LinearRange slider = new (options)
         {
             X = 0,
             Y = 0,
-            Type = SliderType.Multiple,
+            Type = LinearRangeType.Multiple,
             AllowEmpty = false,
             BorderStyle = LineStyle.Double,
             Title = "_Slider"
