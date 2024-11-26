@@ -1,4 +1,5 @@
-﻿namespace Terminal.Gui;
+﻿#nullable enable
+namespace Terminal.Gui;
 
 /// <summary>Delegates of this type are used to fetch string representations of user's model objects</summary>
 /// <param name="toRender">The object that is being rendered</param>

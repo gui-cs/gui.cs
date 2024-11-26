@@ -7,7 +7,7 @@ public class TreeStyle
     ///     Symbol to use for branch nodes that can be collapsed (are currently expanded). Defaults to '-'. Set to null to
     ///     hide.
     /// </summary>
-    public Rune? CollapseableSymbol { get; set; } = Glyphs.Collapse;
+    public Rune? CollapsableSymbol { get; set; } = Glyphs.Collapse;
 
     /// <summary>Set to <see langword="true"/> to highlight expand/collapse symbols in hot key color.</summary>
     public bool ColorExpandSymbol { get; set; }
