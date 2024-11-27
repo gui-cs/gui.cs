@@ -79,6 +79,9 @@ public class Line : View, IOrientation
     }
     #endregion
 
+    /// <inheritdoc />
+    protected override bool OnClearingViewport () { return true; }
+
     /// <inheritdoc/>
     protected override bool OnDrawingContent ()
     {
