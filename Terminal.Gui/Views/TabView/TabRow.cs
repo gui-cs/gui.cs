@@ -204,6 +204,14 @@ internal class TabRow : View
 
                             break;
                         case TabSide.Right:
+                            // Upper horizontal line
+                            lc.AddLine (
+                                        new (vts.X - 1, vts.Y - 1),
+                                        -1,
+                                        Orientation.Horizontal,
+                                        tab.BorderStyle
+                                       );
+
                             break;
                         default:
                             throw new ArgumentOutOfRangeException ();
@@ -268,6 +276,24 @@ internal class TabRow : View
 
                             break;
                         case TabSide.Right:
+                            if (Frame.Bottom > tab.Frame.Bottom)
+                            {
+                                // LRCorner
+                                lc.AddLine (
+                                            new (vts.X - 1, vts.Bottom),
+                                            1,
+                                            Orientation.Vertical,
+                                            tab.BorderStyle
+                                           );
+
+                                lc.AddLine (
+                                            new (vts.X - 1, vts.Bottom),
+                                            1,
+                                            Orientation.Horizontal,
+                                            tab.BorderStyle
+                                           );
+                            }
+
                             break;
                         default:
                             throw new ArgumentOutOfRangeException ();
@@ -329,6 +355,21 @@ internal class TabRow : View
 
                                 break;
                             case TabSide.Right:
+                                // Upper left tee
+                                lc.AddLine (
+                                            new (vts.Right, vts.Y - 1),
+                                            0,
+                                            Orientation.Vertical,
+                                            tab.BorderStyle
+                                           );
+
+                                lc.AddLine (
+                                            new (vts.Right, vts.Y - 1),
+                                            -1,
+                                            Orientation.Horizontal,
+                                            tab.BorderStyle
+                                           );
+
                                 break;
                             default:
                                 throw new ArgumentOutOfRangeException ();
@@ -394,6 +435,21 @@ internal class TabRow : View
 
                                 break;
                             case TabSide.Right:
+                                // Upper right tee
+                                lc.AddLine (
+                                            new (vts.Right, vts.Bottom),
+                                            0,
+                                            Orientation.Vertical,
+                                            tab.BorderStyle
+                                           );
+
+                                lc.AddLine (
+                                            new (vts.Right, vts.Bottom),
+                                            -1,
+                                            Orientation.Horizontal,
+                                            tab.BorderStyle
+                                           );
+
                                 break;
                             default:
                                 throw new ArgumentOutOfRangeException ();
@@ -458,6 +514,24 @@ internal class TabRow : View
 
                         break;
                     case TabSide.Right:
+                        if (Frame.Bottom > tab.Frame.Bottom)
+                        {
+                            //LRCorner
+                            lc.AddLine (
+                                        new (vts.X - 1, vts.Bottom),
+                                        1,
+                                        Orientation.Vertical,
+                                        tab.BorderStyle
+                                       );
+
+                            lc.AddLine (
+                                        new (vts.X - 1, vts.Bottom),
+                                        1,
+                                        Orientation.Horizontal,
+                                        tab.BorderStyle
+                                       );
+                        }
+
                         break;
                     default:
                         throw new ArgumentOutOfRangeException ();
@@ -656,6 +730,39 @@ internal class TabRow : View
 
                             break;
                         case TabSide.Right:
+                            if (_host.Style.ShowInitialLine || _host.Style.TabsSide == TabSide.Right)
+                            {
+                                // Upper left tee
+                                lc.AddLine (
+                                            new (vts.Right, vts.Y - 1),
+                                            0,
+                                            Orientation.Vertical,
+                                            tab.BorderStyle
+                                           );
+
+                                lc.AddLine (
+                                            new (vts.Right, vts.Y - 1),
+                                            -1,
+                                            Orientation.Horizontal,
+                                            tab.BorderStyle
+                                           );
+                            }
+
+                            // Lower left tee
+                            lc.AddLine (
+                                        new (vts.X - 1, vts.Y - 1),
+                                        0,
+                                        Orientation.Vertical,
+                                        tab.BorderStyle
+                                       );
+
+                            lc.AddLine (
+                                        new (vts.X - 1, vts.Y - 1),
+                                        1,
+                                        Orientation.Horizontal,
+                                        tab.BorderStyle
+                                       );
+
                             break;
                         default:
                             throw new ArgumentOutOfRangeException ();
@@ -704,6 +811,21 @@ internal class TabRow : View
 
                             break;
                         case TabSide.Right:
+                            // Upper right tee
+                            lc.AddLine (
+                                        new (vts.X - 1, vts.Bottom),
+                                        0,
+                                        Orientation.Vertical,
+                                        tab.BorderStyle
+                                       );
+
+                            lc.AddLine (
+                                        new (vts.X - 1, vts.Bottom),
+                                        1,
+                                        Orientation.Horizontal,
+                                        tab.BorderStyle
+                                       );
+
                             break;
                         default:
                             throw new ArgumentOutOfRangeException ();
@@ -750,6 +872,21 @@ internal class TabRow : View
 
                             break;
                         case TabSide.Right:
+                            // Lower right tee
+                            lc.AddLine (
+                                        new (vts.Right, vts.Bottom),
+                                        0,
+                                        Orientation.Vertical,
+                                        tab.BorderStyle
+                                       );
+
+                            lc.AddLine (
+                                        new (vts.Right, vts.Bottom),
+                                        -1,
+                                        Orientation.Horizontal,
+                                        tab.BorderStyle
+                                       );
+
                             break;
                         default:
                             throw new ArgumentOutOfRangeException ();
@@ -874,6 +1011,21 @@ internal class TabRow : View
 
                         break;
                     case TabSide.Right:
+                        // Upper horizontal line
+                        lc.AddLine (
+                                    new (vts.X - 1, vts.Y - 1),
+                                    1,
+                                    Orientation.Vertical,
+                                    tab.BorderStyle
+                                   );
+
+                        lc.AddLine (
+                                    new (vts.X - 1, vts.Y - 1),
+                                    0,
+                                    Orientation.Horizontal,
+                                    tab.BorderStyle
+                                   );
+
                         break;
                     default:
                         throw new ArgumentOutOfRangeException ();
@@ -939,6 +1091,24 @@ internal class TabRow : View
 
                         break;
                     case TabSide.Right:
+                        if (Frame.Bottom > tab.Frame.Bottom)
+                        {
+                            // Lower right tee
+                            lc.AddLine (
+                                        new (vts.X - 1, vts.Bottom),
+                                        0,
+                                        Orientation.Vertical,
+                                        tab.BorderStyle
+                                       );
+
+                            lc.AddLine (
+                                        new (vts.X - 1, vts.Bottom),
+                                        1,
+                                        Orientation.Horizontal,
+                                        tab.BorderStyle
+                                       );
+                        }
+
                         break;
                     default:
                         throw new ArgumentOutOfRangeException ();
@@ -1010,6 +1180,16 @@ internal class TabRow : View
 
                                 break;
                             case TabSide.Right:
+                                lc.AddLine (
+                                            new (
+                                                 vts.X - 1,
+                                                 vts.Bottom
+                                                ),
+                                            lineLength - arrowOffset,
+                                            Orientation.Vertical,
+                                            tab.BorderStyle
+                                           );
+
                                 break;
                             default:
                                 throw new ArgumentOutOfRangeException ();
@@ -1102,6 +1282,65 @@ internal class TabRow : View
 
                             break;
                         case TabSide.Right:
+                            if (i == selectedTab)
+                            {
+                                if (Frame.Bottom == tab.Frame.Bottom)
+                                {
+                                    // Lower right horizontal line
+                                    lc.AddLine (
+                                                new (vts.X - 1, vts.Bottom),
+                                                0,
+                                                Orientation.Horizontal,
+                                                tab.BorderStyle
+                                               );
+                                }
+                                else
+                                {
+                                    lc.AddLine (
+                                                new (vts.X - 1, vts.Bottom),
+                                                lineLength,
+                                                Orientation.Vertical,
+                                                tab.BorderStyle
+                                               );
+                                }
+                            }
+                            else
+                            {
+                                if (Frame.Bottom == tab.Frame.Bottom)
+                                {
+                                    lc.AddLine (
+                                                new (vts.X - 1, vts.Bottom),
+                                                -1,
+                                                Orientation.Vertical,
+                                                tab.BorderStyle
+                                               );
+
+                                    lc.AddLine (
+                                                new (vts.X - 1, vts.Bottom),
+                                                0,
+                                                Orientation.Horizontal,
+                                                tab.BorderStyle
+                                               );
+
+                                }
+                                else
+                                {
+                                    lc.AddLine (
+                                                new (vts.X - 1, vts.Bottom),
+                                                lineLength,
+                                                Orientation.Vertical,
+                                                tab.BorderStyle
+                                               );
+
+                                    lc.AddLine (
+                                                new (vts.X - 1, tabsBarVts.Bottom),
+                                                1,
+                                                Orientation.Horizontal,
+                                                tab.BorderStyle
+                                               );
+                                }
+                            }
+
                             break;
                         default:
                             throw new ArgumentOutOfRangeException ();
@@ -1154,6 +1393,20 @@ internal class TabRow : View
 
                                 break;
                             case TabSide.Right:
+                                if (Frame.Bottom > tab.Frame.Bottom)
+                                {
+                                    // More URCorner
+                                    lc.AddLine (
+                                                new (
+                                                     vts.X - 1,
+                                                     tabsBarVts.Bottom - 1
+                                                    ),
+                                                -1,
+                                                Orientation.Horizontal,
+                                                tab.BorderStyle
+                                               );
+                                }
+
                                 break;
                             default:
                                 throw new ArgumentOutOfRangeException ();
@@ -1208,6 +1461,7 @@ internal class TabRow : View
 
                     break;
                 case TabSide.Bottom:
+                case TabSide.Right:
                     _leftUpScrollIndicator.X = 0;
                     _leftUpScrollIndicator.Y = 0;
 
@@ -1216,8 +1470,6 @@ internal class TabRow : View
                     _leftUpScrollIndicator.X = Pos.AnchorEnd (1);
                     _leftUpScrollIndicator.Y = 0;
 
-                    break;
-                case TabSide.Right:
                     break;
                 default:
                     throw new ArgumentOutOfRangeException ();
@@ -1251,6 +1503,9 @@ internal class TabRow : View
 
                     break;
                 case TabSide.Right:
+                    _rightDownScrollIndicator.X = 0;
+                    _rightDownScrollIndicator.Y = Pos.AnchorEnd (1);
+
                     break;
                 default:
                     throw new ArgumentOutOfRangeException ();

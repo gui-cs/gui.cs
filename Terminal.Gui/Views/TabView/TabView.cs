@@ -275,7 +275,6 @@ public class TabView : View
         _tabLocations = CalculateViewport (Viewport);
 
         _containerView.BorderStyle = Style.ShowBorder ? LineStyle.Single : LineStyle.None;
-        _containerView.Width = Dim.Fill ();
 
         switch (Style.TabsSide)
         {
@@ -342,6 +341,21 @@ public class TabView : View
 
                 break;
             case TabSide.Right:
+                // Tabs are along the right
+                if (Style.ShowBorder)
+                {
+                    _containerView.Border!.Thickness = new (1, 1, 0, 1);
+                }
+
+                _tabsBar.Y = 0;
+                _tabsBar.Height = Dim.Fill ();
+
+                //move content left to make space for tabs
+                _containerView.X = 0;
+                _containerView.Y = 0;
+
+                _containerView.Height = Dim.Fill ();
+
                 break;
             default:
                 throw new ArgumentOutOfRangeException ();
@@ -685,6 +699,13 @@ public class TabView : View
 
                 _tabsBar.Width = maxColWidth;
 
+                if (Style.TabsSide == TabSide.Right)
+                {
+                    _tabsBar.X = Pos.AnchorEnd (maxColWidth);
+                    // Fill client area leaving space at right for tabs
+                    _containerView.Width = Dim.Fill (maxColWidth);
+                }
+
                 int GetMaxColWidth (int textWidth)
                 {
                     int maxViewportWidth = Math.Max (0, Viewport.Width - (Style.ShowBorder ? 2 : 0));
@@ -754,6 +775,9 @@ public class TabView : View
 
                         break;
                     case TabSide.Right:
+                        tab.Border!.Thickness = new (0, 1, topLine, 1);
+                        tab.Margin!.Thickness = new (1, 0, 0, 0);
+
                         break;
                     default:
                         throw new ArgumentOutOfRangeException ();
@@ -778,6 +802,8 @@ public class TabView : View
 
                         break;
                     case TabSide.Right:
+                        tab.Border!.Thickness = new (1, 1, topLine, 1);
+
                         break;
                     default:
                         throw new ArgumentOutOfRangeException ();
