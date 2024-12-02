@@ -16,6 +16,8 @@ public class TabViewExample : Scenario
     private MenuItem _miShowTopLine;
     private MenuItem [] _miTabsSide;
     private MenuItem _cachedTabsSide;
+    private MenuItem [] _miTabsTextAlignment;
+    private MenuItem _cachedTabsTextAlignment;
     private TabView _tabView;
 
     public override void Main ()
@@ -27,6 +29,7 @@ public class TabViewExample : Scenario
         Toplevel appWindow = new ();
 
         _miTabsSide = SetTabsSide ();
+        _miTabsTextAlignment = SetTabsTextAlignment ();
 
         var menu = new MenuBar
         {
@@ -70,7 +73,12 @@ public class TabViewExample : Scenario
                                   "_Show TabView Border",
                                   "",
                                   ShowTabViewBorder
-                                 ) { Checked = true, CheckType = MenuItemCheckStyle.Checked }
+                                 ) { Checked = true, CheckType = MenuItemCheckStyle.Checked },
+                         null,
+                         _miTabsTextAlignment [0],
+                         _miTabsTextAlignment [1],
+                         _miTabsTextAlignment [2],
+                         _miTabsTextAlignment [3]
                      }
                     )
             ]
@@ -276,6 +284,43 @@ public class TabViewExample : Scenario
             {
                 item.Checked = true;
                 _cachedTabsSide = item;
+            }
+
+            menuItems.Add (item);
+        }
+
+        return menuItems.ToArray ();
+    }
+
+    private MenuItem [] SetTabsTextAlignment ()
+    {
+        List<MenuItem> menuItems = [];
+
+        foreach (TabSide align in Enum.GetValues (typeof (Alignment)))
+        {
+            string alignName = Enum.GetName (typeof (Alignment), align);
+            var item = new MenuItem { Title = $"_{alignName}", Data = align };
+            item.CheckType |= MenuItemCheckStyle.Radio;
+
+            item.Action += () =>
+                           {
+                               if (_cachedTabsTextAlignment == item)
+                               {
+                                   return;
+                               }
+
+                               _cachedTabsTextAlignment.Checked = false;
+                               item.Checked = true;
+                               _cachedTabsTextAlignment = item;
+                               _tabView.Style.TabsTextAlignment = (Alignment)item.Data;
+                               _tabView.ApplyStyleChanges ();
+                           };
+            item.ShortcutKey = ((Key)alignName! [0].ToString ().ToLower ()).WithCtrl;
+
+            if (alignName == "Start")
+            {
+                item.Checked = true;
+                _cachedTabsTextAlignment = item;
             }
 
             menuItems.Add (item);
