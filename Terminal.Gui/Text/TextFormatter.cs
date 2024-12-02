@@ -1411,7 +1411,7 @@ public class TextFormatter
 
                 if (textFormatter is { Alignment: Alignment.Center })
                 {
-                    return GetRangeThatFits (runes, Math.Max ((runes.Count - width) / 2, 0), text, width, tabWidth, textDirection);
+                    return GetRangeThatFits (runes, Math.Max ((runes.Count - width - zeroLength) / 2, 0), text, width, tabWidth, textDirection);
                 }
 
                 return GetRangeThatFits (runes, 0, text, width, tabWidth, textDirection);
@@ -1426,7 +1426,7 @@ public class TextFormatter
 
                 if (textFormatter is { VerticalAlignment: Alignment.Center })
                 {
-                    return GetRangeThatFits (runes, Math.Max ((runes.Count - width) / 2, 0), text, width, tabWidth, textDirection);
+                    return GetRangeThatFits (runes, Math.Max ((runes.Count - width - zeroLength) / 2, 0), text, width, tabWidth, textDirection);
                 }
 
                 return GetRangeThatFits (runes, 0, text, width, tabWidth, textDirection);
@@ -1451,7 +1451,7 @@ public class TextFormatter
             }
             else if (textFormatter is { Alignment: Alignment.Center })
             {
-                return GetRangeThatFits (runes, Math.Max ((runes.Count - width) / 2, 0), text, width, tabWidth, textDirection);
+                return GetRangeThatFits (runes, Math.Max ((runes.Count - width - zeroLength) / 2, 0), text, width, tabWidth, textDirection);
             }
             else if (GetRuneWidth (text, tabWidth, textDirection) > width)
             {
@@ -1470,7 +1470,7 @@ public class TextFormatter
             }
             else if (textFormatter is { VerticalAlignment: Alignment.Center })
             {
-                return GetRangeThatFits (runes, Math.Max ((runes.Count - width) / 2, 0), text, width, tabWidth, textDirection);
+                return GetRangeThatFits (runes, Math.Max ((runes.Count - width - zeroLength) / 2, 0), text, width, tabWidth, textDirection);
             }
             else if (runes.Count - zeroLength > width)
             {
@@ -1526,7 +1526,7 @@ public class TextFormatter
         }
         else
         {
-            textCount = words.Sum (arg => arg.GetRuneCount ());
+            textCount = words.Sum (arg => arg.GetRuneCount ()) - text.EnumerateRunes ().Sum (r => r.GetColumns () == 0 ? 1 : 0);
         }
 
         int spaces = words.Length > 1 ? (width - textCount) / (words.Length - 1) : 0;
@@ -1936,7 +1936,7 @@ public class TextFormatter
 
     private static int GetRuneWidth (Rune rune, int tabWidth, TextDirection textDirection = TextDirection.LeftRight_TopBottom)
     {
-        int runeWidth = IsHorizontalDirection (textDirection) ? rune.GetColumns () : 1;
+        int runeWidth = IsHorizontalDirection (textDirection) ? rune.GetColumns () : rune.GetColumns () == 0 ? 0 : 1;
 
         if (rune.Value == '\t')
         {
