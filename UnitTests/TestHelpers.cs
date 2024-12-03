@@ -411,7 +411,7 @@ internal partial class TestHelpers
                         colIndex++;
                     }
 
-                    if (colIndex + 1 > w)
+                    if (colIndex + 1 > w && !runeAtCurrentLocation.IsCombiningMark ())
                     {
                         w = colIndex + 1;
                     }
@@ -419,15 +419,28 @@ internal partial class TestHelpers
                     h = rowIndex - y + 1;
                 }
 
-                if (x > -1)
+                if (x > -1 && contents [rowIndex, colIndex].CombiningMarks is null)
                 {
                     runes.Add (runeAtCurrentLocation);
                 }
 
-                // See Issue #2616
-                //foreach (var combMark in contents [r, c].CombiningMarks) {
-                //	runes.Add (combMark);
-                //}
+                if (contents [rowIndex, colIndex].CombiningMarks is { Count: > 0 })
+                {
+                    string combine = runeAtCurrentLocation.ToString ();
+                    string? normalized = null;
+
+                    // See Issue #2616
+                    foreach (var combMark in contents [rowIndex, colIndex].CombiningMarks)
+                    {
+                        combine += combMark;
+                        normalized = combine.Normalize (NormalizationForm.FormC);
+                    }
+
+                    foreach (Rune enumerateRune in normalized!.EnumerateRunes ())
+                    {
+                        runes.Add (enumerateRune);
+                    }
+                }
             }
 
             if (runes.Count > 0)

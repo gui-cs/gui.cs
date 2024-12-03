@@ -319,7 +319,7 @@ internal class CursesDriver : ConsoleDriver
                         Rune rune = Contents [row, col].Rune;
                         output.Append (rune);
 
-                        if (Contents [row, col].CombiningMarks.Count > 0)
+                        if (Contents [row, col].CombiningMarks is { Count: > 0 })
                         {
                             // AtlasEngine does not support NON-NORMALIZED combining marks in a way
                             // compatible with the driver architecture. Any CMs (except in the first col)
@@ -327,10 +327,11 @@ internal class CursesDriver : ConsoleDriver
                             // width codepoints E.g. `echo "[e`u{0301}`u{0301}]"` will output `[é  ]`.
                             // 
                             // For now, we just ignore the list of CMs.
-                            //foreach (var combMark in Contents [row, col].CombiningMarks) {
-                            //	output.Append (combMark);
-                            //}
-                            // WriteToConsole (output, ref lastCol, row, ref outputWidth);
+                            foreach (var combMark in Contents [row, col].CombiningMarks)
+                            {
+                                output.Append (combMark);
+                            }
+                            WriteToConsole (output, ref lastCol, row, ref outputWidth);
                         }
                         else if (rune.IsSurrogatePair () && rune.GetColumns () < 2)
                         {

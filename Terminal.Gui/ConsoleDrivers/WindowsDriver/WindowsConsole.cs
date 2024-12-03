@@ -197,6 +197,14 @@ internal class WindowsConsole
                     {
                         _stringBuilder.Append (info.Char);
                     }
+
+                    if (info.CombiningMarks is { })
+                    {
+                        foreach (var combMark in info.CombiningMarks)
+                        {
+                            _stringBuilder.Append (combMark);
+                        }
+                    }
                 }
                 else
                 {
@@ -785,6 +793,7 @@ internal class WindowsConsole
         public char Char { get; set; }
         public Attribute Attribute { get; set; }
         public bool Empty { get; set; } // TODO: Temp hack until virtual terminal sequences
+        internal List<char>? CombiningMarks;
 
         public ExtendedCharInfo (char character, Attribute attribute)
         {

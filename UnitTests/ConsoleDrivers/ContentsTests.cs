@@ -56,7 +56,7 @@ public class ContentsTests
         // a + ogonek + acute = <U+0061, U+0328, U+0301> ( ą́ )
         var ogonek = new Rune (0x0328); // Combining ogonek (a small hook or comma shape)
         combined = "a" + ogonek + acuteaccent;
-        expected = ("a" + ogonek).Normalize (NormalizationForm.FormC); // See Issue #2616
+        expected = ("á" + ogonek).Normalize (NormalizationForm.FormC); // See Issue #2616
 
         driver.Move (0, 0);
         driver.AddStr (combined);
@@ -64,7 +64,7 @@ public class ContentsTests
 
         // e + ogonek + acute = <U+0061, U+0328, U+0301> ( ę́́ )
         combined = "e" + ogonek + acuteaccent;
-        expected = ("e" + ogonek).Normalize (NormalizationForm.FormC); // See Issue #2616
+        expected = ("é" + ogonek).Normalize (NormalizationForm.FormC); // See Issue #2616
 
         driver.Move (0, 0);
         driver.AddStr (combined);
@@ -72,7 +72,7 @@ public class ContentsTests
 
         // i + ogonek + acute = <U+0061, U+0328, U+0301> ( į́́́ )
         combined = "i" + ogonek + acuteaccent;
-        expected = ("i" + ogonek).Normalize (NormalizationForm.FormC); // See Issue #2616
+        expected = ("í" + ogonek).Normalize (NormalizationForm.FormC); // See Issue #2616
 
         driver.Move (0, 0);
         driver.AddStr (combined);
@@ -80,7 +80,7 @@ public class ContentsTests
 
         // u + ogonek + acute = <U+0061, U+0328, U+0301> ( ų́́́́ )
         combined = "u" + ogonek + acuteaccent;
-        expected = ("u" + ogonek).Normalize (NormalizationForm.FormC); // See Issue #2616
+        expected = ("ú" + ogonek).Normalize (NormalizationForm.FormC); // See Issue #2616
 
         driver.Move (0, 0);
         driver.AddStr (combined);

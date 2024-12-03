@@ -356,6 +356,20 @@ internal class WindowsDriver : ConsoleDriver
 
                 _outputBuffer [position].Empty = false;
 
+                if (Contents [row, col].CombiningMarks is { Count: > 0 })
+                {
+                    _outputBuffer [position].CombiningMarks = [];
+
+                    foreach (var combMark in Contents [row, col].CombiningMarks)
+                    {
+                        _outputBuffer [position].CombiningMarks!.Add ((char)combMark.Value);
+                    }
+                }
+                else
+                {
+                    _outputBuffer [position].CombiningMarks = null;
+                }
+
                 if (Contents [row, col].Rune.IsBmp)
                 {
                     _outputBuffer [position].Char = (char)Contents [row, col].Rune.Value;

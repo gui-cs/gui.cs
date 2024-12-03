@@ -208,35 +208,19 @@ public abstract class ConsoleDriver : IConsoleDriver
                     // b) Ignoring any CMs that don't normalize
                     if (Col > 0)
                     {
-                        if (Contents [Row, Col - 1].CombiningMarks.Count > 0)
+                        for (int i = Col; i > 0; i--)
                         {
-                            // Just add this mark to the list
-                            Contents [Row, Col - 1].CombiningMarks.Add (rune);
-
-                            // Ignore. Don't move to next column (let the driver figure out what to do).
-                        }
-                        else
-                        {
-                            // Attempt to normalize the cell to our left combined with this mark
-                            string combined = Contents [Row, Col - 1].Rune + rune.ToString ();
-
-                            // Normalize to Form C (Canonical Composition)
-                            string normalized = combined.Normalize (NormalizationForm.FormC);
-
-                            if (normalized.Length == 1)
+                            if (!Contents [Row, i - 1].Rune.IsCombiningMark ())
                             {
-                                // It normalized! We can just set the Cell to the left with the
-                                // normalized codepoint
-                                Contents [Row, Col - 1].Rune = (Rune)normalized [0];
+                                if (Contents [Row, i - 1].CombiningMarks is null)
+                                {
+                                    Contents [Row, i - 1].CombiningMarks = [];
+                                }
+                                // Just add this mark to the list
+                                Contents [Row, i - 1].CombiningMarks.Add (rune);
+                                Debug.Assert (Contents [Row, i - 1].CombiningMarks.Count > 0);
 
-                                // Ignore. Don't move to next column because we're already there
-                            }
-                            else
-                            {
-                                // It didn't normalize. Add it to the Cell to left's CM list
-                                Contents [Row, Col - 1].CombiningMarks.Add (rune);
-
-                                // Ignore. Don't move to next column (let the driver figure out what to do).
+                                break;
                             }
                         }
 
