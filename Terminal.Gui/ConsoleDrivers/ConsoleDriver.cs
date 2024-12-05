@@ -1,6 +1,7 @@
 #nullable enable
 
 using System.Diagnostics;
+using System.Globalization;
 
 namespace Terminal.Gui;
 
@@ -47,6 +48,10 @@ public abstract class ConsoleDriver : IConsoleDriver
     // As performance is a concern, we keep track of the dirty lines and only refresh those.
     // This is in addition to the dirty flag on each cell.
     internal bool []? _dirtyLines;
+
+    // Represent the necessary space character that must be added at
+    // the end of the line due the use of Format (Cf) unicode category
+    internal int []? _lineColsOffset;
 
     // QUESTION: When non-full screen apps are supported, will this represent the app size, or will that be in Application?
     /// <summary>Gets the location and size of the terminal screen.</summary>
@@ -196,7 +201,7 @@ public abstract class ConsoleDriver : IConsoleDriver
 
             lock (Contents)
             {
-                if (runeWidth == 0 && rune.IsCombiningMark ())
+                if (Rune.GetUnicodeCategory (rune) == UnicodeCategory.Format || (runeWidth == 0 && rune.IsCombiningMark ()))
                 {
                     // AtlasEngine does not support NON-NORMALIZED combining marks in a way
                     // compatible with the driver architecture. Any CMs (except in the first col)
@@ -226,6 +231,11 @@ public abstract class ConsoleDriver : IConsoleDriver
 
                         Contents [Row, Col - 1].Attribute = CurrentAttribute;
                         Contents [Row, Col - 1].IsDirty = true;
+
+                        if (runeWidth == 0 && Rune.GetUnicodeCategory (rune) == UnicodeCategory.Format)
+                        {
+                            _lineColsOffset! [Row]++;
+                        }
                     }
                     else
                     {
@@ -396,6 +406,7 @@ public abstract class ConsoleDriver : IConsoleDriver
         Clip = new (Screen);
 
         _dirtyLines = new bool [Rows];
+        _lineColsOffset = new int [Rows];
 
         lock (Contents)
         {

@@ -348,6 +348,16 @@ internal class CursesDriver : ConsoleDriver
                     }
                 }
 
+                if (_lineColsOffset! [row] > 0)
+                {
+                    for (var i = 0; i < _lineColsOffset [row]; i++)
+                    {
+                        output.Append (' ');
+                    }
+
+                    _lineColsOffset! [row] = 0;
+                }
+
                 if (output.Length > 0)
                 {
                     SetCursorPosition (lastCol, row);
