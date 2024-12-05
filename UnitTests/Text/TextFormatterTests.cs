@@ -4629,6 +4629,90 @@ ssb
         Assert.Equal (expectedWrappedText, wrappedText);
     }
 
+    [Theory]
+    [InlineData (
+                    "Les Mise\u0301rables",
+                    14,
+                    -1,
+                    false,
+                    new [] { "Les Misérables" },
+                    "Les Misérables"
+                )]
+    [InlineData (
+                    "Les Mise\u0328\u0301rables",
+                    14,
+                    -2,
+                    false,
+                    new [] { "Les Misę́rables" },
+                    "Les Misę́rables"
+                )]
+    public void Format_Combining_Marks_Alignments (
+        string text,
+        int maxWidth,
+        int widthOffset,
+        bool wrap,
+        IEnumerable<string> resultLines,
+        string expectedText
+    )
+    {
+        Assert.Equal (maxWidth, text.GetRuneCount () + widthOffset);
+
+        // Horizontal text direction
+        foreach (Alignment alignment in Enum.GetValues (typeof (Alignment)))
+        {
+            TextFormatter tf = new () { Text = text, ConstrainToSize = new (maxWidth, 1), WordWrap = wrap, Alignment = alignment };
+
+            List<string> list = TextFormatter.Format (
+                                                      text,
+                                                      maxWidth,
+                                                      alignment,
+                                                      wrap,
+                                                      tf.PreserveTrailingSpaces,
+                                                      tf.TabWidth,
+                                                      tf.Direction,
+                                                      tf.MultiLine,
+                                                      tf);
+            Assert.Equal (list.Count, resultLines.Count ());
+            Assert.Equal (resultLines, list);
+            var formattedText = string.Empty;
+
+            foreach (string txt in list)
+            {
+                formattedText += txt;
+            }
+
+            Assert.Equal (expectedText, formattedText);
+        }
+
+        // Vertical text direction
+        foreach (Alignment alignment in Enum.GetValues (typeof (Alignment)))
+        {
+            TextFormatter tf = new ()
+                { Text = text, ConstrainToSize = new (1, maxWidth), WordWrap = wrap, VerticalAlignment = alignment, Direction = TextDirection.TopBottom_LeftRight };
+
+            List<string> list = TextFormatter.Format (
+                                                      text,
+                                                      maxWidth,
+                                                      alignment,
+                                                      wrap,
+                                                      tf.PreserveTrailingSpaces,
+                                                      tf.TabWidth,
+                                                      tf.Direction,
+                                                      tf.MultiLine,
+                                                      tf);
+            Assert.Equal (list.Count, resultLines.Count ());
+            Assert.Equal (resultLines, list);
+            var formattedText = string.Empty;
+
+            foreach (string txt in list)
+            {
+                formattedText += txt;
+            }
+
+            Assert.Equal (expectedText, formattedText);
+        }
+    }
+
     public static IEnumerable<object []> FormatEnvironmentNewLine =>
         new List<object []>
         {
