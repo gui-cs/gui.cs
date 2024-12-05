@@ -210,7 +210,7 @@ public abstract class ConsoleDriver : IConsoleDriver
                     {
                         for (int i = Col; i > 0; i--)
                         {
-                            if (!Contents [Row, i - 1].Rune.IsCombiningMark ())
+                            if (!Contents [Row, i - 1].Rune.IsCombiningMark () && Contents [Row, i - 1].Rune.Value != ' ')
                             {
                                 if (Contents [Row, i - 1].CombiningMarks is null)
                                 {
@@ -282,13 +282,13 @@ public abstract class ConsoleDriver : IConsoleDriver
                         {
                             Contents [Row, Col].Rune = rune;
 
-                            if (Col < clipRect.Right - 1)
-                            {
-                                // Invalidate cell to right so that it doesn't get drawn
-                                // TODO: Figure out if it is better to show a replacement character or ' '
-                                Contents [Row, Col + 1].Rune = Rune.ReplacementChar;
-                                Contents [Row, Col + 1].IsDirty = true;
-                            }
+                            //if (Col < clipRect.Right - 1)
+                            //{
+                            //    // Invalidate cell to right so that it doesn't get drawn
+                            //    // TODO: Figure out if it is better to show a replacement character or ' '
+                            //    Contents [Row, Col + 1].Rune = Rune.ReplacementChar;
+                            //    Contents [Row, Col + 1].IsDirty = true;
+                            //}
                         }
                     }
                     else

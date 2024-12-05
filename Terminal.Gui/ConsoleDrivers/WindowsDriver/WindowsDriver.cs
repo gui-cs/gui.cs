@@ -377,16 +377,30 @@ internal class WindowsDriver : ConsoleDriver
                 else
                 {
                     //_outputBuffer [position].Empty = true;
-                    _outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
+                    //_outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
+                    var rune = Contents [row, col].Rune;
+                    char [] surrogatePair = rune.ToString ().ToCharArray ();
+                    Debug.Assert (surrogatePair.Length == 2);
+                    _outputBuffer [position].Char = surrogatePair [0];
 
-                    if (Contents [row, col].Rune.GetColumns () > 1 && col + 1 < Cols)
+                    if (_outputBuffer [position].CombiningMarks == null)
                     {
-                        // TODO: This is a hack to deal with non-BMP and wide characters.
-                        col++;
-                        position = row * Cols + col;
-                        _outputBuffer [position].Empty = false;
-                        _outputBuffer [position].Char = ' ';
+                        _outputBuffer [position].CombiningMarks = [];
+                        _outputBuffer [position].CombiningMarks!.Add (surrogatePair [1]);
                     }
+                    else
+                    {
+                        _outputBuffer [position].CombiningMarks!.Insert (0, surrogatePair [1]);
+                    }
+
+                    //if (Contents [row, col].Rune.GetColumns () > 1 && col + 1 < Cols)
+                    //{
+                    //    // TODO: This is a hack to deal with non-BMP and wide characters.
+                    //    col++;
+                    //    position = row * Cols + col;
+                    //    _outputBuffer [position].Empty = false;
+                    //    _outputBuffer [position].Char = ' ';
+                    //}
                 }
             }
         }
