@@ -165,6 +165,11 @@ internal class NetDriver : ConsoleDriver
 
                     outputWidth++;
                     Rune rune = Contents [row, col].Rune;
+
+                    if (rune == Rune.ReplacementChar)
+                    {
+                        continue;
+                    }
                     output.Append (rune);
 
                     if (Contents [row, col].CombiningMarks is { Count: > 0 })
@@ -179,13 +184,13 @@ internal class NetDriver : ConsoleDriver
                         {
                             output.Append (combMark);
                         }
-                        WriteToConsole (output, ref lastCol, row, ref outputWidth);
+                        //WriteToConsole (output, ref lastCol, row, ref outputWidth);
                     }
-                    else if (rune.IsSurrogatePair () && rune.GetColumns () < 2)
-                    {
-                        WriteToConsole (output, ref lastCol, row, ref outputWidth);
-                        SetCursorPosition (col - 1, row);
-                    }
+                    //else if (rune.IsSurrogatePair () && rune.GetColumns () < 2)
+                    //{
+                    //    WriteToConsole (output, ref lastCol, row, ref outputWidth);
+                    //    SetCursorPosition (col - 1, row);
+                    //}
 
                     Contents [row, col].IsDirty = false;
                 }

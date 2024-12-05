@@ -317,13 +317,10 @@ public abstract class ConsoleDriver : IConsoleDriver
                 lock (Contents!)
                 {
                     // This is a double-width character, and we are not at the end of the line.
-                    // Col now points to the second column of the character. Ensure it doesn't
-                    // Get rendered.
-                    Contents [Row, Col].IsDirty = false;
+                    // Col now points to the second column of the character. Ensure it does get
+                    // rendered to allow the driver to handle it in its own way.
+                    Contents [Row, Col].IsDirty = true;
                     Contents [Row, Col].Attribute = CurrentAttribute;
-
-                    // TODO: Determine if we should wipe this out (for now now)
-                    //Contents [Row, Col].Rune = (Rune)' ';
                 }
             }
 

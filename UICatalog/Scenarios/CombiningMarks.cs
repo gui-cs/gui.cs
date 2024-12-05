@@ -47,7 +47,13 @@ public class CombiningMarks : Scenario
                                 top.Move (0, ++i);
                                 top.AddStr ("[\ud835\udc4b\u0302]<- \"[\\ud835\\udc4b\\u0302]\" using AddStr.");
                                 top.Move (0, ++i);
+                                top.AddStr ("[\ud83e\uddd1\ud83e\uddd2]<- \"[\\ud83e\\uddd1\\ud83e\\uddd2]\" using AddStr.");
+                                top.Move (0, ++i);
                                 top.AddStr ("[\ud83e\uddd1\u200d\ud83e\uddd2]<- \"[\\ud83e\\uddd1\\u200d\\ud83e\\uddd2]\" using AddStr.");
+                                top.Move (0, ++i);
+                                top.AddStr ("[\U0001F9D1\U0001F9D2]<- \"[\\U0001F9D1\\U0001F9D2]\" using AddStr.");
+                                top.Move (0, ++i);
+                                top.AddStr ("[\U0001F9D1\u200D\U0001F9D2]<- \"[\\U0001F9D1\\u200D\\U0001F9D2]\" using AddStr.");
                             };
 
         Application.Run (top);
