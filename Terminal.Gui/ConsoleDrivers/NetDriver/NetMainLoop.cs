@@ -142,6 +142,11 @@ internal class NetMainLoop : IMainLoopDriver
                     _waitForProbe.Reset ();
                 }
 
+                if (_inputHandlerTokenSource.IsCancellationRequested)
+                {
+                    return;
+                }
+
                 ProcessInputQueue ();
             }
             catch (OperationCanceledException)
