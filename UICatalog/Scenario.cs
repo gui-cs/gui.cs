@@ -148,14 +148,15 @@ public class Scenario : IDisposable
     /// </summary>
     public virtual void Main () { }
 
-    private const uint MAX_NATURAL_ITERATIONS = 500; // not including needed for demo keys
-    private const uint ABORT_TIMEOUT_MS = 2500;
-    private const int DEMO_KEY_PACING_MS = 1; // Must be non-zero
+    private const uint BENCHMARK_MAX_NATURAL_ITERATIONS = 500; // not including needed for demo keys
+    private const int BENCHMARK_KEY_PACING = 1; // Must be non-zero
+
+    public static uint BenchmarkTimeout { get; set; } = 2500;
 
     private readonly object _timeoutLock = new ();
     private object? _timeout;
     private Stopwatch? _stopwatch;
-    private readonly BenchmarkResults _benchmarkResults = new BenchmarkResults ();
+    private readonly BenchmarkResults _benchmarkResults = new ();
 
     public void StartBenchmark ()
     {
@@ -178,7 +179,7 @@ public class Scenario : IDisposable
         return _benchmarkResults;
     }
 
-    private List<Key> _demoKeys;
+    private List<Key>? _demoKeys;
     private int _currentDemoKey = 0;
 
     private void OnApplicationOnInitializedChanged (object? s, EventArgs<bool> a)
@@ -187,7 +188,7 @@ public class Scenario : IDisposable
         {
             lock (_timeoutLock!)
             {
-                _timeout = Application.AddTimeout (TimeSpan.FromMilliseconds (ABORT_TIMEOUT_MS), ForceCloseCallback);
+                _timeout = Application.AddTimeout (TimeSpan.FromMilliseconds (BenchmarkTimeout), ForceCloseCallback);
             }
 
             Application.Iteration += OnApplicationOnIteration;
@@ -218,7 +219,7 @@ public class Scenario : IDisposable
     private void OnApplicationOnIteration (object? s, IterationEventArgs a)
     {
         BenchmarkResults.IterationCount++;
-        if (BenchmarkResults.IterationCount > MAX_NATURAL_ITERATIONS + (_demoKeys.Count* DEMO_KEY_PACING_MS))
+        if (BenchmarkResults.IterationCount > BENCHMARK_MAX_NATURAL_ITERATIONS + (_demoKeys.Count * BENCHMARK_KEY_PACING))
         {
             Application.RequestStop ();
         }
@@ -232,7 +233,7 @@ public class Scenario : IDisposable
         _demoKeys = GetDemoKeyStrokes ();
 
         Application.AddTimeout (
-                                new TimeSpan (0, 0, 0, 0, DEMO_KEY_PACING_MS),
+                                new TimeSpan (0, 0, 0, 0, BENCHMARK_KEY_PACING),
                                 () =>
                                 {
                                     if (_currentDemoKey >= _demoKeys.Count)
@@ -271,7 +272,7 @@ public class Scenario : IDisposable
             }
         }
 
-        Debug.WriteLine ($@"  Failed to Quit with {Application.QuitKey} after {ABORT_TIMEOUT_MS}ms and {BenchmarkResults.IterationCount} iterations. Force quit.");
+        Debug.WriteLine ($@"  Failed to Quit with {Application.QuitKey} after {BenchmarkTimeout}ms and {BenchmarkResults.IterationCount} iterations. Force quit.");
 
         Application.RequestStop ();
 
