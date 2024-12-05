@@ -10,7 +10,6 @@ internal class WindowsConsole
 {
     private CancellationTokenSource? _inputReadyCancellationTokenSource;
     private readonly BlockingCollection<InputRecord> _inputQueue = new (new ConcurrentQueue<InputRecord> ());
-    internal WindowsMainLoop? _mainLoop;
 
     public const int STD_OUTPUT_HANDLE = -11;
     public const int STD_INPUT_HANDLE = -10;
