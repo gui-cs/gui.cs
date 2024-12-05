@@ -393,14 +393,14 @@ internal class WindowsDriver : ConsoleDriver
                         _outputBuffer [position].CombiningMarks!.Insert (0, surrogatePair [1]);
                     }
 
-                    //if (Contents [row, col].Rune.GetColumns () > 1 && col + 1 < Cols)
-                    //{
-                    //    // TODO: This is a hack to deal with non-BMP and wide characters.
-                    //    col++;
-                    //    position = row * Cols + col;
-                    //    _outputBuffer [position].Empty = false;
-                    //    _outputBuffer [position].Char = ' ';
-                    //}
+                    if (Contents [row, col].Rune.GetColumns () > 1 && col + 1 < Cols)
+                    {
+                        // TODO: This is a hack to deal with non-BMP and wide characters.
+                        col++;
+                        position = row * Cols + col;
+                        _outputBuffer [position].Empty = false;
+                        _outputBuffer [position].Char = '\0';
+                    }
                 }
             }
         }
