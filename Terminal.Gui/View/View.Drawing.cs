@@ -167,6 +167,13 @@ public partial class View // Drawing APIs
 
     private void DoDrawBorderAndPadding ()
     {
+        if (Margin?.NeedsLayout == true)
+        {
+            Margin.NeedsLayout = false;
+            Margin?.ClearFrame ();
+            Margin?.Parent?.SetSubViewNeedsDraw ();
+        }
+
         if (SubViewNeedsDraw)
         {
             // A Subview may add to the LineCanvas. This ensures any Adornment LineCanvas updates happen.
@@ -208,6 +215,22 @@ public partial class View // Drawing APIs
             Padding?.Draw ();
         }
 
+    }
+
+    private void ClearFrame ()
+    {
+        if (Driver is null)
+        {
+            return;
+        }
+
+        // Get screen-relative coords
+        Rectangle toClear = FrameToScreen ();
+
+        Attribute prev = SetAttribute (GetNormalColor ());
+        Driver.FillRect (toClear);
+        SetAttribute (prev);
+        SetNeedsDraw ();
     }
 
     /// <summary>

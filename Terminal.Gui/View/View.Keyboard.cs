@@ -690,11 +690,11 @@ public partial class View // Keyboard APIs
 
 #if DEBUG
 
-        if (Application.KeyBindings.TryGet (key, out KeyBinding b))
-        {
-            Debug.WriteLine (
-                             $"WARNING: InvokeKeyBindings ({key}) - An Application scope binding exists for this key. The registered view will not invoke Command.");
-        }
+        //if (Application.KeyBindings.TryGet (key, out KeyBinding b))
+        //{
+        //    Debug.WriteLine (
+        //                     $"WARNING: InvokeKeyBindings ({key}) - An Application scope binding exists for this key. The registered view will not invoke Command.");
+        //}
 
         // TODO: This is a "prototype" debug check. It may be too annoying vs. useful.
         // Scour the bindings up our View hierarchy

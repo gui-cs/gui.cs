@@ -561,8 +561,9 @@ public partial class View // Layout APIs
             {
                 SuperView?.SetNeedsDraw ();
             }
-            else
+            else if (Application.TopLevels.Count == 1)
             {
+                // If this is the only TopLevel, we need to redraw the screen
                 Application.ClearScreenNextIteration = true;
             }
         }
