@@ -42,7 +42,7 @@
     },
     "All Views Tester": {
       "commandName": "Project",
-      "commandLineArgs": "\"All Views Tester\" -b"
+      "commandLineArgs": "\"All Views Tester\" -b -t 5000"
     },
     "Charmap": {
       "commandName": "Project",
