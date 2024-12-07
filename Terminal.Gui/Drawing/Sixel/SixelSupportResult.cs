@@ -2,7 +2,7 @@
 
 /// <summary>
 ///     Describes the discovered state of sixel support and ancillary information
-///     e.g. <see cref="Resolution"/>. You can use any <see cref="ISixelSupportDetector"/>
+///     e.g. <see cref="Resolution"/>. You can use any <see cref="SixelSupportDetector"/>
 ///     to discover this information.
 /// </summary>
 public class SixelSupportResult

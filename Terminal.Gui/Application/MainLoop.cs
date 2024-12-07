@@ -268,6 +268,8 @@ public class MainLoop : IDisposable
             }
         }
 
+        RunAnsiScheduler ();
+
         MainLoopDriver?.Iteration ();
 
         bool runIdle;
@@ -281,6 +283,11 @@ public class MainLoop : IDisposable
         {
             RunIdle ();
         }
+    }
+
+    private void RunAnsiScheduler ()
+    {
+        Application.Driver?.GetRequestScheduler ().RunSchedule ();
     }
 
     /// <summary>Stops the main loop driver and calls <see cref="IMainLoopDriver.Wakeup"/>. Used only for unit tests.</summary>

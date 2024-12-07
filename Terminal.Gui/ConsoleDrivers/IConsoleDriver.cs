@@ -31,8 +31,9 @@ public interface IConsoleDriver
     /// <summary>The number of columns visible in the terminal.</summary>
     int Cols { get; set; }
 
+    // BUGBUG: This should not be publicly settable.
     /// <summary>
-    ///     The contents of the application output. The driver outputs this buffer to the terminal when
+    ///     Gets or sets the contents of the application output. The driver outputs this buffer to the terminal when
     ///     <see cref="UpdateScreen"/> is called.
     ///     <remarks>The format of the array is rows, columns. The first index is the row, the second index is the column.</remarks>
     /// </summary>
@@ -92,11 +93,13 @@ public interface IConsoleDriver
     /// </returns>
     bool IsRuneSupported (Rune rune);
 
+    // BUGBUG: This is not referenced. Can it be removed?
     /// <summary>Tests whether the specified coordinate are valid for drawing.</summary>
     /// <param name="col">The column.</param>
     /// <param name="row">The row.</param>
     /// <returns>
-    ///     <see langword="false"/> if the coordinate is outside the screen bounds or outside of <see cref="ConsoleDriver.Clip"/>.
+    ///     <see langword="false"/> if the coordinate is outside the screen bounds or outside of
+    ///     <see cref="ConsoleDriver.Clip"/>.
     ///     <see langword="true"/> otherwise.
     /// </returns>
     bool IsValidLocation (int col, int row);
@@ -106,19 +109,23 @@ public interface IConsoleDriver
     /// <param name="col">The column.</param>
     /// <param name="row">The row.</param>
     /// <returns>
-    ///     <see langword="false"/> if the coordinate is outside the screen bounds or outside of <see cref="ConsoleDriver.Clip"/>.
+    ///     <see langword="false"/> if the coordinate is outside the screen bounds or outside of
+    ///     <see cref="ConsoleDriver.Clip"/>.
     ///     <see langword="true"/> otherwise.
     /// </returns>
     bool IsValidLocation (Rune rune, int col, int row);
 
     /// <summary>
-    ///     Updates <see cref="ConsoleDriver.Col"/> and <see cref="ConsoleDriver.Row"/> to the specified column and row in <see cref="ConsoleDriver.Contents"/>.
-    ///     Used by <see cref="ConsoleDriver.AddRune(System.Text.Rune)"/> and <see cref="ConsoleDriver.AddStr"/> to determine where to add content.
+    ///     Updates <see cref="ConsoleDriver.Col"/> and <see cref="ConsoleDriver.Row"/> to the specified column and row in
+    ///     <see cref="ConsoleDriver.Contents"/>.
+    ///     Used by <see cref="ConsoleDriver.AddRune(System.Text.Rune)"/> and <see cref="ConsoleDriver.AddStr"/> to determine
+    ///     where to add content.
     /// </summary>
     /// <remarks>
     ///     <para>This does not move the cursor on the screen, it only updates the internal state of the driver.</para>
     ///     <para>
-    ///         If <paramref name="col"/> or <paramref name="row"/> are negative or beyond  <see cref="ConsoleDriver.Cols"/> and
+    ///         If <paramref name="col"/> or <paramref name="row"/> are negative or beyond  <see cref="ConsoleDriver.Cols"/>
+    ///         and
     ///         <see cref="ConsoleDriver.Rows"/>, the method still sets those properties.
     ///     </para>
     /// </remarks>
@@ -130,12 +137,15 @@ public interface IConsoleDriver
     /// <remarks>
     ///     <para>
     ///         When the method returns, <see cref="ConsoleDriver.Col"/> will be incremented by the number of columns
-    ///         <paramref name="rune"/> required, even if the new column value is outside of the <see cref="ConsoleDriver.Clip"/> or screen
+    ///         <paramref name="rune"/> required, even if the new column value is outside of the
+    ///         <see cref="ConsoleDriver.Clip"/> or screen
     ///         dimensions defined by <see cref="ConsoleDriver.Cols"/>.
     ///     </para>
     ///     <para>
-    ///         If <paramref name="rune"/> requires more than one column, and <see cref="ConsoleDriver.Col"/> plus the number of columns
-    ///         needed exceeds the <see cref="ConsoleDriver.Clip"/> or screen dimensions, the default Unicode replacement character (U+FFFD)
+    ///         If <paramref name="rune"/> requires more than one column, and <see cref="ConsoleDriver.Col"/> plus the number
+    ///         of columns
+    ///         needed exceeds the <see cref="ConsoleDriver.Clip"/> or screen dimensions, the default Unicode replacement
+    ///         character (U+FFFD)
     ///         will be added instead.
     ///     </para>
     /// </remarks>
@@ -144,7 +154,8 @@ public interface IConsoleDriver
 
     /// <summary>
     ///     Adds the specified <see langword="char"/> to the display at the current cursor position. This method is a
-    ///     convenience method that calls <see cref="ConsoleDriver.AddRune(System.Text.Rune)"/> with the <see cref="Rune"/> constructor.
+    ///     convenience method that calls <see cref="ConsoleDriver.AddRune(System.Text.Rune)"/> with the <see cref="Rune"/>
+    ///     constructor.
     /// </summary>
     /// <param name="c">Character to add.</param>
     void AddRune (char c);
@@ -153,7 +164,8 @@ public interface IConsoleDriver
     /// <remarks>
     ///     <para>
     ///         When the method returns, <see cref="ConsoleDriver.Col"/> will be incremented by the number of columns
-    ///         <paramref name="str"/> required, unless the new column value is outside of the <see cref="ConsoleDriver.Clip"/> or screen
+    ///         <paramref name="str"/> required, unless the new column value is outside of the <see cref="ConsoleDriver.Clip"/>
+    ///         or screen
     ///         dimensions defined by <see cref="ConsoleDriver.Cols"/>.
     ///     </para>
     ///     <para>If <paramref name="str"/> requires more columns than are available, the output will be clipped.</para>
@@ -161,9 +173,12 @@ public interface IConsoleDriver
     /// <param name="str">String.</param>
     void AddStr (string str);
 
-    /// <summary>Fills the specified rectangle with the specified rune, using <see cref="ConsoleDriver.CurrentAttribute"/></summary>
+    /// <summary>
+    ///     Fills the specified rectangle with the specified rune, using <see cref="ConsoleDriver.CurrentAttribute"/>
+    /// </summary>
     /// <remarks>
-    ///     The value of <see cref="ConsoleDriver.Clip"/> is honored. Any parts of the rectangle not in the clip will not be drawn.
+    ///     The value of <see cref="ConsoleDriver.Clip"/> is honored. Any parts of the rectangle not in the clip will not be
+    ///     drawn.
     /// </remarks>
     /// <param name="rect">The Screen-relative rectangle.</param>
     /// <param name="rune">The Rune used to fill the rectangle</param>
@@ -184,16 +199,6 @@ public interface IConsoleDriver
     ///     Raised each time <see cref="ConsoleDriver.ClearContents"/> is called. For benchmarking.
     /// </summary>
     event EventHandler<EventArgs>? ClearedContents;
-
-    /// <summary>
-    /// Sets <see cref="ConsoleDriver.Contents"/> as dirty for situations where views
-    /// don't need layout and redrawing, but just refresh the screen.
-    /// </summary>
-    void SetContentsAsDirty ();
-
-    /// <summary>Determines if the terminal cursor should be visible or not and sets it accordingly.</summary>
-    /// <returns><see langword="true"/> upon success</returns>
-    bool EnsureCursorVisibility ();
 
     /// <summary>Gets the terminal cursor visibility.</summary>
     /// <param name="visibility">The current <see cref="CursorVisibility"/></param>
@@ -224,7 +229,10 @@ public interface IConsoleDriver
     /// <remarks>This is only implemented in <see cref="CursesDriver"/>.</remarks>
     void Suspend ();
 
-    /// <summary>Sets the position of the terminal cursor to <see cref="ConsoleDriver.Col"/> and <see cref="ConsoleDriver.Row"/>.</summary>
+    /// <summary>
+    ///     Sets the position of the terminal cursor to <see cref="ConsoleDriver.Col"/> and
+    ///     <see cref="ConsoleDriver.Row"/>.
+    /// </summary>
     void UpdateCursor ();
 
     /// <summary>Redraws the physical screen with the contents that have been queued up via any of the printing commands.</summary>
@@ -263,6 +271,7 @@ public interface IConsoleDriver
     /// <summary>Event fired when a key is pressed down. This is a precursor to <see cref="ConsoleDriver.KeyUp"/>.</summary>
     event EventHandler<Key>? KeyDown;
 
+    // BUGBUG: This is not referenced. Can it be removed?
     /// <summary>
     ///     Called when a key is pressed down. Fires the <see cref="ConsoleDriver.KeyDown"/> event. This is a precursor to
     ///     <see cref="ConsoleDriver.OnKeyUp"/>.
@@ -272,14 +281,17 @@ public interface IConsoleDriver
 
     /// <summary>Event fired when a key is released.</summary>
     /// <remarks>
-    ///     Drivers that do not support key release events will fire this event after <see cref="ConsoleDriver.KeyDown"/> processing is
+    ///     Drivers that do not support key release events will fire this event after <see cref="ConsoleDriver.KeyDown"/>
+    ///     processing is
     ///     complete.
     /// </remarks>
     event EventHandler<Key>? KeyUp;
 
+    // BUGBUG: This is not referenced. Can it be removed?
     /// <summary>Called when a key is released. Fires the <see cref="ConsoleDriver.KeyUp"/> event.</summary>
     /// <remarks>
-    ///     Drivers that do not support key release events will call this method after <see cref="ConsoleDriver.OnKeyDown"/> processing
+    ///     Drivers that do not support key release events will call this method after <see cref="ConsoleDriver.OnKeyDown"/>
+    ///     processing
     ///     is complete.
     /// </remarks>
     /// <param name="a"></param>
@@ -292,4 +304,21 @@ public interface IConsoleDriver
     /// <param name="alt">If <see langword="true"/> simulates the Alt key being pressed.</param>
     /// <param name="ctrl">If <see langword="true"/> simulates the Ctrl key being pressed.</param>
     void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl);
+
+    /// <summary>
+    ///     How long after Esc has been pressed before we give up on getting an Ansi escape sequence
+    /// </summary>
+    public TimeSpan EscTimeout { get; }
+
+    /// <summary>
+    ///     Queues the given <paramref name="request"/> for execution
+    /// </summary>
+    /// <param name="request"></param>
+    public void QueueAnsiRequest (AnsiEscapeSequenceRequest request);
+
+    /// <summary>
+    ///     Gets the <see cref="AnsiRequestScheduler"/> for the driver
+    /// </summary>
+    /// <returns></returns>
+    public AnsiRequestScheduler GetRequestScheduler ();
 }

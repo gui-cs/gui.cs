@@ -65,4 +65,24 @@ public class ApplicationScreenTests (ITestOutputHelper output)
         Application.Top = null;
         Application.Shutdown ();
     }
+
+    [Fact]
+    public void Screen_Changes_OnSizeChanged_Without_Call_Application_Init ()
+    {
+        // Arrange
+        Application.ResetState (true);
+        Assert.Null (Application.Driver);
+        Application.Driver = new FakeDriver { Rows = 25, Cols = 25 };
+        Application.SubscribeDriverEvents ();
+        Assert.Equal (new (0, 0, 25, 25), Application.Screen);
+
+        // Act
+        (((FakeDriver)Application.Driver)!).SetBufferSize (120, 30);
+
+        // Assert
+        Assert.Equal (new (0, 0, 120, 30), Application.Screen);
+
+        // Cleanup
+        Application.ResetState (true);
+    }
 }

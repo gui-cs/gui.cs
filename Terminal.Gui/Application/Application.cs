@@ -177,10 +177,7 @@ public static partial class Application
         // Driver stuff
         if (Driver is { })
         {
-            Driver.SizeChanged -= Driver_SizeChanged;
-            Driver.KeyDown -= Driver_KeyDown;
-            Driver.KeyUp -= Driver_KeyUp;
-            Driver.MouseEvent -= Driver_MouseEvent;
+            UnsubscribeDriverEvents ();
             Driver?.End ();
             Driver = null;
         }
