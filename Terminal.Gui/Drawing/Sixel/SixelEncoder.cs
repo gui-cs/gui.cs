@@ -47,11 +47,11 @@ public class SixelEncoder
     /// <returns></returns>
     public string EncodeSixel (Color [,] pixels)
     {
-        const string start = "\u001bP"; // Start sixel sequence
+        const string START = "\u001bP"; // Start sixel sequence
 
         string defaultRatios = AnyHasAlphaOfZero (pixels) ? "0;1;0" : "0;0;0"; // Defaults for aspect ratio and grid size
-        const string completeStartSequence = "q"; // Signals beginning of sixel image data
-        const string noScaling = "\"1;1;"; // no scaling factors (1x1);
+        const string COMPLETE_START_SEQUENCE = "q"; // Signals beginning of sixel image data
+        const string NO_SCALING = "\"1;1;"; // no scaling factors (1x1);
 
         string fillArea = GetFillArea (pixels);
 
@@ -61,7 +61,7 @@ public class SixelEncoder
 
         const string terminator = "\u001b\\"; // End sixel sequence
 
-        return start + defaultRatios + completeStartSequence + noScaling + fillArea + pallette + pixelData + terminator;
+        return START + defaultRatios + COMPLETE_START_SEQUENCE + NO_SCALING + fillArea + pallette + pixelData + terminator;
     }
 
     private string WriteSixel (Color [,] pixels)

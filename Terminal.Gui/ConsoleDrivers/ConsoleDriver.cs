@@ -45,6 +45,12 @@ public abstract class ConsoleDriver : IConsoleDriver
 
     #region Screen and Contents
 
+
+    /// <summary>
+    /// How long after Esc has been pressed before we give up on getting an Ansi escape sequence
+    /// </summary>
+    public TimeSpan EscTimeout { get; } = TimeSpan.FromMilliseconds (50);
+
     // As performance is a concern, we keep track of the dirty lines and only refresh those.
     // This is in addition to the dirty flag on each cell.
     internal bool []? _dirtyLines;
@@ -438,7 +444,7 @@ public abstract class ConsoleDriver : IConsoleDriver
     /// Sets <see cref="Contents"/> as dirty for situations where views
     /// don't need layout and redrawing, but just refresh the screen.
     /// </summary>
-    public void SetContentsAsDirty ()
+    protected void SetContentsAsDirty ()
     {
         lock (Contents!)
         {
@@ -465,10 +471,6 @@ public abstract class ConsoleDriver : IConsoleDriver
     #endregion Screen and Contents
 
     #region Cursor Handling
-
-    /// <summary>Determines if the terminal cursor should be visible or not and sets it accordingly.</summary>
-    /// <returns><see langword="true"/> upon success</returns>
-    public abstract bool EnsureCursorVisibility ();
 
     /// <summary>Gets the terminal cursor visibility.</summary>
     /// <param name="visibility">The current <see cref="CursorVisibility"/></param>
@@ -681,5 +683,29 @@ public abstract class ConsoleDriver : IConsoleDriver
     /// <param name="ctrl">If <see langword="true"/> simulates the Ctrl key being pressed.</param>
     public abstract void SendKeys (char keyChar, ConsoleKey key, bool shift, bool alt, bool ctrl);
 
-    #endregion Keyboard Handling
+    #endregion
+
+    private AnsiRequestScheduler? _scheduler;
+
+    /// <summary>
+    /// Queues the given <paramref name="request"/> for execution
+    /// </summary>
+    /// <param name="request"></param>
+    public void QueueAnsiRequest (AnsiEscapeSequenceRequest request)
+    {
+        GetRequestScheduler ().SendOrSchedule (request);
+    }
+
+    internal abstract IAnsiResponseParser GetParser ();
+
+    /// <summary>
+    ///     Gets the <see cref="AnsiRequestScheduler"/> for this <see cref="ConsoleDriver"/>.
+    /// </summary>
+    /// <returns></returns>
+    public AnsiRequestScheduler GetRequestScheduler ()
+    {
+        // Lazy initialization because GetParser is virtual
+        return _scheduler ??= new (GetParser ());
+    }
+
 }

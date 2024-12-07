@@ -3,7 +3,9 @@
 // NetDriver.cs: The System.Console-based .NET driver, works on Windows and Unix, but is not particularly efficient.
 //
 
+using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using static Terminal.Gui.NetEvents;
 
@@ -11,8 +13,10 @@ namespace Terminal.Gui;
 
 internal class NetDriver : ConsoleDriver
 {
+
     public bool IsWinPlatform { get; private set; }
     public NetWinVTConsole? NetWinConsole { get; private set; }
+
 
     public override void Suspend ()
     {
@@ -132,33 +136,30 @@ internal class NetDriver : ConsoleDriver
                         {
                             output.Append (
                                            EscSeqUtils.CSI_SetGraphicsRendition (
-                                                                                                    MapColors (
-                                                                                                         (ConsoleColor)attr.Background
-                                                                                                             .GetClosestNamedColor16 (),
-                                                                                                         false
-                                                                                                        ),
-                                                                                                    MapColors (
-                                                                                                     (ConsoleColor)attr.Foreground
-                                                                                                         .GetClosestNamedColor16 ())
-                                                                                                   )
+                                                                                 MapColors (
+                                                                                            (ConsoleColor)attr.Background.GetClosestNamedColor16 (),
+                                                                                            false
+                                                                                           ),
+                                                                                 MapColors ((ConsoleColor)attr.Foreground.GetClosestNamedColor16 ())
+                                                                                )
                                           );
                         }
                         else
                         {
                             output.Append (
                                            EscSeqUtils.CSI_SetForegroundColorRGB (
-                                                                                                     attr.Foreground.R,
-                                                                                                     attr.Foreground.G,
-                                                                                                     attr.Foreground.B
-                                                                                                    )
+                                                                                  attr.Foreground.R,
+                                                                                  attr.Foreground.G,
+                                                                                  attr.Foreground.B
+                                                                                 )
                                           );
 
                             output.Append (
                                            EscSeqUtils.CSI_SetBackgroundColorRGB (
-                                                                                                     attr.Background.R,
-                                                                                                     attr.Background.G,
-                                                                                                     attr.Background.B
-                                                                                                    )
+                                                                                  attr.Background.R,
+                                                                                  attr.Background.G,
+                                                                                  attr.Background.B
+                                                                                 )
                                           );
                         }
                     }
@@ -237,11 +238,14 @@ internal class NetDriver : ConsoleDriver
 
         return updated;
     }
-
     #region Init/End/MainLoop
 
+    // BUGBUG: Fix this nullable issue.
+    /// <inheritdoc />
+    internal override IAnsiResponseParser GetParser () => _mainLoopDriver._netEvents.Parser;
     internal NetMainLoop? _mainLoopDriver;
 
+    /// <inheritdoc />
     public override MainLoop Init ()
     {
         PlatformID p = Environment.OSVersion.Platform;
@@ -252,7 +256,7 @@ internal class NetDriver : ConsoleDriver
 
             try
             {
-                NetWinConsole = new ();
+                NetWinConsole = new NetWinVTConsole ();
             }
             catch (ApplicationException)
             {
@@ -339,7 +343,6 @@ internal class NetDriver : ConsoleDriver
                 break;
             case EventType.Mouse:
                 MouseEventArgs me = ToDriverMouse (inputEvent.MouseEvent);
-
                 //Debug.WriteLine ($"NetDriver: ({me.X},{me.Y}) - {me.Flags}");
                 OnMouseEvent (me);
 
@@ -350,7 +353,7 @@ internal class NetDriver : ConsoleDriver
                 Left = 0;
                 Cols = inputEvent.WindowSizeEvent.Size.Width;
                 Rows = Math.Max (inputEvent.WindowSizeEvent.Size.Height, 0);
-
+                ;
                 ResizeScreen ();
                 ClearContents ();
                 _winSizeChanging = false;
@@ -365,7 +368,6 @@ internal class NetDriver : ConsoleDriver
                 throw new ArgumentOutOfRangeException ();
         }
     }
-
     public override void End ()
     {
         if (IsWinPlatform)
@@ -389,6 +391,9 @@ internal class NetDriver : ConsoleDriver
     }
 
     #endregion Init/End/MainLoop
+
+    
+
 
     #region Color Handling
 
@@ -507,7 +512,7 @@ internal class NetDriver : ConsoleDriver
         return visibility == CursorVisibility.Default;
     }
 
-    public override bool EnsureCursorVisibility ()
+    private void EnsureCursorVisibility ()
     {
         if (!(Col >= 0 && Row >= 0 && Col < Cols && Row < Rows))
         {
@@ -515,12 +520,10 @@ internal class NetDriver : ConsoleDriver
             _cachedCursorVisibility = cursorVisibility;
             SetCursorVisibility (CursorVisibility.Invisible);
 
-            return false;
+            return;
         }
 
         SetCursorVisibility (_cachedCursorVisibility ?? CursorVisibility.Default);
-
-        return _cachedCursorVisibility == CursorVisibility.Default;
     }
 
     #endregion

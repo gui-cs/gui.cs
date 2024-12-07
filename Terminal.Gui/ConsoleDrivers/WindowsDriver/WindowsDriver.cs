@@ -20,6 +20,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using static Terminal.Gui.ConsoleDrivers.ConsoleKeyMapping;
+using static Terminal.Gui.SpinnerStyle;
 
 namespace Terminal.Gui;
 
@@ -35,7 +36,7 @@ internal class WindowsDriver : ConsoleDriver
 
     private WindowsConsole.ButtonState? _lastMouseButtonPressed;
     private WindowsMainLoop? _mainLoopDriver;
-    private WindowsConsole.ExtendedCharInfo [] _outputBuffer;
+    private WindowsConsole.ExtendedCharInfo [] _outputBuffer = new WindowsConsole.ExtendedCharInfo [0 * 0];
     private Point? _point;
     private Point _pointMove;
     private bool _processButtonClick;
@@ -187,7 +188,14 @@ internal class WindowsDriver : ConsoleDriver
         }
     }
 
-    public override void WriteRaw (string ansi) { WinConsole?.WriteANSI (ansi); }
+    /// <inheritdoc />
+    internal override IAnsiResponseParser GetParser () => _parser;
+
+
+    public override void WriteRaw (string str)
+    {
+        WinConsole?.WriteANSI (str);
+    }
 
     #region Not Implemented
 
@@ -284,35 +292,6 @@ internal class WindowsDriver : ConsoleDriver
             return WinConsole?.WriteANSI (sb.ToString ()) ?? false;
         }
     }
-
-    /// <inheritdoc/>
-    public override bool EnsureCursorVisibility ()
-    {
-        if (Force16Colors)
-        {
-            return WinConsole is null || WinConsole.EnsureCursorVisibility ();
-        }
-        else
-        {
-            var sb = new StringBuilder ();
-            sb.Append (_cachedCursorVisibility != CursorVisibility.Invisible ? EscSeqUtils.CSI_ShowCursor : EscSeqUtils.CSI_HideCursor);
-            return WinConsole?.WriteANSI (sb.ToString ()) ?? false;
-        }
-
-        //if (!(Col >= 0 && Row >= 0 && Col < Cols && Row < Rows))
-        //{
-        //    GetCursorVisibility (out CursorVisibility cursorVisibility);
-        //    _cachedCursorVisibility = cursorVisibility;
-        //    SetCursorVisibility (CursorVisibility.Invisible);
-
-        //    return false;
-        //}
-
-        //SetCursorVisibility (_cachedCursorVisibility ?? CursorVisibility.Default);
-
-        //return _cachedCursorVisibility == CursorVisibility.Default;
-    }
-
     #endregion Cursor Handling
 
     public override bool UpdateScreen ()
@@ -508,14 +487,25 @@ internal class WindowsDriver : ConsoleDriver
 
         if (!RunningUnitTests)
         {
-            WinConsole?.SetInitialCursorVisibility ();
+        WinConsole?.SetInitialCursorVisibility ();
         }
 
         return new MainLoop (_mainLoopDriver);
     }
 
+    private AnsiResponseParser<WindowsConsole.InputRecord> _parser = new ();
+
     internal void ProcessInput (WindowsConsole.InputRecord inputEvent)
     {
+        foreach (var e in Parse (inputEvent))
+        {
+            ProcessInputAfterParsing (e);
+        }
+    }
+
+    internal void ProcessInputAfterParsing (WindowsConsole.InputRecord inputEvent)
+    {
+
         switch (inputEvent.EventType)
         {
             case WindowsConsole.EventType.Key:
@@ -538,22 +528,16 @@ internal class WindowsDriver : ConsoleDriver
                     break;
                 }
 
-                if (inputEvent.KeyEvent.bKeyDown)
-                {
-                    // Avoid sending repeat key down events
-                    OnKeyDown (new Key (map));
-                }
-                else
-                {
-                    OnKeyUp (new Key (map));
-                }
+                // This follows convention in NetDriver
+                OnKeyDown (new Key (map));
+                OnKeyUp (new Key (map));
 
                 break;
 
             case WindowsConsole.EventType.Mouse:
                 MouseEventArgs me = ToDriverMouse (inputEvent.MouseEvent);
 
-                if (me.Flags == MouseFlags.None)
+                if (me is null || me.Flags == MouseFlags.None)
                 {
                     break;
                 }
@@ -589,6 +573,43 @@ internal class WindowsDriver : ConsoleDriver
                 break;
 #endif
         }
+    }
+
+    private IEnumerable<WindowsConsole.InputRecord> Parse (WindowsConsole.InputRecord inputEvent)
+    {
+        if (inputEvent.EventType != WindowsConsole.EventType.Key)
+        {
+            yield return inputEvent;
+            yield break;
+        }
+
+        // Swallow key up events - they are unreliable
+        if (!inputEvent.KeyEvent.bKeyDown)
+        {
+            yield break;
+        }
+
+        foreach (var i in ShouldReleaseParserHeldKeys ())
+        {
+            yield return i;
+        }
+
+        foreach (Tuple<char, WindowsConsole.InputRecord> output in
+                 _parser.ProcessInput (Tuple.Create (inputEvent.KeyEvent.UnicodeChar, inputEvent)))
+        {
+            yield return output.Item2;
+        }
+    }
+
+    public IEnumerable<WindowsConsole.InputRecord> ShouldReleaseParserHeldKeys ()
+    {
+        if (_parser.State == AnsiResponseParserState.ExpectingBracket &&
+            DateTime.Now - _parser.StateChangedAt > EscTimeout)
+        {
+            return _parser.Release ().Select (o => o.Item2);
+        }
+
+        return [];
     }
 
 #if HACK_CHECK_WINCHANGED
@@ -689,13 +710,13 @@ internal class WindowsDriver : ConsoleDriver
 
                 if (keyInfo.KeyChar == 0)
                 {
-                    // If the keyChar is 0, keyInfo.Key value is not a printable character.
+                    // If the keyChar is 0, keyInfo.Key value is not a printable character. 
 
-                    // Dead keys (diacritics) are indicated by setting the top bit of the return value.
+                    // Dead keys (diacritics) are indicated by setting the top bit of the return value. 
                     if ((mapResult & 0x80000000) != 0)
                     {
                         // Dead key (e.g. Oem2 '~'/'^' on POR keyboard)
-                        // Option 1: Throw it out.
+                        // Option 1: Throw it out. 
                         //    - Apps will never see the dead keys
                         //    - If user presses a key that can be combined with the dead key ('a'), the right thing happens (app will see '�').
                         //      - NOTE: With Dead Keys, KeyDown != KeyUp. The KeyUp event will have just the base char ('a').
@@ -716,7 +737,7 @@ internal class WindowsDriver : ConsoleDriver
                     if (keyInfo.Modifiers != 0)
                     {
                         // These Oem keys have well-defined chars. We ensure the representative char is used.
-                        // If we don't do this, then on some keyboard layouts the wrong char is
+                        // If we don't do this, then on some keyboard layouts the wrong char is 
                         // returned (e.g. on ENG OemPlus un-shifted is =, not +). This is important
                         // for key persistence ("Ctrl++" vs. "Ctrl+=").
                         mappedChar = keyInfo.Key switch
@@ -782,11 +803,11 @@ internal class WindowsDriver : ConsoleDriver
                     if (keyInfo.KeyChar <= 'Z')
                     {
                         return (KeyCode)keyInfo.Key | KeyCode.ShiftMask;
-                    }
+                }
 
                     // Always return the KeyChar because it may be an Á, À with Oem1, etc
                     return (KeyCode)keyInfo.KeyChar;
-                }
+            }
             }
 
             if (keyInfo.KeyChar <= 'z')
@@ -975,12 +996,12 @@ internal class WindowsDriver : ConsoleDriver
         {
             // TODO: This makes IConsoleDriver dependent on Application, which is not ideal. This should be moved to Application.
             Application.MainLoop!.AddIdle (
-                                           () =>
-                                           {
-                                               Task.Run (async () => await ProcessButtonDoubleClickedAsync ());
+                                          () =>
+                                          {
+                                              Task.Run (async () => await ProcessButtonDoubleClickedAsync ());
 
-                                               return false;
-                                           });
+                                              return false;
+                                          });
         }
 
         // The ButtonState member of the MouseEvent structure has bit corresponding to each mouse button.
@@ -1047,12 +1068,12 @@ internal class WindowsDriver : ConsoleDriver
             {
                 // TODO: This makes IConsoleDriver dependent on Application, which is not ideal. This should be moved to Application.
                 Application.MainLoop!.AddIdle (
-                                               () =>
-                                               {
-                                                   Task.Run (async () => await ProcessContinuousButtonPressedAsync (mouseFlag));
+                                              () =>
+                                              {
+                                                  Task.Run (async () => await ProcessContinuousButtonPressedAsync (mouseFlag));
 
-                                                   return false;
-                                               });
+                                                  return false;
+                                              });
             }
         }
         else if (_lastMouseButtonPressed != null

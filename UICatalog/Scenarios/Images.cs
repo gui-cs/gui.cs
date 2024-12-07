@@ -60,15 +60,15 @@ public class Images : Scenario
     private RadioGroup _rgDistanceAlgorithm;
     private NumericUpDown _popularityThreshold;
     private SixelToRender _sixelImage;
-    private SixelSupportResult _sixelSupportResult;
+
+    // Start by assuming no support
+    private SixelSupportResult _sixelSupportResult = new ();
+    private CheckBox _cbSupportsSixel;
 
     public override void Main ()
     {
-        // TODO: Change to the one that uses Ansi Requests later
-        var sixelSupportDetector = new AssumeSupportDetector ();
-        _sixelSupportResult = sixelSupportDetector.Detect ();
-
         Application.Init ();
+
         _win = new () { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
 
         bool canTrueColor = Application.Driver?.SupportsTrueColor ?? false;
@@ -96,7 +96,7 @@ public class Images : Scenario
         };
         _win.Add (cbSupportsTrueColor);
 
-        var cbSupportsSixel = new CheckBox
+        _cbSupportsSixel = new()
         {
             X = Pos.Right (lblDriverName) + 2,
             Y = 1,
@@ -104,26 +104,25 @@ public class Images : Scenario
             Text = "Supports Sixel"
         };
 
-        var lblSupportsSixel = new Label ()
+        var lblSupportsSixel = new Label
         {
-
             X = Pos.Right (lblDriverName) + 2,
-            Y = Pos.Bottom (cbSupportsSixel),
+            Y = Pos.Bottom (_cbSupportsSixel),
             Text = "(Check if your terminal supports Sixel)"
         };
-
 
         /*        CheckedState = _sixelSupportResult.IsSupported
                                    ? CheckState.Checked
                                    : CheckState.UnChecked;*/
-        cbSupportsSixel.CheckedStateChanging += (s, e) =>
-                                                {
-                                                    _sixelSupportResult.IsSupported = e.NewValue == CheckState.Checked;
-                                                    SetupSixelSupported (e.NewValue == CheckState.Checked);
-                                                    ApplyShowTabViewHack ();
-                                                };
 
-        _win.Add (cbSupportsSixel);
+        _cbSupportsSixel.CheckedStateChanging += (s, e) =>
+                                                 {
+                                                     _sixelSupportResult.IsSupported = e.NewValue == CheckState.Checked;
+                                                     SetupSixelSupported (e.NewValue == CheckState.Checked);
+                                                     ApplyShowTabViewHack ();
+                                                 };
+
+        _win.Add (_cbSupportsSixel);
 
         var cbUseTrueColor = new CheckBox
         {
@@ -150,15 +149,29 @@ public class Images : Scenario
         BuildBasicTab (tabBasic);
         BuildSixelTab ();
 
-        SetupSixelSupported (cbSupportsSixel.CheckedState == CheckState.Checked);
+        SetupSixelSupported (_cbSupportsSixel.CheckedState == CheckState.Checked);
 
         btnOpenImage.Accepting += OpenImage;
 
         _win.Add (lblSupportsSixel);
         _win.Add (_tabView);
+
+        // Start trying to detect sixel support
+        var sixelSupportDetector = new SixelSupportDetector ();
+        sixelSupportDetector.Detect (UpdateSixelSupportState);
+
         Application.Run (_win);
         _win.Dispose ();
         Application.Shutdown ();
+    }
+
+    private void UpdateSixelSupportState (SixelSupportResult newResult)
+    {
+        _sixelSupportResult = newResult;
+
+        _cbSupportsSixel.CheckedState = newResult.IsSupported ? CheckState.Checked : CheckState.UnChecked;
+        _pxX.Value = _sixelSupportResult.Resolution.Width;
+        _pxY.Value = _sixelSupportResult.Resolution.Height;
     }
 
     private void SetupSixelSupported (bool isSupported)
@@ -295,7 +308,7 @@ public class Images : Scenario
     {
         // TODO HACK: This hack seems to be required to make tabview actually refresh itself
         _tabView.SetNeedsDraw ();
-        var orig = _tabView.SelectedTab;
+        Tab orig = _tabView.SelectedTab;
         _tabView.SelectedTab = _tabView.Tabs.Except (new [] { orig }).ElementAt (0);
         _tabView.SelectedTab = orig;
     }
