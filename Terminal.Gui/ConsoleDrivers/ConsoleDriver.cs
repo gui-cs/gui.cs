@@ -238,10 +238,9 @@ public abstract class ConsoleDriver : IConsoleDriver
                         Contents [Row, _lastValidAddRuneCell.Value.X].CombiningMarks.Add (rune);
                         wasAddedToCombiningMarks = true;
 
-                        //if (runeWidth == 0 && Rune.GetUnicodeCategory (rune) == UnicodeCategory.Format)
-                        if (runeWidth == 0)
+                        if (runeWidth == 0 && Rune.GetUnicodeCategory (rune) == UnicodeCategory.Format)
                         {
-                            _lineColsOffset! [Row]++;
+                            _lineColsOffset! [Row] += Contents [Row, _lastValidAddRuneCell.Value.X].Rune.GetColumns ();
                         }
 
                         Contents [Row, _lastValidAddRuneCell.Value.X].Attribute = CurrentAttribute;
