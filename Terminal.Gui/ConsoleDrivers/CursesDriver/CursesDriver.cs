@@ -323,7 +323,16 @@ internal class CursesDriver : ConsoleDriver
                         {
                             continue;
                         }
+
                         output.Append (rune);
+
+                        if (rune.IsCombiningMark ())
+                        {
+                            if (rune.GetColumns () == 0)
+                            {
+                                output.Append (' ');
+                            }
+                        }
 
                         if (Contents [row, col].CombiningMarks is { Count: > 0 })
                         {
