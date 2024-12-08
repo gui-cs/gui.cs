@@ -77,6 +77,10 @@ public class CombiningMarks : Scenario
                                 top.AddStr ("[\U0001F469\U0001F9D2]<- \"[\\U0001F469\\U0001F9D2]\" using AddStr.");
                                 top.Move (0, ++i);
                                 top.AddStr ("[\U0001F469\u200D\U0001F9D2]<- \"[\\U0001F469\\u200D\\U0001F9D2]\" using AddStr.");
+                                top.Move (0, ++i);
+                                top.AddStr ("[\U0001F468\U0001F469\U0001F9D2]<- \"[\\U0001F468\\U0001F469\\U0001F9D2]\" using AddStr.");
+                                top.Move (0, ++i);
+                                top.AddStr ("[\U0001F468\u200D\U0001F469\u200D\U0001F9D2]<- \"[\\U0001F468\\u200D\\U0001F469\\u200D\\U0001F9D2]\" using AddStr.");
                             };
 
         Application.Run (top);
