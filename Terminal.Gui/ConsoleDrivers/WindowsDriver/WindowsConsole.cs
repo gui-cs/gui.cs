@@ -197,6 +197,14 @@ internal class WindowsConsole
                         _stringBuilder.Append (info.Char);
                     }
 
+                    if (Rune.IsValid (info.Char) && ((Rune)info.Char).IsCombiningMark ())
+                    {
+                        if (((Rune)info.Char).GetColumns () == 0)
+                        {
+                            _stringBuilder.Append (' ');
+                        }
+                    }
+
                     if (info.CombiningMarks is { })
                     {
                         foreach (var combMark in info.CombiningMarks)
