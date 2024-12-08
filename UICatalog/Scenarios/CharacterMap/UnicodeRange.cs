@@ -7,7 +7,7 @@ using System.Text.Unicode;
 namespace UICatalog.Scenarios;
 
 /// <summary>
-///     Represents all of the Uniicode ranges.from System.Text.Unicode.UnicodeRange plus
+///     Represents all the Unicode ranges from System.Text.Unicode.UnicodeRange plus
 ///     the non-BMP ranges not included.
 /// </summary>
 public class UnicodeRange (int start, int end, string category)

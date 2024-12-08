@@ -174,6 +174,13 @@ public abstract class ConsoleDriver : IConsoleDriver
     /// <summary>The topmost row in the terminal.</summary>
     public virtual int Top { get; set; } = 0;
 
+    /// <summary>
+    ///     Gets or sets whenever <see cref="Cell.CombiningMarks"/> is ignored or not.
+    /// </summary>
+    public static bool IgnoreIsCombiningMark { get; set; }
+
+    private Point? _lastValidAddRuneCell = null;
+
     /// <summary>Adds the specified rune to the display at the current cursor position.</summary>
     /// <remarks>
     ///     <para>
@@ -190,15 +197,15 @@ public abstract class ConsoleDriver : IConsoleDriver
     /// <param name="rune">Rune to add.</param>
     public void AddRune (Rune rune)
     {
-        int runeWidth = -1;
-        bool validLocation = IsValidLocation (rune, Col, Row);
-
         if (Contents is null)
         {
             return;
         }
 
+        int runeWidth = -1;
+        bool validLocation = IsValidLocation (rune, Col, Row);
         Rectangle clipRect = Clip!.GetBounds ();
+        bool wasAddedToCombiningMarks = false;
 
         if (validLocation)
         {
@@ -217,31 +224,28 @@ public abstract class ConsoleDriver : IConsoleDriver
                     // Until this is addressed (see Issue #), we do our best by
                     // a) Attempting to normalize any CM with the base char to it's left
                     // b) Ignoring any CMs that don't normalize
-                    if (Col > 0)
+                    if (Col > 0
+                        && _lastValidAddRuneCell is { }
+                        && _lastValidAddRuneCell.Value.Y == Row
+                        && Contents [Row, _lastValidAddRuneCell.Value.X].IsDirty)
                     {
-                        for (int i = Col; i > 0; i--)
+                        if (Contents [Row, _lastValidAddRuneCell.Value.X].CombiningMarks is null)
                         {
-                            if (!Contents [Row, i - 1].Rune.IsCombiningMark () && Contents [Row, i - 1].Rune != Rune.ReplacementChar)
-                            {
-                                if (Contents [Row, i - 1].CombiningMarks is null)
-                                {
-                                    Contents [Row, i - 1].CombiningMarks = [];
-                                }
-                                // Just add this mark to the list
-                                Contents [Row, i - 1].CombiningMarks.Add (rune);
-                                Debug.Assert (Contents [Row, i - 1].CombiningMarks.Count > 0);
-
-                                break;
-                            }
+                            Contents [Row, _lastValidAddRuneCell.Value.X].CombiningMarks = [];
                         }
 
-                        Contents [Row, Col - 1].Attribute = CurrentAttribute;
-                        Contents [Row, Col - 1].IsDirty = true;
+                        // Just add this mark to the list
+                        Contents [Row, _lastValidAddRuneCell.Value.X].CombiningMarks.Add (rune);
+                        wasAddedToCombiningMarks = true;
 
-                        if (runeWidth == 0 && Rune.GetUnicodeCategory (rune) == UnicodeCategory.Format)
+                        //if (runeWidth == 0 && Rune.GetUnicodeCategory (rune) == UnicodeCategory.Format)
+                        if (runeWidth == 0)
                         {
                             _lineColsOffset! [Row]++;
                         }
+
+                        Contents [Row, _lastValidAddRuneCell.Value.X].Attribute = CurrentAttribute;
+                        Contents [Row, _lastValidAddRuneCell.Value.X].IsDirty = true;
                     }
                     else
                     {
@@ -249,7 +253,11 @@ public abstract class ConsoleDriver : IConsoleDriver
                         Contents [Row, Col].Rune = rune;
                         Contents [Row, Col].Attribute = CurrentAttribute;
                         Contents [Row, Col].IsDirty = true;
-                        Col++;
+
+                        if (runeWidth == 0)
+                        {
+                            Col++;
+                        }
                     }
                 }
                 else
@@ -319,7 +327,20 @@ public abstract class ConsoleDriver : IConsoleDriver
             }
         }
 
-        if (runeWidth is < 0 or > 0)
+        switch (IgnoreIsCombiningMark)
+        {
+            case false when _lastValidAddRuneCell is { } && !wasAddedToCombiningMarks:
+            case false when _lastValidAddRuneCell is null && !wasAddedToCombiningMarks:
+                _lastValidAddRuneCell = new (Col, Row);
+
+                break;
+            case true:
+                _lastValidAddRuneCell = null;
+
+                break;
+        }
+
+        if (runeWidth is < 0 or > 0 && !wasAddedToCombiningMarks)
         {
             Col++;
         }
@@ -406,6 +427,7 @@ public abstract class ConsoleDriver : IConsoleDriver
     public void ClearContents ()
     {
         Contents = new Cell [Rows, Cols];
+        _lastValidAddRuneCell = null;
 
         //CONCURRENCY: Unsynchronized access to Clip isn't safe.
         // TODO: ClearContents should not clear the clip; it should only clear the contents. Move clearing it elsewhere.
@@ -491,11 +513,8 @@ public abstract class ConsoleDriver : IConsoleDriver
         {
             return col >= 0 && row >= 0 && col < Cols && row < Rows && Clip!.Contains (col, row);
         }
-        else
-        {
 
-            return Clip!.Contains (col, row) || Clip!.Contains (col + 1, row);
-        }
+        return Clip!.Contains (col, row) || Clip!.Contains (col + 1, row);
     }
 
     /// <summary>Called when the terminal size changes. Fires the <see cref="SizeChanged"/> event.</summary>

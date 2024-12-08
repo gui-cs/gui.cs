@@ -299,6 +299,8 @@ public class CharMap : View, IDesignable
 
     protected override bool OnDrawingContent ()
     {
+        ConsoleDriver.IgnoreIsCombiningMark = true;
+
         if (Viewport.Height == 0 || Viewport.Width == 0)
         {
             return true;
@@ -345,6 +347,8 @@ public class CharMap : View, IDesignable
 
             Move (firstColumnX + COLUMN_WIDTH, y);
             SetAttribute (GetNormalColor ());
+
+            bool lastWasNonSpacingMark = false;
 
             for (var col = 0; col < 16; col++)
             {
@@ -436,6 +440,8 @@ public class CharMap : View, IDesignable
                 AddStr (new (' ', RowLabelWidth));
             }
         }
+
+        ConsoleDriver.IgnoreIsCombiningMark = false;
 
         return true;
     }
