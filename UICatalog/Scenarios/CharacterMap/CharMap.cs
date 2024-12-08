@@ -348,8 +348,6 @@ public class CharMap : View, IDesignable
             Move (firstColumnX + COLUMN_WIDTH, y);
             SetAttribute (GetNormalColor ());
 
-            bool lastWasNonSpacingMark = false;
-
             for (var col = 0; col < 16; col++)
             {
                 int x = firstColumnX + COLUMN_WIDTH * col + 1;
