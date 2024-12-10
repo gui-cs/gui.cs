@@ -1,7 +1,5 @@
 #nullable enable
 
-using static System.Formats.Asn1.AsnWriter;
-
 namespace Terminal.Gui;
 
 /// <summary>
@@ -10,76 +8,115 @@ namespace Terminal.Gui;
 /// </summary>
 internal sealed class Menu : View
 {
-    private readonly MenuBarItem? _barItems;
-    private readonly MenuBar _host;
+    public Menu ()
+    {
+        if (Application.Top is { })
+        {
+            Application.Top.DrawComplete += Top_DrawComplete;
+            Application.Top.SizeChanging += Current_TerminalResized;
+        }
+
+        Application.MouseEvent += Application_RootMouseEvent;
+
+        // Things this view knows how to do
+        AddCommand (Command.Up, () => MoveUp ());
+        AddCommand (Command.Down, () => MoveDown ());
+
+        AddCommand (
+                    Command.Left,
+                    () =>
+                    {
+                        _host!.PreviousMenu (true);
+
+                        return true;
+                    }
+                   );
+
+        AddCommand (
+                    Command.Cancel,
+                    () =>
+                    {
+                        CloseAllMenus ();
+
+                        return true;
+                    }
+                   );
+
+        AddCommand (
+                    Command.Accept,
+                    () =>
+                    {
+                        RunSelected ();
+
+                        return true;
+                    }
+                   );
+
+        AddCommand (
+                    Command.Select,
+                    ctx =>
+                    {
+                        if (ctx is not CommandContext<KeyBinding> keyCommandContext)
+                        {
+                            return false;
+                        }
+
+                        return _host?.SelectItem ((keyCommandContext.Binding.Data as MenuItem)!);
+                    });
+
+        AddCommand (
+                    Command.Toggle,
+                    ctx =>
+                    {
+                        if (ctx is not CommandContext<KeyBinding> keyCommandContext)
+                        {
+                            return false;
+                        }
+
+                        return ExpandCollapse ((keyCommandContext.Binding.Data as MenuItem)!);
+                    });
+
+        AddCommand (
+                    Command.HotKey,
+                    ctx =>
+                    {
+                        if (ctx is not CommandContext<KeyBinding> keyCommandContext)
+                        {
+                            return false;
+                        }
+
+                        return _host?.SelectItem ((keyCommandContext.Binding.Data as MenuItem)!);
+                    });
+
+        // Default key bindings for this view
+        KeyBindings.Add (Key.CursorUp, Command.Up);
+        KeyBindings.Add (Key.CursorDown, Command.Down);
+        KeyBindings.Add (Key.CursorLeft, Command.Left);
+        KeyBindings.Add (Key.CursorRight, Command.Right);
+        KeyBindings.Add (Key.Esc, Command.Cancel);
+    }
+
     internal int _currentChild;
     internal View? _previousSubFocused;
-
-    internal static Rectangle MakeFrame (int x, int y, MenuItem? []? items, Menu? parent = null)
-    {
-        if (items is null || items.Length == 0)
-        {
-            return Rectangle.Empty;
-        }
-
-        int minX = x;
-        int minY = y;
-        const int borderOffset = 2; // This 2 is for the space around
-        int maxW = (items.Max (z => z?.Width) ?? 0) + borderOffset;
-        int maxH = items.Length + borderOffset;
-
-        if (parent is { } && x + maxW > Driver.Cols)
-        {
-            minX = Math.Max (parent.Frame.Right - parent.Frame.Width - maxW, 0);
-        }
-
-        if (y + maxH > Driver.Rows)
-        {
-            minY = Math.Max (Driver.Rows - maxH, 0);
-        }
-
-        return new (minX, minY, maxW, maxH);
-    }
-
-    internal required MenuBar Host
-    {
-        get => _host;
-        init
-        {
-            ArgumentNullException.ThrowIfNull (value);
-            _host = value;
-        }
-    }
-
-    internal required MenuBarItem? BarItems
-    {
-        get => _barItems!;
-        init
-        {
-            ArgumentNullException.ThrowIfNull (value);
-            _barItems = value;
-
-            // Debugging aid so ToString() is helpful
-            Text = _barItems.Title;
-        }
-    }
-
-    internal Menu? Parent { get; init; }
+    private readonly MenuBarItem? _barItems;
+    private readonly MenuBar _host;
 
     public override void BeginInit ()
     {
         base.BeginInit ();
 
-        var frame = MakeFrame (Frame.X, Frame.Y, _barItems!.Children!, Parent);
+        Rectangle frame = MakeFrame (Frame.X, Frame.Y, _barItems!.Children!, Parent);
 
         if (Frame.X != frame.X)
         {
             X = frame.X;
         }
+
         if (Frame.Y != frame.Y)
         {
             Y = frame.Y;
         }
+
         Width = frame.Width;
         Height = frame.Height;
 
@@ -93,10 +130,11 @@ internal sealed class Menu : View
 
                     if (menuItem.ShortcutKey != Key.Empty)
                     {
-                        KeyBinding keyBinding = new ([Command.Select], KeyBindingScope.HotKey, menuItem);
+                        KeyBinding keyBinding = new ([Command.Select], this, data: menuItem);
+
                         // Remove an existent ShortcutKey
-                        menuItem._menuBar.KeyBindings.Remove (menuItem.ShortcutKey!);
-                        menuItem._menuBar.KeyBindings.Add (menuItem.ShortcutKey!, keyBinding);
+                        menuItem._menuBar.HotKeyBindings.Remove (menuItem.ShortcutKey!);
+                        menuItem._menuBar.HotKeyBindings.Add (menuItem.ShortcutKey!, keyBinding);
                     }
                 }
             }
@@ -155,60 +193,281 @@ internal sealed class Menu : View
         AddKeyBindingsHotKey (_barItems);
     }
 
-    public Menu ()
+    public override Point? PositionCursor ()
     {
-        if (Application.Top is { })
+        if (_host.IsMenuOpen)
         {
-            Application.Top.DrawComplete += Top_DrawComplete;
-            Application.Top.SizeChanging += Current_TerminalResized;
+            if (_barItems!.IsTopLevel)
+            {
+                return _host.PositionCursor ();
+            }
+
+            Move (2, 1 + _currentChild);
+
+            return null; // Don't show the cursor
         }
 
-        Application.MouseEvent += Application_RootMouseEvent;
-
-        // Things this view knows how to do
-        AddCommand (Command.Up, () => MoveUp ());
-        AddCommand (Command.Down, () => MoveDown ());
-
-        AddCommand (
-                    Command.Left,
-                    () =>
-                    {
-                        _host!.PreviousMenu (true);
-
-                        return true;
-                    }
-                   );
-
-        AddCommand (
-                    Command.Cancel,
-                    () =>
-                    {
-                        CloseAllMenus ();
-
-                        return true;
-                    }
-                   );
-
-        AddCommand (
-                    Command.Accept,
-                    () =>
-                    {
-                        RunSelected ();
-
-                        return true;
-                    }
-                   );
-        AddCommand (Command.Select, ctx => _host?.SelectItem ((ctx.KeyBinding?.Context as MenuItem)!));
-        AddCommand (Command.Toggle, ctx => ExpandCollapse ((ctx.KeyBinding?.Context as MenuItem)!));
-        AddCommand (Command.HotKey, ctx => _host?.SelectItem ((ctx.KeyBinding?.Context as MenuItem)!));
-
-        // Default key bindings for this view
-        KeyBindings.Add (Key.CursorUp, Command.Up);
-        KeyBindings.Add (Key.CursorDown, Command.Down);
-        KeyBindings.Add (Key.CursorLeft, Command.Left);
-        KeyBindings.Add (Key.CursorRight, Command.Right);
-        KeyBindings.Add (Key.Esc, Command.Cancel);
+        return _host.PositionCursor ();
     }
+
+    public void Run (Action? action)
+    {
+        if (action is null)
+        {
+            return;
+        }
+
+        Application.UngrabMouse ();
+        _host.CloseAllMenus ();
+        Application.LayoutAndDraw (true);
+
+        _host.Run (action);
+    }
+
+    protected override void Dispose (bool disposing)
+    {
+        RemoveKeyBindingsHotKey (_barItems);
+
+        if (Application.Top is { })
+        {
+            Application.Top.DrawComplete -= Top_DrawComplete;
+            Application.Top.SizeChanging -= Current_TerminalResized;
+        }
+
+        Application.MouseEvent -= Application_RootMouseEvent;
+        base.Dispose (disposing);
+    }
+
+    protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? view)
+    {
+        if (!newHasFocus)
+        {
+            _host.LostFocus (previousFocusedView!);
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override bool OnKeyDownNotHandled (Key keyEvent)
+    {
+        // We didn't handle the key, pass it on to host
+        bool? handled = null;
+        return _host.InvokeCommandsBoundToHotKey (keyEvent, ref handled) == true;
+    }
+
+    protected override bool OnMouseEvent (MouseEventArgs me)
+    {
+        if (!_host._handled && !_host.HandleGrabView (me, this))
+        {
+            return false;
+        }
+
+        _host._handled = false;
+        bool disabled;
+
+        if (me.Flags == MouseFlags.Button1Clicked)
+        {
+            disabled = false;
+
+            if (me.Position.Y < 0)
+            {
+                return me.Handled = true;
+            }
+
+            if (me.Position.Y >= _barItems!.Children!.Length)
+            {
+                return me.Handled = true;
+            }
+
+            MenuItem item = _barItems.Children [me.Position.Y]!;
+
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+            if (item is null || !item.IsEnabled ())
+            {
+                disabled = true;
+            }
+
+            if (disabled)
+            {
+                return me.Handled = true;
+            }
+
+            _currentChild = me.Position.Y;
+            RunSelected ();
+
+            return me.Handled = true;
+        }
+
+        if (me.Flags != MouseFlags.Button1Pressed
+            && me.Flags != MouseFlags.Button1DoubleClicked
+            && me.Flags != MouseFlags.Button1TripleClicked
+            && me.Flags != MouseFlags.ReportMousePosition
+            && !me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))
+        {
+            return false;
+        }
+
+        {
+            disabled = false;
+
+            if (me.Position.Y < 0 || me.Position.Y >= _barItems!.Children!.Length)
+            {
+                return me.Handled = true;
+            }
+
+            MenuItem item = _barItems.Children [me.Position.Y]!;
+
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+            if (item is null)
+            {
+                return me.Handled = true;
+            }
+
+            if (item.IsEnabled () != true)
+            {
+                disabled = true;
+            }
+
+            if (!disabled)
+            {
+                _currentChild = me.Position.Y;
+            }
+
+            if (_host.UseSubMenusSingleFrame || !CheckSubMenu ())
+            {
+                SetNeedsDraw ();
+                SetParentSetNeedsDisplay ();
+
+                return me.Handled = true;
+            }
+
+            _host.OnMenuOpened ();
+
+            return me.Handled = true;
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override void OnVisibleChanged ()
+    {
+        base.OnVisibleChanged ();
+
+        if (Visible)
+        {
+            Application.MouseEvent += Application_RootMouseEvent;
+        }
+        else
+        {
+            Application.MouseEvent -= Application_RootMouseEvent;
+        }
+    }
+
+    internal required MenuBarItem? BarItems
+    {
+        get => _barItems!;
+        init
+        {
+            ArgumentNullException.ThrowIfNull (value);
+            _barItems = value;
+
+            // Debugging aid so ToString() is helpful
+            Text = _barItems.Title;
+        }
+    }
+
+    internal bool CheckSubMenu ()
+    {
+        if (_currentChild == -1 || _barItems?.Children? [_currentChild] is null)
+        {
+            return true;
+        }
+
+        MenuBarItem? subMenu = _barItems.SubMenu (_barItems.Children [_currentChild]!);
+
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+        if (subMenu is { })
+        {
+            int pos = -1;
+
+            if (_host._openSubMenu is { })
+            {
+                pos = _host._openSubMenu.FindIndex (o => o._barItems == subMenu);
+            }
+
+            if (pos == -1
+                && this != _host.OpenCurrentMenu
+                && subMenu.Children != _host.OpenCurrentMenu!._barItems!.Children
+                && !_host.CloseMenu (false, true))
+            {
+                return false;
+            }
+
+            _host.Activate (_host._selected, pos, subMenu);
+        }
+        else if (_host._openSubMenu?.Count == 0 || _host._openSubMenu?.Last ()._barItems!.IsSubMenuOf (_barItems.Children [_currentChild]!) == false)
+        {
+            return _host.CloseMenu (false, true);
+        }
+        else
+        {
+            SetNeedsDraw ();
+            SetParentSetNeedsDisplay ();
+        }
+
+        return true;
+    }
+
+    internal Attribute DetermineColorSchemeFor (MenuItem? item, int index)
+    {
+        if (item is null)
+        {
+            return GetNormalColor ();
+        }
+
+        if (index == _currentChild)
+        {
+            return GetFocusColor ();
+        }
+
+        return !item.IsEnabled () ? ColorScheme!.Disabled : GetNormalColor ();
+    }
+
+    internal required MenuBar Host
+    {
+        get => _host;
+        init
+        {
+            ArgumentNullException.ThrowIfNull (value);
+            _host = value;
+        }
+    }
+
+    internal static Rectangle MakeFrame (int x, int y, MenuItem? []? items, Menu? parent = null)
+    {
+        if (items is null || items.Length == 0)
+        {
+            return Rectangle.Empty;
+        }
+
+        int minX = x;
+        int minY = y;
+        const int borderOffset = 2; // This 2 is for the space around
+        int maxW = (items.Max (z => z?.Width) ?? 0) + borderOffset;
+        int maxH = items.Length + borderOffset;
+
+        if (parent is { } && x + maxW > Driver.Cols)
+        {
+            minX = Math.Max (parent.Frame.Right - parent.Frame.Width - maxW, 0);
+        }
+
+        if (y + maxH > Driver.Rows)
+        {
+            minY = Math.Max (Driver.Rows - maxH, 0);
+        }
+
+        return new (minX, minY, maxW, maxH);
+    }
+
+    internal Menu? Parent { get; init; }
 
     private void AddKeyBindingsHotKey (MenuBarItem? menuBarItem)
     {
@@ -221,34 +480,59 @@ internal sealed class Menu : View
 
         foreach (MenuItem menuItem in menuItems)
         {
-            KeyBinding keyBinding = new ([Command.Toggle], KeyBindingScope.HotKey, menuItem);
+            KeyBinding keyBinding = new ([Command.Toggle], this, data: menuItem);
 
             if (menuItem.HotKey != Key.Empty)
             {
-                KeyBindings.Remove (menuItem.HotKey!);
-                KeyBindings.Add (menuItem.HotKey!, keyBinding);
-                KeyBindings.Remove (menuItem.HotKey!.WithAlt);
-                KeyBindings.Add (menuItem.HotKey.WithAlt, keyBinding);
+                HotKeyBindings.Remove (menuItem.HotKey!);
+                HotKeyBindings.Add (menuItem.HotKey!, keyBinding);
+                HotKeyBindings.Remove (menuItem.HotKey!.WithAlt);
+                HotKeyBindings.Add (menuItem.HotKey.WithAlt, keyBinding);
             }
         }
     }
 
-    private void RemoveKeyBindingsHotKey (MenuBarItem? menuBarItem)
+    private void Application_RootMouseEvent (object? sender, MouseEventArgs a)
     {
-        if (menuBarItem is null || menuBarItem.Children is null)
+        if (a.View is { } and (MenuBar or not Menu))
         {
             return;
         }
 
-        IEnumerable<MenuItem> menuItems = menuBarItem.Children.Where (m => m is { })!;
-
-        foreach (MenuItem menuItem in menuItems)
+        if (!Visible)
         {
-            if (menuItem.HotKey != Key.Empty)
-            {
-                KeyBindings.Remove (menuItem.HotKey!);
-                KeyBindings.Remove (menuItem.HotKey!.WithAlt);
-            }
+            throw new InvalidOperationException ("This shouldn't running on a invisible menu!");
+        }
+
+        View view = a.View ?? this;
+
+        Point boundsPoint = view.ScreenToViewport (new (a.Position.X, a.Position.Y));
+
+        var me = new MouseEventArgs
+        {
+            Position = boundsPoint,
+            Flags = a.Flags,
+            ScreenPosition = a.Position,
+            View = view
+        };
+
+        if (view.NewMouseEvent (me) == true || a.Flags == MouseFlags.Button1Pressed || a.Flags == MouseFlags.Button1Released)
+        {
+            a.Handled = true;
+        }
+    }
+
+    private void CloseAllMenus ()
+    {
+        Application.UngrabMouse ();
+        _host.CloseAllMenus ();
+    }
+
+    private void Current_TerminalResized (object? sender, SizeChangedEventArgs e)
+    {
+        if (_host.IsMenuOpen)
+        {
+            _host.CloseAllMenus ();
         }
     }
 
@@ -260,7 +544,6 @@ internal sealed class Menu : View
         {
             return true;
         }
-
 
         for (var c = 0; c < _barItems!.Children!.Length; c++)
         {
@@ -316,341 +599,6 @@ internal sealed class Menu : View
         }
 
         return true;
-    }
-
-    /// <inheritdoc />
-    protected override bool OnKeyDownNotHandled (Key keyEvent)
-    {
-        // We didn't handle the key, pass it on to host
-        return _host.InvokeCommandsBoundToKey (keyEvent) == true;
-    }
-
-    private void Current_TerminalResized (object? sender, SizeChangedEventArgs e)
-    {
-        if (_host.IsMenuOpen)
-        {
-            _host.CloseAllMenus ();
-        }
-    }
-
-    /// <inheritdoc/>
-    protected override void OnVisibleChanged ()
-    {
-        base.OnVisibleChanged ();
-
-        if (Visible)
-        {
-            Application.MouseEvent += Application_RootMouseEvent;
-        }
-        else
-        {
-            Application.MouseEvent -= Application_RootMouseEvent;
-        }
-    }
-
-    private void Application_RootMouseEvent (object? sender, MouseEventArgs a)
-    {
-        if (a.View is { } and (MenuBar or not Menu))
-        {
-            return;
-        }
-
-        if (!Visible)
-        {
-            throw new InvalidOperationException ("This shouldn't running on a invisible menu!");
-        }
-
-        View view = a.View ?? this;
-
-        Point boundsPoint = view.ScreenToViewport (new (a.Position.X, a.Position.Y));
-
-        var me = new MouseEventArgs
-        {
-            Position = boundsPoint,
-            Flags = a.Flags,
-            ScreenPosition = a.Position,
-            View = view
-        };
-
-        if (view.NewMouseEvent (me) == true || a.Flags == MouseFlags.Button1Pressed || a.Flags == MouseFlags.Button1Released)
-        {
-            a.Handled = true;
-        }
-    }
-
-    internal Attribute DetermineColorSchemeFor (MenuItem? item, int index)
-    {
-        if (item is null)
-        {
-            return GetNormalColor ();
-        }
-
-        if (index == _currentChild)
-        {
-            return GetFocusColor ();
-        }
-
-        return !item.IsEnabled () ? ColorScheme!.Disabled : GetNormalColor ();
-    }
-
-    // By doing this we draw last, over everything else.
-    private void Top_DrawComplete (object? sender, DrawEventArgs e)
-    {
-        if (!Visible)
-        {
-            return;
-        }
-
-        if (_barItems!.Children is null)
-        {
-            return;
-        }
-
-        DrawBorderAndPadding ();
-        RenderLineCanvas ();
-
-        // BUGBUG: Views should not change the clip. Doing so is an indcation of poor design or a bug in the framework.
-        Region? savedClip = View.SetClipToScreen ();
-
-        SetAttribute (GetNormalColor ());
-
-        for (int i = Viewport.Y; i < _barItems!.Children.Length; i++)
-        {
-            if (i < 0)
-            {
-                continue;
-            }
-
-            if (ViewportToScreen (Viewport).Y + i >= Driver.Rows)
-            {
-                break;
-            }
-
-            MenuItem? item = _barItems.Children [i];
-
-            SetAttribute (
-                                 // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-                                 item is null ? GetNormalColor () :
-                                 i == _currentChild ? GetFocusColor () : GetNormalColor ()
-                                );
-
-            if (item is null && BorderStyle != LineStyle.None)
-            {
-                Point s = ViewportToScreen (new Point (-1, i));
-                Driver.Move (s.X, s.Y);
-                Driver.AddRune (Glyphs.LeftTee);
-            }
-            else if (Frame.X < Driver.Cols)
-            {
-                Move (0, i);
-            }
-
-            SetAttribute (DetermineColorSchemeFor (item, i));
-
-            for (int p = Viewport.X; p < Frame.Width - 2; p++)
-            {
-                // This - 2 is for the border
-                if (p < 0)
-                {
-                    continue;
-                }
-
-                if (ViewportToScreen (Viewport).X + p >= Driver.Cols)
-                {
-                    break;
-                }
-
-                if (item is null)
-                {
-                    Driver.AddRune (Glyphs.HLine);
-                }
-                else if (i == 0 && p == 0 && _host.UseSubMenusSingleFrame && item.Parent!.Parent is { })
-                {
-                    Driver.AddRune (Glyphs.LeftArrow);
-                }
-
-                // This `- 3` is left border + right border + one row in from right
-                else if (p == Frame.Width - 3 && _barItems?.SubMenu (_barItems.Children [i]!) is { })
-                {
-                    Driver.AddRune (Glyphs.RightArrow);
-                }
-                else
-                {
-                    Driver.AddRune ((Rune)' ');
-                }
-            }
-
-            if (item is null)
-            {
-                if (BorderStyle != LineStyle.None && SuperView?.Frame.Right - Frame.X > Frame.Width)
-                {
-                    Point s = ViewportToScreen (new Point (Frame.Width - 2, i));
-                    Driver.Move (s.X, s.Y);
-                    Driver.AddRune (Glyphs.RightTee);
-                }
-
-                continue;
-            }
-
-            string? textToDraw;
-            Rune nullCheckedChar = Glyphs.CheckStateNone;
-            Rune checkChar = Glyphs.Selected;
-            Rune uncheckedChar = Glyphs.UnSelected;
-
-            if (item.CheckType.HasFlag (MenuItemCheckStyle.Checked))
-            {
-                checkChar = Glyphs.CheckStateChecked;
-                uncheckedChar = Glyphs.CheckStateUnChecked;
-            }
-
-            // Support Checked even though CheckType wasn't set
-            if (item is { CheckType: MenuItemCheckStyle.Checked, Checked: null })
-            {
-                textToDraw = $"{nullCheckedChar} {item.Title}";
-            }
-            else if (item.Checked == true)
-            {
-                textToDraw = $"{checkChar} {item.Title}";
-            }
-            else if (item.CheckType.HasFlag (MenuItemCheckStyle.Checked) || item.CheckType.HasFlag (MenuItemCheckStyle.Radio))
-            {
-                textToDraw = $"{uncheckedChar} {item.Title}";
-            }
-            else
-            {
-                textToDraw = item.Title;
-            }
-
-            Point screen = ViewportToScreen (new Point (0, i));
-
-            if (screen.X < Driver.Cols)
-            {
-                Driver.Move (screen.X + 1, screen.Y);
-
-                if (!item.IsEnabled ())
-                {
-                    DrawHotString (textToDraw, ColorScheme!.Disabled, ColorScheme.Disabled);
-                }
-                else if (i == 0 && _host.UseSubMenusSingleFrame && item.Parent!.Parent is { })
-                {
-                    var tf = new TextFormatter
-                    {
-                        ConstrainToWidth = Frame.Width - 3,
-                        ConstrainToHeight = 1,
-                        Alignment = Alignment.Center, HotKeySpecifier = MenuBar.HotKeySpecifier, Text = textToDraw
-                    };
-
-                    // The -3 is left/right border + one space (not sure what for)
-                    tf.Draw (
-                             ViewportToScreen (new Rectangle (1, i, Frame.Width - 3, 1)),
-                             i == _currentChild ? GetFocusColor () : GetNormalColor (),
-                             i == _currentChild ? ColorScheme!.HotFocus : ColorScheme!.HotNormal,
-                             SuperView?.ViewportToScreen (SuperView.Viewport) ?? Rectangle.Empty
-                            );
-                }
-                else
-                {
-                    DrawHotString (
-                                   textToDraw,
-                                   i == _currentChild ? ColorScheme!.HotFocus : ColorScheme!.HotNormal,
-                                   i == _currentChild ? GetFocusColor () : GetNormalColor ()
-                                  );
-                }
-
-                // The help string
-                int l = item.ShortcutTag.GetColumns () == 0
-                            ? item.Help.GetColumns ()
-                            : item.Help.GetColumns () + item.ShortcutTag.GetColumns () + 2;
-                int col = Frame.Width - l - 3;
-                screen = ViewportToScreen (new Point (col, i));
-
-                if (screen.X < Driver.Cols)
-                {
-                    Driver.Move (screen.X, screen.Y);
-                    Driver.AddStr (item.Help);
-
-                    // The shortcut tag string
-                    if (!string.IsNullOrEmpty (item.ShortcutTag))
-                    {
-                        Driver.Move (screen.X + l - item.ShortcutTag.GetColumns (), screen.Y);
-                        Driver.AddStr (item.ShortcutTag);
-                    }
-                }
-            }
-        }
-
-        View.SetClip (savedClip);
-    }
-
-    public override Point? PositionCursor ()
-    {
-        if (_host.IsMenuOpen)
-        {
-            if (_barItems!.IsTopLevel)
-            {
-                return _host.PositionCursor ();
-            }
-
-            Move (2, 1 + _currentChild);
-
-            return null; // Don't show the cursor
-        }
-
-        return _host.PositionCursor ();
-    }
-
-    public void Run (Action? action)
-    {
-        if (action is null)
-        {
-            return;
-        }
-
-        Application.UngrabMouse ();
-        _host.CloseAllMenus ();
-        Application.LayoutAndDraw (true);
-
-        _host.Run (action);
-    }
-
-    protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? view)
-    {
-        if (!newHasFocus)
-        {
-            _host.LostFocus (previousFocusedView!);
-        }
-    }
-
-    private void RunSelected ()
-    {
-        if (_barItems!.IsTopLevel)
-        {
-            Run (_barItems.Action);
-        }
-        else
-        {
-            switch (_currentChild)
-            {
-                case > -1 when _barItems.Children! [_currentChild]!.Action != null!:
-                    Run (_barItems.Children [_currentChild]?.Action);
-
-                    break;
-                case 0 when _host.UseSubMenusSingleFrame && _barItems.Children [_currentChild]?.Parent!.Parent != null:
-                    _host.PreviousMenu (_barItems.Children [_currentChild]!.Parent!.IsFromSubMenu, true);
-
-                    break;
-                case > -1 when _barItems.SubMenu (_barItems.Children [_currentChild]) != null!:
-                    CheckSubMenu ();
-
-                    break;
-            }
-        }
-    }
-
-    private void CloseAllMenus ()
-    {
-        Application.UngrabMouse ();
-        _host.CloseAllMenus ();
     }
 
     private bool MoveDown ()
@@ -801,6 +749,51 @@ internal sealed class Menu : View
         return true;
     }
 
+    private void RemoveKeyBindingsHotKey (MenuBarItem? menuBarItem)
+    {
+        if (menuBarItem is null || menuBarItem.Children is null)
+        {
+            return;
+        }
+
+        IEnumerable<MenuItem> menuItems = menuBarItem.Children.Where (m => m is { })!;
+
+        foreach (MenuItem menuItem in menuItems)
+        {
+            if (menuItem.HotKey != Key.Empty)
+            {
+                KeyBindings.Remove (menuItem.HotKey!);
+                KeyBindings.Remove (menuItem.HotKey!.WithAlt);
+            }
+        }
+    }
+
+    private void RunSelected ()
+    {
+        if (_barItems!.IsTopLevel)
+        {
+            Run (_barItems.Action);
+        }
+        else
+        {
+            switch (_currentChild)
+            {
+                case > -1 when _barItems.Children! [_currentChild]!.Action != null!:
+                    Run (_barItems.Children [_currentChild]?.Action);
+
+                    break;
+                case 0 when _host.UseSubMenusSingleFrame && _barItems.Children [_currentChild]?.Parent!.Parent != null:
+                    _host.PreviousMenu (_barItems.Children [_currentChild]!.Parent!.IsFromSubMenu, true);
+
+                    break;
+                case > -1 when _barItems.SubMenu (_barItems.Children [_currentChild]) != null!:
+                    CheckSubMenu ();
+
+                    break;
+            }
+        }
+    }
+
     private void SetParentSetNeedsDisplay ()
     {
         if (_host._openSubMenu is { })
@@ -815,151 +808,193 @@ internal sealed class Menu : View
         _host.SetNeedsDraw ();
     }
 
-    protected override bool OnMouseEvent (MouseEventArgs me)
+    // By doing this we draw last, over everything else.
+    private void Top_DrawComplete (object? sender, DrawEventArgs e)
     {
-        if (!_host._handled && !_host.HandleGrabView (me, this))
+        if (!Visible)
         {
-            return false;
+            return;
         }
 
-        _host._handled = false;
-        bool disabled;
-
-        if (me.Flags == MouseFlags.Button1Clicked)
+        if (_barItems!.Children is null)
         {
-            disabled = false;
-
-            if (me.Position.Y < 0)
-            {
-                return me.Handled = true;
-            }
-
-            if (me.Position.Y >= _barItems!.Children!.Length)
-            {
-                return me.Handled = true;
-            }
-
-            MenuItem item = _barItems.Children [me.Position.Y]!;
-
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-            if (item is null || !item.IsEnabled ())
-            {
-                disabled = true;
-            }
-
-            if (disabled)
-            {
-                return me.Handled = true;
-            }
-
-            _currentChild = me.Position.Y;
-            RunSelected ();
-
-            return me.Handled = true;
+            return;
         }
 
-        if (me.Flags != MouseFlags.Button1Pressed
-            && me.Flags != MouseFlags.Button1DoubleClicked
-            && me.Flags != MouseFlags.Button1TripleClicked
-            && me.Flags != MouseFlags.ReportMousePosition
-            && !me.Flags.HasFlag (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))
-        {
-            return false;
-        }
+        DrawBorderAndPadding ();
+        RenderLineCanvas ();
 
-        {
-            disabled = false;
+        // BUGBUG: Views should not change the clip. Doing so is an indcation of poor design or a bug in the framework.
+        Region? savedClip = SetClipToScreen ();
 
-            if (me.Position.Y < 0 || me.Position.Y >= _barItems!.Children!.Length)
+        SetAttribute (GetNormalColor ());
+
+        for (int i = Viewport.Y; i < _barItems!.Children.Length; i++)
+        {
+            if (i < 0)
             {
-                return me.Handled = true;
+                continue;
             }
 
-            MenuItem item = _barItems.Children [me.Position.Y]!;
+            if (ViewportToScreen (Viewport).Y + i >= Driver.Rows)
+            {
+                break;
+            }
 
-            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+            MenuItem? item = _barItems.Children [i];
+
+            SetAttribute (
+
+                          // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+                          item is null ? GetNormalColor () :
+                          i == _currentChild ? GetFocusColor () : GetNormalColor ()
+                         );
+
+            if (item is null && BorderStyle != LineStyle.None)
+            {
+                Point s = ViewportToScreen (new Point (-1, i));
+                Driver.Move (s.X, s.Y);
+                Driver.AddRune (Glyphs.LeftTee);
+            }
+            else if (Frame.X < Driver.Cols)
+            {
+                Move (0, i);
+            }
+
+            SetAttribute (DetermineColorSchemeFor (item, i));
+
+            for (int p = Viewport.X; p < Frame.Width - 2; p++)
+            {
+                // This - 2 is for the border
+                if (p < 0)
+                {
+                    continue;
+                }
+
+                if (ViewportToScreen (Viewport).X + p >= Driver.Cols)
+                {
+                    break;
+                }
+
+                if (item is null)
+                {
+                    Driver.AddRune (Glyphs.HLine);
+                }
+                else if (i == 0 && p == 0 && _host.UseSubMenusSingleFrame && item.Parent!.Parent is { })
+                {
+                    Driver.AddRune (Glyphs.LeftArrow);
+                }
+
+                // This `- 3` is left border + right border + one row in from right
+                else if (p == Frame.Width - 3 && _barItems?.SubMenu (_barItems.Children [i]!) is { })
+                {
+                    Driver.AddRune (Glyphs.RightArrow);
+                }
+                else
+                {
+                    Driver.AddRune ((Rune)' ');
+                }
+            }
+
             if (item is null)
             {
-                return me.Handled = true;
+                if (BorderStyle != LineStyle.None && SuperView?.Frame.Right - Frame.X > Frame.Width)
+                {
+                    Point s = ViewportToScreen (new Point (Frame.Width - 2, i));
+                    Driver.Move (s.X, s.Y);
+                    Driver.AddRune (Glyphs.RightTee);
+                }
+
+                continue;
             }
 
-            if (item.IsEnabled () != true)
+            string? textToDraw;
+            Rune nullCheckedChar = Glyphs.CheckStateNone;
+            Rune checkChar = Glyphs.Selected;
+            Rune uncheckedChar = Glyphs.UnSelected;
+
+            if (item.CheckType.HasFlag (MenuItemCheckStyle.Checked))
             {
-                disabled = true;
+                checkChar = Glyphs.CheckStateChecked;
+                uncheckedChar = Glyphs.CheckStateUnChecked;
             }
 
-            if (!disabled)
+            // Support Checked even though CheckType wasn't set
+            if (item is { CheckType: MenuItemCheckStyle.Checked, Checked: null })
             {
-                _currentChild = me.Position.Y;
+                textToDraw = $"{nullCheckedChar} {item.Title}";
             }
-
-            if (_host.UseSubMenusSingleFrame || !CheckSubMenu ())
+            else if (item.Checked == true)
             {
-                SetNeedsDraw ();
-                SetParentSetNeedsDisplay ();
-
-                return me.Handled = true;
+                textToDraw = $"{checkChar} {item.Title}";
             }
-
-            _host.OnMenuOpened ();
-
-            return me.Handled = true;
-        }
-    }
-
-    internal bool CheckSubMenu ()
-    {
-        if (_currentChild == -1 || _barItems?.Children? [_currentChild] is null)
-        {
-            return true;
-        }
-
-        MenuBarItem? subMenu = _barItems.SubMenu (_barItems.Children [_currentChild]!);
-
-        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
-        if (subMenu is { })
-        {
-            int pos = -1;
-
-            if (_host._openSubMenu is { })
+            else if (item.CheckType.HasFlag (MenuItemCheckStyle.Checked) || item.CheckType.HasFlag (MenuItemCheckStyle.Radio))
             {
-                pos = _host._openSubMenu.FindIndex (o => o._barItems == subMenu);
+                textToDraw = $"{uncheckedChar} {item.Title}";
             }
-
-            if (pos == -1
-                && this != _host.OpenCurrentMenu
-                && subMenu.Children != _host.OpenCurrentMenu!._barItems!.Children
-                && !_host.CloseMenu (false, true))
+            else
             {
-                return false;
+                textToDraw = item.Title;
             }
 
-            _host.Activate (_host._selected, pos, subMenu);
-        }
-        else if (_host._openSubMenu?.Count == 0 || _host._openSubMenu?.Last ()._barItems!.IsSubMenuOf (_barItems.Children [_currentChild]!) == false)
-        {
-            return _host.CloseMenu (false, true);
-        }
-        else
-        {
-            SetNeedsDraw ();
-            SetParentSetNeedsDisplay ();
+            Point screen = ViewportToScreen (new Point (0, i));
+
+            if (screen.X < Driver.Cols)
+            {
+                Driver.Move (screen.X + 1, screen.Y);
+
+                if (!item.IsEnabled ())
+                {
+                    DrawHotString (textToDraw, ColorScheme!.Disabled, ColorScheme.Disabled);
+                }
+                else if (i == 0 && _host.UseSubMenusSingleFrame && item.Parent!.Parent is { })
+                {
+                    var tf = new TextFormatter
+                    {
+                        ConstrainToWidth = Frame.Width - 3,
+                        ConstrainToHeight = 1,
+                        Alignment = Alignment.Center, HotKeySpecifier = MenuBar.HotKeySpecifier, Text = textToDraw
+                    };
+
+                    // The -3 is left/right border + one space (not sure what for)
+                    tf.Draw (
+                             ViewportToScreen (new Rectangle (1, i, Frame.Width - 3, 1)),
+                             i == _currentChild ? GetFocusColor () : GetNormalColor (),
+                             i == _currentChild ? ColorScheme!.HotFocus : ColorScheme!.HotNormal,
+                             SuperView?.ViewportToScreen (SuperView.Viewport) ?? Rectangle.Empty
+                            );
+                }
+                else
+                {
+                    DrawHotString (
+                                   textToDraw,
+                                   i == _currentChild ? ColorScheme!.HotFocus : ColorScheme!.HotNormal,
+                                   i == _currentChild ? GetFocusColor () : GetNormalColor ()
+                                  );
+                }
+
+                // The help string
+                int l = item.ShortcutTag.GetColumns () == 0
+                            ? item.Help.GetColumns ()
+                            : item.Help.GetColumns () + item.ShortcutTag.GetColumns () + 2;
+                int col = Frame.Width - l - 3;
+                screen = ViewportToScreen (new Point (col, i));
+
+                if (screen.X < Driver.Cols)
+                {
+                    Driver.Move (screen.X, screen.Y);
+                    Driver.AddStr (item.Help);
+
+                    // The shortcut tag string
+                    if (!string.IsNullOrEmpty (item.ShortcutTag))
+                    {
+                        Driver.Move (screen.X + l - item.ShortcutTag.GetColumns (), screen.Y);
+                        Driver.AddStr (item.ShortcutTag);
+                    }
+                }
+            }
         }
 
-        return true;
-    }
-
-    protected override void Dispose (bool disposing)
-    {
-        RemoveKeyBindingsHotKey (_barItems);
-
-        if (Application.Top is { })
-        {
-            Application.Top.DrawComplete -= Top_DrawComplete;
-            Application.Top.SizeChanging -= Current_TerminalResized;
-        }
-
-        Application.MouseEvent -= Application_RootMouseEvent;
-        base.Dispose (disposing);
+        SetClip (savedClip);
     }
 }

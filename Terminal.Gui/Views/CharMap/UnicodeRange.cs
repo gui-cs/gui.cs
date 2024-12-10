@@ -1,10 +1,8 @@
 #nullable enable
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Text.Unicode;
 
-namespace UICatalog.Scenarios;
+namespace Terminal.Gui;
 
 /// <summary>
 ///     Represents all of the Uniicode ranges.from System.Text.Unicode.UnicodeRange plus

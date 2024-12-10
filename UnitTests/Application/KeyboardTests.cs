@@ -135,22 +135,22 @@ public class KeyboardTests
 
     [Fact]
     [AutoInitShutdown]
-    public void KeyBinding_Application_KeyBindings_Add_Adds ()
+    public void KeyBindings_Add_Adds ()
     {
-        Application.KeyBindings.Add (Key.A, KeyBindingScope.Application, Command.Accept);
-        Application.KeyBindings.Add (Key.B, KeyBindingScope.Application, Command.Accept);
+        Application.KeyBindings.Add (Key.A, Command.Accept);
+        Application.KeyBindings.Add (Key.B, Command.Accept);
 
         Assert.True (Application.KeyBindings.TryGet (Key.A, out KeyBinding binding));
-        Assert.Null (binding.BoundView);
+        Assert.Null (binding.Target);
         Assert.True (Application.KeyBindings.TryGet (Key.B, out binding));
-        Assert.Null (binding.BoundView);
+        Assert.Null (binding.Target);
     }
-
+            
     [Fact]
     [AutoInitShutdown]
-    public void KeyBinding_Application_RemoveKeyBinding_Removes ()
+    public void KeyBindings_Remove_Removes ()
     {
-        Application.KeyBindings.Add (Key.A, KeyBindingScope.Application, Command.Accept);
+        Application.KeyBindings.Add (Key.A, Command.Accept);
 
         Assert.True (Application.KeyBindings.TryGet (Key.A, out _));
 
@@ -159,7 +159,7 @@ public class KeyboardTests
     }
 
     [Fact]
-    public void KeyBinding_OnKeyDown ()
+    public void KeyBindings_OnKeyDown ()
     {
         Application.Top = new Toplevel ();
         var view = new ScopedKeyBindingView ();
@@ -189,6 +189,7 @@ public class KeyboardTests
         keyWasHandled = false;
         Application.RaiseKeyDownEvent (Key.H);
         Assert.False (keyWasHandled);
+        Assert.True (view.HotKeyCommand);
 
         keyWasHandled = false;
         Assert.False (view.HasFocus);
@@ -204,7 +205,7 @@ public class KeyboardTests
 
     [Fact]
     [AutoInitShutdown]
-    public void KeyBinding_OnKeyDown_Negative ()
+    public void KeyBindings_OnKeyDown_Negative ()
     {
         var view = new ScopedKeyBindingView ();
         var keyWasHandled = false;
@@ -228,36 +229,6 @@ public class KeyboardTests
         Assert.False (view.HotKeyCommand);
         Assert.False (view.FocusedCommand);
         top.Dispose ();
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void KeyBinding_View_KeyBindings_Add_Adds ()
-    {
-        View view1 = new ();
-        Application.KeyBindings.Add (Key.A, view1, Command.Accept);
-
-        View view2 = new ();
-        Application.KeyBindings.Add (Key.B, view2, Command.Accept);
-
-        Assert.True (Application.KeyBindings.TryGet (Key.A, out KeyBinding binding));
-        Assert.Equal (view1, binding.BoundView);
-        Assert.True (Application.KeyBindings.TryGet (Key.B, out binding));
-        Assert.Equal (view2, binding.BoundView);
-    }
-
-    [Fact]
-    [AutoInitShutdown]
-    public void KeyBinding_View_KeyBindings_RemoveKeyBinding_Removes ()
-    {
-        View view1 = new ();
-        Application.KeyBindings.Add (Key.A, view1, Command.Accept);
-
-        View view2 = new ();
-        Application.KeyBindings.Add (Key.B, view1, Command.Accept);
-
-        Application.KeyBindings.Remove (Key.A, view1);
-        Assert.False (Application.KeyBindings.TryGet (Key.A, out _));
     }
 
     [Fact]

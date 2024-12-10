@@ -63,7 +63,6 @@ public class Shortcuts : Scenario
                 HighlightStyle = HighlightStyle.None,
             },
             Key = Key.F5.WithCtrl.WithAlt.WithShift,
-            KeyBindingScope = KeyBindingScope.HotKey,
         };
 
         // ((CheckBox)vShortcut3.CommandView).CheckedStateChanging += (_, args) =>
@@ -111,7 +110,6 @@ public class Shortcuts : Scenario
                 HighlightStyle = HighlightStyle.None,
             },
             Key = Key.F.WithCtrl,
-            KeyBindingScope = KeyBindingScope.HotKey,
         };
         ((CheckBox)commandFirstShortcut.CommandView).CheckedState =
             commandFirstShortcut.AlignmentModes.HasFlag (AlignmentModes.EndToStart) ? CheckState.UnChecked : CheckState.Checked;
@@ -151,7 +149,6 @@ public class Shortcuts : Scenario
             Width = Dim.Fill ()! - Dim.Width (eventLog),
             Key = Key.F4,
             HelpText = "Changes all Command.CanFocus",
-            KeyBindingScope = KeyBindingScope.HotKey,
             CommandView = new CheckBox { Text = "_CanFocus" },
         };
 
@@ -183,7 +180,7 @@ public class Shortcuts : Scenario
             Title = "A_pp Shortcut",
             Key = Key.F1,
             Text = "Width is DimFill",
-            KeyBindingScope = KeyBindingScope.Application,
+            BindKeyToApplication = true,
         };
 
         Application.Top.Add (appShortcut);
@@ -203,7 +200,6 @@ public class Shortcuts : Scenario
                 HighlightStyle = HighlightStyle.None
             },
             Key = Key.K,
-            KeyBindingScope = KeyBindingScope.HotKey,
         };
         var button = (Button)buttonShortcut.CommandView;
         buttonShortcut.Accepting += Button_Clicked;
@@ -218,7 +214,6 @@ public class Shortcuts : Scenario
             Y = Pos.Bottom (buttonShortcut),
             Key = Key.F2,
             Width = Dim.Fill ()! - Dim.Width (eventLog),
-            KeyBindingScope = KeyBindingScope.HotKey,
             CommandView = new RadioGroup
             {
                 Orientation = Orientation.Vertical,
@@ -244,7 +239,6 @@ public class Shortcuts : Scenario
             X = 0,
             Y = Pos.Bottom (radioGroupShortcut),
             Width = Dim.Fill ()! - Dim.Width (eventLog),
-            KeyBindingScope = KeyBindingScope.HotKey,
             HelpText = "Sliders work!",
             CommandView = new Slider<string>
             {
@@ -457,7 +451,7 @@ public class Shortcuts : Scenario
             X = Pos.Align (Alignment.Start, AlignmentModes.IgnoreFirstOrLast, 1),
             Y = Pos.AnchorEnd () - 1,
             Key = Key.Esc,
-            KeyBindingScope = KeyBindingScope.Application,
+            BindKeyToApplication = true,
             Title = "Quit",
             HelpText = "App Scope",
         };

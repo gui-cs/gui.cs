@@ -1,8 +1,6 @@
 ﻿#nullable enable
 using System;
 using System.Collections.ObjectModel;
-using System.Diagnostics.Tracing;
-using System.Text;
 using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
@@ -22,12 +20,15 @@ public class EventLog : ListView
 
         X = Pos.AnchorEnd ();
         Y = 0;
-        Width = Dim.Func (() =>
+
+        Width = Dim.Func (
+                          () =>
                           {
                               if (!IsInitialized)
                               {
                                   return 0;
                               }
+
                               return Math.Min (SuperView!.Viewport.Width / 3, MaxLength + GetAdornmentsThickness ().Horizontal);
                           });
         Height = Dim.Fill ();
@@ -42,17 +43,18 @@ public class EventLog : ListView
         HorizontalScrollBar.AutoShow = true;
         VerticalScrollBar.AutoShow = true;
 
-        AddCommand (Command.DeleteAll,
-                   () =>
-                   {
-                       _eventSource.Clear ();
+        AddCommand (
+                    Command.DeleteAll,
+                    () =>
+                    {
+                        _eventSource.Clear ();
 
-                       return true;
-                   });
+                        return true;
+                    });
 
         KeyBindings.Add (Key.Delete, Command.DeleteAll);
-
     }
+
     public ExpanderButton? ExpandButton { get; }
 
     private readonly ObservableCollection<string> _eventSource = [];
@@ -74,28 +76,16 @@ public class EventLog : ListView
             if (_viewToLog is { })
             {
                 _viewToLog.Initialized += (s, args) =>
-                                             {
-                                                 View? sender = s as View;
-                                                 Log ($"Initialized: {GetIdentifyingString (sender)}");
-                                             };
+                                          {
+                                              var sender = s as View;
+                                              Log ($"Initialized: {GetIdentifyingString (sender)}");
+                                          };
 
-                _viewToLog.MouseClick += (s, args) =>
-                {
-                    Log ($"MouseClick: {args}");
-                };
-
-                _viewToLog.HandlingHotKey += (s, args) =>
-                                        {
-                                            Log ($"HandlingHotKey: {args.Context.Command} {args.Context.Data}");
-                                        };
-                _viewToLog.Selecting += (s, args) =>
-                                        {
-                                            Log ($"Selecting: {args.Context.Command} {args.Context.Data}");
-                                        };
-                _viewToLog.Accepting += (s, args) =>
-                                        {
-                                            Log ($"Accepting: {args.Context.Command} {args.Context.Data}");
-                                        };
+                _viewToLog.MouseClick += (s, args) => { Log ($"MouseClick: {args}"); };
+                _viewToLog.MouseWheel += (s, args) => { Log ($"MouseWheel: {args}"); };
+                _viewToLog.HandlingHotKey += (s, args) => { Log ($"HandlingHotKey: {args.Context}"); };
+                _viewToLog.Selecting += (s, args) => { Log ($"Selecting: {args.Context}"); };
+                _viewToLog.Accepting += (s, args) => { Log ($"Accepting: {args.Context}"); };
             }
         }
     }
@@ -111,6 +101,7 @@ public class EventLog : ListView
         Border?.Add (ExpandButton!);
         Source = new ListWrapper<string> (_eventSource);
     }
+
     private string GetIdentifyingString (View? view)
     {
         if (view is null)

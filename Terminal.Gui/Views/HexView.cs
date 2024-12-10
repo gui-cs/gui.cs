@@ -58,9 +58,7 @@ public class HexView : View, IDesignable
         _leftSideHasFocus = true;
         _firstNibble = true;
 
-        // PERF: Closure capture of 'this' creates a lot of overhead.
-        // BUG: Closure capture of 'this' may have unexpected results depending on how this is called.
-        // The above two comments apply to all the lambdas passed to all calls to AddCommand below.
+        AddCommand (Command.Select, HandleMouseClick);
         AddCommand (Command.Left, () => MoveLeft ());
         AddCommand (Command.Right, () => MoveRight ());
         AddCommand (Command.Down, () => MoveDown (BytesPerLine));
@@ -76,6 +74,8 @@ public class HexView : View, IDesignable
                     Command.EndOfPage,
                     () => MoveDown (BytesPerLine * (Viewport.Height - 1 - (int)(Address - Viewport.Y) / BytesPerLine))
                    );
+        AddCommand (Command.ScrollDown, () => ScrollVertical (1));
+        AddCommand (Command.ScrollUp, () => ScrollVertical (-1));
         AddCommand (Command.DeleteCharLeft, () => true);
         AddCommand (Command.DeleteCharRight, () => true);
         AddCommand (Command.Insert, () => true);
@@ -84,11 +84,8 @@ public class HexView : View, IDesignable
         KeyBindings.Add (Key.CursorRight, Command.Right);
         KeyBindings.Add (Key.CursorDown, Command.Down);
         KeyBindings.Add (Key.CursorUp, Command.Up);
-
         KeyBindings.Add (Key.PageUp, Command.PageUp);
-
         KeyBindings.Add (Key.PageDown, Command.PageDown);
-
         KeyBindings.Add (Key.Home, Command.Start);
         KeyBindings.Add (Key.End, Command.End);
         KeyBindings.Add (Key.CursorLeft.WithCtrl, Command.LeftStart);
@@ -102,6 +99,12 @@ public class HexView : View, IDesignable
 
         KeyBindings.Remove (Key.Space);
         KeyBindings.Remove (Key.Enter);
+
+        // The Select handler deals with both single and double clicks
+        MouseBindings.ReplaceCommands (MouseFlags.Button1Clicked, Command.Select);
+        MouseBindings.Add (MouseFlags.Button1DoubleClicked, Command.Select);
+        MouseBindings.Add (MouseFlags.WheeledUp, Command.ScrollUp);
+        MouseBindings.Add (MouseFlags.WheeledDown, Command.ScrollDown);
 
         SubviewsLaidOut += HexViewSubviewsLaidOut;
     }
@@ -173,7 +176,7 @@ public class HexView : View, IDesignable
 
         if (offsetToNewCursor.X < 1)
         {
-            ScrollHorizontal(offsetToNewCursor.X);
+            ScrollHorizontal (offsetToNewCursor.X);
         }
         else if (offsetToNewCursor.X >= Viewport.Width)
         {
@@ -347,20 +350,16 @@ public class HexView : View, IDesignable
 
     private int GetLeftSideStartColumn () { return AddressWidth == 0 ? 0 : AddressWidth + 1; }
 
-    /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEventArgs me)
+    private bool? HandleMouseClick (ICommandContext? commandContext)
     {
-        if (_source is null)
+        if (commandContext is not CommandContext<MouseBinding> { Binding.MouseEventArgs: { } } mouseCommandContext)
         {
             return false;
         }
 
-        if (!me.Flags.HasFlag (MouseFlags.Button1Clicked)
-            && !me.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
-            && !me.Flags.HasFlag (MouseFlags.WheeledDown)
-            && !me.Flags.HasFlag (MouseFlags.WheeledUp))
+        if (RaiseSelecting (commandContext) is true)
         {
-            return false;
+            return true;
         }
 
         if (!HasFocus)
@@ -368,21 +367,7 @@ public class HexView : View, IDesignable
             SetFocus ();
         }
 
-        if (me.Flags == MouseFlags.WheeledDown)
-        {
-            ScrollVertical (1);
-
-            return true;
-        }
-
-        if (me.Flags == MouseFlags.WheeledUp)
-        {
-            ScrollVertical (-1);
-
-            return true;
-        }
-
-        if (me.Position.X < GetLeftSideStartColumn ())
+        if (mouseCommandContext.Binding.MouseEventArgs.Position.X < GetLeftSideStartColumn ())
         {
             return true;
         }
@@ -391,14 +376,14 @@ public class HexView : View, IDesignable
         int blocksSize = blocks * HEX_COLUMN_WIDTH;
         int blocksRightOffset = GetLeftSideStartColumn () + blocksSize - 1;
 
-        if (me.Position.X > blocksRightOffset + BytesPerLine - 1)
+        if (mouseCommandContext.Binding.MouseEventArgs.Position.X > blocksRightOffset + BytesPerLine - 1)
         {
             return true;
         }
 
-        bool clickIsOnLeftSide = me.Position.X >= blocksRightOffset;
-        long lineStart = me.Position.Y * BytesPerLine + Viewport.Y * BytesPerLine;
-        int x = me.Position.X - GetLeftSideStartColumn () + 1;
+        bool clickIsOnLeftSide = mouseCommandContext.Binding.MouseEventArgs.Position.X >= blocksRightOffset;
+        long lineStart = mouseCommandContext.Binding.MouseEventArgs.Position.Y * BytesPerLine + Viewport.Y * BytesPerLine;
+        int x = mouseCommandContext.Binding.MouseEventArgs.Position.X - GetLeftSideStartColumn () + 1;
         int block = x / HEX_COLUMN_WIDTH;
         x -= block * 2;
         int empty = x % 3;
@@ -413,14 +398,14 @@ public class HexView : View, IDesignable
 
         if (clickIsOnLeftSide)
         {
-            Address = Math.Min (lineStart + me.Position.X - blocksRightOffset, GetEditedSize ());
+            Address = Math.Min (lineStart + mouseCommandContext.Binding.MouseEventArgs.Position.X - blocksRightOffset, GetEditedSize ());
         }
         else
         {
             Address = Math.Min (lineStart + item, GetEditedSize ());
         }
 
-        if (me.Flags == MouseFlags.Button1DoubleClicked)
+        if (mouseCommandContext.Binding.MouseEventArgs.Flags == MouseFlags.Button1DoubleClicked)
         {
             _leftSideHasFocus = !clickIsOnLeftSide;
 
@@ -435,7 +420,7 @@ public class HexView : View, IDesignable
             SetNeedsDraw ();
         }
 
-        return true;
+        return false;
     }
 
     ///<inheritdoc/>

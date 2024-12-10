@@ -265,7 +265,7 @@ public class Editor : Scenario
         _textView.VerticalScrollBar.AutoShow = false;
         _textView.UnwrappedCursorPosition += (s, e) =>
                                              {
-                                                 siCursorPosition.Title = $"Ln {e.Point.Y + 1}, Col {e.Point.X + 1}";
+                                                 siCursorPosition.Title = $"Ln {e.Y + 1}, Col {e.X + 1}";
                                              };
 
         _appWindow.Add (statusBar);
@@ -699,7 +699,7 @@ public class Editor : Scenario
             Height = 11;
             Arrangement = ViewArrangement.Movable;
 
-            KeyBindings.Add (Key.Esc, KeyBindingScope.Focused, Command.Cancel);
+            KeyBindings.Add (Key.Esc, Command.Cancel);
             AddCommand (Command.Cancel, () =>
                                         {
                                             Visible = false;

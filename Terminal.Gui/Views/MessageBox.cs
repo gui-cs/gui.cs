@@ -358,14 +358,19 @@ public static class MessageBox
                 if (count == defaultButton)
                 {
                     b.IsDefault = true;
-                    b.Accepting += (s, e) =>
+                    b.Accepting += (_, e) =>
                                    {
+                                       if (e.Context is not CommandContext<KeyBinding> keyCommandContext)
+                                       {
+                                           return;
+                                       }
+
                                        // TODO: With https://github.com/gui-cs/Terminal.Gui/issues/3778 we can simplify this
-                                       if (e.Context.Data is Button button)
+                                       if (keyCommandContext.Binding.Data is Button button)
                                        {
                                            Clicked = (int)button.Data!;
-                                       } 
-                                       else if (e.Context.KeyBinding?.BoundView is Button btn)
+                                       }
+                                       else if (keyCommandContext.Binding.Target is Button btn)
                                        {
                                            Clicked = (int)btn.Data!;
                                        }

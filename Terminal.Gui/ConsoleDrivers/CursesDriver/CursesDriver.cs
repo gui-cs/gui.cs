@@ -116,6 +116,7 @@ internal class CursesDriver : ConsoleDriver
         }
     }
 
+
     public override void Suspend ()
     {
         StopReportingMouseMoves ();
@@ -506,8 +507,8 @@ internal class CursesDriver : ConsoleDriver
     private CursorVisibility? _currentCursorVisibility;
     private CursorVisibility? _initialCursorVisibility;
 
-    /// <inheritdoc/>
-    public override bool EnsureCursorVisibility ()
+
+    private void EnsureCursorVisibility ()
     {
         if (!(Col >= 0 && Row >= 0 && Col < Cols && Row < Rows))
         {
@@ -515,12 +516,10 @@ internal class CursesDriver : ConsoleDriver
             _currentCursorVisibility = cursorVisibility;
             SetCursorVisibility (CursorVisibility.Invisible);
 
-            return false;
+            return;
         }
 
         SetCursorVisibility (_currentCursorVisibility ?? CursorVisibility.Default);
-
-        return _currentCursorVisibility == CursorVisibility.Default;
     }
 
     /// <inheritdoc/>
@@ -580,7 +579,7 @@ internal class CursesDriver : ConsoleDriver
 
     private Curses.Window? _window;
     private UnixMainLoop? _mainLoopDriver;
-    private object _processInputToken;
+    private object? _processInputToken;
 
     public override MainLoop Init ()
     {
@@ -693,6 +692,10 @@ internal class CursesDriver : ConsoleDriver
         return new (_mainLoopDriver);
     }
 
+    private readonly AnsiResponseParser _parser = new ();
+    /// <inheritdoc />
+    internal override IAnsiResponseParser GetParser () => _parser;
+
     internal void ProcessInput ()
     {
         int wch;
@@ -725,6 +728,7 @@ internal class CursesDriver : ConsoleDriver
 
                 while (wch2 == Curses.KeyMouse)
                 {
+                    // BUGBUG: Fix this nullable issue.
                     Key kea = null;
 
                     ConsoleKeyInfo [] cki =
@@ -734,6 +738,7 @@ internal class CursesDriver : ConsoleDriver
                         new ('<', 0, false, false, false)
                     };
                     code = 0;
+                    // BUGBUG: Fix this nullable issue.
                     HandleEscSeqResponse (ref code, ref k, ref wch2, ref kea, ref cki);
                 }
 
@@ -791,6 +796,7 @@ internal class CursesDriver : ConsoleDriver
                 k = KeyCode.AltMask | MapCursesKey (wch);
             }
 
+            // BUGBUG: Fix this nullable issue.
             Key key = null;
 
             if (code == 0)
@@ -821,6 +827,7 @@ internal class CursesDriver : ConsoleDriver
                     [
                         new ((char)KeyCode.Esc, 0, false, false, false), new ((char)wch2, 0, false, false, false)
                     ];
+                    // BUGBUG: Fix this nullable issue.
                     HandleEscSeqResponse (ref code, ref k, ref wch2, ref key, ref cki);
 
                     return;
@@ -930,6 +937,15 @@ internal class CursesDriver : ConsoleDriver
             OnSizeChanged (new SizeChangedEventArgs (new (Cols, Rows)));
         }
     }
+    static string ConvertToString (ConsoleKeyInfo [] keyInfos)
+    {
+        char [] chars = new char [keyInfos.Length];
+        for (int i = 0; i < keyInfos.Length; i++)
+        {
+            chars [i] = keyInfos [i].KeyChar;
+        }
+        return new string (chars);
+    }
 
     private void HandleEscSeqResponse (
         ref int code,
@@ -949,6 +965,18 @@ internal class CursesDriver : ConsoleDriver
 
             if (wch2 == 0 || wch2 == 27 || wch2 == Curses.KeyMouse)
             {
+                // Give ansi parser a chance to deal with the escape sequence
+                if (cki != null && string.IsNullOrEmpty(_parser.ProcessInput (ConvertToString(cki))))
+                {
+                    // Parser fully consumed all keys meaning keys are processed - job done
+                    return;
+                }
+
+                // Ansi parser could not deal with it either because it is not expecting
+                // the given terminator (e.g. mouse) or did not understand format somehow.
+                // Carry on with the older code for processing curses escape codes
+
+                // BUGBUG: Fix this nullable issue.
                 EscSeqUtils.DecodeEscSeq (
                                           ref consoleKeyInfo,
                                           ref ck,
@@ -972,6 +1000,7 @@ internal class CursesDriver : ConsoleDriver
                         OnMouseEvent (new () { Flags = mf, Position = pos });
                     }
 
+                    // BUGBUG: Fix this nullable issue.
                     cki = null;
 
                     if (wch2 == 27)
@@ -1091,7 +1120,7 @@ internal class CursesDriver : ConsoleDriver
         StopReportingMouseMoves ();
         SetCursorVisibility (CursorVisibility.Default);
 
-        if (_mainLoopDriver is { })
+        if (_mainLoopDriver is { } && _processInputToken != null)
         {
             _mainLoopDriver.RemoveWatch (_processInputToken);
         }

@@ -18,7 +18,7 @@ namespace Terminal.Gui;
 ///         - Pressing the HotKey specified by <see cref="CommandView"/>.
 ///     </para>
 ///     <para>
-///         If <see cref="KeyBindingScope"/> is <see cref="KeyBindingScope.Application"/>, <see cref="Key"/> will invoke
+///         If <see cref="BindKeyToApplication"/> is <see langword="true"/>, <see cref="Key"/> will invoke
 ///         <see cref="Command.Accept"/>
 ///         regardless of what View has focus, enabling an application-wide keyboard shortcut.
 ///     </para>
@@ -69,7 +69,7 @@ public class Shortcut : View, IOrientation, IDesignable
     /// <param name="helpText">The help text to display.</param>
     public Shortcut (View targetView, Command command, string commandText, string? helpText = null)
         : this (
-                targetView?.KeyBindings.GetKeyFromCommands (command)!,
+                targetView?.HotKeyBindings.GetFirstFromCommands (command)!,
                 commandText,
                 null,
                 helpText)
@@ -117,7 +117,7 @@ public class Shortcut : View, IOrientation, IDesignable
         {
             Id = "CommandView",
             Width = Dim.Auto (),
-            Height = Dim.Fill()
+            Height = Dim.Fill ()
         };
         Title = commandText ?? string.Empty;
 
@@ -144,7 +144,7 @@ public class Shortcut : View, IOrientation, IDesignable
                          DimAutoStyle.Content,
                          minimumContentDim: Dim.Func (() => _minimumNaturalWidth ?? 0),
                          maximumContentDim: Dim.Func (() => _minimumNaturalWidth ?? 0))!;
-}
+    }
 
     private AlignmentModes _alignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast;
 
@@ -224,7 +224,7 @@ public class Shortcut : View, IOrientation, IDesignable
         _minimumNaturalWidth = PosAlign.CalculateMinDimension (0, Subviews, Dimension.Width);
 
         // Reset our relative layout
-        SetRelativeLayout (SuperView?.GetContentSize() ?? Application.Screen.Size);
+        SetRelativeLayout (SuperView?.GetContentSize () ?? Application.Screen.Size);
     }
 
     // TODO: Enable setting of the margin thickness
@@ -300,17 +300,19 @@ public class Shortcut : View, IOrientation, IDesignable
         AddCommand (Command.Select, DispatchCommand);
     }
 
-    private bool? DispatchCommand (CommandContext ctx)
+    private bool? DispatchCommand (ICommandContext? commandContext)
     {
-        if (ctx.Data != this)
+        CommandContext<KeyBinding>? keyCommandContext = commandContext is CommandContext<KeyBinding> ? (CommandContext<KeyBinding>)commandContext : default;
+
+        if (keyCommandContext?.Binding.Data != this)
         {
             // Invoke Select on the command view to cause it to change state if it wants to
             // If this causes CommandView to raise Accept, we eat it
-            ctx.Data = this;
-            CommandView.InvokeCommand (Command.Select, ctx);
+            keyCommandContext = keyCommandContext!.Value with { Binding = keyCommandContext.Value.Binding with { Data = this } };
+            CommandView.InvokeCommand (Command.Select, keyCommandContext);
         }
 
-        if (RaiseSelecting (ctx) is true)
+        if (RaiseSelecting (keyCommandContext) is true)
         {
             return true;
         }
@@ -320,16 +322,16 @@ public class Shortcut : View, IOrientation, IDesignable
 
         var cancel = false;
 
-        cancel = RaiseAccepting (ctx) is true;
+        cancel = RaiseAccepting (commandContext) is true;
 
         if (cancel)
         {
             return true;
         }
 
-        if (ctx.Command != Command.Accept)
+        if (commandContext?.Command != Command.Accept)
         {
-           // return false;
+            // return false;
         }
 
         if (Action is { })
@@ -342,7 +344,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
         if (_targetView is { })
         {
-            _targetView.InvokeCommand (Command);
+            _targetView.InvokeCommand (Command, commandContext);
         }
 
         return cancel;
@@ -493,10 +495,11 @@ public class Shortcut : View, IOrientation, IDesignable
 
             void CommandViewOnSelecting (object? sender, CommandEventArgs e)
             {
-                if (e.Context.Data != this)
+                if ((e.Context is CommandContext<KeyBinding> keyCommandContext && keyCommandContext.Binding.Data != this) ||
+                    e.Context is CommandContext<MouseBinding>)
                 {
                     // Forward command to ourselves
-                    InvokeCommand (Command.Select, new (Command.Select, null, null, this));
+                    InvokeCommand<KeyBinding> (Command.Select, new ([Command.Select], null, this));
                 }
 
                 // BUGBUG: This prevents NumericUpDown on statusbar in HexEditor from working
@@ -612,32 +615,31 @@ public class Shortcut : View, IOrientation, IDesignable
         }
     }
 
-    private KeyBindingScope _keyBindingScope = KeyBindingScope.HotKey;
+    private bool _bindKeyToApplication = false;
 
     /// <summary>
-    ///     Gets or sets the scope for the key binding for how <see cref="Key"/> is bound to <see cref="Command"/>.
+    ///     Gets or sets whether <see cref="Key"/> is bound to <see cref="Command"/> via <see cref="View.HotKeyBindings"/> or <see cref="Application.KeyBindings"/>.
     /// </summary>
-    public KeyBindingScope KeyBindingScope
+    public bool BindKeyToApplication
     {
-        get => _keyBindingScope;
+        get => _bindKeyToApplication;
         set
         {
-            if (value == _keyBindingScope)
+            if (value == _bindKeyToApplication)
             {
                 return;
             }
 
-            if (_keyBindingScope == KeyBindingScope.Application)
+            if (_bindKeyToApplication)
             {
-                Application.KeyBindings.Remove (Key, this);
+                Application.KeyBindings.Remove (Key);
+            }
+            else
+            {
+                HotKeyBindings.Remove (Key);
             }
 
-            if (_keyBindingScope is KeyBindingScope.HotKey or KeyBindingScope.Focused)
-            {
-                KeyBindings.Remove (Key);
-            }
-
-            _keyBindingScope = value;
+            _bindKeyToApplication = value;
 
             UpdateKeyBindings (Key.Empty);
         }
@@ -700,25 +702,25 @@ public class Shortcut : View, IOrientation, IDesignable
     {
         if (Key.IsValid)
         {
-            if (KeyBindingScope.FastHasFlags (KeyBindingScope.Application))
+            if (BindKeyToApplication)
             {
                 if (oldKey != Key.Empty)
                 {
-                    Application.KeyBindings.Remove (oldKey, this);
+                    Application.KeyBindings.Remove (oldKey);
                 }
 
-                Application.KeyBindings.Remove (Key, this);
+                Application.KeyBindings.Remove (Key);
                 Application.KeyBindings.Add (Key, this, Command.HotKey);
             }
             else
             {
                 if (oldKey != Key.Empty)
                 {
-                    KeyBindings.Remove (oldKey);
+                    HotKeyBindings.Remove (oldKey);
                 }
 
-                KeyBindings.Remove (Key);
-                KeyBindings.Add (Key, KeyBindingScope | KeyBindingScope.HotKey, Command.HotKey);
+                HotKeyBindings.Remove (Key);
+                HotKeyBindings.Add (Key,  Command.HotKey);
             }
         }
     }
@@ -766,7 +768,7 @@ public class Shortcut : View, IOrientation, IDesignable
             if (_nonFocusColorScheme is { })
             {
                 base.ColorScheme = _nonFocusColorScheme;
-               //_nonFocusColorScheme = null;
+                //_nonFocusColorScheme = null;
             }
             else
             {

@@ -177,10 +177,7 @@ public static partial class Application
         // Driver stuff
         if (Driver is { })
         {
-            Driver.SizeChanged -= Driver_SizeChanged;
-            Driver.KeyDown -= Driver_KeyDown;
-            Driver.KeyUp -= Driver_KeyUp;
-            Driver.MouseEvent -= Driver_MouseEvent;
+            UnsubscribeDriverEvents ();
             Driver?.End ();
             Driver = null;
         }
@@ -217,7 +214,8 @@ public static partial class Application
 
         ClearScreenNextIteration = false;
 
-        AddApplicationKeyBindings ();
+        KeyBindings.Clear ();
+        AddKeyBindings ();
 
         // Reset synchronization context to allow the user to run async/await,
         // as the main loop has been ended, the synchronization context from
