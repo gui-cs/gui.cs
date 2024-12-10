@@ -115,7 +115,7 @@ public class ContextMenuv2 : Menuv2
     {
         if (disposing)
         {
-            Application.KeyBindings.Remove (Key, this);
+            Application.KeyBindings.Remove (Key);
         }
         base.Dispose (disposing);
     }

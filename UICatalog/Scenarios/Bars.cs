@@ -290,7 +290,7 @@ public class Bars : Scenario
                 {
                     menuv2.ShortcutCommandInvoked += (o, args) =>
                                                      {
-                                                         if (args.Context.Data is Shortcut { } sc)
+                                                         if (args.Context is CommandContext<KeyBinding> { Binding.Data: Shortcut { } sc })
                                                          {
                                                              eventSource.Add ($"Invoked: {sc.Id} {args.Context.Command}");
                                                          }

@@ -88,7 +88,7 @@ public class Menuv2 : Bar
     /// </summary>
     /// <param name="ctx"></param>
     /// <returns></returns>
-    protected bool? RaiseShortcutCommandInvoked (CommandContext ctx)
+    protected bool? RaiseShortcutCommandInvoked (ICommandContext? ctx)
     {
         CommandEventArgs args = new () { Context = ctx };
 

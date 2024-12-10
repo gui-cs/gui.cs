@@ -26,7 +26,7 @@ public class MenuBarv2 : Bar
         AddCommand (Command.Context,
                    (ctx) =>
                    {
-                       if (ctx.Data is Shortcut { TargetView: { } } shortcut)
+                       if (ctx is CommandContext<KeyBinding> commandContext && commandContext.Binding.Data is Shortcut { TargetView: { } } shortcut)
                        {
                            //MenuBarv2? clone = MemberwiseClone () as MenuBarv2;
                            //clone!.SuperView = null;

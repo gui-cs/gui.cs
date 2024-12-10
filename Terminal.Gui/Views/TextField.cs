@@ -1243,8 +1243,8 @@ public class TextField : View
             new (this, Command.Redo, Strings.ctxRedo),
         });
 
-        KeyBindings.Remove (menu.Key);
-        KeyBindings.Add (menu.Key, KeyBindingScope.HotKey, Command.Context);
+        HotKeyBindings.Remove (menu.Key);
+        HotKeyBindings.Add (menu.Key, Command.Context);
         menu.KeyChanged += ContextMenu_KeyChanged;
 
         ContextMenu = menu;
@@ -1252,7 +1252,7 @@ public class TextField : View
 
     private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e)
     {
-        KeyBindings.ReplaceKey (e.OldKey.KeyCode, e.NewKey.KeyCode);
+        KeyBindings.Replace (e.OldKey.KeyCode, e.NewKey.KeyCode);
     }
 
     private List<Rune> DeleteSelectedText ()
