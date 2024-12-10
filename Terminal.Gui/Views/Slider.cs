@@ -850,7 +850,7 @@ public class Slider<T> : View, IOrientation
 
         if (IsInitialized)
         {
-            normalAttr = GetNormalColor();
+            normalAttr = GetNormalColor ();
             setAttr = Style.SetChar.Attribute ?? GetHotNormalColor ();
         }
 
@@ -1785,11 +1785,11 @@ public class Slider<T> : View, IOrientation
         return SetFocusedOption ();
     }
 
-    internal bool Accept (CommandContext ctx)
+    internal bool Accept (ICommandContext commandContext)
     {
         SetFocusedOption ();
 
-        return RaiseAccepting (ctx) == true;
+        return RaiseAccepting (commandContext) == true;
     }
 
     internal bool MovePlus ()

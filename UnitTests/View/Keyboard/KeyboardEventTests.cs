@@ -273,12 +273,12 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
     [InlineData (null, null)]
     [InlineData (true, true)]
     [InlineData (false, false)]
-    public void InvokeCommandsBoundToKey_Returns_Nullable_Properly (bool? toReturn, bool? expected)
+    public void InvokeCommands_Returns_Nullable_Properly (bool? toReturn, bool? expected)
     {
         var view = new KeyBindingsTestView ();
         view.CommandReturns = toReturn;
 
-        bool? result = view.InvokeCommandsBoundToKey (Key.A);
+        bool? result = view.InvokeCommands (Key.A);
         Assert.Equal (expected, result);
     }
 

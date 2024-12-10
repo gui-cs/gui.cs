@@ -1,5 +1,6 @@
 ﻿namespace Terminal.Gui;
 
+// TODO: This class is unnecessary. Replace it with CancelEventArgs<T> from Terminal.Gui.View\CancelEventArgs.cs
 /// <summary>Args for events that describe a change in <see cref="MouseFlags"/></summary>
 public class MouseFlagsChangedEventArgs : EventArgs
 {

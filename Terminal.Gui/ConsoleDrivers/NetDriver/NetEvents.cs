@@ -1,238 +1,150 @@
 ﻿#nullable enable
+using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Terminal.Gui;
 
 internal class NetEvents : IDisposable
 {
-    private readonly ManualResetEventSlim _inputReady = new (false);
-    private CancellationTokenSource? _inputReadyCancellationTokenSource;
-    private readonly Queue<InputResult> _inputQueue = new ();
+    private readonly CancellationTokenSource _netEventsDisposed = new CancellationTokenSource ();
+
+    //CancellationTokenSource _waitForStartCancellationTokenSource;
+    private readonly ManualResetEventSlim _winChange = new (false);
+    private readonly BlockingCollection<InputResult?> _inputQueue = new (new ConcurrentQueue<InputResult?> ());
     private readonly IConsoleDriver _consoleDriver;
-    private ConsoleKeyInfo []? _cki;
-    private bool _isEscSeq;
-#if PROCESS_REQUEST
-    bool _neededProcessRequest;
-#endif
+
+    public AnsiResponseParser<ConsoleKeyInfo> Parser { get; private set; } = new ();
+
     public NetEvents (IConsoleDriver consoleDriver)
     {
         _consoleDriver = consoleDriver ?? throw new ArgumentNullException (nameof (consoleDriver));
-        _inputReadyCancellationTokenSource = new ();
 
-        Task.Run (ProcessInputQueue, _inputReadyCancellationTokenSource.Token);
-
-        Task.Run (CheckWindowSizeChange, _inputReadyCancellationTokenSource.Token);
-    }
-
-    public InputResult? DequeueInput ()
-    {
-        while (_inputReadyCancellationTokenSource is { Token.IsCancellationRequested: false })
+        Task.Run (() =>
         {
             try
             {
-                if (!_inputReadyCancellationTokenSource.Token.IsCancellationRequested)
-                {
-                    if (_inputQueue.Count == 0)
-                    {
-                        _inputReady.Wait (_inputReadyCancellationTokenSource.Token);
-                    }
-                }
+                ProcessInputQueue ();
+            }
+            catch (OperationCanceledException)
+            { }
+        }, _netEventsDisposed.Token);
 
-                if (_inputQueue.Count > 0)
+        Task.Run (() => {
+            try
+            {
+                CheckWindowSizeChange ();
+            }
+            catch (OperationCanceledException)
+            { }
+        }, _netEventsDisposed.Token);
+
+        Parser.UnexpectedResponseHandler = ProcessRequestResponse;
+    }
+
+
+    public InputResult? DequeueInput ()
+    {
+        while (!_netEventsDisposed.Token.IsCancellationRequested)
+        {
+            _winChange.Set ();
+
+            try
+            {
+                if (_inputQueue.TryTake (out var item, -1, _netEventsDisposed.Token))
                 {
-                    return _inputQueue.Dequeue ();
+                    return item;
                 }
             }
             catch (OperationCanceledException)
             {
                 return null;
             }
-            finally
-            {
-                if (_inputReadyCancellationTokenSource is { IsCancellationRequested: false })
-                {
-                    _inputReady.Reset ();
-                }
-            }
 
-#if PROCESS_REQUEST
-            _neededProcessRequest = false;
-#endif
         }
 
         return null;
     }
 
-    private ConsoleKeyInfo ReadConsoleKeyInfo (CancellationToken cancellationToken, bool intercept = true)
+    private ConsoleKeyInfo ReadConsoleKeyInfo (bool intercept = true)
     {
-        while (!cancellationToken.IsCancellationRequested)
+        // if there is a key available, return it without waiting
+        //  (or dispatching work to the thread queue)
+        if (Console.KeyAvailable)
         {
-            // if there is a key available, return it without waiting
-            //  (or dispatching work to the thread queue)
+            return Console.ReadKey (intercept);
+        }
+
+        while (!_netEventsDisposed.IsCancellationRequested)
+        {
+            Task.Delay (100, _netEventsDisposed.Token).Wait (_netEventsDisposed.Token);
+
+            foreach (var k in ShouldReleaseParserHeldKeys ())
+            {
+                ProcessMapConsoleKeyInfo (k);
+            }
+
             if (Console.KeyAvailable)
             {
                 return Console.ReadKey (intercept);
             }
-
-            // The delay must be here because it may have a request response after a while
-            // In WSL it takes longer for keys to be available.
-            Task.Delay (100, cancellationToken).Wait (cancellationToken);
         }
 
-        cancellationToken.ThrowIfCancellationRequested ();
+        _netEventsDisposed.Token.ThrowIfCancellationRequested ();
 
         return default (ConsoleKeyInfo);
     }
 
+    public IEnumerable<ConsoleKeyInfo> ShouldReleaseParserHeldKeys ()
+    {
+        if (Parser.State == AnsiResponseParserState.ExpectingBracket &&
+            DateTime.Now - Parser.StateChangedAt > _consoleDriver.EscTimeout)
+        {
+            return Parser.Release ().Select (o => o.Item2);
+        }
+
+        return [];
+    }
+
     private void ProcessInputQueue ()
     {
-        while (_inputReadyCancellationTokenSource is { IsCancellationRequested: false })
+        while (!_netEventsDisposed.IsCancellationRequested)
         {
-            try
+            if (_inputQueue.Count == 0)
             {
-                ConsoleKey key = 0;
-                ConsoleModifiers mod = 0;
-                ConsoleKeyInfo newConsoleKeyInfo = default;
-
-                while (_inputReadyCancellationTokenSource is { IsCancellationRequested: false })
+                while (!_netEventsDisposed.IsCancellationRequested)
                 {
                     ConsoleKeyInfo consoleKeyInfo;
 
-                    try
+                    consoleKeyInfo = ReadConsoleKeyInfo ();
+
+                    // Parse
+                    foreach (var k in Parser.ProcessInput (Tuple.Create (consoleKeyInfo.KeyChar, consoleKeyInfo)))
                     {
-                        consoleKeyInfo = ReadConsoleKeyInfo (_inputReadyCancellationTokenSource.Token);
+                        ProcessMapConsoleKeyInfo (k.Item2);
                     }
-                    catch (OperationCanceledException)
-                    {
-                        return;
-                    }
-
-                    var ckiAlreadyResized = false;
-
-                    if (EscSeqUtils.IncompleteCkInfos is { })
-                    {
-                        ckiAlreadyResized = true;
-
-                        _cki = EscSeqUtils.ResizeArray (consoleKeyInfo, _cki);
-                        _cki = EscSeqUtils.InsertArray (EscSeqUtils.IncompleteCkInfos, _cki);
-                        EscSeqUtils.IncompleteCkInfos = null;
-
-                        if (_cki.Length > 1 && _cki [0].KeyChar == '\u001B')
-                        {
-                            _isEscSeq = true;
-                        }
-                    }
-
-                    if ((consoleKeyInfo.KeyChar == (char)KeyCode.Esc && !_isEscSeq)
-                        || (consoleKeyInfo.KeyChar != (char)KeyCode.Esc && _isEscSeq))
-                    {
-                        if (_cki is null && consoleKeyInfo.KeyChar != (char)KeyCode.Esc && _isEscSeq)
-                        {
-                            _cki = EscSeqUtils.ResizeArray (
-                                                                               new (
-                                                                                    (char)KeyCode.Esc,
-                                                                                    0,
-                                                                                    false,
-                                                                                    false,
-                                                                                    false
-                                                                                   ),
-                                                                               _cki
-                                                                              );
-                        }
-
-                        _isEscSeq = true;
-
-                        if ((_cki is { } && _cki [^1].KeyChar != Key.Esc && consoleKeyInfo.KeyChar != Key.Esc && consoleKeyInfo.KeyChar <= Key.Space)
-                            || (_cki is { } && _cki [^1].KeyChar != '\u001B' && consoleKeyInfo.KeyChar == 127)
-                            || (_cki is { }
-                                && char.IsLetter (_cki [^1].KeyChar)
-                                && char.IsLower (consoleKeyInfo.KeyChar)
-                                && char.IsLetter (consoleKeyInfo.KeyChar))
-                            || (_cki is { Length: > 2 } && char.IsLetter (_cki [^1].KeyChar) && char.IsLetterOrDigit (consoleKeyInfo.KeyChar))
-                            || (_cki is { Length: > 2 } && char.IsLetter (_cki [^1].KeyChar) && char.IsPunctuation (consoleKeyInfo.KeyChar))
-                            || (_cki is { Length: > 2 } && char.IsLetter (_cki [^1].KeyChar) && char.IsSymbol (consoleKeyInfo.KeyChar)))
-                        {
-                            ProcessRequestResponse (ref newConsoleKeyInfo, ref key, _cki, ref mod);
-                            _cki = null;
-                            _isEscSeq = false;
-
-                            ProcessMapConsoleKeyInfo (consoleKeyInfo);
-                        }
-                        else
-                        {
-                            newConsoleKeyInfo = consoleKeyInfo;
-
-                            if (!ckiAlreadyResized)
-                            {
-                                _cki = EscSeqUtils.ResizeArray (consoleKeyInfo, _cki);
-                            }
-
-                            if (Console.KeyAvailable)
-                            {
-                                continue;
-                            }
-
-                            ProcessRequestResponse (ref newConsoleKeyInfo, ref key, _cki!, ref mod);
-                            _cki = null;
-                            _isEscSeq = false;
-                        }
-
-                        break;
-                    }
-
-                    if (consoleKeyInfo.KeyChar == (char)KeyCode.Esc && _isEscSeq && _cki is { })
-                    {
-                        ProcessRequestResponse (ref newConsoleKeyInfo, ref key, _cki, ref mod);
-                        _cki = null;
-
-                        if (Console.KeyAvailable)
-                        {
-                            _cki = EscSeqUtils.ResizeArray (consoleKeyInfo, _cki);
-                        }
-                        else
-                        {
-                            ProcessMapConsoleKeyInfo (consoleKeyInfo);
-                        }
-
-                        break;
-                    }
-
-                    ProcessMapConsoleKeyInfo (consoleKeyInfo);
-
-                    break;
-                }
-
-                if (_inputQueue.Count > 0)
-                {
-                    _inputReady.Set ();
                 }
             }
-            catch (OperationCanceledException)
-            {
-                return;
-            }
         }
+    }
 
-        void ProcessMapConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)
-        {
-            _inputQueue.Enqueue (
-                                 new ()
-                                 {
-                                     EventType = EventType.Key, ConsoleKeyInfo = EscSeqUtils.MapConsoleKeyInfo (consoleKeyInfo)
-                                 }
-                                );
-            _isEscSeq = false;
-        }
+    void ProcessMapConsoleKeyInfo (ConsoleKeyInfo consoleKeyInfo)
+    {
+        _inputQueue.Add (
+                             new InputResult
+                             {
+                                 EventType = EventType.Key, ConsoleKeyInfo = EscSeqUtils.MapConsoleKeyInfo (consoleKeyInfo)
+                             }
+                            );
     }
 
     private void CheckWindowSizeChange ()
     {
-        void RequestWindowSize (CancellationToken cancellationToken)
+        void RequestWindowSize ()
         {
-            while (!cancellationToken.IsCancellationRequested)
+            while (!_netEventsDisposed.IsCancellationRequested)
             {
                 // Wait for a while then check if screen has changed sizes
-                Task.Delay (500, cancellationToken).Wait (cancellationToken);
+                Task.Delay (500, _netEventsDisposed.Token).Wait (_netEventsDisposed.Token);
 
                 int buffHeight, buffWidth;
 
@@ -258,19 +170,17 @@ internal class NetEvents : IDisposable
                 }
             }
 
-            cancellationToken.ThrowIfCancellationRequested ();
+            _netEventsDisposed.Token.ThrowIfCancellationRequested ();
         }
 
-        while (_inputReadyCancellationTokenSource is { IsCancellationRequested: false })
+        while (!_netEventsDisposed.IsCancellationRequested)
         {
             try
             {
-                RequestWindowSize (_inputReadyCancellationTokenSource.Token);
+                _winChange.Wait (_netEventsDisposed.Token);
+                _winChange.Reset ();
 
-                if (_inputQueue.Count > 0)
-                {
-                    _inputReady.Set ();
-                }
+                RequestWindowSize ();
             }
             catch (OperationCanceledException)
             {
@@ -295,13 +205,26 @@ internal class NetEvents : IDisposable
         int w = Math.Max (winWidth, 0);
         int h = Math.Max (winHeight, 0);
 
-        _inputQueue.Enqueue (
-                             new ()
+        _inputQueue.Add (
+                             new InputResult
                              {
-                                 EventType = EventType.WindowSize, WindowSizeEvent = new () { Size = new (w, h) }
+                                 EventType = EventType.WindowSize, WindowSizeEvent = new WindowSizeEvent { Size = new (w, h) }
                              }
                             );
 
+        return true;
+    }
+
+    private bool ProcessRequestResponse (IEnumerable<Tuple<char, ConsoleKeyInfo>> obj)
+    {
+        // Added for signature compatibility with existing method, not sure what they are even for.
+        ConsoleKeyInfo newConsoleKeyInfo = default;
+        ConsoleKey key = default;
+        ConsoleModifiers mod = default;
+
+        ProcessRequestResponse (ref newConsoleKeyInfo, ref key, obj.Select (v => v.Item2).ToArray (), ref mod);
+
+        // Handled
         return true;
     }
 
@@ -313,22 +236,23 @@ internal class NetEvents : IDisposable
         ref ConsoleModifiers mod
     )
     {
+
         // isMouse is true if it's CSI<, false otherwise
         EscSeqUtils.DecodeEscSeq (
-                                                     ref newConsoleKeyInfo,
-                                                     ref key,
-                                                     cki,
-                                                     ref mod,
-                                                     out string c1Control,
-                                                     out string code,
-                                                     out string [] values,
-                                                     out string terminating,
-                                                     out bool isMouse,
-                                                     out List<MouseFlags> mouseFlags,
-                                                     out Point pos,
-                                                     out bool isReq,
-                                                     (f, p) => HandleMouseEvent (MapMouseFlags (f), p)
-                                                    );
+                                  ref newConsoleKeyInfo,
+                                  ref key,
+                                  cki,
+                                  ref mod,
+                                  out string c1Control,
+                                  out string code,
+                                  out string [] values,
+                                  out string terminating,
+                                  out bool isMouse,
+                                  out List<MouseFlags> mouseFlags,
+                                  out Point pos,
+                                  out bool isReq,
+                                  (f, p) => HandleMouseEvent (MapMouseFlags (f), p)
+                                 );
 
         if (isMouse)
         {
@@ -347,10 +271,7 @@ internal class NetEvents : IDisposable
             return;
         }
 
-        if (newConsoleKeyInfo != default)
-        {
-            HandleKeyboardEvent (newConsoleKeyInfo);
-        }
+        HandleKeyboardEvent (newConsoleKeyInfo);
     }
 
     [UnconditionalSuppressMessage ("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "<Pending>")]
@@ -491,51 +412,53 @@ internal class NetEvents : IDisposable
 
     private void HandleRequestResponseEvent (string c1Control, string code, string [] values, string terminating)
     {
-        if (terminating ==
-
+        switch (terminating)
+        {
             // BUGBUG: I can't find where we send a request for cursor position (ESC[?6n), so I'm not sure if this is needed.
-            // The observation is correct because the response isn't immediate and this is useless
-            EscSeqUtils.CSI_RequestCursorPositionReport_Terminator)
-        {
-            var point = new Point { X = int.Parse (values [1]) - 1, Y = int.Parse (values [0]) - 1 };
+            case EscSeqUtils.CSI_RequestCursorPositionReport_Terminator:
+                var point = new Point { X = int.Parse (values [1]) - 1, Y = int.Parse (values [0]) - 1 };
 
-            if (_lastCursorPosition.Y != point.Y)
-            {
-                _lastCursorPosition = point;
-                var eventType = EventType.WindowPosition;
-                var winPositionEv = new WindowPositionEvent { CursorPosition = point };
+                if (_lastCursorPosition.Y != point.Y)
+                {
+                    _lastCursorPosition = point;
+                    var eventType = EventType.WindowPosition;
+                    var winPositionEv = new WindowPositionEvent { CursorPosition = point };
 
-                _inputQueue.Enqueue (
-                                     new InputResult { EventType = eventType, WindowPositionEvent = winPositionEv }
-                                    );
-            }
-            else
-            {
-                return;
-            }
-        }
-        else if (terminating == EscSeqUtils.CSI_ReportTerminalSizeInChars_Terminator)
-        {
-            if (values [0] == EscSeqUtils.CSI_ReportTerminalSizeInChars_ResponseValue)
-            {
-                EnqueueWindowSizeEvent (
-                                        Math.Max (int.Parse (values [1]), 0),
-                                        Math.Max (int.Parse (values [2]), 0),
-                                        Math.Max (int.Parse (values [1]), 0),
-                                        Math.Max (int.Parse (values [2]), 0)
-                                       );
-            }
-            else
-            {
+                    _inputQueue.Add (
+                                         new InputResult { EventType = eventType, WindowPositionEvent = winPositionEv }
+                                        );
+                }
+                else
+                {
+                    return;
+                }
+
+                break;
+
+            case EscSeqUtils.CSI_ReportTerminalSizeInChars_Terminator:
+                switch (values [0])
+                {
+                    case EscSeqUtils.CSI_ReportTerminalSizeInChars_ResponseValue:
+                        EnqueueWindowSizeEvent (
+                                                Math.Max (int.Parse (values [1]), 0),
+                                                Math.Max (int.Parse (values [2]), 0),
+                                                Math.Max (int.Parse (values [1]), 0),
+                                                Math.Max (int.Parse (values [2]), 0)
+                                               );
+
+                        break;
+                    default:
+                        EnqueueRequestResponseEvent (c1Control, code, values, terminating);
+
+                        break;
+                }
+
+                break;
+            default:
                 EnqueueRequestResponseEvent (c1Control, code, values, terminating);
-            }
-        }
-        else
-        {
-            EnqueueRequestResponseEvent (c1Control, code, values, terminating);
-        }
 
-        _inputReady.Set ();
+                break;
+        }
     }
 
     private void EnqueueRequestResponseEvent (string c1Control, string code, string [] values, string terminating)
@@ -543,7 +466,7 @@ internal class NetEvents : IDisposable
         var eventType = EventType.RequestResponse;
         var requestRespEv = new RequestResponseEvent { ResultTuple = (c1Control, code, values, terminating) };
 
-        _inputQueue.Enqueue (
+        _inputQueue.Add (
                              new InputResult { EventType = eventType, RequestResponseEvent = requestRespEv }
                             );
     }
@@ -552,8 +475,8 @@ internal class NetEvents : IDisposable
     {
         var mouseEvent = new MouseEvent { Position = pos, ButtonState = buttonState };
 
-        _inputQueue.Enqueue (
-                             new () { EventType = EventType.Mouse, MouseEvent = mouseEvent }
+        _inputQueue.Add (
+                             new InputResult { EventType = EventType.Mouse, MouseEvent = mouseEvent }
                             );
     }
 
@@ -634,15 +557,15 @@ internal class NetEvents : IDisposable
 
         public readonly override string ToString ()
         {
-            return (EventType switch
-                    {
-                        EventType.Key => ToString (ConsoleKeyInfo),
-                        EventType.Mouse => MouseEvent.ToString (),
+            return EventType switch
+            {
+                EventType.Key => ToString (ConsoleKeyInfo),
+                EventType.Mouse => MouseEvent.ToString (),
 
-                        //EventType.WindowSize => WindowSize.ToString (),
-                        //EventType.RequestResponse => RequestResponse.ToString (),
-                        _ => "Unknown event type: " + EventType
-                    })!;
+                //EventType.WindowSize => WindowSize.ToString (),
+                //EventType.RequestResponse => RequestResponse.ToString (),
+                _ => "Unknown event type: " + EventType
+            };
         }
 
         /// <summary>Prints a ConsoleKeyInfoEx structure</summary>
@@ -667,16 +590,13 @@ internal class NetEvents : IDisposable
     {
         var inputResult = new InputResult { EventType = EventType.Key, ConsoleKeyInfo = cki };
 
-        _inputQueue.Enqueue (inputResult);
+        _inputQueue.Add (inputResult);
     }
 
     public void Dispose ()
     {
-        _inputReadyCancellationTokenSource?.Cancel ();
-        _inputReadyCancellationTokenSource?.Dispose ();
-        _inputReadyCancellationTokenSource = null;
-
-        _inputReady.Dispose ();
+        _netEventsDisposed?.Cancel ();
+        _netEventsDisposed?.Dispose ();
 
         try
         {

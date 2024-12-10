@@ -1,13 +1,10 @@
 #nullable enable
-using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
 using System.Text.Json;
-using Terminal.Gui;
+using Terminal.Gui.Resources;
 
-namespace UICatalog.Scenarios;
+namespace Terminal.Gui;
 
 /// <summary>
 ///     A scrollable map of the Unicode codepoints.
@@ -23,106 +20,36 @@ public class CharMap : View, IDesignable
 
     private ContextMenu _contextMenu = new ();
 
+
     /// <summary>
     ///     Initializes a new instance.
     /// </summary>
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
     public CharMap ()
     {
         base.ColorScheme = Colors.ColorSchemes ["Dialog"];
         CanFocus = true;
         CursorVisibility = CursorVisibility.Default;
 
-        AddCommand (
-                    Command.Up,
-                    () =>
-                    {
-                        SelectedCodePoint -= 16;
+        AddCommand (Command.Up, commandContext => Move (commandContext, -16));
+        AddCommand (Command.Down, commandContext => Move (commandContext, 16));
+        AddCommand (Command.Left, commandContext => Move (commandContext, -1));
+        AddCommand (Command.Right, commandContext => Move (commandContext, 1));
 
-                        return true;
-                    }
-                   );
+        AddCommand (Command.PageUp, commandContext => Move (commandContext, -(Viewport.Height - HEADER_HEIGHT / _rowHeight) * 16));
+        AddCommand (Command.PageDown, commandContext => Move (commandContext, (Viewport.Height - HEADER_HEIGHT / _rowHeight) * 16));
+        AddCommand (Command.Start, commandContext => Move (commandContext, -SelectedCodePoint));
+        AddCommand (Command.End, commandContext => Move (commandContext, MAX_CODE_POINT - SelectedCodePoint));
 
-        AddCommand (
-                    Command.Down,
-                    () =>
-                    {
-                        SelectedCodePoint += 16;
+        AddCommand (Command.ScrollDown, () => ScrollVertical (1));
+        AddCommand (Command.ScrollUp, () => ScrollVertical (-1));
+        AddCommand (Command.ScrollRight, () => ScrollHorizontal (1));
+        AddCommand (Command.ScrollLeft, () => ScrollHorizontal (-1));
 
-                        return true;
-                    }
-                   );
-
-        AddCommand (
-                    Command.Left,
-                    () =>
-                    {
-                        SelectedCodePoint--;
-
-                        return true;
-                    }
-                   );
-
-        AddCommand (
-                    Command.Right,
-                    () =>
-                    {
-                        SelectedCodePoint++;
-
-                        return true;
-                    }
-                   );
-
-        AddCommand (
-                    Command.PageUp,
-                    () =>
-                    {
-                        int page = (Viewport.Height - HEADER_HEIGHT / _rowHeight) * 16;
-                        SelectedCodePoint -= page;
-
-                        return true;
-                    }
-                   );
-
-        AddCommand (
-                    Command.PageDown,
-                    () =>
-                    {
-                        int page = (Viewport.Height - HEADER_HEIGHT / _rowHeight) * 16;
-                        SelectedCodePoint += page;
-
-                        return true;
-                    }
-                   );
-
-        AddCommand (
-                    Command.Start,
-                    () =>
-                    {
-                        SelectedCodePoint = 0;
-
-                        return true;
-                    }
-                   );
-
-        AddCommand (
-                    Command.End,
-                    () =>
-                    {
-                        SelectedCodePoint = MAX_CODE_POINT;
-
-                        return true;
-                    }
-                   );
-
-        AddCommand (
-                    Command.Accept,
-                    () =>
-                    {
-                        ShowDetails ();
-
-                        return true;
-                    }
-                   );
+        AddCommand (Command.Accept, HandleAcceptCommand);
+        AddCommand (Command.Select, HandleSelectCommand);
+        AddCommand (Command.Context, HandleContextCommand);
 
         KeyBindings.Add (Key.CursorUp, Command.Up);
         KeyBindings.Add (Key.CursorDown, Command.Down);
@@ -132,8 +59,15 @@ public class CharMap : View, IDesignable
         KeyBindings.Add (Key.PageDown, Command.PageDown);
         KeyBindings.Add (Key.Home, Command.Start);
         KeyBindings.Add (Key.End, Command.End);
+        KeyBindings.Add (ContextMenu.DefaultKey, Command.Context);
 
-        MouseClick += Handle_MouseClick;
+        MouseBindings.Add (MouseFlags.Button1DoubleClicked, Command.Accept);
+        MouseBindings.ReplaceCommands(MouseFlags.Button3Clicked, Command.Context);
+        MouseBindings.ReplaceCommands (MouseFlags.Button1Clicked | MouseFlags.ButtonCtrl, Command.Context);
+        MouseBindings.Add (MouseFlags.WheeledDown, Command.ScrollDown);
+        MouseBindings.Add (MouseFlags.WheeledUp, Command.ScrollUp);
+        MouseBindings.Add (MouseFlags.WheeledLeft, Command.ScrollLeft);
+        MouseBindings.Add (MouseFlags.WheeledRight, Command.ScrollRight);
 
         SetContentSize (new (COLUMN_WIDTH * 16 + RowLabelWidth, MAX_CODE_POINT / 16 * _rowHeight + HEADER_HEIGHT));
 
@@ -167,6 +101,18 @@ public class CharMap : View, IDesignable
         VerticalScrollBar.Visible = true; // Force always visible
         VerticalScrollBar.X = Pos.AnchorEnd ();
         VerticalScrollBar.Y = HEADER_HEIGHT; // Header
+    }
+
+    private bool? Move (ICommandContext? commandContext, int cpOffset)
+    {
+        if (RaiseSelecting (commandContext) is true)
+        {
+            return true;
+        }
+
+        SelectedCodePoint += cpOffset;
+
+        return true;
     }
 
     private void ScrollToMakeCursorVisible (Point offsetToNewCursor)
@@ -203,6 +149,7 @@ public class CharMap : View, IDesignable
         return new (x, y);
     }
 
+    /// <inheritdoc/>
     public override Point? PositionCursor ()
     {
         Point cursor = GetCursor (SelectedCodePoint);
@@ -297,6 +244,7 @@ public class CharMap : View, IDesignable
 
     private static int RowLabelWidth => $"U+{MAX_CODE_POINT:x5}".Length + 1;
 
+    /// <inheritdoc/>
     protected override bool OnDrawingContent ()
     {
         if (Viewport.Height == 0 || Viewport.Width == 0)
@@ -465,79 +413,91 @@ public class CharMap : View, IDesignable
     #region Mouse Handling
 
     // TODO: Use this to demonstrate using a popover to show glyph info on hover
-    public event EventHandler<ListViewItemEventArgs>? Hover;
+    // public event EventHandler<ListViewItemEventArgs>? Hover;
 
-    /// <inheritdoc />
-    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
+    private bool? HandleSelectCommand (ICommandContext? commandContext)
     {
-        if (mouseEvent.Flags == MouseFlags.WheeledDown)
+        Point position = GetCursor (SelectedCodePoint);
+
+        if (commandContext is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } } mouseCommandContext)
         {
-            if (Viewport.Y + Viewport.Height - HEADER_HEIGHT < GetContentSize ().Height)
+            // If the mouse is clicked on the headers, map it to the first glyph of the row/col
+            position = mouseCommandContext.Binding.MouseEventArgs.Position;
+
+            if (position.Y == 0)
             {
-                ScrollVertical (1);
+                position = position with { Y = GetCursor (SelectedCodePoint).Y };
             }
-            return mouseEvent.Handled = true;
-        }
 
-        if (mouseEvent.Flags == MouseFlags.WheeledUp)
-        {
-            ScrollVertical (-1);
-            return mouseEvent.Handled = true;
-        }
-
-        if (mouseEvent.Flags == MouseFlags.WheeledRight)
-        {
-            if (Viewport.X + Viewport.Width < GetContentSize ().Width)
+            if (position.X < RowLabelWidth || position.X > RowLabelWidth + 16 * COLUMN_WIDTH - 1)
             {
-                ScrollHorizontal (1);
+                position = position with { X = GetCursor (SelectedCodePoint).X };
             }
-            return mouseEvent.Handled = true;
         }
 
-        if (mouseEvent.Flags == MouseFlags.WheeledLeft)
+        if (RaiseSelecting (commandContext) is true)
         {
-            ScrollHorizontal (-1);
-            return mouseEvent.Handled = true;
+            return true;
         }
 
-        return false;
+        if (!TryGetCodePointFromPosition (position, out int cp))
+        {
+            return false;
+        }
+
+        if (cp != SelectedCodePoint)
+        {
+            if (!HasFocus && CanFocus)
+            {
+                SetFocus ();
+            }
+
+            SelectedCodePoint = cp;
+        }
+
+        return true;
     }
 
-    private void Handle_MouseClick (object? sender, MouseEventArgs me)
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
+
+    private bool? HandleAcceptCommand (ICommandContext? commandContext)
     {
-        if (me.Flags != MouseFlags.ReportMousePosition && me.Flags != MouseFlags.Button1Clicked && me.Flags != MouseFlags.Button1DoubleClicked)
+        if (RaiseAccepting (commandContext) is true)
         {
-            return;
+            return true;
         }
 
-        if (me.Position.Y == 0)
+        if (commandContext is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } } mouseCommandContext)
         {
-            me.Position = me.Position with { Y = GetCursor (SelectedCodePoint).Y };
+            if (!HasFocus && CanFocus)
+            {
+                SetFocus ();
+            }
+
+            if (!TryGetCodePointFromPosition (mouseCommandContext.Binding.MouseEventArgs.Position, out int cp))
+            {
+                return false;
+            }
+
+            SelectedCodePoint = cp;
         }
 
-        if (me.Position.X < RowLabelWidth || me.Position.X > RowLabelWidth + 16 * COLUMN_WIDTH - 1)
+        ShowDetails ();
+
+        return true;
+    }
+
+    private bool? HandleContextCommand (ICommandContext? commandContext)
+    {
+        int newCodePoint = SelectedCodePoint;
+
+        if (commandContext is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } } mouseCommandContext)
         {
-            me.Position = me.Position with { X = GetCursor (SelectedCodePoint).X };
-        }
-
-        int row = (me.Position.Y - 1 - -Viewport.Y) / _rowHeight; // -1 for header
-        int col = (me.Position.X - RowLabelWidth - -Viewport.X) / COLUMN_WIDTH;
-
-        if (col > 15)
-        {
-            col = 15;
-        }
-
-        int val = row * 16 + col;
-
-        if (val > MAX_CODE_POINT)
-        {
-            return;
-        }
-
-        if (me.Flags == MouseFlags.ReportMousePosition)
-        {
-            Hover?.Invoke (this, new (val, null));
+            if (!TryGetCodePointFromPosition (mouseCommandContext.Binding.MouseEventArgs.Position, out newCodePoint))
+            {
+                return false;
+            }
         }
 
         if (!HasFocus && CanFocus)
@@ -545,76 +505,83 @@ public class CharMap : View, IDesignable
             SetFocus ();
         }
 
-        me.Handled = true;
+        SelectedCodePoint = newCodePoint;
 
-        if (me.Flags == MouseFlags.Button1Clicked)
+        _contextMenu = new ()
         {
-            SelectedCodePoint = val;
+            Position = ViewportToScreen (GetCursor (SelectedCodePoint))
+        };
 
-            return;
+        MenuBarItem menuItems = new (
+                                     [
+                                         new (
+                                              Strings.charMapCopyGlyph,
+                                              "",
+                                              CopyGlyph,
+                                              null,
+                                              null,
+                                              (KeyCode)Key.G.WithCtrl
+                                             ),
+                                         new (
+                                              Strings.charMapCopyCP,
+                                              "",
+                                              CopyCodePoint,
+                                              null,
+                                              null,
+                                              (KeyCode)Key.P.WithCtrl
+                                             )
+                                     ]
+                                    );
+        _contextMenu.Show (menuItems);
+
+        return true;
+    }
+
+    private bool TryGetCodePointFromPosition (Point position, out int codePoint)
+    {
+        int row = (position.Y - 1 - -Viewport.Y) / _rowHeight; // -1 for header
+        int col = (position.X - RowLabelWidth - -Viewport.X) / COLUMN_WIDTH;
+
+        if (col > 15)
+        {
+            col = 15;
         }
 
-        if (me.Flags == MouseFlags.Button1DoubleClicked)
-        {
-            SelectedCodePoint = val;
-            ShowDetails ();
+        codePoint = row * 16 + col;
 
-            return;
+        if (codePoint > MAX_CODE_POINT)
+        {
+            return false;
         }
 
-        if (me.Flags == _contextMenu.MouseFlags)
-        {
-            SelectedCodePoint = val;
-
-            _contextMenu = new ()
-            {
-                Position = new (me.Position.X + 1, me.Position.Y + 1)
-            };
-
-            MenuBarItem menuItems = new (
-                                         new MenuItem []
-                                         {
-                                             new (
-                                                  "_Copy Glyph",
-                                                  "",
-                                                  CopyGlyph,
-                                                  null,
-                                                  null,
-                                                  (KeyCode)Key.C.WithCtrl
-                                                 ),
-                                             new (
-                                                  "Copy Code _Point",
-                                                  "",
-                                                  CopyCodePoint,
-                                                  null,
-                                                  null,
-                                                  (KeyCode)Key.C.WithCtrl
-                                                              .WithShift
-                                                 )
-                                         }
-                                        );
-            _contextMenu.Show (menuItems);
-        }
+        return true;
     }
 
     #endregion Mouse Handling
 
     #region Details Dialog
 
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
     private void ShowDetails ()
     {
+        if (!Application.Initialized)
+        {
+            // Some unit tests invoke Accept without Init
+            return;
+        }
         UcdApiClient? client = new ();
         var decResponse = string.Empty;
         var getCodePointError = string.Empty;
 
         Dialog? waitIndicator = new ()
         {
-            Title = "Getting Code Point Information",
+            Title = Strings.charMapCPInfoDlgTitle,
             X = Pos.Center (),
             Y = Pos.Center (),
             Width = 40,
             Height = 10,
-            Buttons = [new () { Text = "_Cancel" }]
+            Buttons = [new () { Text = Strings.btnCancel }]
         };
 
         var errorLabel = new Label
@@ -641,7 +608,7 @@ public class CharMap : View, IDesignable
                                {
                                    try
                                    {
-                                       decResponse = await client.GetCodepointDec (SelectedCodePoint);
+                                       decResponse = await client.GetCodepointDec (SelectedCodePoint).ConfigureAwait (false);
                                        Application.Invoke (() => waitIndicator.RequestStop ());
                                    }
                                    catch (HttpRequestException e)
@@ -676,15 +643,15 @@ public class CharMap : View, IDesignable
                                                         document.RootElement,
                                                         new
                                                             JsonSerializerOptions
-                                                        { WriteIndented = true }
+                                                            { WriteIndented = true }
                                                        );
             }
 
             var title = $"{ToCamelCase (name!)} - {new Rune (SelectedCodePoint)} U+{SelectedCodePoint:x5}";
 
-            Button? copyGlyph = new () { Text = "Copy _Glyph" };
-            Button? copyCodepoint = new () { Text = "Copy Code _Point" };
-            Button? cancel = new () { Text = "Cancel" };
+            Button? copyGlyph = new () { Text = Strings.charMapCopyGlyph };
+            Button? copyCodepoint = new () { Text = Strings.charMapCopyCP };
+            Button? cancel = new () { Text = Strings.btnCancel };
 
             var dlg = new Dialog { Title = title, Buttons = [copyGlyph, copyCodepoint, cancel] };
 
@@ -747,7 +714,7 @@ public class CharMap : View, IDesignable
             label = new ()
             {
                 Text =
-                    $"Code Point Information from {UcdApiClient.BaseUrl}codepoint/dec/{SelectedCodePoint}:",
+                    $"{Strings.charMapInfoDlgInfoLabel} {UcdApiClient.BaseUrl}codepoint/dec/{SelectedCodePoint}:",
                 X = 0,
                 Y = Pos.Bottom (label)
             };
@@ -771,9 +738,9 @@ public class CharMap : View, IDesignable
         else
         {
             MessageBox.ErrorQuery (
-                                   "Code Point API",
-                                   $"{UcdApiClient.BaseUrl}codepoint/dec/{SelectedCodePoint} did not return a result for\r\n {new Rune (SelectedCodePoint)} U+{SelectedCodePoint:x5}.",
-                                   "_Ok"
+                                   Strings.error,
+                                   $"{UcdApiClient.BaseUrl}codepoint/dec/{SelectedCodePoint} {Strings.failedGetting}{Environment.NewLine}{new Rune (SelectedCodePoint)} U+{SelectedCodePoint:x5}.",
+                                   Strings.btnOk
                                   );
         }
 

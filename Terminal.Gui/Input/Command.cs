@@ -4,9 +4,14 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     Actions which can be performed by a <see cref="View"/>. Commands are typically invoked via
-///     <see cref="View.KeyBindings"/> and mouse events.
+///     Actions which can be performed by a <see cref="View"/>.
 /// </summary>
+/// <seealso cref="View.KeyBindings"/>
+/// <seealso cref="View.MouseBindings"/>
+/// <seealso cref="Application.KeyBindings"/>
+/// <remarks>
+///     <see cref="Application"/> supports a subset of these commands by default, which can be overriden via <see cref="Application.KeyBindings"/>.
+/// </remarks>
 public enum Command
 {
     #region Base View Commands

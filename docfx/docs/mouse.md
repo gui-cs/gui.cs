@@ -10,6 +10,30 @@ Tenets higher in the list have precedence over tenets lower in the list.
 
 ## Mouse APIs
 
+*Terminal.Gui* provides the following APIs for handling mouse input:
+
+* **MouseEventArgs** - @Terminal.Gui.MouseEventArgs provides a platform-independent abstraction for common mouse operations. It is used for processing mouse input and raising mouse events.
+* **Mouse Bindings** - Mouse Bindings provide a declarative method for handling mouse input in View implementations. The View calls @Terminal.Gui.AddCommand to declare it supports a particular command and then uses @Terminal.Gui.MouseBindings to indicate which mouse events will invoke the command. 
+* **Mouse Events** - The Mouse Bindings API is rich enough to support the  majority of use-cases. However, in some cases subscribing directly to key events is needed (e.g. drag & drop). Use @Terminal.Gui.View.MouseEvent and related events in these cases.
+
+Each of these APIs are described more fully below.
+
+## Mouse Bindings
+
+Mouse Bindings is the preferred way of handling mouse input in View implementations. The View calls @Terminal.Gui.AddCommand to declare it supports a particular command and then uses @Terminal.Gui.MouseBindings to indicate which mouse events will invoke the command. For example, if a View wants to respond to the user using the mouse wheel to scroll up, it would do this:
+
+```cs
+public MyView : View
+{
+  AddCommand (Command.ScrollUp, () => ScrollVertical (-1));
+  MouseBindings.Add (MouseFlags.Button1DoubleClick, Command.ScrollUp);
+}
+```
+
+The [Command](~/api/Terminal.Gui.Command.yml) enum lists generic operations that are implemented by views. 
+
+## Mouse Events
+
 At the core of *Terminal.Gui*'s mouse API is the @Terminal.Gui.MouseEventArgs class. The @Terminal.Gui.MouseEventArgs class provides a platform-independent abstraction for common mouse events. Every mouse event can be fully described in a @Terminal.Gui.MouseEventArgs instance, and most of the mouse-related APIs are simply helper functions for decoding a @Terminal.Gui.MouseEventArgs.
 
 When the user does something with the mouse, the `ConsoleDriver` maps the platform-specific mouse event into a `MouseEventArgs` and calls `Application.RaiseMouseEvent`. Then, `Application.RaiseMouseEvent` determines which `View` the event should go to. The `View.OnMouseEvent` method can be overridden or the `View.MouseEvent` event can be subscribed to, to handle the low-level mouse event. If the low-level event is not handled by a view, `Application` will then call the appropriate high-level helper APIs. For example, if the user double-clicks the mouse, `View.OnMouseClick` will be called/`View.MouseClick` will be raised with the event arguments indicating which mouse button was double-clicked. 

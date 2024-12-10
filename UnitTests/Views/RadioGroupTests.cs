@@ -64,24 +64,28 @@ public class RadioGroupTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void KeyBindings_Are_Added_Correctly ()
+    public void HotKeyBindings_Are_Added_Correctly ()
     {
         var rg = new RadioGroup { RadioLabels = new [] { "_Left", "_Right" } };
-        Assert.NotEmpty (rg.KeyBindings.GetCommands (Key.L));
-        Assert.NotEmpty (rg.KeyBindings.GetCommands (Key.R));
+        Assert.NotEmpty (rg.HotKeyBindings.GetCommands (Key.L));
+        Assert.NotEmpty (rg.HotKeyBindings.GetCommands (Key.R));
 
-        Assert.NotEmpty (rg.KeyBindings.GetCommands (Key.L.WithShift));
-        Assert.NotEmpty (rg.KeyBindings.GetCommands (Key.L.WithAlt));
+        Assert.NotEmpty (rg.HotKeyBindings.GetCommands (Key.L.WithShift));
+        Assert.NotEmpty (rg.HotKeyBindings.GetCommands (Key.L.WithAlt));
 
-        Assert.NotEmpty (rg.KeyBindings.GetCommands (Key.R.WithShift));
-        Assert.NotEmpty (rg.KeyBindings.GetCommands (Key.R.WithAlt));
+        Assert.NotEmpty (rg.HotKeyBindings.GetCommands (Key.R.WithShift));
+        Assert.NotEmpty (rg.HotKeyBindings.GetCommands (Key.R.WithAlt));
     }
 
     [Fact]
     public void Commands_HasFocus ()
     {
         Application.Navigation = new ();
-        var rg = new RadioGroup { RadioLabels = new [] { "Test", "New Test" } };
+        var rg = new RadioGroup
+        {
+            Id = "rg",
+            RadioLabels = ["Test", "New Test"]
+        };
         Application.Top = new ();
         Application.Top.Add (rg);
         rg.SetFocus ();
@@ -201,7 +205,7 @@ public class RadioGroupTests (ITestOutputHelper output)
     public void HotKey_HasFocus_False ()
     {
         Application.Navigation = new ();
-        var rg = new RadioGroup { RadioLabels = new [] { "Test", "New Test" } };
+        var rg = new RadioGroup { RadioLabels = ["Test", "New Test"] };
         Application.Top = new ();
 
         // With !HasFocus
@@ -278,7 +282,7 @@ public class RadioGroupTests (ITestOutputHelper output)
     public void HotKeys_HasFocus_False_Does_Not_SetFocus_Selects ()
     {
         Application.Navigation = new ();
-        var rg = new RadioGroup { RadioLabels = new [] { "Item _A", "Item _B" } };
+        var rg = new RadioGroup { RadioLabels = ["Item _A", "Item _B"] };
         Application.Top = new ();
 
         // With !HasFocus
@@ -363,14 +367,14 @@ public class RadioGroupTests (ITestOutputHelper output)
     [Fact]
     public void HotKeys_HasFocus_True_Selects ()
     {
-        var rg = new RadioGroup { RadioLabels = new [] { "_Left", "_Right", "Cen_tered", "_Justified" } };
+        var rg = new RadioGroup { RadioLabels = ["_Left", "_Right", "Cen_tered", "_Justified"] };
         Application.Top = new ();
         Application.Top.Add (rg);
         rg.SetFocus ();
 
-        Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L));
-        Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L | KeyCode.ShiftMask));
-        Assert.NotEmpty (rg.KeyBindings.GetCommands (KeyCode.L | KeyCode.AltMask));
+        Assert.NotEmpty (rg.HotKeyBindings.GetCommands (KeyCode.L));
+        Assert.NotEmpty (rg.HotKeyBindings.GetCommands (KeyCode.L | KeyCode.ShiftMask));
+        Assert.NotEmpty (rg.HotKeyBindings.GetCommands (KeyCode.L | KeyCode.AltMask));
 
         Assert.True (Application.RaiseKeyDownEvent (Key.T));
         Assert.Equal (2, rg.SelectedItem);
@@ -425,7 +429,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         var group = new RadioGroup
         {
             Title = "Radio_Group",
-            RadioLabels = new [] { "_Left", "_Right", "Cen_tered", "_Justified" }
+            RadioLabels = ["_Left", "_Right", "Cen_tered", "_Justified"]
         };
         superView.Add (group);
 
@@ -450,7 +454,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         var group = new RadioGroup
         {
             Title = "Radio_Group",
-            RadioLabels = new [] { "_Left", "_Right", "Cen_tered", "_Justified" }
+            RadioLabels = ["_Left", "_Right", "Cen_tered", "_Justified"]
         };
         group.SelectedItem = -1;
 
@@ -488,7 +492,7 @@ public class RadioGroupTests (ITestOutputHelper output)
     [Fact]
     public void HotKey_Command_Does_Not_Accept ()
     {
-        var group = new RadioGroup { RadioLabels = new [] { "_Left", "_Right", "Cen_tered", "_Justified" } };
+        var group = new RadioGroup { RadioLabels = ["_Left", "_Right", "Cen_tered", "_Justified"] };
         var accepted = false;
 
         group.Accepting += OnAccept;
@@ -504,7 +508,7 @@ public class RadioGroupTests (ITestOutputHelper output)
     [Fact]
     public void Accept_Command_Fires_Accept ()
     {
-        var group = new RadioGroup { RadioLabels = new [] { "_Left", "_Right", "Cen_tered", "_Justified" } };
+        var group = new RadioGroup { RadioLabels = ["_Left", "_Right", "Cen_tered", "_Justified"] };
         var accepted = false;
 
         group.Accepting += OnAccept;
@@ -521,7 +525,7 @@ public class RadioGroupTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Orientation_Width_Height_Vertical_Horizontal_Space ()
     {
-        var rg = new RadioGroup { RadioLabels = new [] { "Test", "New Test 你" } };
+        var rg = new RadioGroup { RadioLabels = ["Test", "New Test 你"] };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (rg);
         var top = new Toplevel ();
@@ -597,7 +601,7 @@ public class RadioGroupTests (ITestOutputHelper output)
     {
         int previousSelectedItem = -1;
         int selectedItem = -1;
-        var rg = new RadioGroup { RadioLabels = new [] { "Test", "New Test" } };
+        var rg = new RadioGroup { RadioLabels = ["Test", "New Test"] };
 
         rg.SelectedItemChanged += (s, e) =>
                                   {
@@ -664,7 +668,7 @@ public class RadioGroupTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void Mouse_DoubleClick ()
+    public void Mouse_DoubleClick_Accepts ()
     {
         var radioGroup = new RadioGroup
         {
@@ -701,12 +705,13 @@ public class RadioGroupTests (ITestOutputHelper output)
         // NOTE: We need to do the same
 
         Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked }));
-        Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked }));
+        Assert.False (radioGroup.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked }));
         Assert.Equal (0, radioGroup.SelectedItem);
         Assert.Equal (0, selectedItemChanged);
         Assert.Equal (0, selectingCount);
         Assert.Equal (1, acceptedCount);
 
+        // single click twice
         Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 1), Flags = MouseFlags.Button1Clicked }));
         Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 1), Flags = MouseFlags.Button1Clicked }));
         Assert.Equal (1, radioGroup.SelectedItem);
@@ -715,7 +720,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         Assert.Equal (1, acceptedCount);
 
         Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 1), Flags = MouseFlags.Button1Clicked }));
-        Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 1), Flags = MouseFlags.Button1DoubleClicked }));
+        Assert.False (radioGroup.NewMouseEvent (new () { Position = new (0, 1), Flags = MouseFlags.Button1DoubleClicked }));
         Assert.Equal (1, radioGroup.SelectedItem);
         Assert.Equal (1, selectedItemChanged);
         Assert.Equal (1, selectingCount);
@@ -762,7 +767,7 @@ public class RadioGroupTests (ITestOutputHelper output)
 
         radioGroup.DoubleClickAccepts = false;
         Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 1), Flags = MouseFlags.Button1Clicked }));
-        Assert.True (radioGroup.NewMouseEvent (new () { Position = new (0, 1), Flags = MouseFlags.Button1DoubleClicked }));
+        Assert.False (radioGroup.NewMouseEvent (new () { Position = new (0, 1), Flags = MouseFlags.Button1DoubleClicked }));
     }
 
     #endregion Mouse Tests

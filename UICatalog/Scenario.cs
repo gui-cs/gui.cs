@@ -220,7 +220,7 @@ public class Scenario : IDisposable
     private void OnApplicationOnIteration (object? s, IterationEventArgs a)
     {
         BenchmarkResults.IterationCount++;
-        if (BenchmarkResults.IterationCount > BENCHMARK_MAX_NATURAL_ITERATIONS + (_demoKeys.Count * BENCHMARK_KEY_PACING))
+        if (BenchmarkResults.IterationCount > BENCHMARK_MAX_NATURAL_ITERATIONS + (_demoKeys!.Count * BENCHMARK_KEY_PACING))
         {
             Application.RequestStop ();
         }

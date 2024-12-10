@@ -147,7 +147,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
         SetupKeyboard ();
 
-        //SetupMouse ();
+        SetupMouse ();
 
         SetupText ();
 
@@ -550,6 +550,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
     {
         LineCanvas.Dispose ();
 
+        DisposeMouse ();
         DisposeKeyboard ();
         DisposeAdornments ();
         DisposeScrollBars ();

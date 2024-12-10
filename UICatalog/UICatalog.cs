@@ -761,7 +761,7 @@ public class UICatalogApp
                     CanFocus = false
                 },
                 HelpText = "",
-                KeyBindingScope = KeyBindingScope.Application,
+                BindKeyToApplication = true,
                 Key = Key.F7
             };
 
@@ -796,7 +796,8 @@ public class UICatalogApp
                                              {
                                                  if (_statusBar.NeedsLayout)
                                                  {
-                                                     //  throw new LayoutException ("DimFunc.Fn aborted because dependent View needs layout.");
+                                                       throw new LayoutException ("DimFunc.Fn aborted because dependent View needs layout.");
+                                                     //_statusBar.Layout ();
                                                  }
                                                  return _statusBar.Frame.Height;
                                              })),
@@ -825,7 +826,8 @@ public class UICatalogApp
                                              {
                                                  if (_statusBar.NeedsLayout)
                                                  {
-                                                     // throw new LayoutException ("DimFunc.Fn aborted because dependent View needs layout.");
+                                                     throw new LayoutException ("DimFunc.Fn aborted because dependent View needs layout.");
+                                                     //_statusBar.Layout ();
                                                  }
                                                  return _statusBar.Frame.Height;
                                              })),

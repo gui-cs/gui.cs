@@ -31,10 +31,7 @@ internal class NetMainLoop : IMainLoopDriver
     {
         ArgumentNullException.ThrowIfNull (consoleDriver);
 
-        if (!ConsoleDriver.RunningUnitTests)
-        {
-            _netEvents = new (consoleDriver);
-        }
+        _netEvents = new (consoleDriver);
     }
 
     void IMainLoopDriver.Setup (MainLoop mainLoop)

@@ -185,7 +185,9 @@ public class MessageBoxes : Scenario
 
         var styleRadioGroup = new RadioGroup
         {
-            X = Pos.Right (label) + 1, Y = Pos.Top (label), RadioLabels = new [] { "_Query", "_Error" }
+            X = Pos.Right (label) + 1, 
+            Y = Pos.Top (label), 
+            RadioLabels = ["_Query", "_Error"],
         };
         frame.Add (styleRadioGroup);
 

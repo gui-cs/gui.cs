@@ -252,7 +252,7 @@ public class CheckBoxTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void Mouse_Click ()
+    public void Mouse_Click_Selects ()
     {
         var checkBox = new CheckBox { Text = "_Checkbox" };
         Assert.True (checkBox.CanFocus);
@@ -296,7 +296,7 @@ public class CheckBoxTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void Mouse_DoubleClick ()
+    public void Mouse_DoubleClick_Accepts ()
     {
         var checkBox = new CheckBox { Text = "_Checkbox" };
         Assert.True (checkBox.CanFocus);
@@ -308,7 +308,11 @@ public class CheckBoxTests (ITestOutputHelper output)
         checkBox.Selecting += (s, e) => selectCount++;
 
         int acceptCount = 0;
-        checkBox.Accepting += (s, e) => acceptCount++;
+        checkBox.Accepting += (s, e) =>
+                              {
+                                  acceptCount++;
+                                  e.Cancel = true;
+                              };
 
         checkBox.HasFocus = true;
         Assert.True (checkBox.HasFocus);
@@ -319,9 +323,14 @@ public class CheckBoxTests (ITestOutputHelper output)
 
         Assert.True (checkBox.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1DoubleClicked }));
 
+        Assert.Equal (CheckState.UnChecked, checkBox.CheckedState);
+        Assert.Equal (0, checkedStateChangingCount);
+        Assert.Equal (0, selectCount);
+        Assert.Equal (1, acceptCount);
+
     }
 
-#endregion Mouse Tests
+    #endregion Mouse Tests
 
     [Fact]
     [AutoInitShutdown]

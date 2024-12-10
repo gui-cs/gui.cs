@@ -167,7 +167,7 @@ public class Bars : Scenario
         {
             Title = "Toggle Hide",
             Text = "App",
-            KeyBindingScope = KeyBindingScope.Application,
+            BindKeyToApplication = true,
             Key = Key.F4.WithCtrl,
         };
         _popoverMenu.Add (toggleShortcut);

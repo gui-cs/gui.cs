@@ -222,7 +222,7 @@ public class MenuBarItem : MenuItem
                 if (menuItem?.ShortcutKey != Key.Empty)
                 {
                     // Remove an existent ShortcutKey
-                    _menuBar?.KeyBindings.Remove (menuItem?.ShortcutKey!);
+                    _menuBar?.HotKeyBindings.Remove (menuItem?.ShortcutKey!);
                 }
             }
         }
@@ -230,7 +230,7 @@ public class MenuBarItem : MenuItem
         if (ShortcutKey != Key.Empty)
         {
             // Remove an existent ShortcutKey
-            _menuBar?.KeyBindings.Remove (ShortcutKey!);
+            _menuBar?.HotKeyBindings.Remove (ShortcutKey!);
         }
 
         var index = _menuBar!.Menus.IndexOf (this);
@@ -239,7 +239,7 @@ public class MenuBarItem : MenuItem
             if (_menuBar.Menus [index].HotKey != Key.Empty)
             {
                 // Remove an existent HotKey
-                _menuBar.KeyBindings.Remove (HotKey!.WithAlt);
+                _menuBar.HotKeyBindings.Remove (HotKey!.WithAlt);
             }
 
             _menuBar.Menus [index] = null!;
