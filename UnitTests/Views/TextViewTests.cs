@@ -6999,7 +6999,7 @@ TAB to jump between text field",
         {
             Width = Dim.Fill (), Height = Dim.Fill (), Text = "This is the first line.\nThis is the second line.\n"
         };
-        tv.UnwrappedCursorPosition += (s, e) => { cp = e.Point; };
+        tv.UnwrappedCursorPosition += (s, e) => { cp = e; };
         var top = new Toplevel ();
         top.Add (tv);
         Application.Begin (top);

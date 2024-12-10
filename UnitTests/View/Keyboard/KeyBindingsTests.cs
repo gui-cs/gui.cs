@@ -2,13 +2,14 @@
 
 namespace Terminal.Gui.ViewTests;
 
-public class ViewKeyBindingTests (ITestOutputHelper output)
+/// <summary>
+///     Tests for View.KeyBindings
+/// </summary>
+public class KeyBindingsTests ()
 {
-    private readonly ITestOutputHelper _output = output;
-
     [Fact]
     [AutoInitShutdown]
-    public void Focus_KeyBinding ()
+    public void Focused_HotKey_Application_All_Work ()
     {
         var view = new ScopedKeyBindingView ();
         var keyWasHandled = false;
@@ -48,7 +49,7 @@ public class ViewKeyBindingTests (ITestOutputHelper output)
 
     [Fact]
     [AutoInitShutdown]
-    public void Focus_KeyBinding_Negative ()
+    public void KeyBinding_Negative ()
     {
         var view = new ScopedKeyBindingView ();
         var keyWasHandled = false;
@@ -139,7 +140,7 @@ public class ViewKeyBindingTests (ITestOutputHelper output)
 
             Application.KeyBindings.Add (Key.A, this, Command.Save);
             HotKey = KeyCode.H;
-            KeyBindings.Add (Key.F, KeyBindingScope.Focused, Command.Left);
+            KeyBindings.Add (Key.F, Command.Left);
         }
 
         public bool ApplicationCommand { get; set; }

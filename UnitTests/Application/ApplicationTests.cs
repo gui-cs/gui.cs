@@ -317,9 +317,6 @@ public class ApplicationTests
             Assert.Empty (Application.TopLevels);
             Assert.Empty (Application._cachedViewsUnderMouse);
 
-            // Keyboard
-            Assert.Empty (Application.GetViewKeyBindings ());
-
             // Mouse
             Assert.Null (Application._lastMousePosition);
 
@@ -358,7 +355,7 @@ public class ApplicationTests
         Application.PrevTabGroupKey = Key.A;
         Application.NextTabGroupKey = Key.B;
         Application.QuitKey = Key.C;
-        Application.KeyBindings.Add (Key.D, KeyBindingScope.Application, Command.Cancel);
+        Application.KeyBindings.Add (Key.D, Command.Cancel);
 
         Application._cachedViewsUnderMouse.Clear ();
 
@@ -555,7 +552,7 @@ public class ApplicationTests
 
         Assert.Equal (Key.Q.WithCtrl, Application.QuitKey);
 
-        Assert.Contains (Key.Q.WithCtrl, Application.KeyBindings.Bindings);
+        Assert.True (Application.KeyBindings.TryGet (Key.Q.WithCtrl, out _));
 
         Application.Shutdown ();
         Locations = ConfigLocations.Default;

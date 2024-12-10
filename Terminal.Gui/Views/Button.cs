@@ -70,16 +70,16 @@ public class Button : View, IDesignable
         HighlightStyle = DefaultHighlightStyle;
     }
 
-    private bool? HandleHotKeyCommand (CommandContext ctx)
+    private bool? HandleHotKeyCommand (ICommandContext commandContext)
     {
         bool cachedIsDefault = IsDefault; // Supports "Swap Default" in Buttons scenario where IsDefault changes
 
-        if (RaiseSelecting (ctx) is true)
+        if (RaiseSelecting (commandContext) is true)
         {
             return true;
         }
 
-        bool? handled = RaiseAccepting (ctx);
+        bool? handled = RaiseAccepting (commandContext);
 
         if (handled == true)
         {
@@ -133,7 +133,7 @@ public class Button : View, IDesignable
         }
 
         // TODO: With https://github.com/gui-cs/Terminal.Gui/issues/3778 we won't have to pass data:
-        e.Handled = InvokeCommand (Command.HotKey, new (Command.HotKey, null, data: this)) == true;
+        e.Handled = InvokeCommand<KeyBinding> (Command.HotKey, new KeyBinding ([Command.HotKey], this, data: null)) == true;
     }
 
     private void Button_TitleChanged (object sender, EventArgs<string> e)

@@ -149,11 +149,11 @@ public class MenuItem
         if (AllowNullChecked)
         {
             Checked = previousChecked switch
-                      {
-                          null => true,
-                          true => false,
-                          false => null
-                      };
+            {
+                null => true,
+                true => false,
+                false => null
+            };
         }
         else
         {
@@ -242,9 +242,9 @@ public class MenuItem
             }
             else if (nextIsHot)
             {
-                    HotKey = char.ToLower (x);
+                HotKey = char.ToLower (x);
 
-                    return;
+                return;
             }
         }
 
@@ -289,15 +289,15 @@ public class MenuItem
     {
         if (key != Key.Empty)
         {
-            _menuBar.KeyBindings.Remove (key);
+            _menuBar.HotKeyBindings.Remove (key);
         }
 
         if (ShortcutKey != Key.Empty)
         {
-            KeyBinding keyBinding = new ([Command.Select], KeyBindingScope.HotKey, this);
+            KeyBinding keyBinding = new ([Command.Select], null, data: this);
             // Remove an existent ShortcutKey
-            _menuBar.KeyBindings.Remove (ShortcutKey!);
-            _menuBar.KeyBindings.Add (ShortcutKey!, keyBinding);
+            _menuBar.HotKeyBindings.Remove (ShortcutKey!);
+            _menuBar.HotKeyBindings.Add (ShortcutKey!, keyBinding);
         }
     }
 
@@ -314,7 +314,7 @@ public class MenuItem
 
             if (index > -1)
             {
-                _menuBar.KeyBindings.Remove (oldKey.WithAlt);
+                _menuBar.HotKeyBindings.Remove (oldKey.WithAlt);
             }
         }
 
@@ -324,9 +324,9 @@ public class MenuItem
 
             if (index > -1)
             {
-                _menuBar.KeyBindings.Remove (HotKey!.WithAlt);
-                KeyBinding keyBinding = new ([Command.Toggle], KeyBindingScope.HotKey, this);
-                _menuBar.KeyBindings.Add (HotKey.WithAlt, keyBinding);
+                _menuBar.HotKeyBindings.Remove (HotKey!.WithAlt);
+                KeyBinding keyBinding = new ([Command.Toggle], null, data: this);
+                _menuBar.HotKeyBindings.Add (HotKey.WithAlt, keyBinding);
             }
         }
     }
@@ -378,7 +378,7 @@ public class MenuItem
         if (ShortcutKey != Key.Empty)
         {
             // Remove an existent ShortcutKey
-            _menuBar.KeyBindings.Remove (ShortcutKey!);
+            _menuBar.HotKeyBindings.Remove (ShortcutKey!);
         }
     }
 }

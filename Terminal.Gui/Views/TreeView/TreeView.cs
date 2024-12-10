@@ -375,7 +375,7 @@ public class TreeView<T> : View, ITreeView where T : class
         {
             if (objectActivationKey != value)
             {
-                KeyBindings.ReplaceKey (ObjectActivationKey, value);
+                KeyBindings.Replace (ObjectActivationKey, value);
                 objectActivationKey = value;
                 SetNeedsDraw ();
             }
@@ -462,10 +462,10 @@ public class TreeView<T> : View, ITreeView where T : class
     ///     <para>This method also ensures that the selected object is visible.</para>
     /// </summary>
     /// <returns><see langword="true"/> if <see cref="ObjectActivated"/> was fired.</returns>
-    public bool? ActivateSelectedObjectIfAny (CommandContext ctx)
+    public bool? ActivateSelectedObjectIfAny (ICommandContext commandContext)
     {
         // By default, Command.Accept calls OnAccept, so we need to call it here to ensure that the event is fired.
-        if (RaiseAccepting (ctx) == true)
+        if (RaiseAccepting (commandContext) == true)
         {
             return true;
         }

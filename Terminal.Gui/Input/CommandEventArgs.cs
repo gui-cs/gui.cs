@@ -9,7 +9,10 @@ namespace Terminal.Gui;
 public class CommandEventArgs : CancelEventArgs
 {
     /// <summary>
-    ///     The context for the command.
+    ///     The context for the command, if any.
     /// </summary>
-    public CommandContext Context { get; init; }
+    /// <remarks>
+    ///     If <see langword="null"/> the command was invoked without context.
+    /// </remarks>
+    public required ICommandContext? Context { get; init; }
 }

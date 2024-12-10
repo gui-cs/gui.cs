@@ -5,6 +5,8 @@ namespace Terminal.Gui;
 
 public partial class View // Command APIs
 {
+    private readonly Dictionary<Command, CommandImplementation> _commandImplementations = new ();
+
     #region Default Implementation
 
     /// <summary>
@@ -30,7 +32,7 @@ public partial class View // Command APIs
                     });
 
         // Space or single-click - Raise Selecting
-        AddCommand (Command.Select, (ctx) =>
+        AddCommand (Command.Select, ctx =>
                                     {
                                         if (RaiseSelecting (ctx) is true)
                                         {
@@ -54,7 +56,7 @@ public partial class View // Command APIs
     /// </summary>
     /// <remarks>
     /// <para>
-    ///     The <see cref="Accepting"/> event should raised after the state of the View has changed (after <see cref="Selecting"/> is raised).
+    ///     The <see cref="Accepting"/> event should be raised after the state of the View has changed (after <see cref="Selecting"/> is raised).
     /// </para>
     /// <para>
     ///    If the Accepting event is not handled, <see cref="Command.Accept"/> will be invoked on the SuperView, enabling default Accept behavior.
@@ -65,11 +67,11 @@ public partial class View // Command APIs
     /// </para>
     /// </remarks>
     /// <returns>
-    ///     <see langword="null"/> if no event was raised; input proessing should continue.
-    ///     <see langword="false"/> if the event was raised and was not handled (or cancelled); input proessing should continue.
-    ///     <see langword="true"/> if the event was raised and handled (or cancelled); input proessing should stop.
+    ///     <see langword="null"/> if no event was raised; input processing should continue.
+    ///     <see langword="false"/> if the event was raised and was not handled (or cancelled); input processing should continue.
+    ///     <see langword="true"/> if the event was raised and handled (or cancelled); input processing should stop.
     /// </returns>
-    protected bool? RaiseAccepting (CommandContext ctx)
+    protected bool? RaiseAccepting (ICommandContext? ctx)
     {
         CommandEventArgs args = new () { Context = ctx };
 
@@ -93,14 +95,17 @@ public partial class View // Command APIs
 
             if (isDefaultView != this && isDefaultView is Button { IsDefault: true } button)
             {
-                bool? handled = isDefaultView.InvokeCommand (Command.Accept, ctx: new (Command.Accept, null, null, this));
+                bool? handled = isDefaultView.InvokeCommand<KeyBinding> (Command.Accept, new ([Command.Accept], null, this));
                 if (handled == true)
                 {
                     return true;
                 }
             }
 
-            return SuperView?.InvokeCommand (Command.Accept, ctx: new (Command.Accept, null, null, this)) == true;
+            if (SuperView is { })
+            {
+                return SuperView?.InvokeCommand<KeyBinding> (Command.Accept, new ([Command.Accept], null, this)) is true;
+            }
         }
 
         return Accepting is null ? null : args.Cancel;
@@ -135,14 +140,14 @@ public partial class View // Command APIs
     ///     event. The default <see cref="Command.Select"/> handler calls this method.
     /// </summary>
     /// <remarks>
-    ///     The <see cref="Selecting"/> event should raised after the state of the View has been changed and before see <see cref="Accepting"/>.
+    ///     The <see cref="Selecting"/> event should be raised after the state of the View has been changed and before see <see cref="Accepting"/>.
     /// </remarks>
     /// <returns>
-    ///     <see langword="null"/> if no event was raised; input proessing should continue.
-    ///     <see langword="false"/> if the event was raised and was not handled (or cancelled); input proessing should continue.
-    ///     <see langword="true"/> if the event was raised and handled (or cancelled); input proessing should stop.
+    ///     <see langword="null"/> if no event was raised; input processing should continue.
+    ///     <see langword="false"/> if the event was raised and was not handled (or cancelled); input processing should continue.
+    ///     <see langword="true"/> if the event was raised and handled (or cancelled); input processing should stop.
     /// </returns>
-    protected bool? RaiseSelecting (CommandContext ctx)
+    protected bool? RaiseSelecting (ICommandContext? ctx)
     {
         CommandEventArgs args = new () { Context = ctx };
 
@@ -179,13 +184,13 @@ public partial class View // Command APIs
     ///     event. The default <see cref="Command.HotKey"/> handler calls this method.
     /// </summary>
     /// <returns>
-    ///     <see langword="null"/> if no event was raised; input proessing should continue.
-    ///     <see langword="false"/> if the event was raised and was not handled (or cancelled); input proessing should continue.
-    ///     <see langword="true"/> if the event was raised and handled (or cancelled); input proessing should stop.
+    ///     <see langword="null"/> if no event was raised; input processing should continue.
+    ///     <see langword="false"/> if the event was raised and was not handled (or cancelled); input processing should continue.
+    ///     <see langword="true"/> if the event was raised and handled (or cancelled); input processing should stop.
     /// </returns>
     protected bool? RaiseHandlingHotKey ()
     {
-        CommandEventArgs args = new ();
+        CommandEventArgs args = new () { Context = new CommandContext<KeyBinding> () { Command = Command.HotKey } };
 
         // Best practice is to invoke the virtual method first.
         // This allows derived classes to handle the event and potentially cancel it.
@@ -219,13 +224,13 @@ public partial class View // Command APIs
     /// <summary>
     /// Function signature commands.
     /// </summary>
-    /// <param name="ctx">Provides information about the circumstances of invoking the command (e.g. <see cref="CommandContext.Key"/>)</param>
+    /// <param name="ctx">Provides context about the circumstances of invoking the command.</param>
     /// <returns>
-    ///     <see langword="null"/> if no command was found; input proessing should continue.
-    ///     <see langword="false"/> if the command was invoked and was not handled (or cancelled); input proessing should continue.
-    ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input proessing should stop.
+    ///     <see langword="null"/> if no event was raised; input processing should continue.
+    ///     <see langword="false"/> if the event was raised and was not handled (or cancelled); input processing should continue.
+    ///     <see langword="true"/> if the event was raised and handled (or cancelled); input processing should stop.
     /// </returns>
-    public delegate bool? CommandImplementation (CommandContext ctx);
+    public delegate bool? CommandImplementation (ICommandContext? ctx);
 
     /// <summary>
     ///     <para>
@@ -239,12 +244,12 @@ public partial class View // Command APIs
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         This version of AddCommand is for commands that require <see cref="CommandContext"/>.
+    ///         This version of AddCommand is for commands that require <see cref="ICommandContext"/>.
     ///     </para>
     /// </remarks>
     /// <param name="command">The command.</param>
     /// <param name="impl">The delegate.</param>
-    protected void AddCommand (Command command, CommandImplementation impl) { CommandImplementations [command] = impl; }
+    protected void AddCommand (Command command, CommandImplementation impl) { _commandImplementations [command] = impl; }
 
     /// <summary>
     ///     <para>
@@ -258,45 +263,44 @@ public partial class View // Command APIs
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         This version of AddCommand is for commands that do not require a <see cref="CommandContext"/>.
+    ///         This version of AddCommand is for commands that do not require context.
     ///         If the command requires context, use
     ///         <see cref="AddCommand(Command,CommandImplementation)"/>
     ///     </para>
     /// </remarks>
     /// <param name="command">The command.</param>
     /// <param name="impl">The delegate.</param>
-    protected void AddCommand (Command command, Func<bool?> impl) { CommandImplementations [command] = ctx => impl (); }
+    protected void AddCommand (Command command, Func<bool?> impl) { _commandImplementations [command] = ctx => impl (); }
 
     /// <summary>Returns all commands that are supported by this <see cref="View"/>.</summary>
     /// <returns></returns>
-    public IEnumerable<Command> GetSupportedCommands () { return CommandImplementations.Keys; }
+    public IEnumerable<Command> GetSupportedCommands () { return _commandImplementations.Keys; }
 
     /// <summary>
     ///     Invokes the specified commands.
     /// </summary>
     /// <param name="commands">The set of commands to invoke.</param>
-    /// <param name="key">The key that caused the command to be invoked, if any. This will be passed as context with the command.</param>
-    /// <param name="keyBinding">The key binding that was bound to the key and caused the invocation, if any. This will be passed as context with the command.</param>
+    /// <param name="binding">The binding that caused the invocation, if any. This will be passed as context with the command.</param>
     /// <returns>
-    ///     <see langword="null"/> if no command was found; input proessing should continue.
-    ///     <see langword="false"/> if at least one command was invoked and was not handled (or cancelled); input proessing should continue.
-    ///     <see langword="true"/> if at least one command was invoked the command was handled (or cancelled); input proessing should stop.
+    ///     <see langword="null"/> if no command was found; input processing should continue.
+    ///     <see langword="false"/> if the command was invoked and was not handled (or cancelled); input processing should continue.
+    ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should stop.
     /// </returns>
-    public bool? InvokeCommands (Command [] commands, Key? key = null, KeyBinding? keyBinding = null)
+    public bool? InvokeCommands<TBindingType> (Command [] commands, TBindingType binding)
     {
         bool? toReturn = null;
 
         foreach (Command command in commands)
         {
-            if (!CommandImplementations.ContainsKey (command))
+            if (!_commandImplementations.ContainsKey (command))
             {
                 throw new NotSupportedException (
-                                                 @$"A KeyBinding was set up for the command {command} ({key}) but that command is not supported by this View ({GetType ().Name})"
+                                                 @$"A Binding was set up for the command {command} ({binding}) but that command is not supported by this View ({GetType ().Name})"
                                                 );
             }
 
             // each command has its own return value
-            bool? thisReturn = InvokeCommand (command, key, keyBinding);
+            bool? thisReturn = InvokeCommand<TBindingType> (command, binding);
 
             // if we haven't got anything yet, the current command result should be used
             toReturn ??= thisReturn;
@@ -311,41 +315,44 @@ public partial class View // Command APIs
         return toReturn;
     }
 
-    /// <summary>Invokes the specified command.</summary>
+    /// <summary>
+    /// Invokes the specified command.
+    /// </summary>
     /// <param name="command">The command to invoke.</param>
-    /// <param name="key">The key that caused the command to be invoked, if any. This will be passed as context with the command.</param>
-    /// <param name="keyBinding">The key binding that was bound to the key and caused the invocation, if any. This will be passed as context with the command.</param>
+    /// <param name="binding">The binding that caused the invocation, if any. This will be passed as context with the command.</param>
     /// <returns>
-    ///     <see langword="null"/> if no command was found; input proessing should continue.
-    ///     <see langword="false"/> if the command was invoked and was not handled (or cancelled); input proessing should continue.
-    ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input proessing should stop.
+    ///     <see langword="null"/> if no command was found; input processing should continue.
+    ///     <see langword="false"/> if the command was invoked and was not handled (or cancelled); input processing should continue.
+    ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should stop.
     /// </returns>
-    public bool? InvokeCommand (Command command, Key? key = null, KeyBinding? keyBinding = null)
+    public bool? InvokeCommand<TBindingType> (Command command, TBindingType binding)
     {
-        if (CommandImplementations.TryGetValue (command, out CommandImplementation? implementation))
+        if (_commandImplementations.TryGetValue (command, out CommandImplementation? implementation))
         {
-            var context = new CommandContext (command, key, keyBinding); // Create the context here
-            return implementation (context);
+            return implementation (new CommandContext<TBindingType> ()
+            {
+                Command = command,
+                Binding = binding,
+            });
         }
 
         return null;
     }
 
     /// <summary>
-    /// Invokes the specified command.
+    /// Invokes the specified command without context.
     /// </summary>
     /// <param name="command">The command to invoke.</param>
-    /// <param name="ctx">Context to pass with the invocation.</param>
     /// <returns>
-    ///     <see langword="null"/> if no command was found; input proessing should continue.
-    ///     <see langword="false"/> if the command was invoked and was not handled (or cancelled); input proessing should continue.
-    ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input proessing should stop.
+    ///     <see langword="null"/> if no command was found; input processing should continue.
+    ///     <see langword="false"/> if the command was invoked and was not handled (or cancelled); input processing should continue.
+    ///     <see langword="true"/> if the command was invoked the command was handled (or cancelled); input processing should stop.
     /// </returns>
-    public bool? InvokeCommand (Command command, CommandContext ctx)
+    public bool? InvokeCommand (Command command)
     {
-        if (CommandImplementations.TryGetValue (command, out CommandImplementation? implementation))
+        if (_commandImplementations.TryGetValue (command, out CommandImplementation? implementation))
         {
-            return implementation (ctx);
+            return implementation (null);
         }
 
         return null;

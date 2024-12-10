@@ -19,7 +19,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         {
             if (_quitKey != value)
             {
-                ReplaceKey (_quitKey, value);
+                KeyBindings.Replace (_quitKey, value);
                 _quitKey = value;
             }
         }
@@ -37,7 +37,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         {
             if (_arrangeKey != value)
             {
-                ReplaceKey (_arrangeKey, value);
+                KeyBindings.Replace (_arrangeKey, value);
                 _arrangeKey = value;
             }
         }

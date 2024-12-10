@@ -293,7 +293,7 @@ public class TableView : View, IDesignable
             {
                 if (KeyBindings.TryGet (cellActivationKey, out _))
                 {
-                    KeyBindings.ReplaceKey (cellActivationKey, value);
+                    KeyBindings.Replace (cellActivationKey, value);
                 }
                 else
                 {
@@ -1013,7 +1013,7 @@ public class TableView : View, IDesignable
         if (CollectionNavigator != null
             && HasFocus
             && Table.Rows != 0
-            && key != KeyBindings.GetKeyFromCommands (Command.Accept)
+            && key != KeyBindings.GetFirstFromCommands (Command.Accept)
             && key != CellActivationKey
             && CollectionNavigatorBase.IsCompatibleKey (key)
             && !key.KeyCode.HasFlag (KeyCode.CtrlMask)

@@ -36,7 +36,7 @@ public class Label : View, IDesignable
     {
         if (!CanFocus)
         {
-            e.Handled = InvokeCommand (Command.HotKey, ctx: new (Command.HotKey, key: null, data: this)) == true;
+            e.Handled = InvokeCommand<KeyBinding> (Command.HotKey, new ([Command.HotKey], this, data: this)) == true;
         }
     }
 
@@ -60,7 +60,7 @@ public class Label : View, IDesignable
         set => TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value;
     }
 
-    private bool? InvokeHotKeyOnNext (CommandContext context)
+    private bool? InvokeHotKeyOnNext (ICommandContext commandContext)
     {
         if (RaiseHandlingHotKey () == true)
         {
@@ -78,7 +78,8 @@ public class Label : View, IDesignable
 
         if (me != -1 && me < SuperView?.Subviews.Count - 1)
         {
-            return SuperView?.Subviews [me + 1].InvokeCommand (Command.HotKey, context.Key, context.KeyBinding) == true;
+
+            return SuperView?.Subviews [me + 1].InvokeCommand (Command.HotKey) == true;
         }
 
         return false;
