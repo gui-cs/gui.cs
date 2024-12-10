@@ -507,14 +507,10 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         if (Popover is { Visible: true })
         {
-            tops.Insert(0, Popover);
+            tops.Insert (0, Popover);
         }
 
         bool neededLayout = View.Layout (tops.ToArray ().Reverse (), Screen.Size);
-
-        View.SetClipToScreen ();
-        View.Draw (tops, neededLayout || forceDraw);
-        View.SetClipToScreen ();
 
         if (ClearScreenNextIteration)
         {
@@ -526,7 +522,38 @@ public static partial class Application // Run (Begin, Run, End, Stop)
             Driver?.ClearContents ();
         }
 
+        View.SetClipToScreen ();
+        View.Draw (tops, neededLayout || forceDraw);
+        View.SetClipToScreen ();
+
         Driver?.Refresh ();
+
+        return;
+
+        //List<View> tops = new (TopLevels);
+
+        //if (Popover is { Visible: true })
+        //{
+        //    tops.Insert(0, Popover);
+        //}
+
+        //bool neededLayout = View.Layout (tops.ToArray ().Reverse (), Screen.Size);
+
+        //View.SetClipToScreen ();
+        //View.Draw (tops, neededLayout || forceDraw);
+        //View.SetClipToScreen ();
+
+        //if (ClearScreenNextIteration)
+        //{
+        //    forceDraw = true;
+        //    ClearScreenNextIteration = false;
+        //}
+        //if (forceDraw)
+        //{
+        //    Driver?.ClearContents ();
+        //}
+
+        //Driver?.Refresh ();
     }
 
     /// <summary>This event is raised on each iteration of the main loop.</summary>

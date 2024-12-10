@@ -399,11 +399,10 @@ public class TextField : View
 
         KeyBindings.Remove (Key.Space);
 
-        KeyBindings.Add (ContextMenu.Key, Command.Context);
-
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
 
         CreateContextMenu ();
+        KeyBindings.Add (ContextMenu.Key, Command.Context);
     }
 
     /// <summary>
