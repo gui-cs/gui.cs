@@ -22,7 +22,7 @@ namespace Terminal.Gui;
 ///     </para>
 ///     <para>The menu will be displayed at the current mouse coordinates.</para>
 /// </summary>
-public class ContextMenuv2 : Menuv2
+public class ContextMenuv2 : Menuv2, IDesignable
 {
     private Key _key = DefaultKey;
 
@@ -118,5 +118,47 @@ public class ContextMenuv2 : Menuv2
             Application.KeyBindings.Remove (Key);
         }
         base.Dispose (disposing);
+    }
+
+
+    /// <inheritdoc />
+    public override bool EnableForDesign ()
+    {
+        var shortcut = new Shortcut
+        {
+            Text = "Quit",
+            Title = "Q_uit",
+            Key = Key.Z.WithCtrl,
+        };
+
+        Add (shortcut);
+
+        shortcut = new Shortcut
+        {
+            Text = "Help Text",
+            Title = "Help",
+            Key = Key.F1,
+        };
+
+        Add (shortcut);
+
+        shortcut = new Shortcut
+        {
+            Text = "Czech",
+            CommandView = new CheckBox ()
+            {
+                Title = "_Check"
+            },
+            Key = Key.F9,
+            CanFocus = false
+        };
+
+        Add (shortcut);
+
+        // HACK: This enables All Views Tester to show the CM if DefaultKey is pressed
+        AddCommand (Command.Context, () => Visible = true);
+        HotKeyBindings.Add (DefaultKey, Command.Context);
+
+        return true;
     }
 }
