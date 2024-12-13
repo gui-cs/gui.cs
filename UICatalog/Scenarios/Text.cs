@@ -148,8 +148,8 @@ public class Text : Scenario
                                     }
                                 };
 
-        Key keyTab = textView.KeyBindings.GetKeyFromCommands (Command.Tab);
-        Key keyBackTab = textView.KeyBindings.GetKeyFromCommands (Command.BackTab);
+        Key keyTab = textView.KeyBindings.GetFirstFromCommands (Command.Tab);
+        Key keyBackTab = textView.KeyBindings.GetFirstFromCommands (Command.BackTab);
 
         chxCaptureTabs.CheckedStateChanging += (s, e) =>
                                   {

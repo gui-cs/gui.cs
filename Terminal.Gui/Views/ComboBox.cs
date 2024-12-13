@@ -80,7 +80,11 @@ public class ComboBox : View, IDesignable
         // Things this view knows how to do
         AddCommand (Command.Accept, (ctx) =>
                                     {
-                                        if (ctx.Data == _search)
+                                        if (ctx is not CommandContext<KeyBinding> keyCommandContext)
+                                        {
+                                            return false;
+                                        }
+                                        if (keyCommandContext.Binding.Data == _search)
                                         {
                                             return null;
                                         }
@@ -395,7 +399,7 @@ public class ComboBox : View, IDesignable
         }
     }
 
-    private bool ActivateSelected (CommandContext ctx)
+    private bool ActivateSelected (ICommandContext commandContext)
     {
         if (HasItems ())
         {
@@ -404,7 +408,7 @@ public class ComboBox : View, IDesignable
                 return false;
             }
 
-            return RaiseAccepting (ctx) == true;
+            return RaiseAccepting (commandContext) == true;
         }
 
         return false;

@@ -80,10 +80,10 @@ public sealed class KeyBindings : Scenario
         };
         appWindow.Add (appBindingsListView);
 
-        foreach (var key in Application.KeyBindings.GetBoundKeys())
+        foreach (Key key in Application.KeyBindings.GetBindings().ToDictionary().Keys)
         {
             var binding = Application.KeyBindings.Get (key);
-            appBindings.Add ($"{key} -> {binding.BoundView?.GetType ().Name} - {binding.Commands [0]}");
+            appBindings.Add ($"{key} -> {binding.Target?.GetType ().Name} - {binding.Commands [0]}");
         }
 
         ObservableCollection<string> hotkeyBindings = new ();
@@ -104,7 +104,7 @@ public sealed class KeyBindings : Scenario
 
         foreach (var subview in appWindow.Subviews)
         {
-            foreach (var binding in subview.KeyBindings.Bindings.Where (b => b.Value.Scope == KeyBindingScope.HotKey))
+            foreach (KeyValuePair<Key, KeyBinding> binding in subview.HotKeyBindings.GetBindings ())
             {
                 hotkeyBindings.Add ($"{binding.Key} -> {subview.GetType ().Name} - {binding.Value.Commands [0]}");
             }
@@ -148,8 +148,8 @@ public sealed class KeyBindings : Scenario
 
         _focusedBindingsListView.Title = $"_Focused ({focused?.GetType ().Name}) Bindings";
 
-        _focusedBindings.Clear();
-        foreach (var binding in focused?.KeyBindings!.Bindings.Where (b => b.Value.Scope == KeyBindingScope.Focused)!)
+        _focusedBindings.Clear ();
+        foreach (var binding in focused?.KeyBindings!.GetBindings ())
         {
             _focusedBindings.Add ($"{binding.Key} -> {binding.Value.Commands [0]}");
         }
@@ -165,28 +165,32 @@ public class KeyBindingsDemo : View
 
         AddCommand (Command.Save, ctx =>
                                  {
-                                     MessageBox.Query ($"{ctx.KeyBinding?.Scope}", $"Key: {ctx.Key}\nCommand: {ctx.Command}", buttons: "Ok");
+                                     MessageBox.Query ($"{ctx.Command}", $"Ctx: {ctx}", buttons: "Ok");
                                      return true;
                                  });
         AddCommand (Command.New, ctx =>
                                 {
-                                    MessageBox.Query ($"{ctx.KeyBinding?.Scope}", $"Key: {ctx.Key}\nCommand: {ctx.Command}", buttons: "Ok");
+                                    MessageBox.Query ($"{ctx.Command}", $"Ctx: {ctx}", buttons: "Ok");
                                     return true;
                                 });
         AddCommand (Command.HotKey, ctx =>
         {
-            MessageBox.Query ($"{ctx.KeyBinding?.Scope}", $"Key: {ctx.Key}\nCommand: {ctx.Command}", buttons: "Ok");
+            MessageBox.Query ($"{ctx.Command}", $"Ctx: {ctx}\nCommand: {ctx.Command}", buttons: "Ok");
             SetFocus ();
             return true;
         });
 
-        KeyBindings.Add (Key.F2, KeyBindingScope.Focused, Command.Save);
+        KeyBindings.Add (Key.F2, Command.Save);
         KeyBindings.Add (Key.F3, Command.New); // same as specifying KeyBindingScope.Focused
         Application.KeyBindings.Add (Key.F4, this, Command.New);
 
         AddCommand (Command.Quit, ctx =>
                                          {
-                                             MessageBox.Query ($"{ctx.KeyBinding?.Scope}", $"Key: {ctx.Key}\nCommand: {ctx.Command}", buttons: "Ok");
+                                             if (ctx is not CommandContext<KeyBinding> keyCommandContext)
+                                             {
+                                                 return false;
+                                             }
+                                             MessageBox.Query ($"{keyCommandContext.Binding}", $"Key: {keyCommandContext.Binding.Key}\nCommand: {ctx.Command}", buttons: "Ok");
                                              Application.RequestStop ();
                                              return true;
                                          });

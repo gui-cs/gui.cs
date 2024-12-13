@@ -1390,15 +1390,15 @@ public class Border : Adornment
                         return true; // Always eat
                     });
 
-        KeyBindings.Add (Key.Esc, KeyBindingScope.HotKey, Command.Quit);
-        KeyBindings.Add (Application.ArrangeKey, KeyBindingScope.HotKey, Command.Quit);
-        KeyBindings.Add (Key.CursorUp, KeyBindingScope.HotKey, Command.Up);
-        KeyBindings.Add (Key.CursorDown, KeyBindingScope.HotKey, Command.Down);
-        KeyBindings.Add (Key.CursorLeft, KeyBindingScope.HotKey, Command.Left);
-        KeyBindings.Add (Key.CursorRight, KeyBindingScope.HotKey, Command.Right);
+        HotKeyBindings.Add (Key.Esc, Command.Quit);
+        HotKeyBindings.Add (Application.ArrangeKey, Command.Quit);
+        HotKeyBindings.Add (Key.CursorUp,  Command.Up);
+        HotKeyBindings.Add (Key.CursorDown, Command.Down);
+        HotKeyBindings.Add (Key.CursorLeft, Command.Left);
+        HotKeyBindings.Add (Key.CursorRight, Command.Right);
 
-        KeyBindings.Add (Key.Tab, KeyBindingScope.HotKey, Command.Tab);
-        KeyBindings.Add (Key.Tab.WithShift, KeyBindingScope.HotKey, Command.BackTab);
+        HotKeyBindings.Add (Key.Tab, Command.Tab);
+        HotKeyBindings.Add (Key.Tab.WithShift,  Command.BackTab);
     }
 
     private void ApplicationOnMouseEvent (object? sender, MouseEventArgs e)
@@ -1472,7 +1472,7 @@ public class Border : Adornment
             _bottomSizeButton = null;
         }
 
-        KeyBindings.Clear ();
+        HotKeyBindings.Clear ();
 
         if (CanFocus)
         {

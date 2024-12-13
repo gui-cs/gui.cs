@@ -438,8 +438,6 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
     [Fact]
     public void UnknownResponses_ParameterShouldMatch ()
     {
-        int i = 0;
-
         // Track unknown responses passed to the UnexpectedResponseHandler
         var unknownResponses = new List<string> ();
 

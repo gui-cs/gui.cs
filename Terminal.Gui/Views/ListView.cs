@@ -141,7 +141,15 @@ public class ListView : View, IDesignable
                                         return !SetFocus ();
                                     });
 
-        AddCommand (Command.SelectAll, (ctx) => MarkAll ((bool)ctx.KeyBinding?.Context!));
+        AddCommand (Command.SelectAll, (ctx) =>
+                                       {
+                                           if (ctx is not CommandContext<KeyBinding> keyCommandContext)
+                                           {
+                                               return false;
+                                           }
+
+                                           return keyCommandContext.Binding.Data is { } && MarkAll ((bool)keyCommandContext.Binding.Data);
+                                       });
 
         // Default keybindings for all ListViews
         KeyBindings.Add (Key.CursorUp, Command.Up);
@@ -163,8 +171,8 @@ public class ListView : View, IDesignable
         KeyBindings.Add (Key.Space.WithShift, [Command.Select, Command.Down]);
 
         // Use the form of Add that lets us pass context to the handler
-        KeyBindings.Add (Key.A.WithCtrl, new KeyBinding ([Command.SelectAll], KeyBindingScope.Focused, true));
-        KeyBindings.Add (Key.U.WithCtrl, new KeyBinding ([Command.SelectAll], KeyBindingScope.Focused, false));
+        KeyBindings.Add (Key.A.WithCtrl, new KeyBinding ([Command.SelectAll], true));
+        KeyBindings.Add (Key.U.WithCtrl, new KeyBinding ([Command.SelectAll], false));
     }
 
     /// <inheritdoc />
@@ -805,14 +813,14 @@ public class ListView : View, IDesignable
         // at it
         if (AllowsMarking)
         {
-            var keys = KeyBindings.GetKeysFromCommands (Command.Select);
+            var keys = KeyBindings.GetAllFromCommands (Command.Select);
 
             if (keys.Contains (a))
             {
                 return false;
             }
 
-            keys = KeyBindings.GetKeysFromCommands ([Command.Select, Command.Down]);
+            keys = KeyBindings.GetAllFromCommands ([Command.Select, Command.Down]);
 
             if (keys.Contains (a))
             {

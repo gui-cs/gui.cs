@@ -228,7 +228,8 @@ public static partial class Application
 
         ClearScreenNextIteration = false;
 
-        AddApplicationKeyBindings ();
+        KeyBindings.Clear ();
+        AddKeyBindings ();
 
         // Reset synchronization context to allow the user to run async/await,
         // as the main loop has been ended, the synchronization context from

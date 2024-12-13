@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui;
+﻿using Terminal.Gui.Resources;
+
+namespace Terminal.Gui;
 
 public partial class ColorPicker
 {
@@ -42,7 +44,7 @@ public partial class ColorPicker
         {
             X = Pos.Center () + 5,
             Y = 4,
-            Text = "Cancel",
+            Text = Strings.btnCancel,
             Width = Dim.Auto ()
         };
 

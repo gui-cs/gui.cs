@@ -21,7 +21,7 @@ public class AnsiEscapeSequenceRequest : AnsiEscapeSequence
 
 
     /// <summary>
-    ///     Sends the <see cref="Request"/> to the raw output stream of the current <see cref="ConsoleDriver"/>.
+    ///     Sends the <see cref="AnsiEscapeSequence.Request"/> to the raw output stream of the current <see cref="ConsoleDriver"/>.
     ///     Only call this method from the main UI thread. You should use <see cref="AnsiRequestScheduler"/> if
     ///     sending many requests.
     /// </summary>

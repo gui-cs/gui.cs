@@ -402,7 +402,7 @@ public class TextField : View
         ContextMenu = new () { Host = this };
         ContextMenu.KeyChanged += ContextMenu_KeyChanged;
 
-        KeyBindings.Add (ContextMenu.Key, KeyBindingScope.HotKey, Command.Context);
+        KeyBindings.Add (ContextMenu.Key, Command.Context);
 
         KeyBindings.Remove (Key.Space);
     }
@@ -1236,7 +1236,7 @@ public class TextField : View
                              () => SelectAll (),
                              null,
                              null,
-                             (KeyCode)KeyBindings.GetKeyFromCommands (Command.SelectAll)
+                             (KeyCode)KeyBindings.GetFirstFromCommands (Command.SelectAll)
                             ),
                         new (
                              Strings.ctxDeleteAll,
@@ -1244,7 +1244,7 @@ public class TextField : View
                              () => DeleteAll (),
                              null,
                              null,
-                             (KeyCode)KeyBindings.GetKeyFromCommands (Command.DeleteAll)
+                             (KeyCode)KeyBindings.GetFirstFromCommands (Command.DeleteAll)
                             ),
                         new (
                              Strings.ctxCopy,
@@ -1252,7 +1252,7 @@ public class TextField : View
                              () => Copy (),
                              null,
                              null,
-                             (KeyCode)KeyBindings.GetKeyFromCommands (Command.Copy)
+                             (KeyCode)KeyBindings.GetFirstFromCommands (Command.Copy)
                             ),
                         new (
                              Strings.ctxCut,
@@ -1260,7 +1260,7 @@ public class TextField : View
                              () => Cut (),
                              null,
                              null,
-                             (KeyCode)KeyBindings.GetKeyFromCommands (Command.Cut)
+                             (KeyCode)KeyBindings.GetFirstFromCommands (Command.Cut)
                             ),
                         new (
                              Strings.ctxPaste,
@@ -1268,7 +1268,7 @@ public class TextField : View
                              () => Paste (),
                              null,
                              null,
-                             (KeyCode)KeyBindings.GetKeyFromCommands (Command.Paste)
+                             (KeyCode)KeyBindings.GetFirstFromCommands (Command.Paste)
                             ),
                         new (
                              Strings.ctxUndo,
@@ -1276,7 +1276,7 @@ public class TextField : View
                              () => Undo (),
                              null,
                              null,
-                             (KeyCode)KeyBindings.GetKeyFromCommands (Command.Undo)
+                             (KeyCode)KeyBindings.GetFirstFromCommands (Command.Undo)
                             ),
                         new (
                              Strings.ctxRedo,
@@ -1284,13 +1284,13 @@ public class TextField : View
                              () => Redo (),
                              null,
                              null,
-                             (KeyCode)KeyBindings.GetKeyFromCommands (Command.Redo)
+                             (KeyCode)KeyBindings.GetFirstFromCommands (Command.Redo)
                             )
                     }
                    );
     }
 
-    private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.ReplaceKey (e.OldKey.KeyCode, e.NewKey.KeyCode); }
+    private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey.KeyCode, e.NewKey.KeyCode); }
 
     private List<Rune> DeleteSelectedText ()
     {

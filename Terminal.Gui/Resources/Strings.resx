@@ -721,4 +721,22 @@
   <data name="ctxColors" xml:space="preserve">
     <value>Co_lors</value>
   </data>
+  <data name="charMapCPInfoDlgTitle" xml:space="preserve">
+    <value>Getting Codepoint Information</value>
+  </data>
+  <data name="charMapCopyGlyph" xml:space="preserve">
+    <value>Copy _Glyph</value>
+  </data>
+  <data name="charMapCopyCP" xml:space="preserve">
+    <value>Copy Code_point</value>
+  </data>
+  <data name="charMapInfoDlgInfoLabel" xml:space="preserve">
+    <value>Codepoint Information from</value>
+  </data>
+  <data name="error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="failedGetting" xml:space="preserve">
+    <value>failed getting</value>
+  </data>
 </root>

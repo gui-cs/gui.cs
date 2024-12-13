@@ -188,25 +188,21 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
             view.HotKey = Key.T;
         }
 
-        var selectingCount = 0;
-        view.Selecting += (s, e) => selectingCount++;
-
         var acceptedCount = 0;
         view.Accepting += (s, e) =>
                          {
                              acceptedCount++;
                          };
 
-        var hotkeyHandledCount = 0;
+        var handlingHotKeyCount = 0;
         view.HandlingHotKey += (s, e) =>
                          {
-                             hotkeyHandledCount++;
+                             handlingHotKeyCount++;
                          };
 
         if (view.InvokeCommand (Command.HotKey) == true)
         {
-            Assert.Equal (1, hotkeyHandledCount);
-            Assert.Equal (0, selectingCount);
+            Assert.Equal (1, handlingHotKeyCount);
             Assert.Equal (0, acceptedCount);
         }
     }

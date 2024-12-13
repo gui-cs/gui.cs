@@ -92,7 +92,7 @@ public static partial class Application // Initialization (Init/Shutdown)
             }
         }
 
-        AddApplicationKeyBindings ();
+        AddKeyBindings ();
 
         // Start the process of configuration management.
         // Note that we end up calling LoadConfigurationFromAllSources

@@ -537,7 +537,7 @@ internal class WindowsDriver : ConsoleDriver
             case WindowsConsole.EventType.Mouse:
                 MouseEventArgs me = ToDriverMouse (inputEvent.MouseEvent);
 
-                if (me is null || me.Flags == MouseFlags.None)
+                if (/*me is null ||*/ me.Flags == MouseFlags.None)
                 {
                     break;
                 }
