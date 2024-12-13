@@ -84,7 +84,10 @@ public static partial class Application
                         normalized = combine.Normalize (NormalizationForm.FormC);
                     }
 
-                    sb.Append (normalized);
+                    foreach (Rune enumerateRune in normalized!.EnumerateRunes ())
+                    {
+                        sb.Append (enumerateRune);
+                    }
                 }
                 else
                 {
