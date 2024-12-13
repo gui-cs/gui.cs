@@ -18,7 +18,7 @@ public class ApplicationScreenTests (ITestOutputHelper output)
         Assert.False (Application.ClearScreenNextIteration);
 
         // Cleanup
-        Application.ResetState (true);
+        Application.Shutdown ();
     }
 
     [Fact]
