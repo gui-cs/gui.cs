@@ -326,17 +326,9 @@ public abstract class ConsoleDriver : IConsoleDriver
             }
         }
 
-        switch (IgnoreIsCombiningMark)
+        if (!IgnoreIsCombiningMark && !wasAddedToCombiningMarks)
         {
-            case false when _lastValidAddRuneCell is { } && !wasAddedToCombiningMarks:
-            case false when _lastValidAddRuneCell is null && !wasAddedToCombiningMarks:
-                _lastValidAddRuneCell = new (Col, Row);
-
-                break;
-            case true:
-                _lastValidAddRuneCell = null;
-
-                break;
+            _lastValidAddRuneCell = new (Col, Row);
         }
 
         if (runeWidth is < 0 or > 0 && !wasAddedToCombiningMarks)

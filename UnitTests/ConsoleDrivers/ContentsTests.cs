@@ -58,6 +58,7 @@ public class ContentsTests
         combined = "a" + ogonek + acuteaccent;
         expected = ("á" + ogonek).Normalize (NormalizationForm.FormC); // See Issue #2616
 
+        driver.ClearContents ();
         driver.Move (0, 0);
         driver.AddStr (combined);
         TestHelpers.AssertDriverContentsAre (expected, output, driver);
@@ -66,6 +67,7 @@ public class ContentsTests
         combined = "e" + ogonek + acuteaccent;
         expected = ("é" + ogonek).Normalize (NormalizationForm.FormC); // See Issue #2616
 
+        driver.ClearContents ();
         driver.Move (0, 0);
         driver.AddStr (combined);
         TestHelpers.AssertDriverContentsAre (expected, output, driver);
@@ -74,6 +76,7 @@ public class ContentsTests
         combined = "i" + ogonek + acuteaccent;
         expected = ("í" + ogonek).Normalize (NormalizationForm.FormC); // See Issue #2616
 
+        driver.ClearContents ();
         driver.Move (0, 0);
         driver.AddStr (combined);
         TestHelpers.AssertDriverContentsAre (expected, output, driver);
@@ -82,6 +85,7 @@ public class ContentsTests
         combined = "u" + ogonek + acuteaccent;
         expected = ("ú" + ogonek).Normalize (NormalizationForm.FormC); // See Issue #2616
 
+        driver.ClearContents ();
         driver.Move (0, 0);
         driver.AddStr (combined);
         TestHelpers.AssertDriverContentsAre (expected, output, driver);
