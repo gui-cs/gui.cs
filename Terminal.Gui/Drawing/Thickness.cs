@@ -236,6 +236,19 @@ public record struct Thickness
     }
 
     /// <summary>
+    ///     Returns a region describing the thickness.
+    /// </summary>
+    /// <param name="rect">The source rectangle</param>
+    /// <returns></returns>
+    public Region AsRegion (Rectangle rect)
+    {
+        Region region = new Region (rect);
+        region.Exclude (GetInside (rect));
+
+        return region;
+    }
+
+    /// <summary>
     ///     Gets the total width of the left and right sides of the rectangle. Sets the width of the left and right sides
     ///     of the rectangle to half the specified value.
     /// </summary>

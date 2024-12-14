@@ -13,7 +13,7 @@ public enum ViewportSettings
     /// <summary>
     ///     No settings.
     /// </summary>
-    None = 0,
+    None = 0b_0000,
 
     /// <summary>
     ///     If set, <see cref="View.Viewport"/><c>.X</c> can be set to negative values enabling scrolling beyond the left of
@@ -23,7 +23,7 @@ public enum ViewportSettings
     ///         When not set, <see cref="View.Viewport"/><c>.X</c> is constrained to positive values.
     ///     </para>
     /// </summary>
-    AllowNegativeX = 1,
+    AllowNegativeX = 0b_0001,
 
     /// <summary>
     ///     If set, <see cref="View.Viewport"/><c>.Y</c> can be set to negative values enabling scrolling beyond the top of the
@@ -32,7 +32,7 @@ public enum ViewportSettings
     ///         When not set, <see cref="View.Viewport"/><c>.Y</c> is constrained to positive values.
     ///     </para>
     /// </summary>
-    AllowNegativeY = 2,
+    AllowNegativeY = 0b_0010,
 
     /// <summary>
     ///     If set, <see cref="View.Viewport"/><c>.Size</c> can be set to negative coordinates enabling scrolling beyond the
@@ -58,7 +58,7 @@ public enum ViewportSettings
     ///         The practical effect of this is that the last column of the content will always be visible.
     ///     </para>
     /// </summary>
-    AllowXGreaterThanContentWidth = 4,
+    AllowXGreaterThanContentWidth = 0b_0100,
 
     /// <summary>
     ///     If set, <see cref="View.Viewport"/><c>.Y</c> can be set values greater than <see cref="View.GetContentSize ()"/>
@@ -74,7 +74,7 @@ public enum ViewportSettings
     ///         The practical effect of this is that the last row of the content will always be visible.
     ///     </para>
     /// </summary>
-    AllowYGreaterThanContentHeight = 8,
+    AllowYGreaterThanContentHeight = 0b_1000,
 
     /// <summary>
     ///     If set, <see cref="View.Viewport"/><c>.Location</c> can be set values greater than
@@ -102,7 +102,7 @@ public enum ViewportSettings
     ///         This can be useful in infinite scrolling scenarios.
     ///     </para>
     /// </summary>
-    AllowNegativeXWhenWidthGreaterThanContentWidth = 16,
+    AllowNegativeXWhenWidthGreaterThanContentWidth = 0b_0001_0000,
 
     /// <summary>
     ///     If set and <see cref="View.Viewport"/><c>.Height</c> is greater than <see cref="View.GetContentSize ()"/>
@@ -117,7 +117,7 @@ public enum ViewportSettings
     ///         This can be useful in infinite scrolling scenarios.
     ///     </para>
     /// </summary>
-    AllowNegativeYWhenHeightGreaterThanContentHeight = 32,
+    AllowNegativeYWhenHeightGreaterThanContentHeight = 0b_0010_0000,
 
     /// <summary>
     ///     The combination of <see cref="AllowNegativeXWhenWidthGreaterThanContentWidth"/> and
@@ -129,7 +129,7 @@ public enum ViewportSettings
     ///     By default, clipping is applied to the <see cref="View.Viewport"/>. Setting this flag will cause clipping to be
     ///     applied to the visible content area.
     /// </summary>
-    ClipContentOnly = 64,
+    ClipContentOnly = 0b_0100_0000,
 
     /// <summary>
     ///     If set <see cref="View.ClearViewport"/> will clear only the portion of the content
@@ -138,5 +138,11 @@ public enum ViewportSettings
     ///     <see cref="ClipContentOnly"/> must be set for this setting to work (clipping beyond the visible area must be
     ///     disabled).
     /// </summary>
-    ClearContentOnly = 128
+    ClearContentOnly = 0b_1000_0000,
+
+    /// <summary>
+    ///     If set, any <see cref="View.Viewport"/> will not be cleared when the View is drawn and the clip region
+    ///     will be set to clip the View's <see cref="View.Text"/> and <see cref="View.Subviews"/>.
+    /// </summary>
+    Transparent = 0b_0001_0000_0000,
 }
