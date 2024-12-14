@@ -62,8 +62,10 @@ public partial class View // Drawing APIs
             }
             else
             {
-                // Set the clip to be just the thicknesses
-                Region? clipAdornments = Border!.Thickness.AsRegion (Border!.FrameToScreen ());
+                // Set the clip to be just the thicknesses of the adornments
+                // TODO: Put this union logic in a method on View? 
+                Region? clipAdornments = Margin!.Thickness.AsRegion (Margin!.FrameToScreen ());
+                clipAdornments?.Union (Border!.Thickness.AsRegion (Border!.FrameToScreen ()));
                 clipAdornments?.Union (Padding!.Thickness.AsRegion (Padding!.FrameToScreen ()));
                 clipAdornments?.Intersect (originalClip);
                 SetClip (clipAdornments);
@@ -150,10 +152,9 @@ public partial class View // Drawing APIs
                 borderFrame = Border.FrameToScreen ();
             }
 
-            // TODO: This flag may not be needed. Just returning true from OnClearViewport may be sufficient.
             if (ViewportSettings.HasFlag (ViewportSettings.Transparent) && contentClip is { })
             {
-                Region? saved = originalClip.Clone ();
+                Region? saved = originalClip!.Clone ();
 
                 saved.Exclude (Border!.Thickness.AsRegion (Border!.FrameToScreen ()));
                 saved.Exclude (Padding!.Thickness.AsRegion (Padding!.FrameToScreen ()));
