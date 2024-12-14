@@ -148,6 +148,13 @@ public static partial class Application
             t!.Running = false;
         }
 
+        //Popover = null;
+        if (PopoverHost is { })
+        {
+            PopoverHost.Dispose ();
+            PopoverHost = null;
+        }
+
         TopLevels.Clear ();
 #if DEBUG_IDISPOSABLE
 
@@ -166,8 +173,6 @@ public static partial class Application
 #endif
         Top = null;
         _cachedRunStateToplevel = null;
-
-        Popover = null;
 
         // MainLoop stuff
         MainLoop?.Dispose ();

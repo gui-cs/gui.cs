@@ -292,7 +292,7 @@ public class ApplicationTests
 
             // Public Properties
             Assert.Null (Application.Top);
-            Assert.Null (Application.Popover);
+            Assert.Null (Application.PopoverHost);
             Assert.Null (Application.MouseGrabView);
             Assert.Null (Application.WantContinuousButtonPressedView);
 

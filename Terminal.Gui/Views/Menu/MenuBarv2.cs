@@ -43,7 +43,7 @@ public class MenuBarv2 : Bar
 
 
                            Rectangle screen = shortcut.FrameToScreen ();
-                           Application.Popover = shortcut.TargetView;
+                           //Application.Popover = shortcut.TargetView;
                            shortcut.TargetView.X = screen.X;
                            shortcut.TargetView.Y = screen.Y + screen.Height;
                            shortcut.TargetView.Visible = true;
@@ -60,10 +60,10 @@ public class MenuBarv2 : Bar
     {
         if (args.NewValue.HasFlag (HighlightStyle.Hover))
         {
-            if (Application.Popover is { Visible: true } && View.IsInHierarchy (this, Application.Popover))
-            {
+            //if (Application.Popover is { Visible: true } && View.IsInHierarchy (this, Application.Popover))
+            //{
 
-            }
+            //}
         }
         return base.OnHighlight (args);
     }

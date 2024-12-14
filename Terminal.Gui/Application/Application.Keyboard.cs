@@ -22,10 +22,10 @@ public static partial class Application // Keyboard handling
 
         View? top = Top;
 
-        if (Popover is { Visible: true })
-        {
-            top = Popover;
-        }
+        //if (Popover is { Visible: true })
+        //{
+        //    top = Popover;
+        //}
 
         if (top is null)
         {
@@ -179,12 +179,12 @@ public static partial class Application // Keyboard handling
                     Command.Quit,
                     static () =>
                     {
-                        if (Popover is {Visible: true})
-                        {
-                            Popover.Visible = false;
+                        //if (Popover is {Visible: true})
+                        //{
+                        //    Popover.Visible = false;
 
-                            return true;
-                        }
+                        //    return true;
+                        //}
                         RequestStop ();
 
                         return true;

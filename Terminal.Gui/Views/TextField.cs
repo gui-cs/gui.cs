@@ -1795,7 +1795,7 @@ public class TextField : View
             ContextMenu!.X = loc.X;
             ContextMenu!.Y = loc.Y;
         }
-        Application.Popover = ContextMenu;
+        //Application.Popover = ContextMenu;
         ContextMenu!.Visible = true;
     }
 

@@ -86,7 +86,7 @@ public partial class View
     /// <returns>
     ///     The current Clip, which can be then re-applied <see cref="View.SetClip"/>
     /// </returns>
-    internal Region? ClipFrame ()
+    internal Region? AddFrameToClip ()
     {
         if (Driver is null)
         {
@@ -133,7 +133,7 @@ public partial class View
     /// <returns>
     ///     The current Clip, which can be then re-applied <see cref="View.SetClip"/>
     /// </returns>
-    public Region? ClipViewport ()
+    public Region? AddViewportToClip ()
     {
         if (Driver is null)
         {

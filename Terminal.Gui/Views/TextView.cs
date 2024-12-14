@@ -6347,7 +6347,7 @@ public class TextView : View
             ContextMenu!.Y = loc.Y;
         }
 
-        Application.Popover = ContextMenu;
+        //Application.Popover = ContextMenu;
         ContextMenu!.Visible = true;
     }
 

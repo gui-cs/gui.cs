@@ -1,9 +1,11 @@
 #nullable enable
+using static Unix.Terminal.Curses;
+
 namespace Terminal.Gui;
 
 public static partial class Application // Popover handling
 {
-    private static View? _popover;
+    private static PopoverHost? _popoverHost;
 
     /// <summary>Gets or sets the Application Popover View.</summary>
     /// <remarks>
@@ -11,82 +13,117 @@ public static partial class Application // Popover handling
     ///         To show or hide the Popover, set it's <see cref="View.Visible"/> property.
     ///     </para>
     /// </remarks>
-    public static View? Popover
+    public static PopoverHost? PopoverHost
     {
-        get => _popover;
-        set
+        get
         {
-            if (_popover == value)
+            if (_popoverHost is null)
             {
-                return;
+                _popoverHost = new PopoverHost ();
             }
-
-            if (_popover is { })
-            {
-                _popover.Visible = false;
-                _popover.VisibleChanging -= PopoverVisibleChanging;
-            }
-
-            _popover = value;
-
-            if (_popover is { })
-            {
-                if (!_popover.IsInitialized)
-                {
-                    _popover.BeginInit ();
-                    _popover.EndInit ();
-                }
-
-                _popover.Arrangement |= ViewArrangement.Overlapped;
-
-                if (_popover.ColorScheme is null)
-                {
-                    _popover.ColorScheme = Top?.ColorScheme;
-                }
-
-                _popover.SetRelativeLayout (Screen.Size);
-
-                _popover.VisibleChanging += PopoverVisibleChanging;
-            }
+            return _popoverHost;
         }
+        internal set => _popoverHost = value;
+        //{
+        //    if (_popoverHost == value)
+        //    {
+        //        return;
+        //    }
+
+        //    if (_popoverHost is { })
+        //    {
+        //        _popoverHost.Visible = false;
+        //        _popoverHost.VisibleChanging -= PopoverVisibleChanging;
+        //    }
+
+        //    _popoverHost = value;
+
+        //    if (_popoverHost is { })
+        //    {
+        //        if (!_popoverHost.IsInitialized)
+        //        {
+        //            _popoverHost.BeginInit ();
+        //            _popoverHost.EndInit ();
+        //        }
+
+        //        _popoverHost.Arrangement |= ViewArrangement.Overlapped;
+
+        //        if (_popoverHost.ColorScheme is null)
+        //        {
+        //            _popoverHost.ColorScheme = Top?.ColorScheme;
+        //        }
+
+        //        _popoverHost.SetRelativeLayout (Screen.Size);
+
+        //        _popoverHost.VisibleChanging += PopoverVisibleChanging;
+        //    }
+        //}
     }
 
     private static void PopoverVisibleChanging (object? sender, CancelEventArgs<bool> e)
     {
-        if (Popover is null)
+        if (PopoverHost is null)
         {
             return;
         }
 
         if (e.NewValue)
         {
-            Popover.Arrangement |= ViewArrangement.Overlapped;
+            PopoverHost.Arrangement |= ViewArrangement.Overlapped;
 
-            Popover.ColorScheme ??= Top?.ColorScheme;
+            PopoverHost.ColorScheme ??= Top?.ColorScheme;
 
-            if (Popover.NeedsLayout)
+            if (PopoverHost.NeedsLayout)
             {
-                Popover.SetRelativeLayout (Screen.Size);
+                PopoverHost.SetRelativeLayout (Screen.Size);
             }
 
             View.GetLocationEnsuringFullVisibility (
-                                                    Popover,
-                                                    Popover.Frame.X,
-                                                    Popover.Frame.Y,
+                                                    PopoverHost,
+                                                    PopoverHost.Frame.X,
+                                                    PopoverHost.Frame.Y,
                                                     out int nx,
                                                     out int ny);
 
-            Popover.X = nx;
-            Popover.Y = ny;
+            PopoverHost.X = nx;
+            PopoverHost.Y = ny;
 
-            Popover.SetRelativeLayout (Screen.Size);
+            PopoverHost.SetRelativeLayout (Screen.Size);
 
             if (Top is { })
             {
                 Top.HasFocus = false;
             }
 
-            Popover?.SetFocus ();
+            PopoverHost?.SetFocus ();
         }
+    }
+}
+
+public class PopoverHost : View
+{
+    public PopoverHost()
+    {
+        Id = "popoverHost";
+        Width = Dim.Fill ();
+        Height = Dim.Fill ();
+        Visible = false;
+    }
+
+    /// <inheritdoc />
+    protected override bool OnClearingViewport () { return true; }
+
+    /// <inheritdoc />
+    protected override bool OnVisibleChanging ()
+    {
+        if (!Visible)
+        {
+            ColorScheme ??= Application.Top?.ColorScheme;
+            Frame = Application.Screen;
+
+            SetRelativeLayout (Application.Screen.Size);
+        }
+
+        return false;
     }
 }

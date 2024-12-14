@@ -138,5 +138,11 @@ public enum ViewportSettings
     ///     <see cref="ClipContentOnly"/> must be set for this setting to work (clipping beyond the visible area must be
     ///     disabled).
     /// </summary>
-    ClearContentOnly = 128
+    ClearContentOnly = 128,
+
+    /// <summary>
+    ///     If set, any <see cref="View.Viewport"/> will not be cleared when the View is drawn and the clip region
+    ///     will be set to clip the View's <see cref="View.Text"/> and <see cref="View.Subviews"/>.
+    /// </summary>
+    Transparent = 256,
 }

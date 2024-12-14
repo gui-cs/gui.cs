@@ -153,10 +153,10 @@ public class ContextMenus : Scenario
     {
         if (_winContextMenu is { })
         {
-            if (Application.Popover == _winContextMenu)
-            {
-                Application.Popover = null;
-            }
+            //if (Application.Popover == _winContextMenu)
+            //{
+            //    Application.Popover = null;
+            //}
 
             _winContextMenu.Dispose ();
             _winContextMenu = null;
@@ -175,7 +175,7 @@ public class ContextMenus : Scenario
     private void ShowWinContextMenu (Point? screenPosition)
     {
         _winContextMenu!.SetPosition (screenPosition);
-        Application.Popover = _winContextMenu;
+        //Application.Popover = _winContextMenu;
         _winContextMenu.Visible = true;
     }
 

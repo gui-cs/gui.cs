@@ -27,9 +27,13 @@ public class Bars : Scenario
         _popoverMenu = new Menuv2
         {
             Id = "popoverMenu",
+            Arrangement = ViewArrangement.Popover
         };
 
+        Application.PopoverHost.Add (_popoverMenu);
+
         Application.Run (app);
+        Application.PopoverHost.Remove(_popoverMenu);
         _popoverMenu.Dispose ();
         app.Dispose ();
         Application.Shutdown ();
@@ -213,11 +217,14 @@ public class Bars : Scenario
         {
             if (e.Flags.HasFlag (MouseFlags.Button3Clicked))
             {
-                Application.Popover = _popoverMenu;
+                //Application.Popover = _popoverMenu;
+                _popoverMenu.Arrangement = ViewArrangement.Overlapped;
 
                 _popoverMenu.X = e.ScreenPosition.X;
                 _popoverMenu.Y = e.ScreenPosition.Y;
                 _popoverMenu.Visible = true;
+
+                Application.PopoverHost.Visible = true;
             }
         }
 
@@ -503,7 +510,7 @@ public class Bars : Scenario
 
         editMenuBarItem.Accepting += (sender, args) =>
                                      {
-                                         Application.Popover = editMenu;
+                                         //Application.Popover = editMenu;
                                          Rectangle screen = editMenuBarItem.FrameToScreen ();
                                          editMenu.X = screen.X;
                                          editMenu.Y = screen.Y + screen.Height;
