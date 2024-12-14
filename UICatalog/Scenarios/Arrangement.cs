@@ -185,6 +185,9 @@ public class Arrangement : Scenario
         };
         testFrame.Add (datePicker);
 
+
+        testFrame.Add (new TransparentView ());
+
         adornmentsEditor.AutoSelectSuperView = testFrame;
         arrangementEditor.AutoSelectSuperView = testFrame;
 
@@ -297,5 +300,30 @@ public class Arrangement : Scenario
         }
 
         return keys;
+    }
+
+    public class TransparentView : FrameView
+    {
+        public TransparentView()
+        {
+            Title = "Transparent";
+            Text = "Text";
+            X = 0;
+            Y = 0;
+            Width = 30;
+            Height = 10;
+            Arrangement = ViewArrangement.Overlapped | ViewArrangement.Resizable | ViewArrangement.Movable;
+            ViewportSettings |= Terminal.Gui.ViewportSettings.Transparent;
+
+            Padding!.Thickness = new Thickness (1);
+
+            Add (
+                 new Button ()
+                 {
+                     Title = "_Hi",
+                     X = Pos.Center (),
+                     Y = Pos.Center ()
+                 });
+        }
     }
 }
