@@ -53,7 +53,7 @@ public partial class View // Drawing APIs
         Region? contentClip = null;
 
         // TODO: This can be further optimized by checking NeedsDraw below and only clearing, drawing text, drawing content, etc. if it is true.
-        if (NeedsDraw || SubViewNeedsDraw)
+        if (NeedsDraw || SubViewNeedsDraw || ViewportSettings.HasFlag(ViewportSettings.Transparent))
         {
             // Draw the Border and Padding.
             if (this is Adornment)
