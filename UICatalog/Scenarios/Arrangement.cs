@@ -185,8 +185,28 @@ public class Arrangement : Scenario
         };
         testFrame.Add (datePicker);
 
+        TransparentView transparentView = new ()
+        {
+            Id = "transparentView",
+            X = 5,
+            Y = 11,
+            Width = 35,
+            Height = 15
+        };
 
-        testFrame.Add (new TransparentView ());
+        transparentView.Add (
+                             new TransparentView ()
+                             {
+                                 Title = "Transparent SubView",
+                                 Text = "Transparent SubView",
+                                 Id = "transparentSubView",
+                                 X = 10,
+                                 Y = 10,
+                                 Width = 10,
+                                 Height = 5
+
+                             });
+        testFrame.Add (transparentView);
 
         adornmentsEditor.AutoSelectSuperView = testFrame;
         arrangementEditor.AutoSelectSuperView = testFrame;
@@ -301,29 +321,27 @@ public class Arrangement : Scenario
 
         return keys;
     }
+}
 
-    public class TransparentView : FrameView
+public class TransparentView : FrameView
+{
+    public TransparentView ()
     {
-        public TransparentView()
-        {
-            Title = "Transparent";
-            Text = "Text";
-            X = 0;
-            Y = 0;
-            Width = 30;
-            Height = 10;
-            Arrangement = ViewArrangement.Overlapped | ViewArrangement.Resizable | ViewArrangement.Movable;
-            ViewportSettings |= Terminal.Gui.ViewportSettings.Transparent;
-
-            Padding!.Thickness = new Thickness (1);
-
-            Add (
-                 new Button ()
-                 {
-                     Title = "_Hi",
-                     X = Pos.Center (),
-                     Y = Pos.Center ()
-                 });
-        }
+        Title = "Transparent";
+        base.Text = "Text";
+        Arrangement = ViewArrangement.Overlapped | ViewArrangement.Resizable | ViewArrangement.Movable;
+        ViewportSettings |= Terminal.Gui.ViewportSettings.Transparent;
+        base.Add (
+             new Button ()
+             {
+                 Title = "_Hi",
+                 X = Pos.Center (),
+                 Y = Pos.Center (),
+                 ShadowStyle = ShadowStyle.None,
+                 ColorScheme = Colors.ColorSchemes ["Toplevel"],
+             });
     }
+
+    /// <inheritdoc />
+    protected override bool OnMouseEvent (MouseEventArgs mouseEvent) { return false; }
 }
