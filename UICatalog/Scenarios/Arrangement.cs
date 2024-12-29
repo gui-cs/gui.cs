@@ -195,7 +195,7 @@ public class Arrangement : Scenario
         };
 
         transparentView.Add (
-                             new TransparentView ()
+                             new View ()
                              {
                                  Title = "Transparent SubView",
                                  Text = "Transparent SubView",
@@ -212,6 +212,12 @@ public class Arrangement : Scenario
         arrangementEditor.AutoSelectSuperView = testFrame;
 
         testFrame.SetFocus ();
+
+        testFrame.Add (
+                       new Button ()
+                       {
+                           Title = "Hey",
+                       });
         Application.Run (app);
         timer.Close ();
         app.Dispose ();
