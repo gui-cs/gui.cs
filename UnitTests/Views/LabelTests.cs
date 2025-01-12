@@ -1460,4 +1460,16 @@ e
         Application.Top.Dispose ();
         Application.ResetState ();
     }
+
+    // https://github.com/gui-cs/Terminal.Gui/issues/3893
+    [Fact]
+    [SetupFakeDriver]
+    public void TestLabelUnderscoreMinus ()
+    {
+        var lbl = new Label ()
+        {
+            Text = "TextView with some more test_- text. Unicode shouldn't 𝔹Aℝ𝔽!"
+        };
+        lbl.Draw ();
+    }
 }
