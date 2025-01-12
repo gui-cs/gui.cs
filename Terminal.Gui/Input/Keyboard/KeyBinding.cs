@@ -6,48 +6,46 @@
 namespace Terminal.Gui;
 
 /// <summary>
-/// Provides a collection of <see cref="Command"/> objects that are scoped to <see cref="KeyBindingScope"/>.
+/// Provides a collection of <see cref="Command"/> objects stored in <see cref="KeyBindings"/>.
 /// </summary>
 /// <seealso cref="Application.KeyBindings"/>
 /// <seealso cref="View.KeyBindings"/>
 /// <seealso cref="Command"/>
-public record struct KeyBinding
+public record struct KeyBinding : IInputBinding
 {
     /// <summary>Initializes a new instance.</summary>
     /// <param name="commands">The commands this key binding will invoke.</param>
-    /// <param name="scope">The scope of the <see cref="Commands"/>.</param>
     /// <param name="context">Arbitrary context that can be associated with this key binding.</param>
-    public KeyBinding (Command [] commands, KeyBindingScope scope, object? context = null)
+    public KeyBinding (Command [] commands, object? context = null)
     {
         Commands = commands;
-        Scope = scope;
-        Context = context;
+        Data = context;
     }
 
     /// <summary>Initializes a new instance.</summary>
     /// <param name="commands">The commands this key binding will invoke.</param>
-    /// <param name="scope">The scope of the <see cref="Commands"/>.</param>
-    /// <param name="boundView">The view the key binding is bound to.</param>
-    /// <param name="context">Arbitrary context that can be associated with this key binding.</param>
-    public KeyBinding (Command [] commands, KeyBindingScope scope, View? boundView, object? context = null)
+    /// <param name="target">The view the key binding is bound to.</param>
+    /// <param name="data">Arbitrary data that can be associated with this key binding.</param>
+    public KeyBinding (Command [] commands, View? target, object? data = null)
     {
         Commands = commands;
-        Scope = scope;
-        BoundView = boundView;
-        Context = context;
+        Target = target;
+        Data = data;
     }
 
     /// <summary>The commands this key binding will invoke.</summary>
     public Command [] Commands { get; set; }
 
-    /// <summary>The scope of the <see cref="Commands"/>.</summary>
-    public KeyBindingScope Scope { get; set; }
+    /// <summary>
+    ///     The Key that is bound to the <see cref="Commands"/>.
+    /// </summary>
+    public Key? Key { get; set; }
 
     /// <summary>The view the key binding is bound to.</summary>
-    public View? BoundView { get; set; }
+    public View? Target { get; set; }
 
     /// <summary>
     ///     Arbitrary context that can be associated with this key binding.
     /// </summary>
-    public object? Context { get; set; }
+    public object? Data { get; set; }
 }

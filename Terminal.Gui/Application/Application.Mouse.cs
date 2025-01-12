@@ -184,7 +184,7 @@ public static partial class Application // Mouse handling
         }
 
         // Create a view-relative mouse event to send to the view that is under the mouse.
-        MouseEventArgs? viewMouseEvent;
+        MouseEventArgs viewMouseEvent;
 
         if (deepestViewUnderMouse is Adornment adornment)
         {

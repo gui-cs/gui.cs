@@ -1,12 +1,9 @@
-using System.ComponentModel;
-using System.Text;
-using Xunit.Abstractions;
-
 namespace Terminal.Gui.ViewTests;
 
-public class ViewCommandTests (ITestOutputHelper output)
+public class ViewCommandTests
 {
     #region OnAccept/Accept tests
+
     [Fact]
     public void Accept_Command_Raises_NoFocus ()
     {
@@ -77,8 +74,8 @@ public class ViewCommandTests (ITestOutputHelper output)
     [Fact]
     public void Accept_Command_Bubbles_Up_To_SuperView ()
     {
-        var view = new ViewEventTester () { Id = "view" };
-        var subview = new ViewEventTester () { Id = "subview" };
+        var view = new ViewEventTester { Id = "view" };
+        var subview = new ViewEventTester { Id = "subview" };
         view.Add (subview);
 
         subview.InvokeCommand (Command.Accept);
@@ -97,7 +94,7 @@ public class ViewCommandTests (ITestOutputHelper output)
         Assert.Equal (1, view.OnAcceptedCount);
 
         // Add a super view to test deeper hierarchy
-        var superView = new ViewEventTester () { Id = "superView" };
+        var superView = new ViewEventTester { Id = "superView" };
         superView.Add (view);
 
         subview.InvokeCommand (Command.Accept);
@@ -135,7 +132,7 @@ public class ViewCommandTests (ITestOutputHelper output)
     [CombinatorialData]
     public void Select_Command_Raises_SetsFocus (bool canFocus)
     {
-        var view = new ViewEventTester ()
+        var view = new ViewEventTester
         {
             CanFocus = canFocus
         };
@@ -236,30 +233,29 @@ public class ViewCommandTests (ITestOutputHelper output)
             CanFocus = true;
 
             Accepting += (s, a) =>
-                      {
-                          a.Cancel = HandleAccepted;
-                          AcceptedCount++;
-                      };
+                         {
+                             a.Cancel = HandleAccepted;
+                             AcceptedCount++;
+                         };
 
             HandlingHotKey += (s, a) =>
-                             {
-                                 a.Cancel = HandleHandlingHotKey;
-                                 HandlingHotKeyCount++;
-                             };
-
+                              {
+                                  a.Cancel = HandleHandlingHotKey;
+                                  HandlingHotKeyCount++;
+                              };
 
             Selecting += (s, a) =>
-                             {
-                                 a.Cancel = HandleSelecting;
-                                 SelectingCount++;
-                             };
+                         {
+                             a.Cancel = HandleSelecting;
+                             SelectingCount++;
+                         };
         }
 
         public int OnAcceptedCount { get; set; }
         public int AcceptedCount { get; set; }
         public bool HandleOnAccepted { get; set; }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         protected override bool OnAccepting (CommandEventArgs args)
         {
             OnAcceptedCount++;
@@ -273,7 +269,7 @@ public class ViewCommandTests (ITestOutputHelper output)
         public int HandlingHotKeyCount { get; set; }
         public bool HandleOnHandlingHotKey { get; set; }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         protected override bool OnHandlingHotKey (CommandEventArgs args)
         {
             OnHandlingHotKeyCount++;
@@ -283,12 +279,11 @@ public class ViewCommandTests (ITestOutputHelper output)
 
         public bool HandleHandlingHotKey { get; set; }
 
-
         public int OnSelectingCount { get; set; }
         public int SelectingCount { get; set; }
         public bool HandleOnSelecting { get; set; }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         protected override bool OnSelecting (CommandEventArgs args)
         {
             OnSelectingCount++;
@@ -297,6 +292,5 @@ public class ViewCommandTests (ITestOutputHelper output)
         }
 
         public bool HandleSelecting { get; set; }
-
     }
 }

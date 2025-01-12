@@ -2413,7 +2413,7 @@ public class TextView : View
         ContextMenu = new ();
         ContextMenu.KeyChanged += ContextMenu_KeyChanged!;
 
-        KeyBindings.Add ((KeyCode)ContextMenu.Key, KeyBindingScope.HotKey, Command.Context);
+        KeyBindings.Add (ContextMenu.Key, Command.Context);
     }
 
     private void TextView_Added1 (object? sender, SuperViewChangedEventArgs e) { throw new NotImplementedException (); }
@@ -3710,8 +3710,8 @@ public class TextView : View
     /// <summary>Invoke the <see cref="UnwrappedCursorPosition"/> event with the unwrapped <see cref="CursorPosition"/>.</summary>
     public virtual void OnUnwrappedCursorPosition (int? cRow = null, int? cCol = null)
     {
-        int? row = cRow is null ? CurrentRow : cRow;
-        int? col = cCol is null ? CurrentColumn : cCol;
+        int? row = cRow ?? CurrentRow;
+        int? col = cCol ?? CurrentColumn;
 
         if (cRow is null && cCol is null && _wordWrap)
         {
@@ -3719,7 +3719,7 @@ public class TextView : View
             col = _wrapManager.GetModelColFromWrappedLines (CurrentRow, CurrentColumn);
         }
 
-        UnwrappedCursorPosition?.Invoke (this, new (new ((int)col, (int)row)));
+        UnwrappedCursorPosition?.Invoke (this, new Point (col.Value, row.Value));
     }
 
     /// <summary>Paste the clipboard contents into the current selected position.</summary>
@@ -3956,7 +3956,7 @@ public class TextView : View
     }
 
     /// <summary>Invoked with the unwrapped <see cref="CursorPosition"/>.</summary>
-    public event EventHandler<PointEventArgs>? UnwrappedCursorPosition;
+    public event EventHandler<Point>? UnwrappedCursorPosition;
 
     /// <summary>
     ///     Sets the <see cref="View.Driver"/> to an appropriate color for rendering the given <paramref name="idxCol"/>
@@ -4163,7 +4163,7 @@ public class TextView : View
                              SelectAll,
                              null,
                              null,
-                             (KeyCode)KeyBindings.GetKeyFromCommands (Command.SelectAll)
+                             (KeyCode)KeyBindings.GetFirstFromCommands (Command.SelectAll)
                             ),
                         new (
                              Strings.ctxDeleteAll,
@@ -4171,7 +4171,7 @@ public class TextView : View
                              DeleteAll,
                              null,
                              null,
-                             (KeyCode)KeyBindings.GetKeyFromCommands (Command.DeleteAll)
+                             (KeyCode)KeyBindings.GetFirstFromCommands (Command.DeleteAll)
                             ),
                         new (
                              Strings.ctxCopy,
@@ -4179,7 +4179,7 @@ public class TextView : View
                              Copy,
                              null,
                              null,
-                             (KeyCode)KeyBindings.GetKeyFromCommands (Command.Copy)
+                             (KeyCode)KeyBindings.GetFirstFromCommands (Command.Copy)
                             ),
                         new (
                              Strings.ctxCut,
@@ -4187,7 +4187,7 @@ public class TextView : View
                              Cut,
                              null,
                              null,
-                             (KeyCode)KeyBindings.GetKeyFromCommands (Command.Cut)
+                             (KeyCode)KeyBindings.GetFirstFromCommands (Command.Cut)
                             ),
                         new (
                              Strings.ctxPaste,
@@ -4195,7 +4195,7 @@ public class TextView : View
                              Paste,
                              null,
                              null,
-                             (KeyCode)KeyBindings.GetKeyFromCommands (Command.Paste)
+                             (KeyCode)KeyBindings.GetFirstFromCommands (Command.Paste)
                             ),
                         new (
                              Strings.ctxUndo,
@@ -4203,7 +4203,7 @@ public class TextView : View
                              Undo,
                              null,
                              null,
-                             (KeyCode)KeyBindings.GetKeyFromCommands (Command.Undo)
+                             (KeyCode)KeyBindings.GetFirstFromCommands (Command.Undo)
                             ),
                         new (
                              Strings.ctxRedo,
@@ -4211,7 +4211,7 @@ public class TextView : View
                              Redo,
                              null,
                              null,
-                             (KeyCode)KeyBindings.GetKeyFromCommands (Command.Redo)
+                             (KeyCode)KeyBindings.GetFirstFromCommands (Command.Redo)
                             ),
                         new (
                              Strings.ctxColors,
@@ -4219,7 +4219,7 @@ public class TextView : View
                              () => PromptForColors (),
                              null,
                              null,
-                             (KeyCode)KeyBindings.GetKeyFromCommands (Command.Open)
+                             (KeyCode)KeyBindings.GetFirstFromCommands (Command.Open)
                             )
                     }
                    );
@@ -4333,7 +4333,7 @@ public class TextView : View
         DoNeededAction ();
     }
 
-    private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.ReplaceKey (e.OldKey, e.NewKey); }
+    private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey, e.NewKey); }
 
     private bool DeleteTextBackwards ()
     {
@@ -4465,12 +4465,12 @@ public class TextView : View
         }
         else
         {
-            _historyText.Add ([[.. currentLine]], CursorPosition);
+            _historyText.Add ([ [.. currentLine]], CursorPosition);
 
             currentLine.RemoveAt (CurrentColumn);
 
             _historyText.Add (
-                              [[.. currentLine]],
+                              [ [.. currentLine]],
                               CursorPosition,
                               HistoryText.LineStatus.Replaced
                              );
@@ -5057,7 +5057,7 @@ public class TextView : View
         }
 
         _historyText.Add (
-                          [[.. GetCurrentLine ()]],
+                          [ [.. GetCurrentLine ()]],
                           CursorPosition,
                           HistoryText.LineStatus.Replaced
                          );
@@ -5097,7 +5097,7 @@ public class TextView : View
             return;
         }
 
-        _historyText.Add ([[.. currentLine]], CursorPosition);
+        _historyText.Add ([ [.. currentLine]], CursorPosition);
 
         if (currentLine.Count == 0)
         {
@@ -5164,7 +5164,7 @@ public class TextView : View
         }
 
         _historyText.Add (
-                          [[.. GetCurrentLine ()]],
+                          [ [.. GetCurrentLine ()]],
                           CursorPosition,
                           HistoryText.LineStatus.Replaced
                          );
@@ -5188,14 +5188,14 @@ public class TextView : View
 
         List<Cell> currentLine = GetCurrentLine ();
 
-        _historyText.Add ([[.. GetCurrentLine ()]], CursorPosition);
+        _historyText.Add ([ [.. GetCurrentLine ()]], CursorPosition);
 
         if (CurrentColumn == 0)
         {
             DeleteTextBackwards ();
 
             _historyText.ReplaceLast (
-                                      [[.. GetCurrentLine ()]],
+                                      [ [.. GetCurrentLine ()]],
                                       CursorPosition,
                                       HistoryText.LineStatus.Replaced
                                      );
@@ -5234,7 +5234,7 @@ public class TextView : View
         }
 
         _historyText.Add (
-                          [[.. GetCurrentLine ()]],
+                          [ [.. GetCurrentLine ()]],
                           CursorPosition,
                           HistoryText.LineStatus.Replaced
                          );
@@ -5256,14 +5256,14 @@ public class TextView : View
 
         List<Cell> currentLine = GetCurrentLine ();
 
-        _historyText.Add ([[.. GetCurrentLine ()]], CursorPosition);
+        _historyText.Add ([ [.. GetCurrentLine ()]], CursorPosition);
 
         if (currentLine.Count == 0 || CurrentColumn == currentLine.Count)
         {
             DeleteTextForwards ();
 
             _historyText.ReplaceLast (
-                                      [[.. GetCurrentLine ()]],
+                                      [ [.. GetCurrentLine ()]],
                                       CursorPosition,
                                       HistoryText.LineStatus.Replaced
                                      );
@@ -5293,7 +5293,7 @@ public class TextView : View
         }
 
         _historyText.Add (
-                          [[.. GetCurrentLine ()]],
+                          [ [.. GetCurrentLine ()]],
                           CursorPosition,
                           HistoryText.LineStatus.Replaced
                          );
@@ -6143,7 +6143,7 @@ public class TextView : View
         Paste ();
     }
 
-    private bool ProcessEnterKey (CommandContext ctx)
+    private bool ProcessEnterKey (ICommandContext? commandContext)
     {
         ResetColumnTrack ();
 
@@ -6156,7 +6156,7 @@ public class TextView : View
         {
             // By Default pressing ENTER should be ignored (OnAccept will return false or null). Only cancel if the
             // event was fired and set Cancel = true.
-            return RaiseAccepting (ctx) is null or false;
+            return RaiseAccepting (commandContext) is null or false;
         }
 
         SetWrapModel ();

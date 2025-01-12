@@ -1438,6 +1438,42 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Copy Code_point.
+        /// </summary>
+        internal static string charMapCopyCP {
+            get {
+                return ResourceManager.GetString("charMapCopyCP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Copy _Glyph.
+        /// </summary>
+        internal static string charMapCopyGlyph {
+            get {
+                return ResourceManager.GetString("charMapCopyGlyph", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Getting Codepoint Information.
+        /// </summary>
+        internal static string charMapCPInfoDlgTitle {
+            get {
+                return ResourceManager.GetString("charMapCPInfoDlgTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Codepoint Information from.
+        /// </summary>
+        internal static string charMapInfoDlgInfoLabel {
+            get {
+                return ResourceManager.GetString("charMapInfoDlgInfoLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Co_lors.
         /// </summary>
         internal static string ctxColors {
@@ -1515,6 +1551,24 @@ namespace Terminal.Gui.Resources {
         internal static string dpTitle {
             get {
                 return ResourceManager.GetString("dpTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Error.
+        /// </summary>
+        internal static string error {
+            get {
+                return ResourceManager.GetString("error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to failed getting.
+        /// </summary>
+        internal static string failedGetting {
+            get {
+                return ResourceManager.GetString("failedGetting", resourceCulture);
             }
         }
         
