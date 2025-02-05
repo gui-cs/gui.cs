@@ -2124,7 +2124,7 @@ public class TextFormatter
         var start = string.Empty;
         var i = 0;
 
-        foreach (Rune c in text)
+        foreach (Rune c in text.EnumerateRunes ())
         {
             if (c == hotKeySpecifier && i == hotPos)
             {
