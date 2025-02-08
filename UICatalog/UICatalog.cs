@@ -615,7 +615,7 @@ public class UICatalogApp
     {
 #if DEBUG_IDISPOSABLE
 
-        // Validate there are no outstanding Responder-based instances 
+        // Validate there are no outstanding View instances 
         // after a scenario was selected to run. This proves the main UI Catalog
         // 'app' closed cleanly.
         foreach (View? inst in View.Instances)
@@ -796,7 +796,7 @@ public class UICatalogApp
                                              {
                                                  if (_statusBar.NeedsLayout)
                                                  {
-                                                       throw new LayoutException ("DimFunc.Fn aborted because dependent View needs layout.");
+                                                     throw new LayoutException ("DimFunc.Fn aborted because dependent View needs layout.");
                                                      //_statusBar.Layout ();
                                                  }
                                                  return _statusBar.Frame.Height;

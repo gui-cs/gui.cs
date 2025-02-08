@@ -968,7 +968,7 @@ public class DrawTests (ITestOutputHelper _output)
         Assert.Equal (view.Frame, View.GetClip ()!.GetBounds ());
 
         // Act
-        view.ClipViewport ();
+        view.AddViewportToClip ();
 
         // Assert
         Assert.Equal (expectedClip, View.GetClip ()!.GetBounds ());
@@ -1002,7 +1002,7 @@ public class DrawTests (ITestOutputHelper _output)
         view.Viewport = view.Viewport with { X = 1, Y = 1 };
 
         // Act
-        view.ClipViewport ();
+        view.AddViewportToClip ();
 
         // Assert
         Assert.Equal (expectedClip, View.GetClip ()!.GetBounds ());

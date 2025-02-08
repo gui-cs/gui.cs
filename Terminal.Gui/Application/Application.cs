@@ -148,6 +148,13 @@ public static partial class Application
             t!.Running = false;
         }
 
+        //Popover = null;
+        if (PopoverHost is { })
+        {
+            PopoverHost.Dispose ();
+            PopoverHost = null;
+        }
+
         TopLevels.Clear ();
 #if DEBUG_IDISPOSABLE
 

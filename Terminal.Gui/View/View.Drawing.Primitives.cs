@@ -137,7 +137,7 @@ public partial class View
             return;
         }
 
-        Region prevClip = ClipViewport ();
+        Region prevClip = AddViewportToClip ();
         Rectangle toClear = ViewportToScreen (rect);
         Attribute prev = SetAttribute (new (color ?? GetNormalColor ().Background));
         Driver.FillRect (toClear);
@@ -155,7 +155,7 @@ public partial class View
             return;
         }
 
-        Region prevClip = ClipViewport ();
+        Region prevClip = AddViewportToClip ();
         Rectangle toClear = ViewportToScreen (rect);
         Driver.FillRect (toClear, rune);
         SetClip (prevClip);

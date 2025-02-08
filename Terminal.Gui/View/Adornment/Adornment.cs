@@ -231,7 +231,6 @@ public class Adornment : View, IDesignable
 
         return Thickness.Contains (outside, location);
     }
-
     #endregion View Overrides
 
     /// <inheritdoc/>

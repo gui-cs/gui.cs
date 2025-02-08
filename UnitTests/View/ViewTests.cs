@@ -163,7 +163,7 @@ public class ViewTests (ITestOutputHelper output)
 
         view.DrawingContent += (s, e) =>
                             {
-                                Region savedClip = view.ClipViewport ();
+                                Region savedClip = view.AddViewportToClip ();
 
                                 for (var row = 0; row < view.Viewport.Height; row++)
                                 {
@@ -226,7 +226,7 @@ public class ViewTests (ITestOutputHelper output)
 
         view.DrawingContent += (s, e) =>
                                {
-                                   Region savedClip = view.ClipViewport ();
+                                   Region savedClip = view.AddViewportToClip ();
 
                                    for (var row = 0; row < view.Viewport.Height; row++)
                                    {

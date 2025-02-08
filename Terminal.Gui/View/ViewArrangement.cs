@@ -70,5 +70,10 @@ public enum ViewArrangement
     ///         Use Ctrl-Tab (Ctrl-PageDown) / Ctrl-Shift-Tab (Ctrl-PageUp) to move between overlapped views.
     ///     </para>
     /// </summary>
-    Overlapped = 32
+    Overlapped = 32,
+
+    /// <summary>
+    ///     The view overlaps other views and prevents any subviews without this flag set to gain input.
+    /// </summary>
+    Popover = 64,
 }

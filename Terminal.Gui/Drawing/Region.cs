@@ -1,21 +1,25 @@
-﻿/// <summary>
+﻿#nullable enable
+
+namespace Terminal.Gui;
+
+/// <summary>
 ///     Represents a region composed of one or more rectangles, providing methods for union, intersection, exclusion, and
 ///     complement operations.
 /// </summary>
 public class Region : IDisposable
 {
-    private List<Rectangle> _rectangles;
+    private List<Rectangle>? _rectangles;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Region"/> class.
     /// </summary>
-    public Region () { _rectangles = new (); }
+    public Region () { _rectangles = []; }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Region"/> class with the specified rectangle.
     /// </summary>
     /// <param name="rectangle">The initial rectangle for the region.</param>
-    public Region (Rectangle rectangle) { _rectangles = new () { rectangle }; }
+    public Region (Rectangle rectangle) { _rectangles = [rectangle]; }
 
     /// <summary>
     ///     Adds the specified rectangle to the region.
@@ -23,7 +27,7 @@ public class Region : IDisposable
     /// <param name="rectangle">The rectangle to add to the region.</param>
     public void Union (Rectangle rectangle)
     {
-        _rectangles.Add (rectangle);
+        _rectangles!.Add (rectangle);
         _rectangles = MergeRectangles (_rectangles);
     }
 
@@ -31,10 +35,13 @@ public class Region : IDisposable
     ///     Adds the specified region to this region.
     /// </summary>
     /// <param name="region">The region to add to this region.</param>
-    public void Union (Region region)
+    public void Union (Region? region)
     {
-        _rectangles.AddRange (region._rectangles);
-        _rectangles = MergeRectangles (_rectangles);
+        if (region is { })
+        {
+            _rectangles!.AddRange (region._rectangles!);
+            _rectangles = MergeRectangles (_rectangles);
+        }
     }
 
     /// <summary>
@@ -43,20 +50,23 @@ public class Region : IDisposable
     /// <param name="rectangle">The rectangle to intersect with the region.</param>
     public void Intersect (Rectangle rectangle)
     {
-        _rectangles = _rectangles.Select (r => Rectangle.Intersect (r, rectangle)).Where (r => !r.IsEmpty).ToList ();
+        _rectangles = _rectangles!.Select (r => Rectangle.Intersect (r, rectangle)).Where (r => !r.IsEmpty).ToList ();
     }
 
     /// <summary>
     ///     Updates the region to be the intersection of itself with the specified region.
     /// </summary>
     /// <param name="region">The region to intersect with this region.</param>
-    public void Intersect (Region region)
+    public void Intersect (Region? region)
     {
-        List<Rectangle> intersections = new List<Rectangle> ();
+        List<Rectangle> intersections = [];
 
-        foreach (Rectangle rect1 in _rectangles)
+        // Null is same as empty region
+        region ??= new ();
+
+        foreach (Rectangle rect1 in _rectangles!)
         {
-            foreach (Rectangle rect2 in region._rectangles)
+            foreach (Rectangle rect2 in region!._rectangles!)
             {
                 Rectangle intersected = Rectangle.Intersect (rect1, rect2);
 
@@ -74,17 +84,20 @@ public class Region : IDisposable
     ///     Removes the specified rectangle from the region.
     /// </summary>
     /// <param name="rectangle">The rectangle to exclude from the region.</param>
-    public void Exclude (Rectangle rectangle) { _rectangles = _rectangles.SelectMany (r => SubtractRectangle (r, rectangle)).ToList (); }
+    public void Exclude (Rectangle rectangle) { _rectangles = _rectangles!.SelectMany (r => SubtractRectangle (r, rectangle)).ToList (); }
 
     /// <summary>
     ///     Removes the portion of the specified region from this region.
     /// </summary>
     /// <param name="region">The region to exclude from this region.</param>
-    public void Exclude (Region region)
+    public void Exclude (Region? region)
     {
-        foreach (Rectangle rect in region._rectangles)
+        // Null is same as empty region
+        region ??= new ();
+
+        foreach (Rectangle rect in region._rectangles!)
         {
-            _rectangles = _rectangles.SelectMany (r => SubtractRectangle (r, rect)).ToList ();
+            _rectangles = _rectangles!.SelectMany (r => SubtractRectangle (r, rect)).ToList ();
         }
     }
 
@@ -94,14 +107,14 @@ public class Region : IDisposable
     /// <param name="bounds">The bounding rectangle to use for complementing the region.</param>
     public void Complement (Rectangle bounds)
     {
-        if (bounds.IsEmpty || _rectangles.Count == 0)
+        if (bounds.IsEmpty || _rectangles!.Count == 0)
         {
-            _rectangles.Clear ();
+            _rectangles!.Clear ();
 
             return;
         }
 
-        List<Rectangle> complementRectangles = new List<Rectangle> { bounds };
+        List<Rectangle> complementRectangles = [bounds];
 
         foreach (Rectangle rect in _rectangles)
         {
@@ -118,7 +131,7 @@ public class Region : IDisposable
     public Region Clone ()
     {
         var clone = new Region ();
-        clone._rectangles = new (_rectangles);
+        clone._rectangles = [.. _rectangles!];
 
         return clone;
     }
@@ -129,7 +142,7 @@ public class Region : IDisposable
     /// <returns>A <see cref="Rectangle"/> that bounds the region.</returns>
     public Rectangle GetBounds ()
     {
-        if (_rectangles.Count == 0)
+        if (_rectangles!.Count == 0)
         {
             return Rectangle.Empty;
         }
@@ -146,7 +159,7 @@ public class Region : IDisposable
     ///     Determines whether the region is empty.
     /// </summary>
     /// <returns><c>true</c> if the region is empty; otherwise, <c>false</c>.</returns>
-    public bool IsEmpty () { return !_rectangles.Any (); }
+    public bool IsEmpty () { return !_rectangles!.Any (); }
 
     /// <summary>
     ///     Determines whether the specified point is contained within the region.
@@ -154,20 +167,20 @@ public class Region : IDisposable
     /// <param name="x">The x-coordinate of the point.</param>
     /// <param name="y">The y-coordinate of the point.</param>
     /// <returns><c>true</c> if the point is contained within the region; otherwise, <c>false</c>.</returns>
-    public bool Contains (int x, int y) { return _rectangles.Any (r => r.Contains (x, y)); }
+    public bool Contains (int x, int y) { return _rectangles!.Any (r => r.Contains (x, y)); }
 
     /// <summary>
     ///     Determines whether the specified rectangle is contained within the region.
     /// </summary>
     /// <param name="rectangle">The rectangle to check for containment.</param>
     /// <returns><c>true</c> if the rectangle is contained within the region; otherwise, <c>false</c>.</returns>
-    public bool Contains (Rectangle rectangle) { return _rectangles.Any (r => r.Contains (rectangle)); }
+    public bool Contains (Rectangle rectangle) { return _rectangles!.Any (r => r.Contains (rectangle)); }
 
     /// <summary>
     ///     Returns an array of rectangles that represent the region.
     /// </summary>
     /// <returns>An array of <see cref="Rectangle"/> objects that make up the region.</returns>
-    public Rectangle [] GetRegionScans () { return _rectangles.ToArray (); }
+    public Rectangle [] GetRegionScans () { return _rectangles!.ToArray (); }
 
     /// <summary>
     ///     Offsets all rectangles in the region by the specified amounts.
@@ -176,10 +189,10 @@ public class Region : IDisposable
     /// <param name="offsetY">The amount to offset along the y-axis.</param>
     public void Offset (int offsetX, int offsetY)
     {
-        for (int i = 0; i < _rectangles.Count; i++)
+        for (var i = 0; i < _rectangles!.Count; i++)
         {
-            var rect = _rectangles [i];
-            _rectangles [i] = new Rectangle (rect.Left + offsetX, rect.Top + offsetY, rect.Width, rect.Height);
+            Rectangle rect = _rectangles [i];
+            _rectangles [i] = new (rect.Left + offsetX, rect.Top + offsetY, rect.Width, rect.Height);
         }
     }
 
@@ -188,11 +201,11 @@ public class Region : IDisposable
     /// </summary>
     /// <param name="rectangles">The list of rectangles to merge.</param>
     /// <returns>A list of merged rectangles.</returns>
-    private List<Rectangle> MergeRectangles (List<Rectangle> rectangles)
+    private static List<Rectangle> MergeRectangles (List<Rectangle> rectangles)
     {
         // Simplified merging logic: this does not handle all edge cases for merging overlapping rectangles.
         // For a full implementation, a plane sweep algorithm or similar would be needed.
-        List<Rectangle> merged = new List<Rectangle> (rectangles);
+        List<Rectangle> merged = [.. rectangles];
         bool mergedAny;
 
         do
@@ -230,7 +243,7 @@ public class Region : IDisposable
     /// <param name="original">The original rectangle.</param>
     /// <param name="subtract">The rectangle to subtract from the original.</param>
     /// <returns>An enumerable collection of resulting rectangles after subtraction.</returns>
-    private IEnumerable<Rectangle> SubtractRectangle (Rectangle original, Rectangle subtract)
+    private static IEnumerable<Rectangle> SubtractRectangle (Rectangle original, Rectangle subtract)
     {
         if (!original.IntersectsWith (subtract))
         {
@@ -279,5 +292,5 @@ public class Region : IDisposable
     /// <summary>
     ///     Releases all resources used by the <see cref="Region"/>.
     /// </summary>
-    public void Dispose () { _rectangles.Clear (); }
+    public void Dispose () { _rectangles!.Clear (); }
 }

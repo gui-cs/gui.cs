@@ -834,6 +834,16 @@ public partial class View // Focus and cross-view navigation management (TabStop
         // Set HasFocus false
         _hasFocus = false;
 
+        if (Application.Navigation is { })
+        {
+            View? appFocused = Application.Navigation.GetFocused ();
+
+            if (appFocused is { } || appFocused == this)
+            {
+                Application.Navigation.SetFocused (newFocusedView ?? superViewOrParent/* ?? Application.Popover*/);
+            }
+        }
+
         RaiseFocusChanged (HasFocus, this, newFocusedView);
 
         if (_hasFocus)

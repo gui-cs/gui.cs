@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.ComponentModel;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Terminal.Gui;
 
@@ -47,27 +48,38 @@ public partial class View // Drawing APIs
             return;
         }
 
-        Region? saved = GetClip ();
+        Region? originalClip = GetClip ();
+
+        Region? contentClip = null;
 
         // TODO: This can be further optimized by checking NeedsDraw below and only clearing, drawing text, drawing content, etc. if it is true.
         if (NeedsDraw || SubViewNeedsDraw)
         {
             // Draw the Border and Padding.
-            // We clip to the frame to prevent drawing outside the frame.
-            saved = ClipFrame ();
-
+            if (this is Adornment)
+            {
+                AddFrameToClip ();
+            }
+            else
+            {
+                // Set the clip to be just the thicknesses of the adornments
+                // TODO: Put this union logic in a method on View? 
+                Region? clipAdornments = Margin!.Thickness.AsRegion (Margin!.FrameToScreen ());
+                clipAdornments?.Union (Border!.Thickness.AsRegion (Border!.FrameToScreen ()));
+                clipAdornments?.Union (Padding!.Thickness.AsRegion (Padding!.FrameToScreen ()));
+                clipAdornments?.Intersect (originalClip);
+                SetClip (clipAdornments);
+            }
             DoDrawBorderAndPadding ();
-            SetClip (saved);
+            SetClip (originalClip);
 
-            // Draw the content within the Viewport
+            // Clear the Viewport
             // By default, we clip to the viewport preventing drawing outside the viewport
             // We also clip to the content, but if a developer wants to draw outside the viewport, they can do
             // so via settings. SetClip honors the ViewportSettings.DisableVisibleContentClipping flag.
             // Get our Viewport in screen coordinates
+            originalClip = AddViewportToClip ();
 
-            saved = ClipViewport ();
-
-            // Clear the viewport
             // TODO: Simplify/optimize SetAttribute system.
             DoSetAttribute ();
             DoClearViewport ();
@@ -87,11 +99,28 @@ public partial class View // Drawing APIs
             DoSetAttribute ();
             DoDrawContent ();
 
+            // TODO: This flag may not be needed. Just returning true from OnClearViewport may be sufficient.
+            if (ViewportSettings.HasFlag (ViewportSettings.Transparent) && _subviews is { Count: > 0 })
+            {
+                contentClip = new Region ();
+
+                contentClip.Union(ViewportToScreen (new Rectangle(Viewport.Location, TextFormatter.FormatAndGetSize())));
+                // TODO: Move this into DrawSubviews somehow
+                foreach (View view in _subviews?.Where (view => view.Visible).Reverse ())
+                {
+                    contentClip.Union (view.FrameToScreen ());
+                }
+            }
+            else
+            {
+                contentClip = new (ViewportToScreen (new Rectangle (Point.Empty, Viewport.Size)));
+            }
+
             // Restore the clip before rendering the line canvas and adornment subviews
             // because they may draw outside the viewport.
-            SetClip (saved);
+            SetClip (originalClip);
 
-            saved = ClipFrame ();
+            originalClip = AddFrameToClip ();
 
             // Draw the line canvas
             DoRenderLineCanvas ();
@@ -113,9 +142,6 @@ public partial class View // Drawing APIs
         // We're done drawing
         DoDrawComplete ();
 
-        // QUESTION: Should this go before DoDrawComplete? What is more correct?
-        SetClip (saved);
-
         // Exclude this view (not including Margin) from the Clip
         if (this is not Adornment)
         {
@@ -126,7 +152,24 @@ public partial class View // Drawing APIs
                 borderFrame = Border.FrameToScreen ();
             }
 
-            ExcludeFromClip (borderFrame);
+            if (ViewportSettings.HasFlag (ViewportSettings.Transparent) && contentClip is { })
+            {
+                Region? saved = originalClip!.Clone ();
+
+                saved.Exclude (Border!.Thickness.AsRegion (Border!.FrameToScreen ()));
+                saved.Exclude (Padding!.Thickness.AsRegion (Padding!.FrameToScreen ()));
+                saved.Exclude (contentClip);
+                SetClip (saved);
+            }
+            else
+            {
+                SetClip (originalClip);
+                ExcludeFromClip (borderFrame);
+            }
+        }
+        else
+        {
+            SetClip (originalClip);
         }
     }
 
@@ -144,10 +187,10 @@ public partial class View // Drawing APIs
                     subview.SetNeedsDraw ();
                 }
 
-                LineCanvas.Exclude (new (subview.FrameToScreen()));
+                LineCanvas.Exclude (new (subview.FrameToScreen ()));
             }
 
-            Region? saved = Border?.ClipFrame ();
+            Region? saved = Border?.AddFrameToClip ();
             Border?.DoDrawSubviews ();
             SetClip (saved);
         }
@@ -159,7 +202,7 @@ public partial class View // Drawing APIs
                 subview.SetNeedsDraw ();
             }
 
-            Region? saved = Padding?.ClipFrame ();
+            Region? saved = Padding?.AddFrameToClip ();
             Padding?.DoDrawSubviews ();
             SetClip (saved);
         }
@@ -170,6 +213,7 @@ public partial class View // Drawing APIs
         if (Margin?.NeedsLayout == true)
         {
             Margin.NeedsLayout = false;
+            // BUGBUG: This should not use ClearFrame as that clears the insides too
             Margin?.ClearFrame ();
             Margin?.Parent?.SetSubViewNeedsDraw ();
         }
@@ -293,6 +337,11 @@ public partial class View // Drawing APIs
 
     private void DoClearViewport ()
     {
+        if (ViewportSettings.HasFlag (ViewportSettings.Transparent))
+        {
+            return;
+        }
+
         if (OnClearingViewport ())
         {
             return;
