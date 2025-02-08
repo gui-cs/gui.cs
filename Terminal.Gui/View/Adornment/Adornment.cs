@@ -184,17 +184,17 @@ public class Adornment : View, IDesignable
 
     /// <summary>Does nothing for Adornment</summary>
     /// <returns></returns>
-    protected override bool OnRenderingLineCanvas () { return true; }
+    protected override bool OnRenderingLineCanvas () { return false; }
 
-    /// <summary>
-    ///     Adornments only render to their <see cref="Parent"/>'s or Parent's SuperView's LineCanvas, so setting this
-    ///     property throws an <see cref="InvalidOperationException"/>.
-    /// </summary>
-    public override bool SuperViewRendersLineCanvas
-    {
-        get => false;
-        set => throw new InvalidOperationException (@"Adornment can only render to their Parent or Parent's Superview.");
-    }
+    ///// <summary>
+    /////     Adornments only render to their <see cref="Parent"/>'s or Parent's SuperView's LineCanvas, so setting this
+    /////     property throws an <see cref="InvalidOperationException"/>.
+    ///// </summary>
+    //public override bool SuperViewRendersLineCanvas
+    //{
+    //    get => false;
+    //    set => throw new InvalidOperationException (@"Adornment can only render to their Parent or Parent's Superview.");
+    //}
 
     /// <inheritdoc/>
     protected override void OnDrawComplete () { }

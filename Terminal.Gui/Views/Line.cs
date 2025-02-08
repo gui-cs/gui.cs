@@ -18,9 +18,27 @@ public class Line : View, IOrientation
 
         _orientationHelper = new (this);
         _orientationHelper.Orientation = Orientation.Horizontal;
-        OnOrientationChanged(Orientation);
+        OnOrientationChanged (Orientation);
     }
 
+    private LineStyle? _lineStyle;
+
+    /// <summary>
+    ///     Gets or sets the style of the Line. The default is the <see cref="Border.BorderStyle"/> of the SuperView.
+    /// </summary>
+    public LineStyle LineStyle
+    {
+        get
+        {
+            if (_lineStyle.HasValue)
+            {
+                return _lineStyle.Value;
+            }
+
+            return SuperView?.BorderStyle ?? LineStyle.Single;
+        }
+        set => _lineStyle = value;
+    }
 
     #region IOrientation members
     /// <summary>
@@ -61,18 +79,24 @@ public class Line : View, IOrientation
     }
     #endregion
 
+    /// <inheritdoc />
+    protected override bool OnClearingViewport () { return true; }
+
     /// <inheritdoc/>
     protected override bool OnDrawingContent ()
     {
         Point pos = ViewportToScreen (Viewport).Location;
         int length = Orientation == Orientation.Horizontal ? Frame.Width : Frame.Height;
 
+        if (length == 0)
+        {
+            return true;
+        }
         LineCanvas?.AddLine (
                     pos,
                     length,
                     Orientation,
-                    BorderStyle
-                   );
+                    LineStyle);
 
         //SuperView?.SetNeedsDraw ();
         return true;
