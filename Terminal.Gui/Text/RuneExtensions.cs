@@ -65,20 +65,23 @@ public static class RuneExtensions
     /// <returns>he number of bytes written into the destination buffer.</returns>
     public static int Encode (this Rune rune, byte [] dest, int start = 0, int count = -1)
     {
-        byte [] bytes = Encoding.UTF8.GetBytes (rune.ToString ());
-        var length = 0;
+        const int maxUtf8BytesPerRune = 4;
+        Span<byte> bytes = stackalloc byte[maxUtf8BytesPerRune];
+        int writtenBytes = rune.EncodeToUtf8 (bytes);
 
-        for (var i = 0; i < (count == -1 ? bytes.Length : count); i++)
+        int bytesToCopy = count == -1
+            ? writtenBytes
+            : Math.Min (count, writtenBytes);
+        int length = 0;
+        for (int i = 0; i < bytesToCopy; i++)
         {
-            if (bytes [i] == 0)
+            if (bytes [i] == '\0')
             {
                 break;
             }
-
             dest [start + i] = bytes [i];
             length++;
         }
-
         return length;
     }
 
