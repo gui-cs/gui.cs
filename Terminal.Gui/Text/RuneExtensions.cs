@@ -137,7 +137,7 @@ public static class RuneExtensions
     {
         UnicodeCategory category = Rune.GetUnicodeCategory (rune);
 
-        return Rune.GetUnicodeCategory (rune) == UnicodeCategory.NonSpacingMark
+        return category == UnicodeCategory.NonSpacingMark
                || category == UnicodeCategory.SpacingCombiningMark
                || category == UnicodeCategory.EnclosingMark;
     }
