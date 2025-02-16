@@ -9,7 +9,7 @@ namespace Terminal.Gui;
 public static class RuneExtensions
 {
     /// <summary>Maximum Unicode code point.</summary>
-    public static int MaxUnicodeCodePoint = 0x10FFFF;
+    public static readonly int MaxUnicodeCodePoint = 0x10FFFF;
 
     /// <summary>Reports if the provided array of bytes can be encoded as UTF-8.</summary>
     /// <param name="buffer">The byte array to probe.</param>
