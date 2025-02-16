@@ -1,4 +1,6 @@
-﻿using System.Globalization;
+﻿#nullable enable
+
+using System.Globalization;
 using Wcwidth;
 
 namespace Terminal.Gui;
@@ -32,7 +34,7 @@ public static class RuneExtensions
     /// <param name="rune">The rune to decode.</param>
     /// <param name="chars">The chars if the rune is a surrogate pair. Null otherwise.</param>
     /// <returns><see langword="true"/> if the rune is a valid surrogate pair; <see langword="false"/> otherwise.</returns>
-    public static bool DecodeSurrogatePair (this Rune rune, out char [] chars)
+    public static bool DecodeSurrogatePair (this Rune rune, out char []? chars)
     {
         if (rune.IsSurrogatePair ())
         {
@@ -105,7 +107,7 @@ public static class RuneExtensions
     /// <param name="rune">The rune to probe.</param>
     /// <param name="encoding">The encoding used; the default is UTF8.</param>
     /// <returns>The number of bytes required.</returns>
-    public static int GetEncodingLength (this Rune rune, Encoding encoding = null)
+    public static int GetEncodingLength (this Rune rune, Encoding? encoding = null)
     {
         encoding ??= Encoding.UTF8;
         byte [] bytes = encoding.GetBytes (rune.ToString ().ToCharArray ());
