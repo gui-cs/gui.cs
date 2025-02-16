@@ -146,7 +146,19 @@ public static class RuneExtensions
     /// <remarks>This is a Terminal.Gui extension method to <see cref="System.Text.Rune"/> to support TUI text manipulation.</remarks>
     /// <param name="rune">The rune to probe.</param>
     /// <returns><see langword="true"/> if the rune is a surrogate code point; <see langword="false"/> otherwise.</returns>
-    public static bool IsSurrogatePair (this Rune rune) { return char.IsSurrogatePair (rune.ToString (), 0); }
+    public static bool IsSurrogatePair (this Rune rune)
+    {
+        bool isSingleUtf16CodeUnit = rune.IsBmp;
+        if (isSingleUtf16CodeUnit)
+        {
+            return false;
+        }
+
+        const int maxCharsPerRune = 2;
+        Span<char> charBuffer = stackalloc char[maxCharsPerRune];
+        int charsWritten = rune.EncodeToUtf16 (charBuffer);
+        return charsWritten >= 2 && char.IsSurrogatePair (charBuffer [0], charBuffer [1]);
+    }
 
     /// <summary>
     ///     Ensures the rune is not a control character and can be displayed by translating characters below 0x20 to

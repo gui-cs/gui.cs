@@ -12,7 +12,20 @@ namespace Terminal.Gui.Benchmarks.Text.RuneExtensions;
 public class IsSurrogatePair
 {
     /// <summary>
-    /// Benchmark for the current implementation.
+    /// Benchmark for previous implementation.
+    /// </summary>
+    /// <param name="rune"></param>
+    [Benchmark]
+    [ArgumentsSource (nameof (DataSource))]
+    public bool Previous (Rune rune)
+    {
+        return WithToString (rune);
+    }
+
+    /// <summary>
+    /// Benchmark for current implementation.
+    /// 
+    /// Avoids intermediate heap allocations by using stack allocated buffer.
     /// </summary>
     [Benchmark (Baseline = true)]
     [ArgumentsSource (nameof (DataSource))]
@@ -22,24 +35,11 @@ public class IsSurrogatePair
     }
 
     /// <summary>
-    /// Benchmark for new implementation.
-    /// 
-    /// Avoids intermediate heap allocations by using stack allocated buffer.
+    /// Previous implementation with intermediate string allocation.
     /// </summary>
-    [Benchmark]
-    [ArgumentsSource (nameof (DataSource))]
-    public bool New (Rune rune)
+    private static bool WithToString (Rune rune)
     {
-        bool isSingleUtf16CodeUnit = rune.IsBmp;
-        if (isSingleUtf16CodeUnit)
-        {
-            return false;
-        }
-
-        const int maxCharsPerRune = 2;
-        Span<char> charBuffer = stackalloc char[maxCharsPerRune];
-        int charsWritten = rune.EncodeToUtf16 (charBuffer);
-        return charsWritten >= 2 && char.IsSurrogatePair (charBuffer [0], charBuffer [1]);
+        return char.IsSurrogatePair (rune.ToString (), 0);
     }
 
     public static IEnumerable<object> DataSource ()
