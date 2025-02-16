@@ -36,15 +36,23 @@ public static class RuneExtensions
     /// <returns><see langword="true"/> if the rune is a valid surrogate pair; <see langword="false"/> otherwise.</returns>
     public static bool DecodeSurrogatePair (this Rune rune, out char []? chars)
     {
-        if (rune.IsSurrogatePair ())
+        bool isSingleUtf16CodeUnit = rune.IsBmp;
+        if (isSingleUtf16CodeUnit)
         {
-            chars = rune.ToString ().ToCharArray ();
+            chars = null;
+            return false;
+        }
 
+        const int maxCharsPerRune = 2;
+        Span<char> charBuffer = stackalloc char[maxCharsPerRune];
+        int charsWritten = rune.EncodeToUtf16 (charBuffer);
+        if (charsWritten >= 2 && char.IsSurrogatePair (charBuffer [0], charBuffer [1]))
+        {
+            chars = charBuffer [..charsWritten].ToArray ();
             return true;
         }
 
         chars = null;
-
         return false;
     }
 
