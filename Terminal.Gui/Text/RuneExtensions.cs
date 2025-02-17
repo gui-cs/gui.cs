@@ -72,7 +72,7 @@ public static class RuneExtensions
         int bytesToCopy = count == -1
             ? writtenBytes
             : Math.Min (count, writtenBytes);
-        int length = 0;
+        int bytesWritten = 0;
         for (int i = 0; i < bytesToCopy; i++)
         {
             if (bytes [i] == '\0')
@@ -80,9 +80,9 @@ public static class RuneExtensions
                 break;
             }
             dest [start + i] = bytes [i];
-            length++;
+            bytesWritten++;
         }
-        return length;
+        return bytesWritten;
     }
 
     /// <summary>Attempts to encode (as UTF-16) a surrogate pair.</summary>
