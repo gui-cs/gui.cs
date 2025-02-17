@@ -141,8 +141,12 @@ public enum ViewportSettings
     ClearContentOnly = 0b_1000_0000,
 
     /// <summary>
-    ///     If set, any <see cref="View.Viewport"/> will not be cleared when the View is drawn and the clip region
+    ///     If set the View will be transparent: The <see cref="View.Viewport"/> will not be cleared when the View is drawn and the clip region
     ///     will be set to clip the View's <see cref="View.Text"/> and <see cref="View.Subviews"/>.
+    ///     <para>
+    ///         NOTE: Only the topmost View in a Subview Hierarchy can be transparent. Any subviews of the topmost transparent view
+    ///         will have indeterminate draw behavior.
+    ///     </para>
     /// </summary>
     Transparent = 0b_0001_0000_0000,
 }

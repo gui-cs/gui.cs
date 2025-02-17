@@ -27,6 +27,7 @@ public class RegionTests
         Assert.True (region.Contains (20, 20));
     }
 
+
     [Fact]
     public void Union_Region_MergesRegions ()
     {
@@ -36,6 +37,72 @@ public class RegionTests
         Assert.True (region1.Contains (20, 20));
         Assert.True (region1.Contains (40, 40));
     }
+
+    /// <summary>
+    ///     Proves MergeRegion does not overly combine regions.
+    /// </summary>
+    [Fact]
+    public void Union_Region_MergesRegions_Overlapping ()
+    {
+        //  01234567
+        // 0+++++
+        // 1+   +
+        // 2+   +
+        // 3+  *****
+        // 4+++*   *
+        // 5   *   *
+        // 6   *   *
+        // 7   *****
+
+        var region1 = new Region (new Rectangle (0, 0, 5, 5));
+        var region2 = new Region (new Rectangle (3, 3, 5, 5));
+        region1.Union (region2);
+
+        // Positive
+        Assert.True (region1.Contains (0, 0));
+        Assert.True (region1.Contains (1, 1));
+        Assert.True (region1.Contains (4, 4));
+        Assert.True (region1.Contains (7, 7));
+
+        // Negative
+        Assert.False (region1.Contains (0, 5));
+        Assert.False (region1.Contains (5, 0));
+        Assert.False (region1.Contains (8, 8));
+        Assert.False (region1.Contains (8, 8));
+    }
+
+
+    /// <summary>
+    ///     Proves MergeRegion does not overly combine regions.
+    /// </summary>
+    [Fact]
+    public void Union_Region_MergesRegions_NonOverlapping ()
+    {
+        //  012345
+        // 0+++
+        // 1+ + 
+        // 2+++
+        // 3   ***
+        // 4   * *
+        // 5   ***
+
+        var region1 = new Region (new Rectangle (0, 0, 3, 3));
+        var region2 = new Region (new Rectangle (3, 3, 3, 3));
+        region1.Union (region2);
+
+        // Positive
+        Assert.True (region1.Contains (0, 0));
+        Assert.True (region1.Contains (1, 1));
+        Assert.True (region1.Contains (2, 2));
+        Assert.True (region1.Contains (4, 4));
+        Assert.True (region1.Contains (5, 5));
+
+        // Negative
+        Assert.False (region1.Contains (0, 3));
+        Assert.False (region1.Contains (3, 0));
+        Assert.False (region1.Contains (6, 6));
+    }
+
 
     [Fact]
     public void Intersect_Rectangle_IntersectsRegion ()

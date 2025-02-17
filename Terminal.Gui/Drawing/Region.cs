@@ -27,8 +27,13 @@ public class Region : IDisposable
     /// <param name="rectangle">The rectangle to add to the region.</param>
     public void Union (Rectangle rectangle)
     {
+        if (rectangle.IsEmpty)
+        {
+            return;
+        }
         _rectangles!.Add (rectangle);
-        _rectangles = MergeRectangles (_rectangles);
+        // TODO: Re-enable Merge after implementing more sophisticated algo
+        //_rectangles = MergeRectangles (_rectangles);
     }
 
     /// <summary>
@@ -40,7 +45,8 @@ public class Region : IDisposable
         if (region is { })
         {
             _rectangles!.AddRange (region._rectangles!);
-            _rectangles = MergeRectangles (_rectangles);
+            // TODO: Re-enable Merge after implementing more sophisticated algo
+            //_rectangles = MergeRectangles (_rectangles);
         }
     }
 
@@ -201,7 +207,7 @@ public class Region : IDisposable
     /// </summary>
     /// <param name="rectangles">The list of rectangles to merge.</param>
     /// <returns>A list of merged rectangles.</returns>
-    private static List<Rectangle> MergeRectangles (List<Rectangle> rectangles)
+    internal static List<Rectangle> MergeRectangles (List<Rectangle> rectangles)
     {
         // Simplified merging logic: this does not handle all edge cases for merging overlapping rectangles.
         // For a full implementation, a plane sweep algorithm or similar would be needed.

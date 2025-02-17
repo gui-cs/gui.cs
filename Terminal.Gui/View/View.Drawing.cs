@@ -52,8 +52,9 @@ public partial class View // Drawing APIs
 
         Region? contentClip = null;
 
-        // TODO: This can be further optimized by checking NeedsDraw below and only clearing, drawing text, drawing content, etc. if it is true.
-        if (NeedsDraw || SubViewNeedsDraw || ViewportSettings.HasFlag(ViewportSettings.Transparent))
+        // TODO: This can be further optimized by checking NeedsDraw below and only
+        // TODO: clearing, drawing text, drawing content, etc. if it is true.
+        if (NeedsDraw || SubViewNeedsDraw || ViewportSettings.HasFlag (ViewportSettings.Transparent))
         {
             // Draw the Border and Padding.
             if (this is Adornment)
@@ -99,20 +100,27 @@ public partial class View // Drawing APIs
             DoSetAttribute ();
             DoDrawContent ();
 
-            // TODO: This flag may not be needed. Just returning true from OnClearViewport may be sufficient.
-            if (ViewportSettings.HasFlag (ViewportSettings.Transparent) && _subviews is { Count: > 0 })
+            // If we're transparent, set the contentClip to include Text and any subviews.
+            if (ViewportSettings.HasFlag (ViewportSettings.Transparent))
             {
                 contentClip = new Region ();
 
-                contentClip.Union(ViewportToScreen (new Rectangle(Viewport.Location, TextFormatter.FormatAndGetSize())));
-                // TODO: Move this into DrawSubviews somehow
-                foreach (View view in _subviews?.Where (view => view.Visible).Reverse ())
+                contentClip.Union (ViewportToScreen (new Rectangle (Viewport.Location, TextFormatter.FormatAndGetSize ())));
+
+                if (_subviews is { Count: > 0 })
                 {
-                    contentClip.Union (view.FrameToScreen ());
+                    // TODO: Move this into DrawSubviews somehow
+                    foreach (View view in _subviews?.Where (view => view.Visible).Reverse ()!)
+                    {
+                        Region subviewClipRegion = new (ViewportToScreen (new Rectangle (Point.Empty, Viewport.Size)));
+                        subviewClipRegion.Intersect(view.FrameToScreen());
+                        contentClip.Union(subviewClipRegion);
+                    }
                 }
             }
             else
             {
+                // Not transparent: clip gets set to our viewport.
                 contentClip = new (ViewportToScreen (new Rectangle (Point.Empty, Viewport.Size)));
             }
 

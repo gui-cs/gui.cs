@@ -194,18 +194,6 @@ public class Arrangement : Scenario
             Height = 15
         };
 
-        transparentView.Add (
-                             new View ()
-                             {
-                                 Title = "Transparent SubView",
-                                 Text = "Transparent SubView",
-                                 Id = "transparentSubView",
-                                 X = 10,
-                                 Y = 10,
-                                 Width = 10,
-                                 Height = 5
-
-                             });
         testFrame.Add (transparentView);
 
         adornmentsEditor.AutoSelectSuperView = testFrame;
@@ -334,19 +322,40 @@ public class TransparentView : FrameView
     public TransparentView ()
     {
         Title = "Transparent";
-        base.Text = "Text";
+        base.Text = "Text. This should be visible in the Viewport.";
         Arrangement = ViewArrangement.Overlapped | ViewArrangement.Resizable | ViewArrangement.Movable;
-        ViewportSettings |= Terminal.Gui.ViewportSettings.Transparent;
+        ViewportSettings |= Terminal.Gui.ViewportSettings.Transparent | Terminal.Gui.ViewportSettings.ClipContentOnly | Terminal.Gui.ViewportSettings.ClearContentOnly;
+
+
+        var transparentSubView = new View ()
+        {
+            //Title = "SubView",
+            Text = "Trans. SubView; Ignored",
+            Id = "transparentSubView",
+            X = 4,
+            Y = 6,
+            Width = 10,
+            Height = 6,
+            BorderStyle = LineStyle.Dashed,
+            Arrangement = ViewArrangement.Movable,
+            ViewportSettings = Terminal.Gui.ViewportSettings.Transparent
+        };
+        transparentSubView.Border.Thickness = new (0, 1, 0, 0);
+        transparentSubView.ColorScheme = Colors.ColorSchemes ["Dialog"];
         base.Add (
-             new Button ()
-             {
-                 Title = "_Hi",
-                 X = Pos.Center (),
-                 Y = Pos.Center (),
-                 ShadowStyle = ShadowStyle.None,
-                 ColorScheme = Colors.ColorSchemes ["Toplevel"],
-             });
+                  new Button ()
+                  {
+                      Title = "_Hi",
+                      X = Pos.Center (),
+                      Y = Pos.Center (),
+                      ShadowStyle = ShadowStyle.None,
+                      ColorScheme = Colors.ColorSchemes ["Toplevel"],
+                  });
+        base.Add (transparentSubView);
     }
+
+    /// <inheritdoc />
+    protected override bool OnClearingViewport () { return false; }
 
     /// <inheritdoc />
     protected override bool OnMouseEvent (MouseEventArgs mouseEvent) { return false; }
