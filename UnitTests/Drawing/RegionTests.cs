@@ -3,6 +3,129 @@
 public class RegionTests
 {
     [Fact]
+    public void Clone_CreatesExactCopy ()
+    {
+        var region = new Region (new (10, 10, 50, 50));
+        Region clone = region.Clone ();
+        Assert.True (clone.Contains (20, 20));
+        Assert.Equal (region.GetRectangles (), clone.GetRectangles ());
+    }
+
+    [Fact]
+    public void Complement_Rectangle_ComplementsRegion ()
+    {
+        var region = new Region (new (10, 10, 50, 50));
+        region.Complement (new (0, 0, 100, 100));
+        Assert.True (region.Contains (5, 5));
+        Assert.False (region.Contains (20, 20));
+    }
+
+    [Theory]
+    [MemberData (nameof (Complement_TestData))]
+    public void Complement_Region_Success (Region region, Rectangle [] rectangles, Rectangle [] expectedScans)
+    {
+        using (region)
+        {
+            foreach (Rectangle rect in rectangles)
+            {
+                region.Complement (rect);
+            }
+
+            Rectangle [] actualScans = region.GetRectangles ();
+            Assert.Equal (expectedScans, actualScans);
+        }
+    }
+
+    public static IEnumerable<object []> Complement_TestData ()
+    {
+        yield return new object []
+        {
+            new Region (new (10, 10, 100, 100)),
+            new Rectangle [] { new (40, 60, 100, 20) },
+            new Rectangle [] { new (110, 60, 30, 20) }
+        };
+
+        yield return new object []
+        {
+            new Region (new (70, 10, 100, 100)),
+            new Rectangle [] { new (40, 60, 100, 20) },
+            new Rectangle [] { new (40, 60, 30, 20) }
+        };
+
+        yield return new object []
+        {
+            new Region (new (40, 100, 100, 100)),
+            new Rectangle [] { new (70, 80, 50, 40) },
+            new Rectangle [] { new (70, 80, 50, 20) }
+        };
+
+        yield return new object []
+        {
+            new Region (new (40, 10, 100, 100)),
+            new Rectangle [] { new (70, 80, 50, 40) },
+            new Rectangle [] { new (70, 110, 50, 10) }
+        };
+
+        yield return new object []
+        {
+            new Region (new (30, 30, 80, 80)),
+            new Rectangle []
+            {
+                new (45, 45, 200, 200),
+                new (160, 260, 10, 10),
+                new (170, 260, 10, 10)
+            },
+            new Rectangle [] { new (170, 260, 10, 10) }
+        };
+
+        yield return new object []
+        {
+            new Region (),
+            new [] { Rectangle.Empty },
+            new Rectangle[0]
+        };
+
+        yield return new object []
+        {
+            new Region (),
+            new Rectangle [] { new (1, 2, 3, 4) },
+            new Rectangle[0]
+        };
+    }
+
+    [Fact]
+    public void Complement_WithRectangle_ComplementsRegion ()
+    {
+        var region = new Region (new (10, 10, 50, 50));
+        var rect = new Rectangle (0, 0, 100, 100);
+
+        region.Complement (rect);
+
+        // Points that were inside the original region should now be outside
+        Assert.False (region.Contains (35, 35));
+
+        // Points that were outside the original region but inside bounds should now be inside
+        Assert.True (region.Contains (5, 5));
+        Assert.True (region.Contains (95, 95));
+    }
+
+    [Fact]
+    public void Complement_WithRegion_ComplementsRegion ()
+    {
+        var region = new Region (new (10, 10, 50, 50));
+        var bounds = new Rectangle (0, 0, 100, 100);
+
+        region.Complement (bounds);
+
+        // Points that were inside the original region should now be outside
+        Assert.False (region.Contains (35, 35));
+
+        // Points that were outside the original region but inside bounds should now be inside
+        Assert.True (region.Contains (5, 5));
+        Assert.True (region.Contains (95, 95));
+    }
+
+    [Fact]
     public void Constructor_EmptyRegion_IsEmpty ()
     {
         var region = new Region ();
@@ -12,169 +135,513 @@ public class RegionTests
     [Fact]
     public void Constructor_WithRectangle_IsNotEmpty ()
     {
-        var region = new Region (new Rectangle (10, 10, 50, 50));
+        var region = new Region (new (10, 10, 50, 50));
         Assert.False (region.IsEmpty ());
     }
 
     [Fact]
-    public void Union_Rectangle_AddsToRegion ()
+    public void Contains_Point_ReturnsCorrectResult ()
     {
-        var region = new Region ();
-        region.Union (new Rectangle (10, 10, 50, 50));
-        Assert.False (region.IsEmpty ());
+        var region = new Region (new (10, 10, 50, 50));
+
+        Assert.True (region.Contains (20, 20));
+        Assert.False (region.Contains (100, 100));
+    }
+
+    [Fact]
+    public void Contains_PointInsideRegion_ReturnsTrue ()
+    {
+        var region = new Region (new (10, 10, 50, 50));
         Assert.True (region.Contains (20, 20));
     }
 
+    [Fact]
+    public void Contains_RectangleInsideRegion_ReturnsTrue ()
+    {
+        var region = new Region (new (10, 10, 50, 50));
+        Assert.True (region.Contains (new (20, 20, 10, 10)));
+    }
 
     [Fact]
-    public void Union_Region_MergesRegions ()
+    public void Dispose_ClearsRectangles ()
     {
-        var region1 = new Region (new Rectangle (10, 10, 50, 50));
-        var region2 = new Region (new Rectangle (30, 30, 50, 50));
-        region1.Union (region2);
+        var region = new Region (new (10, 10, 50, 50));
+        region.Dispose ();
+
+        Assert.True (region.IsEmpty ());
+    }
+
+    [Fact]
+    public void Equals_DisposedRegion_ReturnsFalse ()
+    {
+        var region1 = new Region (new (1, 2, 3, 4));
+        Region region2 = CreateDisposedRegion ();
+
+        // Test both directions since disposed state matters
+        Assert.False (region1.Equals (region2));
+        Assert.False (region2.Equals (region1));
+    }
+
+    [Fact]
+    public void Equals_NullRegion_ReturnsFalse ()
+    {
+        var region = new Region ();
+        Assert.False (region.Equals (null));
+    }
+
+    [Fact]
+    public void Equals_SameRegion_ReturnsTrue ()
+    {
+        var region = new Region (new (1, 2, 3, 4));
+        Assert.True (region.Equals (region));
+    }
+
+    public static IEnumerable<object []> Equals_TestData ()
+    {
+        static Region Empty ()
+        {
+            Region emptyRegion = new ();
+            emptyRegion.Intersect (Rectangle.Empty);
+
+            return emptyRegion;
+        }
+
+        yield return new object [] { new Region (), new Region (), true };
+        yield return new object [] { new Region (), Empty (), true };
+        yield return new object [] { new Region (), new Region (new (1, 2, 3, 4)), false };
+
+        yield return new object [] { Empty (), Empty (), true };
+        yield return new object [] { Empty (), new Region (new (0, 0, 0, 0)), true };
+        yield return new object [] { Empty (), new Region (new (1, 2, 3, 3)), false };
+
+        yield return new object [] { new Region (new (1, 2, 3, 4)), new Region (new (1, 2, 3, 4)), true };
+        yield return new object [] { new Region (new (1, 2, 3, 4)), new Region (new (2, 2, 3, 4)), false };
+        yield return new object [] { new Region (new (1, 2, 3, 4)), new Region (new (1, 3, 3, 4)), false };
+        yield return new object [] { new Region (new (1, 2, 3, 4)), new Region (new (1, 2, 4, 4)), false };
+        yield return new object [] { new Region (new (1, 2, 3, 4)), new Region (new (1, 2, 3, 5)), false };
+    }
+
+    [Theory]
+    [MemberData (nameof (Equals_TestData))]
+    public void Equals_Valid_ReturnsExpected (Region region1, Region region2, bool expected) { Assert.Equal (expected, region1.Equals (region2)); }
+
+    [Fact]
+    public void Exclude_Rectangle_ExcludesFromRegion ()
+    {
+        var region = new Region (new (10, 10, 50, 50));
+        region.Exclude (new Rectangle (20, 20, 20, 20));
+        Assert.False (region.Contains (25, 25));
+        Assert.True (region.Contains (15, 15));
+    }
+
+    [Fact]
+    public void Exclude_Region_ExcludesRegions ()
+    {
+        var region1 = new Region (new (10, 10, 50, 50));
+        var region2 = new Region (new (20, 20, 20, 20));
+        region1.Exclude (region2);
+        Assert.False (region1.Contains (25, 25));
+        Assert.True (region1.Contains (15, 15));
+    }
+
+    [Fact]
+    public void Exclude_WithRectangle_ExcludesRectangle ()
+    {
+        var region = new Region (new (10, 10, 50, 50));
+        var rect = new Rectangle (30, 30, 50, 50);
+
+        region.Exclude (rect);
+
+        Assert.True (region.Contains (20, 20));
+        Assert.False (region.Contains (35, 35));
+    }
+
+    [Fact]
+    public void Exclude_WithRegion_ExcludesRegion ()
+    {
+        var region1 = new Region (new (10, 10, 50, 50));
+        var region2 = new Region (new (30, 30, 50, 50));
+
+        region1.Exclude (region2.GetBounds ());
+
         Assert.True (region1.Contains (20, 20));
+        Assert.False (region1.Contains (35, 35));
+    }
+
+    [Fact]
+    public void GetBounds_ReturnsBoundingRectangle ()
+    {
+        var region = new Region (new (10, 10, 50, 50));
+        region.Union (new Rectangle (100, 100, 20, 20));
+        Rectangle bounds = region.GetBounds ();
+        Assert.Equal (new (10, 10, 110, 110), bounds);
+    }
+
+    [Fact]
+    public void GetBounds_ReturnsCorrectBounds ()
+    {
+        var region = new Region ();
+        region.Union (new Rectangle (10, 10, 50, 50));
+        region.Union (new Rectangle (30, 30, 50, 50));
+
+        Rectangle bounds = region.GetBounds ();
+
+        Assert.Equal (new (10, 10, 70, 70), bounds);
+    }
+
+    [Fact]
+    public void GetRegionScans_ReturnsAllRectangles ()
+    {
+        var region = new Region (new (10, 10, 50, 50));
+        region.Union (new Rectangle (100, 100, 20, 20));
+        Rectangle [] scans = region.GetRectangles ();
+        Assert.Equal (2, scans.Length);
+        Assert.Contains (new (10, 10, 50, 50), scans);
+        Assert.Contains (new (100, 100, 20, 20), scans);
+    }
+
+    [Fact]
+    public void Intersect_Rectangle_IntersectsRegion ()
+    {
+        var region = new Region (new (10, 10, 50, 50));
+        region.Intersect (new Rectangle (30, 30, 50, 50));
+        Assert.False (region.Contains (20, 20));
+        Assert.True (region.Contains (40, 40));
+    }
+
+    [Fact]
+    public void Intersect_Region_IntersectsRegions ()
+    {
+        var region1 = new Region (new (10, 10, 50, 50));
+        var region2 = new Region (new (30, 30, 50, 50));
+        region1.Intersect (region2);
+        Assert.False (region1.Contains (20, 20));
         Assert.True (region1.Contains (40, 40));
     }
 
-    /// <summary>
-    ///     Proves MergeRegion does not overly combine regions.
-    /// </summary>
     [Fact]
-    public void Union_Region_MergesRegions_Overlapping ()
+    public void Intersect_WithEmptyRectangle_ResultsInEmptyRegion ()
     {
-        //  01234567
-        // 0+++++
-        // 1+   +
-        // 2+   +
-        // 3+  *****
-        // 4+++*   *
-        // 5   *   *
-        // 6   *   *
-        // 7   *****
+        // Arrange
+        var region = new Region (new (0, 0, 10, 10));
+        var rectangle = Rectangle.Empty; // Use Empty instead of 0-size
 
-        var region1 = new Region (new Rectangle (0, 0, 5, 5));
-        var region2 = new Region (new Rectangle (3, 3, 5, 5));
-        region1.Union (region2);
+        // Act
+        region.Intersect (rectangle);
 
-        // Positive
-        Assert.True (region1.Contains (0, 0));
-        Assert.True (region1.Contains (1, 1));
-        Assert.True (region1.Contains (4, 4));
-        Assert.True (region1.Contains (7, 7));
-
-        // Negative
-        Assert.False (region1.Contains (0, 5));
-        Assert.False (region1.Contains (5, 0));
-        Assert.False (region1.Contains (8, 8));
-        Assert.False (region1.Contains (8, 8));
+        // Assert
+        Assert.True (region.IsEmpty ());
     }
 
-
-    /// <summary>
-    ///     Proves MergeRegion does not overly combine regions.
-    /// </summary>
-    [Fact]
-    public void Union_Region_MergesRegions_NonOverlapping ()
+    [Theory]
+    [InlineData (0, 0, 0, 0)] // Empty by zero size
+    [InlineData (0, 0, 0, 10)] // Empty by zero width
+    [InlineData (0, 0, 10, 0)] // Empty by zero height
+    [InlineData (-5, -5, 0, 0)] // Empty by zero size at negative coords
+    [InlineData (10, 10, -5, -5)] // Empty by negative size
+    public void Intersect_WithEmptyRegion_ResultsInEmptyRegion (int x, int y, int width, int height)
     {
-        //  012345
-        // 0+++
-        // 1+ + 
-        // 2+++
-        // 3   ***
-        // 4   * *
-        // 5   ***
+        // Arrange
+        var region = new Region ();
+        region.Union (new Rectangle (0, 0, 10, 10));
+        region.Union (new Rectangle (20, 0, 10, 10));
 
-        var region1 = new Region (new Rectangle (0, 0, 3, 3));
-        var region2 = new Region (new Rectangle (3, 3, 3, 3));
-        region1.Union (region2);
+        // Create a region that should be considered empty
+        var emptyRegion = new Region ();
 
-        // Positive
-        Assert.True (region1.Contains (0, 0));
-        Assert.True (region1.Contains (1, 1));
-        Assert.True (region1.Contains (2, 2));
-        Assert.True (region1.Contains (4, 4));
-        Assert.True (region1.Contains (5, 5));
-
-        // Negative
-        Assert.False (region1.Contains (0, 3));
-        Assert.False (region1.Contains (3, 0));
-        Assert.False (region1.Contains (6, 6));
-    }
-
-    [Fact]
-    public void MergeRectangles_NoOverlap_ReturnsSameRectangles ()
-    {
-        var rectangles = new List<Rectangle>
-            {
-                new Rectangle(0, 0, 10, 10),
-                new Rectangle(20, 20, 10, 10),
-                new Rectangle(40, 40, 10, 10)
-            };
-
-        var result = Region.MergeRectangles (rectangles);
-
-        Assert.Equal (3, result.Count);
-        Assert.Contains (new Rectangle (0, 0, 10, 10), result);
-        Assert.Contains (new Rectangle (20, 20, 10, 10), result);
-        Assert.Contains (new Rectangle (40, 40, 10, 10), result);
-    }
-
-
-    [Fact]
-    public void MergeRectangles_ComplexOverlap_ReturnsMergedRectangles ()
-    {
-        /*
-            INPUT: Visual diagram treating (0,0) as top-left, x increasing to the right, y increasing downward:
-            
-                  x=0 1 2 3 4 5 6 ...
-              y=0   A A
-              y=1   A B B
-              y=2     B B
-              y=3         C C
-              y=4         C D D
-              y=5           D D            
-            
-            A overlaps B slightly; C overlaps D slightly. The union of A & B forms one rectangle,
-            and the union of C & D forms another.
-        */
-
-        var rectangles = new List<Rectangle>
+        if (width <= 0 || height <= 0)
         {
-            // A
-            new (0, 0, 2, 2),
-            // B
-            new (1, 1, 2, 2),
-            // C
-            new (3, 3, 2, 2),
-            // D
-            new (4, 4, 2, 2)
-        };
+            // For negative or zero dimensions, use an empty region
+            emptyRegion = new ();
+        }
+        else
+        {
+            emptyRegion = new (new (x, y, width, height));
+        }
 
-        var merged = Region.MergeRectangles (rectangles);
+        // Verify initial states
+        Assert.Equal (2, region.GetRectangles ().Length);
+        Assert.True (emptyRegion.IsEmpty ());
 
-        /*
-           OUTPUT:  Merged fragments (top-left origin, x→, y↓).
-           Lowercase letters a..f show the six sub-rectangles:
+        // Act
+        region.Intersect (emptyRegion);
 
-              x=0 1 2 3 4 5
-           y=0  a b
-           y=1  a b c
-           y=2    b c
-           y=3        d e
-           y=4        d e f
-           y=5          e f
-        */
-
-        Assert.Equal (6, merged.Count);
-
-        Assert.Contains (new (0, 0, 1, 2), merged);  // a
-        Assert.Contains (new (1, 0, 1, 3), merged);  // b
-        Assert.Contains (new (2, 1, 1, 2), merged);  // c
-        Assert.Contains (new (3, 3, 1, 2), merged);  // d
-        Assert.Contains (new (4, 3, 1, 3), merged);  // e
-        Assert.Contains (new (5, 4, 1, 2), merged);  // f
+        // Assert
+        Assert.True (region.IsEmpty ());
+        Assert.Empty (region.GetRectangles ());
     }
 
+    [Fact]
+    public void Intersect_WithFullyContainedRectangle_ResultsInSmallerRegion ()
+    {
+        // Arrange
+        var region = new Region (new (0, 0, 10, 10));
+        var rectangle = new Rectangle (2, 2, 4, 4);
+
+        // Act
+        region.Intersect (rectangle);
+
+        // Assert
+        Assert.Single (region.GetRectangles ());
+        Assert.Equal (new (2, 2, 4, 4), region.GetRectangles () [0]);
+    }
+
+    [Fact]
+    public void Intersect_WithMultipleRectanglesInRegion_IntersectsAll ()
+    {
+        // Arrange
+        var region = new Region ();
+        region.Union (new Rectangle (0, 0, 5, 5));
+        region.Union (new Rectangle (10, 0, 5, 5));
+        var rectangle = new Rectangle (2, 2, 10, 2);
+
+        // Act
+        region.Intersect (rectangle);
+
+        // Assert
+        Assert.Equal (2, region.GetRectangles ().Length);
+        Assert.Contains (new (2, 2, 3, 2), region.GetRectangles ());
+        Assert.Contains (new (10, 2, 2, 2), region.GetRectangles ());
+    }
+
+    //[Fact]
+    //public void Intersect_WithEmptyRegion_ResultsInEmptyRegion ()
+    //{
+    //    // Arrange
+    //    var region = new Region ();
+    //    var rectangle = new Rectangle (0, 0, 10, 10);
+
+    //    // Act
+    //    region.Intersect (rectangle);
+
+    //    // Assert
+    //    Assert.True (region.IsEmpty ());
+    //}
+
+    [Fact]
+    public void Intersect_WithNonOverlappingRectangle_ResultsInEmptyRegion ()
+    {
+        // Arrange
+        var region = new Region (new (0, 0, 5, 5));
+        var rectangle = new Rectangle (10, 10, 5, 5);
+
+        // Act
+        region.Intersect (rectangle);
+
+        // Assert
+        Assert.True (region.IsEmpty ());
+    }
+
+    [Fact]
+    public void Intersect_WithNullRegion_ResultsInEmptyRegion ()
+    {
+        // Arrange
+        var region = new Region ();
+        region.Union (new Rectangle (0, 0, 10, 10));
+        region.Union (new Rectangle (20, 0, 10, 10));
+
+        // Verify initial state
+        Assert.Equal (2, region.GetRectangles ().Length);
+
+        // Act
+        region.Intersect (null);
+
+        // Assert
+        Assert.True (region.IsEmpty ());
+        Assert.Empty (region.GetRectangles ());
+    }
+
+    [Fact]
+    public void Intersect_WithPartiallyOverlappingRectangle_ResultsInIntersectedRegion ()
+    {
+        // Arrange
+        var region = new Region (new (0, 0, 5, 5));
+        var rectangle = new Rectangle (2, 2, 5, 5);
+
+        // Act
+        region.Intersect (rectangle);
+
+        // Assert
+        Assert.Single (region.GetRectangles ());
+        Assert.Equal (new (2, 2, 3, 3), region.GetRectangles () [0]);
+    }
+
+    [Fact]
+    public void Intersect_WithRectangle_IntersectsRectangles ()
+    {
+        var region = new Region (new (10, 10, 50, 50));
+        var rect = new Rectangle (30, 30, 50, 50);
+
+        region.Intersect (rect);
+
+        Assert.True (region.Contains (35, 35));
+        Assert.False (region.Contains (20, 20));
+    }
+
+    [Fact]
+    public void Intersect_WithRegion_IntersectsRegions ()
+    {
+        var region1 = new Region (new (10, 10, 50, 50));
+        var region2 = new Region (new (30, 30, 50, 50));
+
+        region1.Intersect (region2.GetBounds ());
+
+        Assert.True (region1.Contains (35, 35));
+        Assert.False (region1.Contains (20, 20));
+    }
+
+    [Fact]
+    public void IsEmpty_AfterClear_ReturnsTrue ()
+    {
+        // Arrange
+        var region = new Region (new (0, 0, 10, 10));
+
+        // Act
+        region.Intersect (Rectangle.Empty);
+
+        // Assert
+        Assert.True (region.IsEmpty ());
+        Assert.Empty (region.GetRectangles ());
+    }
+
+    [Fact]
+    public void IsEmpty_AfterComplement_ReturnsCorrectState ()
+    {
+        // Test 1: Complement a region with bounds that fully contain it
+        var region = new Region (new (2, 2, 5, 5)); // Small inner rectangle
+        region.Complement (new (0, 0, 10, 10)); // Larger outer bounds
+        Assert.False (region.IsEmpty ()); // Should have area around the original rectangle
+
+        // Test 2: Complement with bounds equal to the region
+        region = new (new (0, 0, 10, 10));
+        region.Complement (new (0, 0, 10, 10));
+        Assert.True (region.IsEmpty ()); // Should be empty as there's no area left
+
+        // Test 3: Complement with empty bounds
+        region = new (new (0, 0, 10, 10));
+        region.Complement (Rectangle.Empty);
+        Assert.True (region.IsEmpty ()); // Should be empty as there's no bounds
+    }
+
+    [Fact]
+    public void IsEmpty_AfterDispose_ReturnsTrue ()
+    {
+        // Arrange
+        var region = new Region (new (0, 0, 10, 10));
+
+        // Act
+        region.Dispose ();
+
+        // Assert
+        Assert.True (region.IsEmpty ());
+        Assert.Empty (region.GetRectangles ());
+    }
+
+    [Fact]
+    public void IsEmpty_AfterExclude_ReturnsTrue ()
+    {
+        // Arrange
+        var region = new Region (new (0, 0, 10, 10));
+
+        // Act
+        region.Exclude (new Rectangle (0, 0, 10, 10));
+
+        // Assert
+        Assert.True (region.IsEmpty ());
+        Assert.Empty (region.GetRectangles ());
+    }
+
+    [Fact]
+    public void IsEmpty_AfterUnion_ReturnsFalse ()
+    {
+        // Arrange
+        var region = new Region ();
+        region.Union (new Rectangle (0, 0, 10, 10));
+
+        // Assert
+        Assert.False (region.IsEmpty ());
+        Assert.Single (region.GetRectangles ());
+    }
+
+    [Fact]
+    public void IsEmpty_EmptyRegion_ReturnsTrue ()
+    {
+        var region = new Region ();
+        Assert.True (region.IsEmpty ());
+    }
+
+    [Fact]
+    public void IsEmpty_MultipleOperations_ReturnsExpectedResult ()
+    {
+        // Arrange
+        var region = new Region ();
+
+        // Act & Assert - Should be empty initially
+        Assert.True (region.IsEmpty ());
+
+        // Add a rectangle - Should not be empty
+        region.Union (new Rectangle (0, 0, 10, 10));
+        Assert.False (region.IsEmpty ());
+
+        // Exclude the same rectangle - Should be empty again
+        region.Exclude (new Rectangle (0, 0, 10, 10));
+        Assert.True (region.IsEmpty ());
+
+        // Add two rectangles - Should not be empty
+        region.Union (new Rectangle (0, 0, 5, 5));
+        region.Union (new Rectangle (10, 10, 5, 5));
+        Assert.False (region.IsEmpty ());
+    }
+
+    [Fact]
+    public void IsEmpty_NewRegion_ReturnsTrue ()
+    {
+        // Arrange
+        var region = new Region ();
+
+        // Act & Assert
+        Assert.True (region.IsEmpty ());
+        Assert.Empty (region.GetRectangles ());
+    }
+
+    [Fact]
+    public void IsEmpty_ReturnsCorrectResult ()
+    {
+        var region = new Region ();
+
+        Assert.True (region.IsEmpty ());
+
+        region.Union (new Rectangle (10, 10, 50, 50));
+
+        Assert.False (region.IsEmpty ());
+    }
+
+    [Theory]
+    [InlineData (0, 0, 1, 1)] // 1x1 at origin
+    [InlineData (10, 10, 5, 5)] // 5x5 at (10,10)
+    [InlineData (-5, -5, 10, 10)] // Negative coordinates
+    public void IsEmpty_ValidRectangle_ReturnsFalse (int x, int y, int width, int height)
+    {
+        // Arrange
+        var region = new Region (new (x, y, width, height));
+
+        // Assert
+        Assert.False (region.IsEmpty ());
+        Assert.Single (region.GetRectangles ());
+    }
+
+    [Theory]
+    [InlineData (0, 0, 0, 0)] // Zero size
+    [InlineData (0, 0, 0, 10)] // Zero width
+    [InlineData (0, 0, 10, 0)] // Zero height
+    [InlineData (-5, -5, 0, 0)] // Zero size at negative coords
+    public void IsEmpty_ZeroSizeRectangle_ReturnsCorrectState (int x, int y, int width, int height)
+    {
+        var region = new Region (new (x, y, width, height));
+
+        // Only check IsEmpty() since Rectangle(0,0,0,0) is still stored
+        Assert.True (region.IsEmpty ());
+    }
 
     [Fact]
     public void MergeRectangles_ComplexAdjacentRectangles_NoOverlap ()
@@ -200,22 +667,22 @@ public class RegionTests
             The expected result is exactly these four rectangles, unmerged.
         */
 
-        var rectangles = new List<Rectangle>
+        List<Rectangle> rectangles = new()
         {
             new (1, 0, 3, 1), // A
             new (0, 1, 1, 3), // B
             new (4, 1, 1, 3), // C
-            new (1, 4, 3, 1), // D
+            new (1, 4, 3, 1) // D
         };
 
-        var merged = Region.MergeRectangles (rectangles);
+        List<Rectangle> merged = Region.MergeRectangles (rectangles);
 
         // Because there's no overlapping area, the method shouldn't merge any of them.
         Assert.Equal (4, merged.Count);
-        Assert.Contains (new Rectangle (1, 0, 3, 1), merged);
-        Assert.Contains (new Rectangle (0, 1, 1, 3), merged);
-        Assert.Contains (new Rectangle (4, 1, 1, 3), merged);
-        Assert.Contains (new Rectangle (1, 4, 3, 1), merged);
+        Assert.Contains (new (1, 0, 3, 1), merged);
+        Assert.Contains (new (0, 1, 1, 3), merged);
+        Assert.Contains (new (4, 1, 1, 3), merged);
+        Assert.Contains (new (1, 4, 3, 1), merged);
     }
 
     [Fact]
@@ -238,15 +705,14 @@ public class RegionTests
           C = (4,4,2,2)  // Also fully contained inside A
      */
 
-        var rectangles = new List<Rectangle>
+        List<Rectangle> rectangles = new List<Rectangle>
         {
-            new Rectangle(0, 0, 6, 6), // A
-            new Rectangle(2, 2, 2, 2), // B inside A
-            new Rectangle(4, 4, 2, 2)  // C inside A
+            new (0, 0, 6, 6), // A
+            new (2, 2, 2, 2), // B inside A
+            new (4, 4, 2, 2) // C inside A
         };
 
-        var merged = Region.MergeRectangles (rectangles);
-
+        List<Rectangle> merged = Region.MergeRectangles (rectangles);
 
         /*
            OUTPUT: The expected result should be a minimal set of non-overlapping rectangles
@@ -263,108 +729,177 @@ public class RegionTests
        */
 
         Assert.Equal (3, merged.Count);
-        Assert.Contains (new Rectangle (0, 0, 2, 6), merged); // a
-        Assert.Contains (new Rectangle (2, 0, 2, 6), merged); // b
-        Assert.Contains (new Rectangle (4, 0, 2, 6), merged); // c
+        Assert.Contains (new (0, 0, 2, 6), merged); // a
+        Assert.Contains (new (2, 0, 2, 6), merged); // b
+        Assert.Contains (new (4, 0, 2, 6), merged); // c
     }
 
-
     [Fact]
-    public void Intersect_Rectangle_IntersectsRegion ()
+    public void MergeRectangles_ComplexOverlap_ReturnsMergedRectangles ()
     {
-        var region = new Region (new Rectangle (10, 10, 50, 50));
-        region.Intersect (new Rectangle (30, 30, 50, 50));
-        Assert.False (region.Contains (20, 20));
-        Assert.True (region.Contains (40, 40));
+        /*
+            INPUT: Visual diagram treating (0,0) as top-left, x increasing to the right, y increasing downward:
+
+                  x=0 1 2 3 4 5 6 ...
+              y=0   A A
+              y=1   A B B
+              y=2     B B
+              y=3         C C
+              y=4         C D D
+              y=5           D D
+
+            A overlaps B slightly; C overlaps D slightly. The union of A & B forms one rectangle,
+            and the union of C & D forms another.
+        */
+
+        List<Rectangle> rectangles = new()
+        {
+            // A
+            new (0, 0, 2, 2),
+
+            // B
+            new (1, 1, 2, 2),
+
+            // C
+            new (3, 3, 2, 2),
+
+            // D
+            new (4, 4, 2, 2)
+        };
+
+        List<Rectangle> merged = Region.MergeRectangles (rectangles);
+
+        /*
+           OUTPUT:  Merged fragments (top-left origin, x→, y↓).
+           Lowercase letters a..f show the six sub-rectangles:
+
+              x=0 1 2 3 4 5
+           y=0  a b
+           y=1  a b c
+           y=2    b c
+           y=3        d e
+           y=4        d e f
+           y=5          e f
+        */
+
+        Assert.Equal (6, merged.Count);
+
+        Assert.Contains (new (0, 0, 1, 2), merged); // a
+        Assert.Contains (new (1, 0, 1, 3), merged); // b
+        Assert.Contains (new (2, 1, 1, 2), merged); // c
+        Assert.Contains (new (3, 3, 1, 2), merged); // d
+        Assert.Contains (new (4, 3, 1, 3), merged); // e
+        Assert.Contains (new (5, 4, 1, 2), merged); // f
     }
 
     [Fact]
-    public void Intersect_Region_IntersectsRegions ()
+    public void MergeRectangles_NoOverlap_ReturnsSameRectangles ()
     {
-        var region1 = new Region (new Rectangle (10, 10, 50, 50));
-        var region2 = new Region (new Rectangle (30, 30, 50, 50));
-        region1.Intersect (region2);
-        Assert.False (region1.Contains (20, 20));
-        Assert.True (region1.Contains (40, 40));
+        List<Rectangle> rectangles = new List<Rectangle>
+        {
+            new (0, 0, 10, 10),
+            new (20, 20, 10, 10),
+            new (40, 40, 10, 10)
+        };
+
+        List<Rectangle> result = Region.MergeRectangles (rectangles);
+
+        Assert.Equal (3, result.Count);
+        Assert.Contains (new (0, 0, 10, 10), result);
+        Assert.Contains (new (20, 20, 10, 10), result);
+        Assert.Contains (new (40, 40, 10, 10), result);
     }
 
-    [Fact]
-    public void Exclude_Rectangle_ExcludesFromRegion ()
+    public static IEnumerable<object []> Region_TestData ()
     {
-        var region = new Region (new Rectangle (10, 10, 50, 50));
-        region.Exclude (new Rectangle (20, 20, 20, 20));
-        Assert.False (region.Contains (25, 25));
-        Assert.True (region.Contains (15, 15));
+        yield return new object [] { new Region () };
+        yield return new object [] { new Region (new (0, 0, 0, 0)) };
+        yield return new object [] { new Region (new (1, 2, 3, 4)) };
     }
 
     [Fact]
-    public void Exclude_Region_ExcludesRegions ()
-    {
-        var region1 = new Region (new Rectangle (10, 10, 50, 50));
-        var region2 = new Region (new Rectangle (20, 20, 20, 20));
-        region1.Exclude (region2);
-        Assert.False (region1.Contains (25, 25));
-        Assert.True (region1.Contains (15, 15));
-    }
-
-    [Fact]
-    public void Complement_Rectangle_ComplementsRegion ()
-    {
-        var region = new Region (new Rectangle (10, 10, 50, 50));
-        region.Complement (new Rectangle (0, 0, 100, 100));
-        Assert.True (region.Contains (5, 5));
-        Assert.False (region.Contains (20, 20));
-    }
-
-    [Fact]
-    public void Clone_CreatesExactCopy ()
-    {
-        var region = new Region (new Rectangle (10, 10, 50, 50));
-        var clone = region.Clone ();
-        Assert.True (clone.Contains (20, 20));
-        Assert.Equal (region.GetRectangles (), clone.GetRectangles ());
-    }
-
-    [Fact]
-    public void GetBounds_ReturnsBoundingRectangle ()
-    {
-        var region = new Region (new Rectangle (10, 10, 50, 50));
-        region.Union (new Rectangle (100, 100, 20, 20));
-        var bounds = region.GetBounds ();
-        Assert.Equal (new Rectangle (10, 10, 110, 110), bounds);
-    }
-
-    [Fact]
-    public void IsEmpty_EmptyRegion_ReturnsTrue ()
+    public void Union_Rectangle_AddsToRegion ()
     {
         var region = new Region ();
-        Assert.True (region.IsEmpty ());
-    }
-
-    [Fact]
-    public void Contains_PointInsideRegion_ReturnsTrue ()
-    {
-        var region = new Region (new Rectangle (10, 10, 50, 50));
+        region.Union (new Rectangle (10, 10, 50, 50));
+        Assert.False (region.IsEmpty ());
         Assert.True (region.Contains (20, 20));
     }
 
     [Fact]
-    public void Contains_RectangleInsideRegion_ReturnsTrue ()
+    public void Union_Region_MergesRegions ()
     {
-        var region = new Region (new Rectangle (10, 10, 50, 50));
-        Assert.True (region.Contains (new Rectangle (20, 20, 10, 10)));
+        var region1 = new Region (new (10, 10, 50, 50));
+        var region2 = new Region (new (30, 30, 50, 50));
+        region1.Union (region2);
+        Assert.True (region1.Contains (20, 20));
+        Assert.True (region1.Contains (40, 40));
     }
 
+    /// <summary>
+    ///     Proves MergeRegion does not overly combine regions.
+    /// </summary>
     [Fact]
-    public void GetRegionScans_ReturnsAllRectangles ()
+    public void Union_Region_MergesRegions_NonOverlapping ()
     {
-        var region = new Region (new Rectangle (10, 10, 50, 50));
-        region.Union (new Rectangle (100, 100, 20, 20));
-        var scans = region.GetRectangles ();
-        Assert.Equal (2, scans.Length);
-        Assert.Contains (new Rectangle (10, 10, 50, 50), scans);
-        Assert.Contains (new Rectangle (100, 100, 20, 20), scans);
+        //  012345
+        // 0+++
+        // 1+ + 
+        // 2+++
+        // 3   ***
+        // 4   * *
+        // 5   ***
+
+        var region1 = new Region (new (0, 0, 3, 3));
+        var region2 = new Region (new (3, 3, 3, 3));
+        region1.Union (region2);
+
+        // Positive
+        Assert.True (region1.Contains (0, 0));
+        Assert.True (region1.Contains (1, 1));
+        Assert.True (region1.Contains (2, 2));
+        Assert.True (region1.Contains (4, 4));
+        Assert.True (region1.Contains (5, 5));
+
+        // Negative
+        Assert.False (region1.Contains (0, 3));
+        Assert.False (region1.Contains (3, 0));
+        Assert.False (region1.Contains (6, 6));
     }
+
+    /// <summary>
+    ///     Proves MergeRegion does not overly combine regions.
+    /// </summary>
+    [Fact]
+    public void Union_Region_MergesRegions_Overlapping ()
+    {
+        //  01234567
+        // 0+++++
+        // 1+   +
+        // 2+   +
+        // 3+  *****
+        // 4+++*   *
+        // 5   *   *
+        // 6   *   *
+        // 7   *****
+
+        var region1 = new Region (new (0, 0, 5, 5));
+        var region2 = new Region (new (3, 3, 5, 5));
+        region1.Union (region2);
+
+        // Positive
+        Assert.True (region1.Contains (0, 0));
+        Assert.True (region1.Contains (1, 1));
+        Assert.True (region1.Contains (4, 4));
+        Assert.True (region1.Contains (7, 7));
+
+        // Negative
+        Assert.False (region1.Contains (0, 5));
+        Assert.False (region1.Contains (5, 0));
+        Assert.False (region1.Contains (8, 8));
+        Assert.False (region1.Contains (8, 8));
+    }
+
     [Fact]
     public void Union_WithRectangle_AddsRectangle ()
     {
@@ -375,72 +910,6 @@ public class RegionTests
 
         Assert.True (region.Contains (20, 20));
         Assert.False (region.Contains (100, 100));
-    }
-
-    [Fact]
-    public void Intersect_WithRectangle_IntersectsRectangles ()
-    {
-        var region = new Region (new (10, 10, 50, 50));
-        var rect = new Rectangle (30, 30, 50, 50);
-
-        region.Intersect (rect);
-
-        Assert.True (region.Contains (35, 35));
-        Assert.False (region.Contains (20, 20));
-    }
-
-    [Fact]
-    public void Exclude_WithRectangle_ExcludesRectangle ()
-    {
-        var region = new Region (new (10, 10, 50, 50));
-        var rect = new Rectangle (30, 30, 50, 50);
-
-        region.Exclude (rect);
-
-        Assert.True (region.Contains (20, 20));
-        Assert.False (region.Contains (35, 35));
-    }
-
-    [Fact]
-    public void Contains_Point_ReturnsCorrectResult ()
-    {
-        var region = new Region (new (10, 10, 50, 50));
-
-        Assert.True (region.Contains (20, 20));
-        Assert.False (region.Contains (100, 100));
-    }
-
-    [Fact]
-    public void IsEmpty_ReturnsCorrectResult ()
-    {
-        var region = new Region ();
-
-        Assert.True (region.IsEmpty ());
-
-        region.Union (new Rectangle(10, 10, 50, 50));
-
-        Assert.False (region.IsEmpty ());
-    }
-
-    [Fact]
-    public void GetBounds_ReturnsCorrectBounds ()
-    {
-        var region = new Region ();
-        region.Union (new Rectangle (10, 10, 50, 50));
-        region.Union (new Rectangle (30, 30, 50, 50));
-
-        Rectangle bounds = region.GetBounds ();
-
-        Assert.Equal (new (10, 10, 70, 70), bounds);
-    }
-
-    [Fact]
-    public void Dispose_ClearsRectangles ()
-    {
-        var region = new Region (new (10, 10, 50, 50));
-        region.Dispose ();
-
-        Assert.True (region.IsEmpty ());
     }
 
     [Fact]
@@ -455,54 +924,6 @@ public class RegionTests
         Assert.True (region1.Contains (40, 40));
     }
 
-    [Fact]
-    public void Intersect_WithRegion_IntersectsRegions ()
-    {
-        var region1 = new Region (new (10, 10, 50, 50));
-        var region2 = new Region (new (30, 30, 50, 50));
-
-        region1.Intersect (region2.GetBounds ());
-
-        Assert.True (region1.Contains (35, 35));
-        Assert.False (region1.Contains (20, 20));
-    }
-
-    [Fact]
-    public void Exclude_WithRegion_ExcludesRegion ()
-    {
-        var region1 = new Region (new (10, 10, 50, 50));
-        var region2 = new Region (new (30, 30, 50, 50));
-
-        region1.Exclude (region2.GetBounds ());
-
-        Assert.True (region1.Contains (20, 20));
-        Assert.False (region1.Contains (35, 35));
-    }
-
-    //[Fact]
-    //public void Complement_WithRectangle_ComplementsRegion ()
-    //{
-    //    var region = new Region (new (10, 10, 50, 50));
-    //    var rect = new Rectangle (30, 30, 50, 50);
-
-    //    region.Complement (rect);
-
-    //    Assert.True (region.Contains (35, 35));
-    //    Assert.False (region.Contains (20, 20));
-    //}
-
-    //[Fact]
-    //public void Complement_WithRegion_ComplementsRegion ()
-    //{
-    //    var region1 = new Region (new (10, 10, 50, 50));
-    //    var region2 = new Region (new (30, 30, 50, 50));
-
-    //    region1.Complement (region2.GetBounds ());
-
-    //    Assert.True (region1.Contains (35, 35));
-    //    Assert.False (region1.Contains (20, 20));
-    //}
-
     private static Region CreateDisposedRegion ()
     {
         Region region = new ();
@@ -510,90 +931,8 @@ public class RegionTests
 
         return region;
     }
-
-    public static IEnumerable<object []> Region_TestData ()
-    {
-        yield return new object [] { new Region () };
-        yield return new object [] { new Region (new Rectangle (0, 0, 0, 0)) };
-        yield return new object [] { new Region (new Rectangle (1, 2, 3, 4)) };
-    }
-
-    public static IEnumerable<object []> Complement_TestData ()
-    {
-        yield return new object []
-        {
-            new Region (new Rectangle (10, 10, 100, 100)),
-            new Rectangle [] { new (40, 60, 100, 20) },
-            new Rectangle [] { new (110, 60, 30, 20) }
-        };
-
-        yield return new object []
-        {
-            new Region (new Rectangle (70, 10, 100, 100)),
-            new Rectangle [] { new (40, 60, 100, 20) },
-            new Rectangle [] { new (40, 60, 30, 20) }
-        };
-
-        yield return new object []
-        {
-            new Region (new Rectangle (40, 100, 100, 100)),
-            new Rectangle [] { new (70, 80, 50, 40) },
-            new Rectangle [] { new (70, 80, 50, 20) }
-        };
-
-        yield return new object []
-        {
-            new Region (new Rectangle (40, 10, 100, 100)),
-            new Rectangle [] { new (70, 80, 50, 40) },
-            new Rectangle [] { new (70, 110, 50, 10) }
-        };
-
-        yield return new object []
-        {
-            new Region (new Rectangle (30, 30, 80, 80)),
-            new Rectangle []
-            {
-                new (45, 45, 200, 200),
-                new (160, 260, 10, 10),
-                new (170, 260, 10, 10),
-            },
-            new Rectangle [] { new (170, 260, 10, 10) }
-        };
-
-        yield return new object []
-        {
-            new Region (),
-            new Rectangle [] { Rectangle.Empty },
-            new Rectangle[0]
-        };
-
-        yield return new object []
-        {
-            new Region (),
-            new Rectangle [] { new (1, 2, 3, 4) },
-            new Rectangle[0]
-        };
-    }
-
-    [Theory]
-    [MemberData (nameof (Complement_TestData))]
-    public void Complement_Region_Success (Region region, Rectangle [] rectangles, Rectangle [] expectedScans)
-    {
-        using (region)
-        {
-            foreach (Rectangle rect in rectangles)
-            {
-                region.Complement (rect);
-            }
-
-            var actualScans = region.GetRectangles ();
-            Assert.Equal (expectedScans, actualScans);
-        }
-    }
-
 }
 #if x
-
     [Fact]
     public void Complement_UnionRegion_Success ()
     {
@@ -740,104 +1079,6 @@ public class RegionTests
     }
 
 
-    public static IEnumerable<object []> Equals_TestData ()
-    {
-        static Region Empty ()
-        {
-            Region emptyRegion = new ();
-            emptyRegion.MakeEmpty ();
-
-            return emptyRegion;
-        }
-
-        Region createdRegion = new ();
-
-        yield return new object [] { createdRegion, createdRegion, true };
-        yield return new object [] { new Region (), new Region (), true };
-        yield return new object [] { new Region (), Empty (), false };
-        yield return new object [] { new Region (), new Region (new Rectangle (1, 2, 3, 4)), false };
-
-        yield return new object [] { Empty (), Empty (), true };
-        yield return new object [] { Empty (), new Region (new Rectangle (0, 0, 0, 0)), true };
-        yield return new object [] { Empty (), new Region (new Rectangle (1, 2, 3, 3)), false };
-
-        yield return new object [] { new Region (new Rectangle (1, 2, 3, 4)), new Region (new Rectangle (1, 2, 3, 4)), true };
-        yield return new object [] { new Region (new Rectangle (1, 2, 3, 4)), new Region (new RectangleF (1, 2, 3, 4)), true };
-        yield return new object [] { new Region (new Rectangle (1, 2, 3, 4)), new Region (new Rectangle (2, 2, 3, 4)), false };
-        yield return new object [] { new Region (new Rectangle (1, 2, 3, 4)), new Region (new Rectangle (1, 3, 3, 4)), false };
-        yield return new object [] { new Region (new Rectangle (1, 2, 3, 4)), new Region (new Rectangle (1, 2, 4, 4)), false };
-        yield return new object [] { new Region (new Rectangle (1, 2, 3, 4)), new Region (new Rectangle (1, 2, 3, 5)), false };
-
-        GraphicsPath graphics1 = new ();
-        graphics1.AddRectangle (new Rectangle (1, 2, 3, 4));
-
-        GraphicsPath graphics2 = new ();
-        graphics2.AddRectangle (new Rectangle (1, 2, 3, 4));
-
-        GraphicsPath graphics3 = new ();
-        graphics3.AddRectangle (new Rectangle (2, 2, 3, 4));
-
-        GraphicsPath graphics4 = new ();
-        graphics4.AddRectangle (new Rectangle (1, 3, 3, 4));
-
-        GraphicsPath graphics5 = new ();
-        graphics5.AddRectangle (new Rectangle (1, 2, 4, 4));
-
-        GraphicsPath graphics6 = new ();
-        graphics6.AddRectangle (new Rectangle (1, 2, 3, 5));
-
-        yield return new object [] { new Region (graphics1), new Region (graphics1), true };
-        yield return new object [] { new Region (graphics1), new Region (graphics2), true };
-        yield return new object [] { new Region (graphics1), new Region (graphics3), false };
-        yield return new object [] { new Region (graphics1), new Region (graphics4), false };
-        yield return new object [] { new Region (graphics1), new Region (graphics5), false };
-        yield return new object [] { new Region (graphics1), new Region (graphics6), false };
-    }
-
-    [Theory]
-    [MemberData (nameof (Equals_TestData))]
-    public void Equals_Valid_ReturnsExpected (Region region, Region other, bool expected)
-    {
-        using (region)
-        using (other)
-        {
-            Assert.Equal (expected, region.Equals (other, s_graphic));
-        }
-    }
-
-    [Fact]
-    public void Equals_NullRegion_ThrowsArgumentNullException ()
-    {
-        using Region region = new ();
-        Assert.Throws<ArgumentNullException> ("region", () => region.Equals (null, s_graphic));
-    }
-
-    [Fact]
-    public void Equals_NullGraphics_ThrowsArgumentNullException ()
-    {
-        using Region region = new ();
-        Assert.Throws<ArgumentNullException> ("g", () => region.Equals (region, null));
-    }
-
-    [Fact]
-    public void Equals_DisposedGraphics_ThrowsArgumentException ()
-    {
-        using Region region = new ();
-        using Region other = new ();
-        using Bitmap image = new (10, 10);
-        var graphics = Graphics.FromImage (image);
-        graphics.Dispose ();
-        Assert.Throws<ArgumentException> (null, () => region.Equals (region, graphics));
-    }
-
-    [Fact]
-    public void Equals_Disposed_ThrowsArgumentException ()
-    {
-        Region disposedRegion = CreateDisposedRegion ();
-
-        Assert.Throws<ArgumentException> (null, () => disposedRegion.Equals (new Region (), s_graphic));
-        Assert.Throws<ArgumentException> (null, () => new Region ().Equals (disposedRegion, s_graphic));
-    }
 
     public static IEnumerable<object []> Exclude_TestData ()
     {
