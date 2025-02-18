@@ -1,8 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <!-- =================================================================== -->
   <!-- Version numbers -->
-  <!-- Automatically updated by gitversion (run `dotnet-gitversion /updateprojectfiles`)  -->
+  <!-- Automatically updated by gitversion (run `dotnet-gitversion`)  -->
   <!-- GitVersion.xml controls settings  -->
+  <!-- See ./README.md for more -->
   <!-- =================================================================== -->
   <PropertyGroup>
     <Version>2.0.0</Version>
