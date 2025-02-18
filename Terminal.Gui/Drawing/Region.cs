@@ -22,18 +22,100 @@ public class Region : IDisposable
     public Region (Rectangle rectangle) { _rectangles = [rectangle]; }
 
     /// <summary>
-    ///     Adds the specified rectangle to the region. Merges all rectangles into a minimal bounding shape.
+    ///     Combines the specified rectangle with the region using the specified operation.
     /// </summary>
-    /// <param name="rectangle">The rectangle to add to the region.</param>
-    public void Union (Rectangle rectangle)
+    /// <param name="rectangle">The rectangle to combine.</param>
+    /// <param name="operation">The operation to perform.</param>
+    public void Combine (Rectangle rectangle, RegionOp operation)
     {
         if (rectangle.IsEmpty)
         {
             return;
         }
 
-        _rectangles!.Add (rectangle);
-        _rectangles = MergeRectangles (_rectangles);
+        Combine (new Region (rectangle), operation);
+    }
+
+    /// <summary>
+    ///     Combines the specified region with the region using the specified operation.
+    /// </summary>
+    /// <param name="region">The region to combine.</param>
+    /// <param name="operation">The operation to perform.</param>
+    public void Combine (Region? region, RegionOp operation)
+    {
+        if (region is null || region._rectangles!.Count == 0)
+        {
+            if (operation == RegionOp.Replace)
+            {
+                _rectangles = [];
+            }
+
+            return;
+        }
+
+        switch (operation)
+        {
+            case RegionOp.Difference:
+                // Null is same as empty region
+                region ??= new ();
+
+                foreach (Rectangle rect in region._rectangles!)
+                {
+                    _rectangles = _rectangles!.SelectMany (r => SubtractRectangle (r, rect)).ToList ();
+                }
+                break;
+
+            case RegionOp.Intersect:
+                List<Rectangle> intersections = [];
+
+                // Null is same as empty region
+                region ??= new ();
+
+                foreach (Rectangle rect1 in _rectangles!)
+                {
+                    foreach (Rectangle rect2 in region!._rectangles!)
+                    {
+                        Rectangle intersected = Rectangle.Intersect (rect1, rect2);
+
+                        if (!intersected.IsEmpty)
+                        {
+                            intersections.Add (intersected);
+                        }
+                    }
+                }
+
+                _rectangles = intersections;
+                break;
+
+            case RegionOp.Union:
+                _rectangles!.AddRange (region._rectangles);
+                _rectangles = MergeRectangles (_rectangles);
+                break;
+
+            case RegionOp.XOR:
+                Exclude (region);
+                region.Combine (this, RegionOp.Difference);
+                _rectangles!.AddRange (region._rectangles);
+                break;
+
+            case RegionOp.ReverseDifference:
+                region.Combine (this, RegionOp.Difference);
+                _rectangles = region._rectangles;
+                break;
+
+            case RegionOp.Replace:
+                _rectangles = region._rectangles;
+                break;
+        }
+    }
+
+    /// <summary>
+    ///     Adds the specified rectangle to the region. Merges all rectangles into a minimal bounding shape.
+    /// </summary>
+    /// <param name="rectangle">The rectangle to add to the region.</param>
+    public void Union (Rectangle rectangle)
+    {
+        Combine(rectangle, RegionOp.Union);
     }
 
     /// <summary>
@@ -42,68 +124,61 @@ public class Region : IDisposable
     /// <param name="region">The region to add to this region.</param>
     public void Union (Region? region)
     {
-        if (region is { })
-        {
-            _rectangles!.AddRange (region._rectangles!);
-            _rectangles = MergeRectangles (_rectangles);
-        }
+        Combine (region, RegionOp.Union);
     }
 
     /// <summary>
     ///     Updates the region to be the intersection of itself with the specified rectangle.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    ///     This is a helper method that is equivalent to calling <see cref="Combine(Rectangle,RegionOp)"/> with
+    ///     <see cref="RegionOp.Intersect"/>.
+    /// </para>
+    /// </remarks>
     /// <param name="rectangle">The rectangle to intersect with the region.</param>
     public void Intersect (Rectangle rectangle)
     {
-        _rectangles = _rectangles!.Select (r => Rectangle.Intersect (r, rectangle)).Where (r => !r.IsEmpty).ToList ();
+        Combine(rectangle, RegionOp.Intersect);
     }
 
     /// <summary>
     ///     Updates the region to be the intersection of itself with the specified region.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    ///     This is a helper method that is equivalent to calling <see cref="Combine(Region,RegionOp)"/> with
+    ///     <see cref="RegionOp.Intersect"/>.
+    /// </para>
+    /// </remarks>
     /// <param name="region">The region to intersect with this region.</param>
     public void Intersect (Region? region)
     {
-        List<Rectangle> intersections = [];
-
-        // Null is same as empty region
-        region ??= new ();
-
-        foreach (Rectangle rect1 in _rectangles!)
-        {
-            foreach (Rectangle rect2 in region!._rectangles!)
-            {
-                Rectangle intersected = Rectangle.Intersect (rect1, rect2);
-
-                if (!intersected.IsEmpty)
-                {
-                    intersections.Add (intersected);
-                }
-            }
-        }
-
-        _rectangles = intersections;
+        Combine(region, RegionOp.Intersect);
     }
 
     /// <summary>
     ///     Removes the specified rectangle from the region.
     /// </summary>
     /// <param name="rectangle">The rectangle to exclude from the region.</param>
-    public void Exclude (Rectangle rectangle) { _rectangles = _rectangles!.SelectMany (r => SubtractRectangle (r, rectangle)).ToList (); }
+    public void Exclude (Rectangle rectangle)
+    {
+        Combine(rectangle, RegionOp.Difference);
+    }
 
     /// <summary>
     ///     Removes the portion of the specified region from this region.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    ///     This is a helper method that is equivalent to calling <see cref="Combine(Region,Terminal.Gui.RegionOp)"/> with
+    ///     <see cref="RegionOp.Difference"/>.
+    /// </para>
+    /// </remarks>
     /// <param name="region">The region to exclude from this region.</param>
     public void Exclude (Region? region)
     {
-        // Null is same as empty region
-        region ??= new ();
-
-        foreach (Rectangle rect in region._rectangles!)
-        {
-            _rectangles = _rectangles!.SelectMany (r => SubtractRectangle (r, rect)).ToList ();
-        }
+        Combine(region, RegionOp.Difference);
     }
 
     /// <summary>

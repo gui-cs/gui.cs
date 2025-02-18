@@ -322,7 +322,7 @@ public class RegionTests
         var region = new Region (new Rectangle (10, 10, 50, 50));
         var clone = region.Clone ();
         Assert.True (clone.Contains (20, 20));
-        Assert.Equal (region.GetRegionScans (), clone.GetRegionScans ());
+        Assert.Equal (region.GetRectangles (), clone.GetRectangles ());
     }
 
     [Fact]
@@ -360,7 +360,7 @@ public class RegionTests
     {
         var region = new Region (new Rectangle (10, 10, 50, 50));
         region.Union (new Rectangle (100, 100, 20, 20));
-        var scans = region.GetRegionScans ();
+        var scans = region.GetRectangles ();
         Assert.Equal (2, scans.Length);
         Assert.Contains (new Rectangle (10, 10, 50, 50), scans);
         Assert.Contains (new Rectangle (100, 100, 20, 20), scans);
@@ -586,7 +586,7 @@ public class RegionTests
                 region.Complement (rect);
             }
 
-            var actualScans = region.GetRegionScans ();
+            var actualScans = region.GetRectangles ();
             Assert.Equal (expectedScans, actualScans);
         }
     }
