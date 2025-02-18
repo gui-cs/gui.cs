@@ -31,6 +31,7 @@ public class Region : IDisposable
         {
             return;
         }
+
         _rectangles!.Add (rectangle);
         _rectangles = MergeRectangles (_rectangles);
     }
@@ -184,7 +185,7 @@ public class Region : IDisposable
     ///     Returns an array of rectangles that represent the region.
     /// </summary>
     /// <returns>An array of <see cref="Rectangle"/> objects that make up the region.</returns>
-    public Rectangle [] GetRegionScans () { return _rectangles!.ToArray (); }
+    public Rectangle [] GetRectangles () { return _rectangles!.ToArray (); }
 
     /// <summary>
     ///     Offsets all rectangles in the region by the specified amounts.
@@ -214,6 +215,7 @@ public class Region : IDisposable
 
         // Create events for the left and right edges of each rectangle
         List<(int x, int y1, int y2, bool isStart)> events = [];
+
         foreach (Rectangle rect in rectangles)
         {
             events.Add ((rect.Left, rect.Top, rect.Bottom, true));
@@ -251,7 +253,6 @@ public class Region : IDisposable
 
         return mergedRectangles;
     }
-
 
     /// <summary>
     ///     Merges overlapping intervals into a minimal set of non-overlapping intervals and creates rectangles from them.
@@ -293,16 +294,14 @@ public class Region : IDisposable
 
         // Create rectangles from merged intervals
         List<Rectangle> rectangles = [];
+
         foreach ((int y1, int y2) in mergedIntervals)
         {
-            rectangles.Add (new Rectangle (startX, y1, endX - startX, y2 - y1));
+            rectangles.Add (new (startX, y1, endX - startX, y2 - y1));
         }
 
         return rectangles;
     }
-
-
-
 
     /// <summary>
     ///     Subtracts the specified rectangle from the original rectangle, returning the resulting rectangles.

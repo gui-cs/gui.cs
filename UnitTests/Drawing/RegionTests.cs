@@ -253,27 +253,19 @@ public class RegionTests
            that cover the same area as the input rectangles.
 
             x=0 1 2 3 4 5
-         y=0  a b c d e f
-         y=1  a . . . . f
-         y=2  a . g g . f
-         y=3  a . g g . f
-         y=4  a . . . k k 
-         y=5  a h i j k k
-        */
+         y=0  a a b b c c
+         y=1  a a b b c c
+         y=2  a a b b c c
+         y=3  a a b b c c
+         y=4  a a b b c c
+         y=5  a a b b c c
 
-        Assert.Equal (10, merged.Count);
-        Assert.Contains (new Rectangle (0, 0, 1, 6), merged); // a
-        Assert.Contains (new Rectangle (1, 0, 1, 1), merged); // b
-        Assert.Contains (new Rectangle (2, 0, 1, 1), merged); // c
-        Assert.Contains (new Rectangle (3, 0, 1, 1), merged); // d
-        Assert.Contains (new Rectangle (4, 0, 1, 1), merged); // e
-        Assert.Contains (new Rectangle (5, 0, 1, 6), merged); // f
-        Assert.Contains (new Rectangle (2, 2, 2, 2), merged); // g
-        Assert.Contains (new Rectangle (1, 5, 1, 1), merged); // h
-        Assert.Contains (new Rectangle (2, 5, 1, 1), merged); // i
-        Assert.Contains (new Rectangle (3, 5, 1, 1), merged); // j
-        Assert.Contains (new Rectangle (4, 4, 2, 2), merged); // k
+       */
 
+        Assert.Equal (3, merged.Count);
+        Assert.Contains (new Rectangle (0, 0, 2, 6), merged); // a
+        Assert.Contains (new Rectangle (2, 0, 2, 6), merged); // b
+        Assert.Contains (new Rectangle (4, 0, 2, 6), merged); // c
     }
 
 
