@@ -19,7 +19,7 @@ public sealed class Transparent : Scenario
         appWindow.BorderStyle = LineStyle.None;
         appWindow.ColorScheme = Colors.ColorSchemes ["Error"];
 
-        appWindow.Text = "Transparent Tester";
+        appWindow.Text = "Transparent Tester.\n2nd Line of Text.";
 
         appWindow.Add (
                        new Button ()
@@ -65,22 +65,41 @@ public sealed class Transparent : Scenario
                 X = 0,
                 Y = 0,
                 Width = 5,
-                Height = 2,
+                Height = 3,
                 BorderStyle = LineStyle.Dashed,
                 Arrangement = ViewArrangement.Movable,
                 //ViewportSettings = Terminal.Gui.ViewportSettings.Transparent
             };
             transparentSubView.Border.Thickness = new (0, 1, 0, 0);
             transparentSubView.ColorScheme = Colors.ColorSchemes ["Dialog"];
-            base.Add (transparentSubView);
+
+            base.Add (
+                      new Label ()
+                      {
+                          X = 4, 
+                          Y = 0,
+                          Width = 15,
+                          Height = 1,
+                          Title = "Label..!"
+                      });
+            base.Add (transparentSubView);  
             base.Add (
                       new Button ()
                       {
-                          Title = "_Ok",
-                          X = 5,
-                          Y = 1,
+                          Title = "_Okay!",
+                          X = 4,
+                          Y = 2,
                           ShadowStyle = ShadowStyle.None,
                           ColorScheme = Colors.ColorSchemes ["Toplevel"],
+                      });
+            base.Add (
+                      new Label ()
+                      {
+                          X = 12,
+                          Y = 0,
+                          Width = 1,
+                          Height = 10,
+                          Title = "Vert..."
                       });
         }
 

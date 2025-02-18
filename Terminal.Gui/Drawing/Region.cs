@@ -22,7 +22,7 @@ public class Region : IDisposable
     public Region (Rectangle rectangle) { _rectangles = [rectangle]; }
 
     /// <summary>
-    ///     Adds the specified rectangle to the region.
+    ///     Adds the specified rectangle to the region. Merges all rectangles into a minimal bounding shape.
     /// </summary>
     /// <param name="rectangle">The rectangle to add to the region.</param>
     public void Union (Rectangle rectangle)
@@ -32,12 +32,11 @@ public class Region : IDisposable
             return;
         }
         _rectangles!.Add (rectangle);
-        // TODO: Re-enable Merge after implementing more sophisticated algo
-        //_rectangles = MergeRectangles (_rectangles);
+        _rectangles = MergeRectangles (_rectangles);
     }
 
     /// <summary>
-    ///     Adds the specified region to this region.
+    ///     Adds the specified region to this region. Merges all rectangles into a minimal bounding shape.
     /// </summary>
     /// <param name="region">The region to add to this region.</param>
     public void Union (Region? region)
@@ -45,8 +44,7 @@ public class Region : IDisposable
         if (region is { })
         {
             _rectangles!.AddRange (region._rectangles!);
-            // TODO: Re-enable Merge after implementing more sophisticated algo
-            //_rectangles = MergeRectangles (_rectangles);
+            _rectangles = MergeRectangles (_rectangles);
         }
     }
 
@@ -203,45 +201,108 @@ public class Region : IDisposable
     }
 
     /// <summary>
-    ///     Merges overlapping rectangles into a minimal set of non-overlapping rectangles.
+    ///     Merges overlapping rectangles into a minimal set of non-overlapping rectangles with a minimal bounding shape.
     /// </summary>
     /// <param name="rectangles">The list of rectangles to merge.</param>
     /// <returns>A list of merged rectangles.</returns>
     internal static List<Rectangle> MergeRectangles (List<Rectangle> rectangles)
     {
-        // Simplified merging logic: this does not handle all edge cases for merging overlapping rectangles.
-        // For a full implementation, a plane sweep algorithm or similar would be needed.
-        List<Rectangle> merged = [.. rectangles];
-        bool mergedAny;
-
-        do
+        if (rectangles is not { Count: not 0 })
         {
-            mergedAny = false;
+            return [];
+        }
 
-            for (var i = 0; i < merged.Count; i++)
+        // Create events for the left and right edges of each rectangle
+        List<(int x, int y1, int y2, bool isStart)> events = [];
+        foreach (Rectangle rect in rectangles)
+        {
+            events.Add ((rect.Left, rect.Top, rect.Bottom, true));
+            events.Add ((rect.Right, rect.Top, rect.Bottom, false));
+        }
+
+        // Sort events by x-coordinate, and by start before end if x-coordinates are equal
+        events.Sort ((a, b) => a.x != b.x ? a.x.CompareTo (b.x) : a.isStart.CompareTo (b.isStart));
+
+        List<(int y1, int y2)> activeIntervals = [];
+        List<Rectangle> mergedRectangles = [];
+        int currentX = events [0].x;
+
+        foreach ((int x, int y1, int y2, bool isStart) in events)
+        {
+            if (x != currentX)
             {
-                for (int j = i + 1; j < merged.Count; j++)
-                {
-                    if (merged [i].IntersectsWith (merged [j]))
-                    {
-                        merged [i] = Rectangle.Union (merged [i], merged [j]);
-                        merged.RemoveAt (j);
-                        mergedAny = true;
+                // Merge active intervals and create rectangles
+                mergedRectangles.AddRange (MergeIntervals (activeIntervals, currentX, x));
+                currentX = x;
+            }
 
-                        break;
-                    }
-                }
-
-                if (mergedAny)
-                {
-                    break;
-                }
+            if (isStart)
+            {
+                activeIntervals.Add ((y1, y2));
+            }
+            else
+            {
+                activeIntervals.Remove ((y1, y2));
             }
         }
-        while (mergedAny);
 
-        return merged;
+        // Handle the last set of active intervals
+        mergedRectangles.AddRange (MergeIntervals (activeIntervals, currentX, events [^1].x));
+
+        return mergedRectangles;
     }
+
+
+    /// <summary>
+    ///     Merges overlapping intervals into a minimal set of non-overlapping intervals and creates rectangles from them.
+    /// </summary>
+    /// <param name="intervals">The list of y-coordinate intervals to merge.</param>
+    /// <param name="startX">The starting x-coordinate for the rectangles.</param>
+    /// <param name="endX">The ending x-coordinate for the rectangles.</param>
+    /// <returns>A list of rectangles created from the merged intervals.</returns>
+    private static List<Rectangle> MergeIntervals (List<(int y1, int y2)> intervals, int startX, int endX)
+    {
+        if (intervals.Count == 0)
+        {
+            return [];
+        }
+
+        // Sort intervals by their starting y-coordinate
+        intervals.Sort ((a, b) => a.y1.CompareTo (b.y1));
+
+        List<(int y1, int y2)> mergedIntervals = [];
+        (int y1, int y2) currentInterval = intervals [0];
+
+        for (var i = 1; i < intervals.Count; i++)
+        {
+            (int y1, int y2) nextInterval = intervals [i];
+
+            if (currentInterval.y2 >= nextInterval.y1)
+            {
+                // Merge overlapping intervals
+                currentInterval = (currentInterval.y1, Math.Max (currentInterval.y2, nextInterval.y2));
+            }
+            else
+            {
+                mergedIntervals.Add (currentInterval);
+                currentInterval = nextInterval;
+            }
+        }
+
+        mergedIntervals.Add (currentInterval);
+
+        // Create rectangles from merged intervals
+        List<Rectangle> rectangles = [];
+        foreach ((int y1, int y2) in mergedIntervals)
+        {
+            rectangles.Add (new Rectangle (startX, y1, endX - startX, y2 - y1));
+        }
+
+        return rectangles;
+    }
+
+
+
 
     /// <summary>
     ///     Subtracts the specified rectangle from the original rectangle, returning the resulting rectangles.

@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.ComponentModel;
+using System.Diagnostics;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Terminal.Gui;
@@ -50,6 +51,7 @@ public partial class View // Drawing APIs
 
         Region? originalClip = GetClip ();
 
+        // If we draw any content (text or subviews) this will hold the regions that were drawn.
         Region? contentClip = null;
 
         // TODO: This can be further optimized by checking NeedsDraw below and only
@@ -101,7 +103,7 @@ public partial class View // Drawing APIs
             DoDrawContent ();
 
             // If we're transparent, set the contentClip to include Text and any subviews.
-            if (ViewportSettings.HasFlag (ViewportSettings.Transparent))
+            //if (ViewportSettings.HasFlag (ViewportSettings.Transparent))
             {
                 contentClip = new Region ();
 
@@ -109,7 +111,7 @@ public partial class View // Drawing APIs
 
                 if (_subviews is { Count: > 0 })
                 {
-                    // TODO: Move this into DrawSubviews somehow
+                    // TODO: Move this into DrawSubviews somehow?
                     foreach (View view in _subviews?.Where (view => view.Visible).Reverse ()!)
                     {
                         Region subviewClipRegion = new (ViewportToScreen (new Rectangle (Point.Empty, Viewport.Size)));
@@ -118,11 +120,11 @@ public partial class View // Drawing APIs
                     }
                 }
             }
-            else
-            {
-                // Not transparent: clip gets set to our viewport.
-                contentClip = new (ViewportToScreen (new Rectangle (Point.Empty, Viewport.Size)));
-            }
+            //else
+            //{
+            //    // Not transparent: clip gets set to our viewport.
+            //    contentClip = new (ViewportToScreen (new Rectangle (Point.Empty, Viewport.Size)));
+            //}
 
             // Restore the clip before rendering the line canvas and adornment subviews
             // because they may draw outside the viewport.
@@ -160,10 +162,14 @@ public partial class View // Drawing APIs
                 borderFrame = Border.FrameToScreen ();
             }
 
-            if (ViewportSettings.HasFlag (ViewportSettings.Transparent) && contentClip is { })
+            if (ViewportSettings.HasFlag (ViewportSettings.Transparent))
             {
+                // contentClip will always be set because Transparent forces redraw
+                Debug.Assert(contentClip is { });
+
                 Region? saved = originalClip!.Clone ();
 
+                // Exclude the Border and Padding adornments regions if we are transparent.
                 saved.Exclude (Border!.Thickness.AsRegion (Border!.FrameToScreen ()));
                 saved.Exclude (Padding!.Thickness.AsRegion (Padding!.FrameToScreen ()));
                 saved.Exclude (contentClip);

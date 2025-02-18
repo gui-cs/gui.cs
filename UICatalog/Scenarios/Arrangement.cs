@@ -325,7 +325,8 @@ public class TransparentView : FrameView
         base.Text = "Text. This should be visible in the Viewport.";
         Arrangement = ViewArrangement.Overlapped | ViewArrangement.Resizable | ViewArrangement.Movable;
         ViewportSettings |= Terminal.Gui.ViewportSettings.Transparent | Terminal.Gui.ViewportSettings.ClipContentOnly | Terminal.Gui.ViewportSettings.ClearContentOnly;
-
+        BorderStyle = LineStyle.RoundedDotted;
+        base.ColorScheme = Colors.ColorSchemes ["Menu"];
 
         var transparentSubView = new View ()
         {

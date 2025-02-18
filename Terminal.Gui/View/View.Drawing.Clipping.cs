@@ -11,8 +11,7 @@ public partial class View
     ///         There is a single clip region for the entire application.
     ///     </para>
     ///     <para>
-    ///         This method returns the current clip region, not a clone. If there is a need to modify the clip region, it is
-    ///         recommended to clone it first.
+    ///         This method returns the current clip region, not a clone. If there is a need to modify the clip region, clone it first.
     ///     </para>
     /// </remarks>
     /// <returns>The current Clip.</returns>
