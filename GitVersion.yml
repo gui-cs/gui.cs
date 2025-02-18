@@ -4,7 +4,7 @@ continuous-delivery-fallback-tag: dev
 branches:
   v2_develop:
     mode: ContinuousDeployment
-    tag: dev
+    tag: v2_develop
     regex: ^v2_develop?[/-]
     tracks-release-branches: true
     is-source-branch-for: ['v2_release']
@@ -19,7 +19,7 @@ branches:
 
   v1_develop:
     mode: ContinuousDeployment
-    tag: dev
+    tag: v1_develop
     regex: v1_develop
     source-branches:
     - v1_release
