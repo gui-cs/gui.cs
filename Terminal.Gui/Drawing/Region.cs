@@ -154,14 +154,34 @@ public class Region : IDisposable
     /// <param name="x">The x-coordinate of the point.</param>
     /// <param name="y">The y-coordinate of the point.</param>
     /// <returns><c>true</c> if the point is contained within the region; otherwise, <c>false</c>.</returns>
-    public bool Contains (int x, int y) { return _rectangles.Any (r => r.Contains (x, y)); }
+    public bool Contains (int x, int y)
+    {
+        foreach (var rect in _rectangles)
+        {
+            if (rect.Contains (x, y))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /// <summary>
     ///     Determines whether the specified rectangle is contained within the region.
     /// </summary>
     /// <param name="rectangle">The rectangle to check for containment.</param>
     /// <returns><c>true</c> if the rectangle is contained within the region; otherwise, <c>false</c>.</returns>
-    public bool Contains (Rectangle rectangle) { return _rectangles.Any (r => r.Contains (rectangle)); }
+    public bool Contains (Rectangle rectangle)
+    {
+        foreach (var rect in _rectangles)
+        {
+            if (rect.Contains (rectangle))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /// <summary>
     ///     Returns an array of rectangles that represent the region.
