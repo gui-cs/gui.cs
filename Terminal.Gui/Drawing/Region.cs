@@ -1,5 +1,7 @@
 ﻿using System.Buffers;
 
+#nullable enable
+
 /// <summary>
 ///     Represents a region composed of one or more rectangles, providing methods for union, intersection, exclusion, and
 ///     complement operations.
@@ -50,13 +52,20 @@ public class Region : IDisposable
             return;
         }
         // TODO: In-place swap within the original list. Does order of intersections matter?
-        var pool = ArrayPool<Rectangle>.Shared;
-        Rectangle [] rentedArray = pool.Rent(_rectangles.Count);
+        // Rectangle = 4 * i32 = 16 B
+        // ~128 B stack allocation
+        const int maxStackallocLength = 8;
+        Rectangle []? rentedArray = null;
         try
         {
-            _rectangles.CopyTo (rentedArray);
-            ReadOnlySpan<Rectangle> rectangles = rentedArray.AsSpan () [.._rectangles.Count];
+            Span<Rectangle> rectBuffer = _rectangles.Count <= maxStackallocLength
+                ? stackalloc Rectangle[maxStackallocLength]
+                : (rentedArray = ArrayPool<Rectangle>.Shared.Rent (_rectangles.Count));
+
+            _rectangles.CopyTo (rectBuffer);
+            ReadOnlySpan<Rectangle> rectangles = rectBuffer[.._rectangles.Count];
             _rectangles.Clear ();
+
             foreach (var rect in rectangles)
             {
                 Rectangle intersection = Rectangle.Intersect (rect, rectangle);
@@ -68,7 +77,10 @@ public class Region : IDisposable
         }
         finally
         {
-            pool.Return (rentedArray);
+            if (rentedArray != null)
+            {
+                ArrayPool<Rectangle>.Shared.Return (rentedArray);
+            }
         }
     }
 
