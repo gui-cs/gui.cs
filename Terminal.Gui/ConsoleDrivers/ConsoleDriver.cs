@@ -1,6 +1,7 @@
 #nullable enable
 
 using System.Diagnostics;
+using System.Globalization;
 
 namespace Terminal.Gui;
 
@@ -53,6 +54,10 @@ public abstract class ConsoleDriver : IConsoleDriver
     // As performance is a concern, we keep track of the dirty lines and only refresh those.
     // This is in addition to the dirty flag on each cell.
     internal bool []? _dirtyLines;
+
+    // Represent the necessary space character that must be added at
+    // the end of the line due the use of Format (Cf) unicode category
+    internal int []? _lineColsOffset;
 
     // QUESTION: When non-full screen apps are supported, will this represent the app size, or will that be in Application?
     /// <summary>Gets the location and size of the terminal screen.</summary>
@@ -169,6 +174,13 @@ public abstract class ConsoleDriver : IConsoleDriver
     /// <summary>The topmost row in the terminal.</summary>
     public virtual int Top { get; set; } = 0;
 
+    /// <summary>
+    ///     Gets or sets whenever <see cref="Cell.CombiningMarks"/> is ignored or not.
+    /// </summary>
+    public static bool IgnoreIsCombiningMark { get; set; }
+
+    private Point? _lastValidAddRuneCell = null;
+
     /// <summary>Adds the specified rune to the display at the current cursor position.</summary>
     /// <remarks>
     ///     <para>
@@ -185,15 +197,15 @@ public abstract class ConsoleDriver : IConsoleDriver
     /// <param name="rune">Rune to add.</param>
     public void AddRune (Rune rune)
     {
-        int runeWidth = -1;
-        bool validLocation = IsValidLocation (rune, Col, Row);
-
         if (Contents is null)
         {
             return;
         }
 
+        int runeWidth = -1;
+        bool validLocation = IsValidLocation (rune, Col, Row);
         Rectangle clipRect = Clip!.GetBounds ();
+        bool wasAddedToCombiningMarks = false;
 
         if (validLocation)
         {
@@ -202,7 +214,7 @@ public abstract class ConsoleDriver : IConsoleDriver
 
             lock (Contents)
             {
-                if (runeWidth == 0 && rune.IsCombiningMark ())
+                if (Rune.GetUnicodeCategory (rune) == UnicodeCategory.Format || (runeWidth == 0 && rune.IsCombiningMark ()))
                 {
                     // AtlasEngine does not support NON-NORMALIZED combining marks in a way
                     // compatible with the driver architecture. Any CMs (except in the first col)
@@ -212,42 +224,27 @@ public abstract class ConsoleDriver : IConsoleDriver
                     // Until this is addressed (see Issue #), we do our best by
                     // a) Attempting to normalize any CM with the base char to it's left
                     // b) Ignoring any CMs that don't normalize
-                    if (Col > 0)
+                    if (Col > 0
+                        && _lastValidAddRuneCell is { }
+                        && _lastValidAddRuneCell.Value.Y == Row
+                        && Contents [Row, _lastValidAddRuneCell.Value.X].IsDirty)
                     {
-                        if (Contents [Row, Col - 1].CombiningMarks.Count > 0)
+                        if (Contents [Row, _lastValidAddRuneCell.Value.X].CombiningMarks is null)
                         {
-                            // Just add this mark to the list
-                            Contents [Row, Col - 1].CombiningMarks.Add (rune);
-
-                            // Ignore. Don't move to next column (let the driver figure out what to do).
-                        }
-                        else
-                        {
-                            // Attempt to normalize the cell to our left combined with this mark
-                            string combined = Contents [Row, Col - 1].Rune + rune.ToString ();
-
-                            // Normalize to Form C (Canonical Composition)
-                            string normalized = combined.Normalize (NormalizationForm.FormC);
-
-                            if (normalized.Length == 1)
-                            {
-                                // It normalized! We can just set the Cell to the left with the
-                                // normalized codepoint
-                                Contents [Row, Col - 1].Rune = (Rune)normalized [0];
-
-                                // Ignore. Don't move to next column because we're already there
-                            }
-                            else
-                            {
-                                // It didn't normalize. Add it to the Cell to left's CM list
-                                Contents [Row, Col - 1].CombiningMarks.Add (rune);
-
-                                // Ignore. Don't move to next column (let the driver figure out what to do).
-                            }
+                            Contents [Row, _lastValidAddRuneCell.Value.X].CombiningMarks = [];
                         }
 
-                        Contents [Row, Col - 1].Attribute = CurrentAttribute;
-                        Contents [Row, Col - 1].IsDirty = true;
+                        // Just add this mark to the list
+                        Contents [Row, _lastValidAddRuneCell.Value.X].CombiningMarks.Add (rune);
+                        wasAddedToCombiningMarks = true;
+
+                        if (runeWidth == 0 && Rune.GetUnicodeCategory (rune) == UnicodeCategory.Format)
+                        {
+                            _lineColsOffset! [Row] += Contents [Row, _lastValidAddRuneCell.Value.X].Rune.GetColumns ();
+                        }
+
+                        Contents [Row, _lastValidAddRuneCell.Value.X].Attribute = CurrentAttribute;
+                        Contents [Row, _lastValidAddRuneCell.Value.X].IsDirty = true;
                     }
                     else
                     {
@@ -255,7 +252,11 @@ public abstract class ConsoleDriver : IConsoleDriver
                         Contents [Row, Col].Rune = rune;
                         Contents [Row, Col].Attribute = CurrentAttribute;
                         Contents [Row, Col].IsDirty = true;
-                        Col++;
+
+                        if (runeWidth == 0)
+                        {
+                            Col++;
+                        }
                     }
                 }
                 else
@@ -325,7 +326,12 @@ public abstract class ConsoleDriver : IConsoleDriver
             }
         }
 
-        if (runeWidth is < 0 or > 0)
+        if (!IgnoreIsCombiningMark && !wasAddedToCombiningMarks)
+        {
+            _lastValidAddRuneCell = new (Col, Row);
+        }
+
+        if (runeWidth is < 0 or > 0 && !wasAddedToCombiningMarks)
         {
             Col++;
         }
@@ -339,13 +345,10 @@ public abstract class ConsoleDriver : IConsoleDriver
                 lock (Contents!)
                 {
                     // This is a double-width character, and we are not at the end of the line.
-                    // Col now points to the second column of the character. Ensure it doesn't
-                    // Get rendered.
-                    Contents [Row, Col].IsDirty = false;
+                    // Col now points to the second column of the character. Ensure it does get
+                    // rendered to allow the driver to handle it in its own way.
+                    Contents [Row, Col].IsDirty = true;
                     Contents [Row, Col].Attribute = CurrentAttribute;
-
-                    // TODO: Determine if we should wipe this out (for now now)
-                    //Contents [Row, Col].Rune = (Rune)' ';
                 }
             }
 
@@ -415,12 +418,14 @@ public abstract class ConsoleDriver : IConsoleDriver
     public void ClearContents ()
     {
         Contents = new Cell [Rows, Cols];
+        _lastValidAddRuneCell = null;
 
         //CONCURRENCY: Unsynchronized access to Clip isn't safe.
         // TODO: ClearContents should not clear the clip; it should only clear the contents. Move clearing it elsewhere.
         Clip = new (Screen);
 
         _dirtyLines = new bool [Rows];
+        _lineColsOffset = new int [Rows];
 
         lock (Contents)
         {
@@ -499,11 +504,8 @@ public abstract class ConsoleDriver : IConsoleDriver
         {
             return col >= 0 && row >= 0 && col < Cols && row < Rows && Clip!.Contains (col, row);
         }
-        else
-        {
 
-            return Clip!.Contains (col, row) || Clip!.Contains (col + 1, row);
-        }
+        return Clip!.Contains (col, row) || Clip!.Contains (col + 1, row);
     }
 
     /// <summary>Called when the terminal size changes. Fires the <see cref="SizeChanged"/> event.</summary>

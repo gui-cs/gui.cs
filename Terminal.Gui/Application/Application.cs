@@ -67,6 +67,28 @@ public static partial class Application
                 {
                     sb.Append (sp);
                 }
+                else if (contents [r, c].CombiningMarks is { Count: > 0 })
+                {
+                    // AtlasEngine does not support NON-NORMALIZED combining marks in a way
+                    // compatible with the driver architecture. Any CMs (except in the first col)
+                    // are correctly combined with the base char, but are ALSO treated as 1 column
+                    // width codepoints E.g. `echo "[e`u{0301}`u{0301}]"` will output `[é  ]`.
+                    // 
+                    // For now, we just ignore the list of CMs.
+                    string combine = rune.ToString ();
+                    string? normalized = null;
+
+                    foreach (Rune combMark in contents [r, c].CombiningMarks)
+                    {
+                        combine += combMark;
+                        normalized = combine.Normalize (NormalizationForm.FormC);
+                    }
+
+                    foreach (Rune enumerateRune in normalized!.EnumerateRunes ())
+                    {
+                        sb.Append (enumerateRune);
+                    }
+                }
                 else
                 {
                     sb.Append ((char)rune.Value);
@@ -76,11 +98,6 @@ public static partial class Application
                 {
                     c++;
                 }
-
-                // See Issue #2616
-                //foreach (var combMark in contents [r, c].CombiningMarks) {
-                //	sb.Append ((char)combMark.Value);
-                //}
             }
 
             sb.AppendLine ();

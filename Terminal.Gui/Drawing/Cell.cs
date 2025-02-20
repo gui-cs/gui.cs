@@ -4,7 +4,7 @@
 ///     Represents a single row/column in a Terminal.Gui rendering surface (e.g. <see cref="LineCanvas"/> and
 ///     <see cref="IConsoleDriver"/>).
 /// </summary>
-public record struct Cell (Attribute? Attribute = null, bool IsDirty = false, Rune Rune = default)
+public record struct Cell (Attribute? Attribute = null, bool IsDirty = false, Rune Rune = default, List<Rune> CombiningMarks = null)
 {
     /// <summary>The attributes to use when drawing the Glyph.</summary>
     public Attribute? Attribute { get; set; } = Attribute;
@@ -23,12 +23,10 @@ public record struct Cell (Attribute? Attribute = null, bool IsDirty = false, Ru
         get => _rune;
         set
         {
-            CombiningMarks.Clear ();
+            CombiningMarks = null;
             _rune = value;
         }
     }
-
-    private List<Rune> _combiningMarks;
 
     /// <summary>
     ///     The combining marks for <see cref="Rune"/> that when combined makes this Cell a combining sequence. If
@@ -38,11 +36,7 @@ public record struct Cell (Attribute? Attribute = null, bool IsDirty = false, Ru
     ///     Only valid in the rare case where <see cref="Rune"/> is a combining sequence that could not be normalized to a
     ///     single Rune.
     /// </remarks>
-    internal List<Rune> CombiningMarks
-    {
-        get => _combiningMarks ?? [];
-        private set => _combiningMarks = value ?? [];
-    }
+    internal List<Rune> CombiningMarks { get; set; } = CombiningMarks;
 
     /// <inheritdoc/>
     public override string ToString () { return $"[{Rune}, {Attribute}]"; }

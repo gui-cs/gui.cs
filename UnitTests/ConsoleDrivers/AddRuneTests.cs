@@ -55,7 +55,9 @@ public class AddRuneTests
 
         text = "\u0103\u0301";
         driver.AddStr (text);
-        Assert.Equal (expected, driver.Contents [0, 0].Rune);
+        Assert.Single (driver.Contents [0, 0].CombiningMarks);
+        string combined = driver.Contents [0, 0].Rune + driver.Contents [0, 0].CombiningMarks [0].ToString ();
+        Assert.Equal (expected, (Rune)combined.Normalize (NormalizationForm.FormC) [0]);
         Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
 
         driver.ClearContents ();
@@ -63,7 +65,9 @@ public class AddRuneTests
 
         text = "\u0061\u0306\u0301";
         driver.AddStr (text);
-        Assert.Equal (expected, driver.Contents [0, 0].Rune);
+        Assert.Equal (2, driver.Contents [0, 0].CombiningMarks.Count);
+        combined = driver.Contents [0, 0].Rune + driver.Contents [0, 0].CombiningMarks [0].ToString () + driver.Contents [0, 0].CombiningMarks [1];
+        Assert.Equal (expected, (Rune)combined.Normalize (NormalizationForm.FormC) [0]);
         Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
 
         //		var s = "a\u0301\u0300\u0306";

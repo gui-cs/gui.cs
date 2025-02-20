@@ -129,7 +129,8 @@ public static class RuneExtensions
 
         return Rune.GetUnicodeCategory (rune) == UnicodeCategory.NonSpacingMark
                || category == UnicodeCategory.SpacingCombiningMark
-               || category == UnicodeCategory.EnclosingMark;
+               || category == UnicodeCategory.EnclosingMark
+               || category == UnicodeCategory.Format;
     }
 
     /// <summary>Reports whether a rune is a surrogate code point.</summary>

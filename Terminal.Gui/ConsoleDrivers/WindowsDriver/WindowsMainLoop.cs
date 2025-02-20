@@ -36,7 +36,6 @@ internal class WindowsMainLoop : IMainLoopDriver
         if (!ConsoleDriver.RunningUnitTests)
         {
             _winConsole = ((WindowsDriver)consoleDriver).WinConsole;
-            _winConsole!._mainLoop = this;
         }
     }
 

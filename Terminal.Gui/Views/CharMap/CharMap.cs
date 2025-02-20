@@ -247,6 +247,8 @@ public class CharMap : View, IDesignable
     /// <inheritdoc/>
     protected override bool OnDrawingContent ()
     {
+        ConsoleDriver.IgnoreIsCombiningMark = true;
+
         if (Viewport.Height == 0 || Viewport.Width == 0)
         {
             return true;
@@ -324,37 +326,37 @@ public class CharMap : View, IDesignable
                 if (!ShowGlyphWidths || (y + Viewport.Y) % _rowHeight > 0)
                 {
                     // Draw the rune
-                    if (width > 0)
-                    {
+                    //if (width > 0)
+                    //{
                         AddRune (rune);
-                    }
-                    else
-                    {
-                        if (rune.IsCombiningMark ())
-                        {
-                            // This is a hack to work around the fact that combining marks
-                            // a) can't be rendered on their own
-                            // b) that don't normalize are not properly supported in 
-                            //    any known terminal (esp Windows/AtlasEngine). 
-                            // See Issue #2616
-                            var sb = new StringBuilder ();
-                            sb.Append ('a');
-                            sb.Append (rune);
+                    //}
+                    //else
+                    //{
+                    //    if (rune.IsCombiningMark ())
+                    //    {
+                    //        // This is a hack to work around the fact that combining marks
+                    //        // a) can't be rendered on their own
+                    //        // b) that don't normalize are not properly supported in 
+                    //        //    any known terminal (esp Windows/AtlasEngine). 
+                    //        // See Issue #2616
+                    //        var sb = new StringBuilder ();
+                    //        sb.Append ('a');
+                    //        sb.Append (rune);
 
-                            // Try normalizing after combining with 'a'. If it normalizes, at least 
-                            // it'll show on the 'a'. If not, just show the replacement char.
-                            string normal = sb.ToString ().Normalize (NormalizationForm.FormC);
+                    //        // Try normalizing after combining with 'a'. If it normalizes, at least 
+                    //        // it'll show on the 'a'. If not, just show the replacement char.
+                    //        string normal = sb.ToString ().Normalize (NormalizationForm.FormC);
 
-                            if (normal.Length == 1)
-                            {
-                                AddRune ((Rune)normal [0]);
-                            }
-                            else
-                            {
-                                AddRune (Rune.ReplacementChar);
-                            }
-                        }
-                    }
+                    //        if (normal.Length == 1)
+                    //        {
+                    //            AddRune ((Rune)normal [0]);
+                    //        }
+                    //        else
+                    //        {
+                    //            AddRune (Rune.ReplacementChar);
+                    //        }
+                    //    }
+                    //}
                 }
                 else
                 {
@@ -384,6 +386,8 @@ public class CharMap : View, IDesignable
                 AddStr (new (' ', RowLabelWidth));
             }
         }
+
+        ConsoleDriver.IgnoreIsCombiningMark = false;
 
         return true;
     }

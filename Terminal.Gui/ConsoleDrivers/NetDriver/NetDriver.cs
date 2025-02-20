@@ -166,9 +166,23 @@ internal class NetDriver : ConsoleDriver
 
                     outputWidth++;
                     Rune rune = Contents [row, col].Rune;
+
+                    if (rune == Rune.ReplacementChar)
+                    {
+                        continue;
+                    }
+
                     output.Append (rune);
 
-                    if (Contents [row, col].CombiningMarks.Count > 0)
+                    if (rune.IsCombiningMark ())
+                    {
+                        if (rune.GetColumns () == 0)
+                        {
+                            output.Append (' ');
+                        }
+                    }
+
+                    if (Contents [row, col].CombiningMarks is { Count: > 0 })
                     {
                         // AtlasEngine does not support NON-NORMALIZED combining marks in a way
                         // compatible with the driver architecture. Any CMs (except in the first col)
@@ -176,19 +190,30 @@ internal class NetDriver : ConsoleDriver
                         // width codepoints E.g. `echo "[e`u{0301}`u{0301}]"` will output `[é  ]`.
                         // 
                         // For now, we just ignore the list of CMs.
-                        //foreach (var combMark in Contents [row, col].CombiningMarks) {
-                        //	output.Append (combMark);
-                        //}
-                        // WriteToConsole (output, ref lastCol, row, ref outputWidth);
+                        foreach (var combMark in Contents [row, col].CombiningMarks)
+                        {
+                            output.Append (combMark);
+                        }
+                        //WriteToConsole (output, ref lastCol, row, ref outputWidth);
                     }
-                    else if (rune.IsSurrogatePair () && rune.GetColumns () < 2)
-                    {
-                        WriteToConsole (output, ref lastCol, row, ref outputWidth);
-                        SetCursorPosition (col - 1, row);
-                    }
+                    //else if (rune.IsSurrogatePair () && rune.GetColumns () < 2)
+                    //{
+                    //    WriteToConsole (output, ref lastCol, row, ref outputWidth);
+                    //    SetCursorPosition (col - 1, row);
+                    //}
 
                     Contents [row, col].IsDirty = false;
                 }
+            }
+
+            if (_lineColsOffset! [row] > 0)
+            {
+                for (var i = 0; i < _lineColsOffset [row]; i++)
+                {
+                    output.Append (' ');
+                }
+
+                _lineColsOffset! [row] = 0;
             }
 
             if (output.Length > 0)

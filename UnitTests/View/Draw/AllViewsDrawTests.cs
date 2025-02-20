@@ -51,5 +51,7 @@ public class AllViewsDrawTests (ITestOutputHelper _output) : TestsAllViews
             Assert.Equal (1, layoutStartedCount);
             Assert.Equal (1, layoutCompleteCount);
         }
+
+        Application.ResetState (true);
     }
 }

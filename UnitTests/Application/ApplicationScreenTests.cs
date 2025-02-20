@@ -8,6 +8,7 @@ public class ApplicationScreenTests (ITestOutputHelper output)
     public void ClearScreenNextIteration_Resets_To_False_After_LayoutAndDraw ()
     {
         // Arrange
+        ConsoleDriver.RunningUnitTests = true;
         Application.Init ();
 
         // Act

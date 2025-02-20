@@ -4114,8 +4114,8 @@ B  ")]
     }
 
     [Theory]
-    [InlineData (14, 1, TextDirection.LeftRight_TopBottom, "Les Misęrables")]
-    [InlineData (1, 14, TextDirection.TopBottom_LeftRight, "L\ne\ns\n \nM\ni\ns\nę\nr\na\nb\nl\ne\ns")]
+    [InlineData (14, 1, TextDirection.LeftRight_TopBottom, "Les Misę́rables")]
+    [InlineData (1, 14, TextDirection.TopBottom_LeftRight, "L\ne\ns\n \nM\ni\ns\nę́\nr\na\nb\nl\ne\ns")]
     [InlineData (
                     4,
                     4,
@@ -4124,7 +4124,7 @@ B  ")]
 LMre
 eias
 ssb 
- ęl "
+ ę́l "
                 )]
     public void Draw_With_Combining_Runes (int width, int height, TextDirection textDirection, string expected)
     {

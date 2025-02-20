@@ -335,6 +335,20 @@ internal class WindowsDriver : ConsoleDriver
 
                 _outputBuffer [position].Empty = false;
 
+                if (Contents [row, col].CombiningMarks is { Count: > 0 })
+                {
+                    _outputBuffer [position].CombiningMarks = [];
+
+                    foreach (var combMark in Contents [row, col].CombiningMarks)
+                    {
+                        _outputBuffer [position].CombiningMarks!.Add ((char)combMark.Value);
+                    }
+                }
+                else
+                {
+                    _outputBuffer [position].CombiningMarks = null;
+                }
+
                 if (Contents [row, col].Rune.IsBmp)
                 {
                     _outputBuffer [position].Char = (char)Contents [row, col].Rune.Value;
@@ -342,7 +356,21 @@ internal class WindowsDriver : ConsoleDriver
                 else
                 {
                     //_outputBuffer [position].Empty = true;
-                    _outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
+                    //_outputBuffer [position].Char = (char)Rune.ReplacementChar.Value;
+                    var rune = Contents [row, col].Rune;
+                    char [] surrogatePair = rune.ToString ().ToCharArray ();
+                    Debug.Assert (surrogatePair.Length == 2);
+                    _outputBuffer [position].Char = surrogatePair [0];
+
+                    if (_outputBuffer [position].CombiningMarks == null)
+                    {
+                        _outputBuffer [position].CombiningMarks = [];
+                        _outputBuffer [position].CombiningMarks!.Add (surrogatePair [1]);
+                    }
+                    else
+                    {
+                        _outputBuffer [position].CombiningMarks!.Insert (0, surrogatePair [1]);
+                    }
 
                     if (Contents [row, col].Rune.GetColumns () > 1 && col + 1 < Cols)
                     {
@@ -350,7 +378,7 @@ internal class WindowsDriver : ConsoleDriver
                         col++;
                         position = row * Cols + col;
                         _outputBuffer [position].Empty = false;
-                        _outputBuffer [position].Char = ' ';
+                        _outputBuffer [position].Char = '\0';
                     }
                 }
             }
