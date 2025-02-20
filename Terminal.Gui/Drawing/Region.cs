@@ -1,4 +1,6 @@
-﻿/// <summary>
+﻿using System.Buffers;
+
+/// <summary>
 ///     Represents a region composed of one or more rectangles, providing methods for union, intersection, exclusion, and
 ///     complement operations.
 /// </summary>
@@ -43,7 +45,31 @@ public class Region : IDisposable
     /// <param name="rectangle">The rectangle to intersect with the region.</param>
     public void Intersect (Rectangle rectangle)
     {
-        _rectangles = _rectangles.Select (r => Rectangle.Intersect (r, rectangle)).Where (r => !r.IsEmpty).ToList ();
+        if (_rectangles.Count == 0)
+        {
+            return;
+        }
+        // TODO: In-place swap within the original list. Does order of intersections matter?
+        var pool = ArrayPool<Rectangle>.Shared;
+        Rectangle [] rentedArray = pool.Rent(_rectangles.Count);
+        try
+        {
+            _rectangles.CopyTo (rentedArray);
+            ReadOnlySpan<Rectangle> rectangles = rentedArray.AsSpan () [.._rectangles.Count];
+            _rectangles.Clear ();
+            foreach (var rect in rectangles)
+            {
+                Rectangle intersection = Rectangle.Intersect (rect, rectangle);
+                if (!intersection.IsEmpty)
+                {
+                    _rectangles.Add (intersection);
+                }
+            }
+        }
+        finally
+        {
+            pool.Return (rentedArray);
+        }
     }
 
     /// <summary>
