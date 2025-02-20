@@ -318,7 +318,14 @@ public class LineCanvas : IDisposable
 
     private static bool All (IntersectionDefinition [] intersects, Orientation orientation)
     {
-        return intersects.All (i => i.Line.Orientation == orientation);
+        foreach (var intersect in intersects)
+        {
+            if (intersect.Line.Orientation != orientation)
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void ConfigurationManager_Applied (object? sender, ConfigurationManagerEventArgs e)
