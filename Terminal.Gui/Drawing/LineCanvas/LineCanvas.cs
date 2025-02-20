@@ -207,10 +207,11 @@ public class LineCanvas : IDisposable
         {
             for (int x = inArea.X; x < inArea.X + inArea.Width; x++)
             {
-                IntersectionDefinition? [] intersects = _lines
-                                                        .Select (l => l.Intersects (x, y))
-                                                        .Where (i => i is { })
-                                                        .ToArray ();
+                IntersectionDefinition [] intersects = _lines
+                    // ! nulls are filtered out by the next Where filter
+                    .Select (l => l.Intersects (x, y)!)
+                    .Where (i => i is not null)
+                    .ToArray ();
 
                 Rune? rune = GetRuneForIntersects (Application.Driver, intersects);
 
@@ -315,9 +316,9 @@ public class LineCanvas : IDisposable
         return sb.ToString ();
     }
 
-    private static bool All (IntersectionDefinition? [] intersects, Orientation orientation)
+    private static bool All (IntersectionDefinition [] intersects, Orientation orientation)
     {
-        return intersects.All (i => i!.Line.Orientation == orientation);
+        return intersects.All (i => i.Line.Orientation == orientation);
     }
 
     private void ConfigurationManager_Applied (object? sender, ConfigurationManagerEventArgs e)
@@ -404,7 +405,7 @@ public class LineCanvas : IDisposable
         return cell;
     }
 
-    private Rune? GetRuneForIntersects (IConsoleDriver? driver, IntersectionDefinition? [] intersects)
+    private Rune? GetRuneForIntersects (IConsoleDriver? driver, IntersectionDefinition [] intersects)
     {
         if (!intersects.Any ())
         {
@@ -495,9 +496,9 @@ public class LineCanvas : IDisposable
         }
     }
 
-    private IntersectionRuneType GetRuneTypeForIntersects (IntersectionDefinition? [] intersects)
+    private IntersectionRuneType GetRuneTypeForIntersects (IntersectionDefinition [] intersects)
     {
-        HashSet<IntersectionType> set = new (intersects.Select (i => i!.Type));
+        HashSet<IntersectionType> set = new (intersects.Select (i => i.Type));
 
         #region Cross Conditions
 
