@@ -49,11 +49,14 @@ public class Arrangement : Scenario
         FrameView testFrame = new ()
         {
             Title = "_1 Test Frame",
+            Text = "This is the text of the Test Frame.\nLine 2.\nLine 3.",
             X = Pos.Right (arrangementEditor),
             Y = 0,
             Width = Dim.Fill (),
             Height = Dim.Fill ()
         };
+        testFrame.TextAlignment = Alignment.Center;
+        testFrame.VerticalTextAlignment = Alignment.Center;
 
         app.Add (testFrame);
 
@@ -324,14 +327,14 @@ public class TransparentView : FrameView
         Title = "Transparent";
         base.Text = "Text. This should be visible in the Viewport.";
         Arrangement = ViewArrangement.Overlapped | ViewArrangement.Resizable | ViewArrangement.Movable;
-        ViewportSettings |= Terminal.Gui.ViewportSettings.Transparent | Terminal.Gui.ViewportSettings.ClipContentOnly | Terminal.Gui.ViewportSettings.ClearContentOnly;
+        ViewportSettings |= Terminal.Gui.ViewportSettings.Transparent;
         BorderStyle = LineStyle.RoundedDotted;
         base.ColorScheme = Colors.ColorSchemes ["Menu"];
 
         var transparentSubView = new View ()
         {
             //Title = "SubView",
-            Text = "Trans. SubView; Ignored",
+            Text = "This is a View with border.",
             Id = "transparentSubView",
             X = 4,
             Y = 6,
@@ -339,19 +342,27 @@ public class TransparentView : FrameView
             Height = 6,
             BorderStyle = LineStyle.Dashed,
             Arrangement = ViewArrangement.Movable,
-            ViewportSettings = Terminal.Gui.ViewportSettings.Transparent
+            //ViewportSettings = Terminal.Gui.ViewportSettings.Transparent
         };
-        transparentSubView.Border.Thickness = new (0, 1, 0, 0);
+        transparentSubView.Border.Thickness = new (1, 1, 1, 1);
         transparentSubView.ColorScheme = Colors.ColorSchemes ["Dialog"];
-        base.Add (
-                  new Button ()
-                  {
-                      Title = "_Hi",
-                      X = Pos.Center (),
-                      Y = Pos.Center (),
-                      ShadowStyle = ShadowStyle.None,
-                      ColorScheme = Colors.ColorSchemes ["Toplevel"],
-                  });
+
+        Button button = new Button ()
+        {
+            Title = "_Button in Transparent View",
+            X = Pos.Center (),
+            Y = 4,
+            ShadowStyle = ShadowStyle.None,
+            ColorScheme = Colors.ColorSchemes ["Dialog"],
+        };
+
+        button.ClearingViewport += (sender, args) =>
+                                   {
+                                       args.Cancel = true;
+                                   };
+
+
+        base.Add (button);
         base.Add (transparentSubView);
     }
 

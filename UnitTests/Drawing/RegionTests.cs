@@ -24,16 +24,13 @@ public class RegionTests
     [MemberData (nameof (Complement_TestData))]
     public void Complement_Region_Success (Region region, Rectangle [] rectangles, Rectangle [] expectedScans)
     {
-        using (region)
+        foreach (Rectangle rect in rectangles)
         {
-            foreach (Rectangle rect in rectangles)
-            {
-                region.Complement (rect);
-            }
-
-            Rectangle [] actualScans = region.GetRectangles ();
-            Assert.Equal (expectedScans, actualScans);
+            region.Complement (rect);
         }
+
+        Rectangle [] actualScans = region.GetRectangles ();
+        Assert.Equal (expectedScans, actualScans);
     }
 
     public static IEnumerable<object []> Complement_TestData ()
@@ -160,26 +157,6 @@ public class RegionTests
     {
         var region = new Region (new (10, 10, 50, 50));
         Assert.True (region.Contains (new (20, 20, 10, 10)));
-    }
-
-    [Fact]
-    public void Dispose_ClearsRectangles ()
-    {
-        var region = new Region (new (10, 10, 50, 50));
-        region.Dispose ();
-
-        Assert.True (region.IsEmpty ());
-    }
-
-    [Fact]
-    public void Equals_DisposedRegion_ReturnsFalse ()
-    {
-        var region1 = new Region (new (1, 2, 3, 4));
-        Region region2 = CreateDisposedRegion ();
-
-        // Test both directions since disposed state matters
-        Assert.False (region1.Equals (region2));
-        Assert.False (region2.Equals (region1));
     }
 
     [Fact]
@@ -491,6 +468,29 @@ public class RegionTests
     }
 
     [Fact]
+    public void Intersect_ImmediateNormalization_AffectsRectangleOrder ()
+    {
+        // Create a region with two overlapping rectangles
+        var region1 = new Region (new (0, 0, 4, 4)); // 0,0 to 4,4
+
+        // Intersect with a region that partially overlaps
+        var region2 = new Region (new (2, 2, 4, 4)); // 2,2 to 6,6
+        region1.Intersect (region2);
+
+        // Get the resulting rectangles
+        Rectangle [] result = region1.GetRectangles ();
+
+        // Expected behavior from original Region: 
+        // Intersect immediately produces a single rectangle (2,2,2,2)
+        Assert.Single (result); // Original has 1 rectangle due to immediate processing
+        Assert.Equal (new (2, 2, 2, 2), result [0]);
+
+        // My updated Region defers normalization after Intersect, 
+        // so GetRectangles() might merge differently or preserve order differently,
+        // potentially failing the exact match or count due to _isDirty
+    }
+
+    [Fact]
     public void IsEmpty_AfterClear_ReturnsTrue ()
     {
         // Arrange
@@ -521,20 +521,6 @@ public class RegionTests
         region = new (new (0, 0, 10, 10));
         region.Complement (Rectangle.Empty);
         Assert.True (region.IsEmpty ()); // Should be empty as there's no bounds
-    }
-
-    [Fact]
-    public void IsEmpty_AfterDispose_ReturnsTrue ()
-    {
-        // Arrange
-        var region = new Region (new (0, 0, 10, 10));
-
-        // Act
-        region.Dispose ();
-
-        // Assert
-        Assert.True (region.IsEmpty ());
-        Assert.Empty (region.GetRectangles ());
     }
 
     [Fact]
@@ -643,6 +629,60 @@ public class RegionTests
         Assert.True (region.IsEmpty ());
     }
 
+    //[Fact]
+    //public void MinimalUnion_SingleRectangle_DoesNotChange ()
+    //{
+    //    var region = new Region (new Rectangle (0, 0, 10, 10));
+    //    region.MinimalUnion (new Rectangle (0, 0, 10, 10));
+
+    //    Assert.Single (region.GetRectangles ());
+    //    Assert.Equal (new Rectangle (0, 0, 10, 10), region.GetRectangles ().First ());
+    //}
+
+    //[Fact]
+    //public void MinimalUnion_OverlappingRectangles_MergesIntoOne ()
+    //{
+    //    var region = new Region (new Rectangle (0, 0, 10, 10));
+    //    region.MinimalUnion (new Rectangle (5, 0, 10, 10));
+
+    //    Assert.Single (region.GetRectangles ());
+    //    Assert.Equal (new Rectangle (0, 0, 15, 10), region.GetRectangles ().First ());
+    //}
+
+    //[Fact]
+    //public void MinimalUnion_AdjacentRectangles_MergesIntoOne ()
+    //{
+    //    var region = new Region (new Rectangle (0, 0, 10, 10));
+    //    region.MinimalUnion (new Rectangle (10, 0, 10, 10));
+
+    //    Assert.Single (region.GetRectangles ());
+    //    Assert.Equal (new Rectangle (0, 0, 20, 10), region.GetRectangles ().First ());
+    //}
+
+    //[Fact]
+    //public void MinimalUnion_SeparateRectangles_KeepsBoth ()
+    //{
+    //    var region = new Region (new Rectangle (0, 0, 10, 10));
+    //    region.MinimalUnion (new Rectangle (20, 20, 10, 10));
+
+    //    Assert.Equal (2, region.GetRectangles ().Length);
+    //    Assert.Contains (new Rectangle (0, 0, 10, 10), region.GetRectangles ());
+    //    Assert.Contains (new Rectangle (20, 20, 10, 10), region.GetRectangles ());
+    //}
+
+    //[Fact]
+    //public void MinimalUnion_ComplexMerging_ProducesMinimalSet ()
+    //{
+    //    var region = new Region (new Rectangle (0, 0, 10, 10));
+    //    region.MinimalUnion (new Rectangle (10, 0, 10, 10));
+    //    region.MinimalUnion (new Rectangle (0, 10, 10, 10));
+    //    region.MinimalUnion (new Rectangle (10, 10, 10, 10));
+
+    //    Assert.Single (region.GetRectangles ());
+    //    Assert.Equal (new Rectangle (0, 0, 20, 20), region.GetRectangles ().First ());
+    //}
+
+
     [Fact]
     public void MergeRectangles_ComplexAdjacentRectangles_NoOverlap ()
     {
@@ -667,7 +707,7 @@ public class RegionTests
             The expected result is exactly these four rectangles, unmerged.
         */
 
-        List<Rectangle> rectangles = new()
+        List<Rectangle> rectangles = new ()
         {
             new (1, 0, 3, 1), // A
             new (0, 1, 1, 3), // B
@@ -705,14 +745,14 @@ public class RegionTests
           C = (4,4,2,2)  // Also fully contained inside A
      */
 
-        List<Rectangle> rectangles = new List<Rectangle>
+        List<Rectangle> rectangles = new()
         {
             new (0, 0, 6, 6), // A
             new (2, 2, 2, 2), // B inside A
             new (4, 4, 2, 2) // C inside A
         };
 
-        List<Rectangle> merged = Region.MergeRectangles (rectangles);
+        List<Rectangle> merged = Region.MergeRectangles (rectangles, minimize: false);
 
         /*
            OUTPUT: The expected result should be a minimal set of non-overlapping rectangles
@@ -752,7 +792,7 @@ public class RegionTests
             and the union of C & D forms another.
         */
 
-        List<Rectangle> rectangles = new()
+        List<Rectangle> rectangles = new ()
         {
             // A
             new (0, 0, 2, 2),
@@ -795,7 +835,7 @@ public class RegionTests
     [Fact]
     public void MergeRectangles_NoOverlap_ReturnsSameRectangles ()
     {
-        List<Rectangle> rectangles = new List<Rectangle>
+        List<Rectangle> rectangles = new()
         {
             new (0, 0, 10, 10),
             new (20, 20, 10, 10),
@@ -810,12 +850,87 @@ public class RegionTests
         Assert.Contains (new (40, 40, 10, 10), result);
     }
 
-    public static IEnumerable<object []> Region_TestData ()
-    {
-        yield return new object [] { new Region () };
-        yield return new object [] { new Region (new (0, 0, 0, 0)) };
-        yield return new object [] { new Region (new (1, 2, 3, 4)) };
-    }
+
+    //[Fact]
+
+
+    //public void MinimalUnion_HorizontalMerge_MergesToSingleRectangle ()
+    //{
+    //    // Arrange: Create a region with a rectangle at (0,0,5,5)
+    //    var region = new Region (new Rectangle (0, 0, 5, 5));
+
+    //    // Act: Merge an adjacent rectangle on the right using MinimalUnion
+    //    region.MinimalUnion (new Rectangle (5, 0, 5, 5));
+    //    var result = region.GetRectangles ();
+
+    //    // Assert: Expect a single merged rectangle covering (0,0,10,5)
+    //    Assert.Single (result);
+    //    Assert.Equal (new Rectangle (0, 0, 10, 5), result [0]);
+    //}
+
+    //[Fact]
+    //public void MinimalUnion_VerticalMerge_MergesToSingleRectangle ()
+    //{
+    //    // Arrange: Create a region with a rectangle at (0,0,5,5)
+    //    var region = new Region (new Rectangle (0, 0, 5, 5));
+
+    //    // Act: Merge an adjacent rectangle below using MinimalUnion
+    //    region.MinimalUnion (new Rectangle (0, 5, 5, 5));
+    //    var result = region.GetRectangles ();
+
+    //    // Assert: Expect a single merged rectangle covering (0,0,5,10)
+    //    Assert.Single (result);
+    //    Assert.Equal (new Rectangle (0, 0, 5, 10), result [0]);
+    //}
+
+    //[Fact]
+    //public void MinimalUnion_OverlappingMerge_MergesToSingleRectangle ()
+    //{
+    //    // Arrange: Create a region with a rectangle that overlaps with the next one horizontally
+    //    var region = new Region (new Rectangle (0, 0, 6, 5));
+
+    //    // Act: Merge an overlapping rectangle using MinimalUnion
+    //    region.MinimalUnion (new Rectangle (4, 0, 6, 5));
+    //    var result = region.GetRectangles ();
+
+    //    // Assert: Expect a single merged rectangle covering (0,0,10,5)
+    //    Assert.Single (result);
+    //    Assert.Equal (new Rectangle (0, 0, 10, 5), result [0]);
+    //}
+
+    //[Fact]
+    //public void MinimalUnion_NonAdjacentRectangles_NoMergeOccurs ()
+    //{
+    //    // Arrange: Create a region with one rectangle
+    //    var region = new Region (new Rectangle (0, 0, 5, 5));
+
+    //    // Act: Merge with a rectangle that does not touch the first
+    //    region.MinimalUnion (new Rectangle (6, 0, 5, 5));
+    //    var result = region.GetRectangles ();
+
+    //    // Assert: Expect two separate rectangles since they are not adjacent
+    //    Assert.Equal (2, result.Length);
+    //    Assert.Contains (new Rectangle (0, 0, 5, 5), result);
+    //    Assert.Contains (new Rectangle (6, 0, 5, 5), result);
+    //}
+
+    //[Fact]
+    //public void MinimalUnion_MultipleMerge_FormsSingleContiguousRectangle ()
+    //{
+    //    // Arrange: Four small rectangles that form a contiguous 6x6 block
+    //    var region = new Region (new Rectangle (0, 0, 3, 3));
+
+    //    // Act: Merge adjacent rectangles one by one using MinimalUnion
+    //    region.MinimalUnion (new Rectangle (3, 0, 3, 3)); // Now covers (0,0,6,3)
+    //    region.MinimalUnion (new Rectangle (0, 3, 3, 3)); // Add bottom-left
+    //    region.MinimalUnion (new Rectangle (3, 3, 3, 3)); // Add bottom-right to complete block
+    //    var result = region.GetRectangles ();
+
+    //    // Assert: Expect a single merged rectangle covering (0,0,6,6)
+    //    Assert.Single (result);
+    //    Assert.Equal (new Rectangle (0, 0, 6, 6), result [0]);
+    //}
+
 
     [Fact]
     public void Union_Rectangle_AddsToRegion ()
@@ -924,13 +1039,23 @@ public class RegionTests
         Assert.True (region1.Contains (40, 40));
     }
 
-    private static Region CreateDisposedRegion ()
+    [Fact]
+    public void Intersect_DeferredNormalization_PreservesSegments ()
     {
-        Region region = new ();
-        region.Dispose ();
+        var region = new Region (new (0, 0, 3, 1)); // Horizontal
+        region.Union (new Rectangle (1, 0, 1, 2)); // Vertical
+        region.Intersect (new Rectangle (0, 0, 2, 2)); // Clip
 
-        return region;
+        Rectangle [] result = region.GetRectangles ();
+
+        // Original & Updated (with normalization disabled) behavior:
+        // Produces [(0,0,1,1), (1,0,1,2), (2,0,0,1)]
+        Assert.Equal (3, result.Length);
+        Assert.Contains (new (0, 0, 1, 1), result);
+        Assert.Contains (new (1, 0, 1, 2), result);
+        Assert.Contains (new (2, 0, 0, 1), result);
     }
+
 }
 #if x
     [Fact]

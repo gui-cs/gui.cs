@@ -438,7 +438,7 @@ public class TextFormatter
             }
         }
     }
-
+    
     /// <summary>
     ///     Determines if the viewport width will be used or only the text width will be used,
     ///     If <see langword="true"/> all the viewport area will be filled with whitespaces and the same background color
@@ -862,6 +862,280 @@ public class TextFormatter
         NeedsFormat = true;
 
         return value;
+    }
+
+    /// <summary>
+    ///     Calculates and returns a <see cref="Region"/> describing the areas where text would be output, based on the
+    ///     formatting rules of <see cref="TextFormatter"/>.
+    /// </summary>
+    /// <remarks>
+    ///     Uses the same formatting logic as <see cref="Draw"/>, including alignment, direction, word wrap, and constraints,
+    ///     but does not perform actual drawing to <see cref="IConsoleDriver"/>.
+    /// </remarks>
+    /// <param name="screen">Specifies the screen-relative location and maximum size for drawing the text.</param>
+    /// <param name="maximum">Specifies the screen-relative location and maximum container size.</param>
+    /// <returns>A <see cref="Region"/> representing the areas where text would be drawn.</returns>
+    public Region GetDrawRegion (Rectangle screen, Rectangle maximum = default)
+    {
+        Region drawnRegion = new Region ();
+
+        // With this check, we protect against subclasses with overrides of Text (like Button)
+        if (string.IsNullOrEmpty (Text))
+        {
+            return drawnRegion;
+        }
+
+        List<string> linesFormatted = GetLines ();
+
+        bool isVertical = IsVerticalDirection (Direction);
+        Rectangle maxScreen = screen;
+
+        // INTENT: What, exactly, is the intent of this?
+        maxScreen = maximum == default (Rectangle)
+                        ? screen
+                        : new (
+                               Math.Max (maximum.X, screen.X),
+                               Math.Max (maximum.Y, screen.Y),
+                               Math.Max (
+                                         Math.Min (maximum.Width, maximum.Right - screen.Left),
+                                         0
+                                        ),
+                               Math.Max (
+                                         Math.Min (
+                                                   maximum.Height,
+                                                   maximum.Bottom - screen.Top
+                                                  ),
+                                         0
+                                        )
+                              );
+
+        if (maxScreen.Width == 0 || maxScreen.Height == 0)
+        {
+            return drawnRegion;
+        }
+
+        int lineOffset = !isVertical && screen.Y < 0 ? Math.Abs (screen.Y) : 0;
+
+        for (int line = lineOffset; line < linesFormatted.Count; line++)
+        {
+            if ((isVertical && line > screen.Width) || (!isVertical && line > screen.Height))
+            {
+                continue;
+            }
+
+            if ((isVertical && line >= maxScreen.Left + maxScreen.Width)
+                || (!isVertical && line >= maxScreen.Top + maxScreen.Height + lineOffset))
+            {
+                break;
+            }
+
+            Rune [] runes = linesFormatted [line].ToRunes ();
+
+            // When text is justified, we lost left or right, so we use the direction to align. 
+            int x = 0, y = 0;
+
+            // Horizontal Alignment
+            if (Alignment is Alignment.End)
+            {
+                if (isVertical)
+                {
+                    int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, line, linesFormatted.Count - line, TabWidth);
+                    x = screen.Right - runesWidth;
+                }
+                else
+                {
+                    int runesWidth = StringExtensions.ToString (runes).GetColumns ();
+                    x = screen.Right - runesWidth;
+                }
+            }
+            else if (Alignment is Alignment.Start)
+            {
+                if (isVertical)
+                {
+                    int runesWidth = line > 0
+                                         ? GetColumnsRequiredForVerticalText (linesFormatted, 0, line, TabWidth)
+                                         : 0;
+                    x = screen.Left + runesWidth;
+                }
+                else
+                {
+                    x = screen.Left;
+                }
+            }
+            else if (Alignment is Alignment.Fill)
+            {
+                if (isVertical)
+                {
+                    int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, linesFormatted.Count, TabWidth);
+                    int prevLineWidth = line > 0 ? GetColumnsRequiredForVerticalText (linesFormatted, line - 1, 1, TabWidth) : 0;
+                    int firstLineWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, 1, TabWidth);
+                    int lastLineWidth = GetColumnsRequiredForVerticalText (linesFormatted, linesFormatted.Count - 1, 1, TabWidth);
+                    var interval = (int)Math.Round ((double)(screen.Width + firstLineWidth + lastLineWidth) / linesFormatted.Count);
+
+                    x = line == 0
+                            ? screen.Left
+                            : line < linesFormatted.Count - 1
+                                ? screen.Width - runesWidth <= lastLineWidth ? screen.Left + prevLineWidth : screen.Left + line * interval
+                                : screen.Right - lastLineWidth;
+                }
+                else
+                {
+                    x = screen.Left;
+                }
+            }
+            else if (Alignment is Alignment.Center)
+            {
+                if (isVertical)
+                {
+                    int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, linesFormatted.Count, TabWidth);
+                    int linesWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, line, TabWidth);
+                    x = screen.Left + linesWidth + (screen.Width - runesWidth) / 2;
+                }
+                else
+                {
+                    int runesWidth = StringExtensions.ToString (runes).GetColumns ();
+                    x = screen.Left + (screen.Width - runesWidth) / 2;
+                }
+            }
+            else
+            {
+                Debug.WriteLine ($"Unsupported Alignment: {nameof (VerticalAlignment)}");
+
+                return drawnRegion;
+            }
+
+            // Vertical Alignment
+            if (VerticalAlignment is Alignment.End)
+            {
+                if (isVertical)
+                {
+                    y = screen.Bottom - runes.Length;
+                }
+                else
+                {
+                    y = screen.Bottom - linesFormatted.Count + line;
+                }
+            }
+            else if (VerticalAlignment is Alignment.Start)
+            {
+                if (isVertical)
+                {
+                    y = screen.Top;
+                }
+                else
+                {
+                    y = screen.Top + line;
+                }
+            }
+            else if (VerticalAlignment is Alignment.Fill)
+            {
+                if (isVertical)
+                {
+                    y = screen.Top;
+                }
+                else
+                {
+                    var interval = (int)Math.Round ((double)(screen.Height + 2) / linesFormatted.Count);
+
+                    y = line == 0 ? screen.Top :
+                        line < linesFormatted.Count - 1 ? screen.Height - interval <= 1 ? screen.Top + 1 : screen.Top + line * interval : screen.Bottom - 1;
+                }
+            }
+            else if (VerticalAlignment is Alignment.Center)
+            {
+                if (isVertical)
+                {
+                    int s = (screen.Height - runes.Length) / 2;
+                    y = screen.Top + s;
+                }
+                else
+                {
+                    int s = (screen.Height - linesFormatted.Count) / 2;
+                    y = screen.Top + line + s;
+                }
+            }
+            else
+            {
+                Debug.WriteLine ($"Unsupported Alignment: {nameof (VerticalAlignment)}");
+
+                return drawnRegion;
+            }
+
+            int colOffset = screen.X < 0 ? Math.Abs (screen.X) : 0;
+            int start = isVertical ? screen.Top : screen.Left;
+            int size = isVertical ? screen.Height : screen.Width;
+            int current = start + colOffset;
+            int zeroLengthCount = isVertical ? runes.Sum (r => r.GetColumns () == 0 ? 1 : 0) : 0;
+
+            int lineX = x, lineY = y, lineWidth = 0, lineHeight = 1;
+
+            for (int idx = (isVertical ? start - y : start - x) + colOffset;
+                 current < start + size + zeroLengthCount;
+                 idx++)
+            {
+                if (idx < 0
+                    || (isVertical
+                            ? VerticalAlignment != Alignment.End && current < 0
+                            : Alignment != Alignment.End && x + current + colOffset < 0))
+                {
+                    current++;
+
+                    continue;
+                }
+
+                if (!FillRemaining && idx > runes.Length - 1)
+                {
+                    break;
+                }
+
+                if ((!isVertical
+                     && (current - start > maxScreen.Left + maxScreen.Width - screen.X + colOffset
+                         || (idx < runes.Length && runes [idx].GetColumns () > screen.Width)))
+                    || (isVertical
+                        && ((current > start + size + zeroLengthCount && idx > maxScreen.Top + maxScreen.Height - screen.Y)
+                            || (idx < runes.Length && runes [idx].GetColumns () > screen.Width))))
+                {
+                    break;
+                }
+
+                Rune rune = idx >= 0 && idx < runes.Length ? runes [idx] : (Rune)' ';
+                int runeWidth = GetRuneWidth (rune, TabWidth);
+
+                if (isVertical)
+                {
+                    if (runeWidth > 0)
+                    {
+                        // Update line height for vertical text (each rune is a column)
+                        lineHeight = Math.Max (lineHeight, current - y + 1);
+                        lineWidth = Math.Max (lineWidth, 1); // Width is 1 per rune in vertical
+                    }
+                }
+                else
+                {
+                    // Update line width and position for horizontal text
+                    lineWidth += runeWidth;
+                }
+
+                current += isVertical && runeWidth > 0 ? 1 : runeWidth;
+
+                int nextRuneWidth = idx + 1 > -1 && idx + 1 < runes.Length
+                                        ? runes [idx + 1].GetColumns ()
+                                        : 0;
+
+                if (!isVertical && idx + 1 < runes.Length && current + nextRuneWidth > start + size)
+                {
+                    break;
+                }
+            }
+
+            // Add the line's drawn region to the overall region
+            if (lineWidth > 0 && lineHeight > 0)
+            {
+                drawnRegion.Union (new Rectangle (lineX, lineY, lineWidth, lineHeight));
+            }
+        }
+
+        return drawnRegion;
     }
 
     #region Static Members

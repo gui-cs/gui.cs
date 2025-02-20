@@ -3,10 +3,42 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     Represents a region composed of one or more rectangles, providing methods for union, intersection, exclusion, and
-///     complement operations.
+///     Represents a region composed of one or more rectangles, providing methods for geometric set operations such as
+///     union,
+///     intersection, exclusion, and complement. This class is designed for use in graphical or terminal-based user
+///     interfaces
+///     where regions need to be manipulated to manage screen areas, clipping, or drawing boundaries.
 /// </summary>
-public class Region : IDisposable
+/// <remarks>
+///     <para>
+///         The <see cref="Region"/> class adopts a philosophy of efficiency and flexibility, balancing performance with
+///         usability for GUI applications. It maintains a list of <see cref="Rectangle"/> objects, representing disjoint
+///         (non-overlapping) rectangular areas, and supports operations inspired by set theory. These operations allow
+///         combining regions in various ways, such as merging areas (<see cref="RegionOp.Union"/> or <see cref="RegionOp.MinimalUnion"/>),
+///         finding common areas (<see cref="RegionOp.Intersect"/>), or removing portions (<see cref="RegionOp.Difference"/> or
+///         <see cref="Exclude(Rectangle)"/>).
+///     </para>
+///     <para>
+///         To achieve high performance, the class employs a sweep-line algorithm for merging rectangles, which efficiently
+///         processes large sets of rectangles in O(n log n) time by scanning along the x-axis and tracking active vertical
+///         intervals. This approach ensures scalability for typical GUI scenarios with moderate numbers of rectangles. For
+///         operations like <see cref="RegionOp.Union"/> and <see cref="RegionOp.MinimalUnion"/>, an optional minimization step (
+///         <see
+///             cref="MinimizeRectangles"/>
+///         ) is used to reduce the number of rectangles to a minimal set, producing the smallest
+///         possible collection of non-overlapping rectangles that cover the same area. This minimization, while O(n²) in
+///         worst-case complexity, is optimized for small-to-medium collections and provides a compact representation ideal
+///         for drawing or logical operations.
+///     </para>
+///     <para>
+///         The class is immutable in its operations (returning new regions or modifying in-place via methods like
+///         <see cref="Combine(Rectangle,RegionOp)"/>), supports nullability for robustness, and implements <see cref="IDisposable"/> to manage
+///         resources by clearing internal state. Developers can choose between granular (detailed) or minimal (compact)
+///         outputs for union operations via <see cref="RegionOp.Union"/> and <see cref="RegionOp.MinimalUnion"/>, catering
+///         to diverse use cases such as rendering optimization, event handling, or visualization.
+///     </para>
+/// </remarks>
+public class Region
 {
     private readonly List<Rectangle> _rectangles = [];
 
@@ -21,12 +53,6 @@ public class Region : IDisposable
     /// <param name="rectangle">The initial rectangle for the region.</param>
     public Region (Rectangle rectangle) { _rectangles.Add (rectangle); }
 
-
-    /// <summary>
-    ///     Releases all resources used by the <see cref="Region"/>.
-    /// </summary>
-    public void Dispose () { _rectangles.Clear (); }
-
     /// <summary>
     ///     Creates an exact copy of the region.
     /// </summary>
@@ -34,12 +60,14 @@ public class Region : IDisposable
     public Region Clone ()
     {
         var clone = new Region ();
+        clone._rectangles.Capacity = _rectangles.Count; // Pre-allocate capacity
         clone._rectangles.AddRange (_rectangles);
+
         return clone;
     }
 
     /// <summary>
-    ///     Combines the specified rectangle with the region using the specified operation.
+    ///     Combines <paramref name="rectangle"/> with the region using the specified operation.
     /// </summary>
     /// <param name="rectangle">The rectangle to combine.</param>
     /// <param name="operation">The operation to perform.</param>
@@ -59,7 +87,7 @@ public class Region : IDisposable
     }
 
     /// <summary>
-    ///     Combines the specified region with the region using the specified operation.
+    ///     Combines <paramref name="region"/> with the region using the specified operation.
     /// </summary>
     /// <param name="region">The region to combine.</param>
     /// <param name="operation">The operation to perform.</param>
@@ -81,17 +109,24 @@ public class Region : IDisposable
                 // Null is same as empty region
                 region ??= new ();
 
+                List<Rectangle> subtracted = new (_rectangles.Count); // Pre-allocate
+
                 foreach (Rectangle rect in region._rectangles)
                 {
-                    List<Rectangle> subtracted = _rectangles.SelectMany(r => SubtractRectangle(r, rect)).ToList();
-                    _rectangles.Clear();
-                    _rectangles.AddRange(subtracted);
+                    foreach (Rectangle r in _rectangles)
+                    {
+                        subtracted.AddRange (SubtractRectangle (r, rect));
+                    }
                 }
+
+                _rectangles.Clear ();
+                _rectangles.AddRange (subtracted);
+                subtracted.Clear ();
 
                 break;
 
             case RegionOp.Intersect:
-                List<Rectangle> intersections = [];
+                List<Rectangle> intersections = new (_rectangles.Count); // Pre-allocate
 
                 // Null is same as empty region
                 region ??= new ();
@@ -115,9 +150,16 @@ public class Region : IDisposable
                 break;
 
             case RegionOp.Union:
-                List<Rectangle> merged = MergeRectangles ([.. _rectangles, .. region._rectangles]);
+                List<Rectangle> mergedUnion = MergeRectangles ([.. _rectangles, .. region._rectangles], false);
                 _rectangles.Clear ();
-                _rectangles.AddRange (merged);
+                _rectangles.AddRange (mergedUnion);
+
+                break;
+
+            case RegionOp.MinimalUnion:
+                List<Rectangle> mergedMinimalUnion = MergeRectangles ([.. _rectangles, .. region._rectangles]);
+                _rectangles.Clear ();
+                _rectangles.AddRange (mergedMinimalUnion);
 
                 break;
 
@@ -129,14 +171,17 @@ public class Region : IDisposable
                 break;
 
             case RegionOp.ReverseDifference:
-                region.Combine(this, RegionOp.Difference);
-                _rectangles.Clear();
-                _rectangles.AddRange(region._rectangles);
+                region.Combine (this, RegionOp.Difference);
+                _rectangles.Clear ();
+                _rectangles.AddRange (region._rectangles);
+
                 break;
 
             case RegionOp.Replace:
-                _rectangles.Clear();
-                _rectangles.AddRange(region._rectangles);
+                _rectangles.Clear ();
+                _rectangles.Capacity = region._rectangles.Count; // Pre-allocate
+                _rectangles.AddRange (region._rectangles);
+
                 break;
         }
     }
@@ -145,16 +190,16 @@ public class Region : IDisposable
     ///     Updates the region to be the complement of itself within the specified bounds.
     /// </summary>
     /// <param name="bounds">The bounding rectangle to use for complementing the region.</param>
-
     public void Complement (Rectangle bounds)
     {
         if (bounds.IsEmpty || _rectangles.Count == 0)
         {
             _rectangles.Clear ();
+
             return;
         }
 
-        List<Rectangle> complementRectangles = [bounds];
+        List<Rectangle> complementRectangles = new (4) { bounds }; // Typical max initial capacity
 
         foreach (Rectangle rect in _rectangles)
         {
@@ -165,21 +210,42 @@ public class Region : IDisposable
         _rectangles.AddRange (complementRectangles);
     }
 
-
     /// <summary>
     ///     Determines whether the specified point is contained within the region.
     /// </summary>
     /// <param name="x">The x-coordinate of the point.</param>
     /// <param name="y">The y-coordinate of the point.</param>
     /// <returns><c>true</c> if the point is contained within the region; otherwise, <c>false</c>.</returns>
-    public bool Contains (int x, int y) { return _rectangles.Any (r => r.Contains (x, y)); }
+    public bool Contains (int x, int y)
+    {
+        foreach (Rectangle r in _rectangles)
+        {
+            if (r.Contains (x, y))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /// <summary>
     ///     Determines whether the specified rectangle is contained within the region.
     /// </summary>
     /// <param name="rectangle">The rectangle to check for containment.</param>
     /// <returns><c>true</c> if the rectangle is contained within the region; otherwise, <c>false</c>.</returns>
-    public bool Contains (Rectangle rectangle) { return _rectangles.Any (r => r.Contains (rectangle)); }
+    public bool Contains (Rectangle rectangle)
+    {
+        foreach (Rectangle r in _rectangles)
+        {
+            if (r.Contains (rectangle))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /// <summary>
     ///     Determines whether the specified object is equal to this region.
@@ -187,6 +253,24 @@ public class Region : IDisposable
     /// <param name="obj">The object to compare with this region.</param>
     /// <returns><c>true</c> if the objects are equal; otherwise, <c>false</c>.</returns>
     public override bool Equals (object? obj) { return obj is Region other && Equals (other); }
+
+    private static bool IsRegionEmpty (List<Rectangle> rectangles)
+    {
+        if (rectangles.Count == 0)
+        {
+            return true;
+        }
+
+        foreach (Rectangle r in rectangles)
+        {
+            if (r is { IsEmpty: false, Width: > 0, Height: > 0 })
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     /// <summary>
     ///     Determines whether the specified region is equal to this region.
@@ -205,9 +289,9 @@ public class Region : IDisposable
             return true;
         }
 
-        // Check if either region is empty (no rectangles or all empty/zero-sized rectangles)
-        bool thisEmpty = !_rectangles.Any () || _rectangles.All (r => r.IsEmpty || r.Width <= 0 || r.Height <= 0);
-        bool otherEmpty = !other._rectangles.Any () || other._rectangles.All (r => r.IsEmpty || r.Width <= 0 || r.Height <= 0);
+        // Check if either region is empty
+        bool thisEmpty = IsRegionEmpty (_rectangles);
+        bool otherEmpty = IsRegionEmpty (other._rectangles);
 
         // If either is empty, they're equal only if both are empty
         if (thisEmpty || otherEmpty)
@@ -236,6 +320,12 @@ public class Region : IDisposable
     /// <summary>
     ///     Removes the specified rectangle from the region.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This is a helper method that is equivalent to calling <see cref="Combine(Rectangle,RegionOp)"/> with
+    ///         <see cref="RegionOp.Difference"/>.
+    ///     </para>
+    /// </remarks>
     /// <param name="rectangle">The rectangle to exclude from the region.</param>
     public void Exclude (Rectangle rectangle) { Combine (rectangle, RegionOp.Difference); }
 
@@ -244,7 +334,7 @@ public class Region : IDisposable
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         This is a helper method that is equivalent to calling <see cref="Combine(Region,Terminal.Gui.RegionOp)"/> with
+    ///         This is a helper method that is equivalent to calling <see cref="Combine(Region,RegionOp)"/> with
     ///         <see cref="RegionOp.Difference"/>.
     ///     </para>
     /// </remarks>
@@ -262,10 +352,20 @@ public class Region : IDisposable
             return Rectangle.Empty;
         }
 
-        int left = _rectangles.Min (r => r.Left);
-        int top = _rectangles.Min (r => r.Top);
-        int right = _rectangles.Max (r => r.Right);
-        int bottom = _rectangles.Max (r => r.Bottom);
+        Rectangle first = _rectangles [0];
+        int left = first.Left;
+        int top = first.Top;
+        int right = first.Right;
+        int bottom = first.Bottom;
+
+        for (var i = 1; i < _rectangles.Count; i++)
+        {
+            Rectangle r = _rectangles [i];
+            left = Math.Min (left, r.Left);
+            top = Math.Min (top, r.Top);
+            right = Math.Max (right, r.Right);
+            bottom = Math.Max (bottom, r.Bottom);
+        }
 
         return new (left, top, right - left, bottom - top);
     }
@@ -274,18 +374,16 @@ public class Region : IDisposable
     ///     Returns a hash code for this region.
     /// </summary>
     /// <returns>A hash code for this region.</returns>
-    public override int GetHashCode()
+    public override int GetHashCode ()
     {
-        // Create a snapshot of rectangles to avoid issues with mutation
-        Rectangle[] rects = _rectangles.ToArray();
-        var hash = new HashCode();
+        var hash = new HashCode ();
 
-        foreach (Rectangle rect in rects)
+        foreach (Rectangle rect in _rectangles)
         {
-            hash.Add(rect);
+            hash.Add (rect);
         }
 
-        return hash.ToHashCode();
+        return hash.ToHashCode ();
     }
 
     /// <summary>
@@ -297,6 +395,12 @@ public class Region : IDisposable
     /// <summary>
     ///     Updates the region to be the intersection of itself with the specified rectangle.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This is a helper method that is equivalent to calling <see cref="Combine(Rectangle,RegionOp)"/> with
+    ///         <see cref="RegionOp.Intersect"/>.
+    ///     </para>
+    /// </remarks>
     /// <param name="rectangle">The rectangle to intersect with the region.</param>
     public void Intersect (Rectangle rectangle) { Combine (rectangle, RegionOp.Intersect); }
 
@@ -318,17 +422,34 @@ public class Region : IDisposable
     /// <returns><c>true</c> if the region is empty; otherwise, <c>false</c>.</returns>
     public bool IsEmpty ()
     {
-        return _rectangles.Count == 0
-               || _rectangles.All (r => r.IsEmpty || r.Width <= 0 || r.Height <= 0);
+        if (_rectangles.Count == 0)
+        {
+            return true;
+        }
+
+        foreach (Rectangle r in _rectangles)
+        {
+            if (r is { IsEmpty: false, Width: > 0, Height: > 0 })
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /// <summary>
-    ///     Offsets all rectangles in the region by the specified amounts.
+    ///     Translates all rectangles in the region by the specified offsets.
     /// </summary>
     /// <param name="offsetX">The amount to offset along the x-axis.</param>
     /// <param name="offsetY">The amount to offset along the y-axis.</param>
-    public void Offset (int offsetX, int offsetY)
+    public void Translate (int offsetX, int offsetY)
     {
+        if (offsetX == 0 && offsetY == 0)
+        {
+            return;
+        }
+
         for (var i = 0; i < _rectangles.Count; i++)
         {
             Rectangle rect = _rectangles [i];
@@ -337,117 +458,243 @@ public class Region : IDisposable
     }
 
     /// <summary>
-    ///     Adds the specified rectangle to the region. Merges all rectangles into a minimal bounding shape.
+    ///     Adds the specified rectangle to the region. Merges all rectangles into a minimal or granular bounding shape.
     /// </summary>
     /// <param name="rectangle">The rectangle to add to the region.</param>
-    public void Union (Rectangle rectangle) { Combine (rectangle, RegionOp.Union); }
+    /// <param name="minimize">
+    ///     If <c>true</c>, minimizes the set to the smallest possible number of rectangles; otherwise, uses
+    ///     granular output.
+    /// </param>
+    public void Union (Rectangle rectangle, bool minimize = true) { Combine (rectangle, RegionOp.Union); }
 
     /// <summary>
-    ///     Adds the specified region to this region. Merges all rectangles into a minimal bounding shape.
+    ///     Adds the specified region to this region. Merges all rectangles into a minimal or granular bounding shape.
     /// </summary>
     /// <param name="region">The region to add to this region.</param>
-    public void Union (Region? region) { Combine (region, RegionOp.Union); }
+    /// <param name="minimize">
+    ///     If <c>true</c>, minimizes the set to the smallest possible number of rectangles; otherwise, uses
+    ///     granular output.
+    /// </param>
+    public void Union (Region? region, bool minimize = true) { Combine (region, RegionOp.Union); }
 
     /// <summary>
-    ///     Merges overlapping rectangles into a minimal set of non-overlapping rectangles with a minimal bounding shape.
+    ///     Adds the specified rectangle to the region. Merges all rectangles into the smallest possible bounding shape.
+    /// </summary>
+    /// <param name="rectangle">The rectangle to add to the region.</param>
+    public void MinimalUnion (Rectangle rectangle) { Combine (rectangle, RegionOp.MinimalUnion); }
+
+    /// <summary>
+    ///     Adds the specified region to this region. Merges all rectangles into the smallest possible bounding shape.
+    /// </summary>
+    /// <param name="region">The region to add to this region.</param>
+    public void MinimalUnion (Region? region) { Combine (region, RegionOp.MinimalUnion); }
+
+    /// <summary>
+    ///     Merges overlapping rectangles into a minimal or granular set of non-overlapping rectangles with a minimal bounding
+    ///     shape.
     /// </summary>
     /// <param name="rectangles">The list of rectangles to merge.</param>
+    /// <param name="minimize">
+    ///     If <c>true</c>, minimizes the set to the smallest possible number of rectangles; otherwise,
+    ///     returns a granular set.
+    /// </param>
     /// <returns>A list of merged rectangles.</returns>
-    internal static List<Rectangle> MergeRectangles (List<Rectangle> rectangles)
+    internal static List<Rectangle> MergeRectangles (List<Rectangle> rectangles, bool minimize = false)
     {
-        if (rectangles is not { Count: not 0 })
+        if (rectangles.Count == 0)
         {
             return [];
         }
 
-        // Create events for the left and right edges of each rectangle
-        List<(int x, int y1, int y2, bool isStart)> events = [];
+        // Sweep-line algorithm to merge rectangles
+        List<(int x, bool isStart, int yTop, int yBottom)> events = new (rectangles.Count * 2); // Pre-allocate
 
-        foreach (Rectangle rect in rectangles)
+        foreach (Rectangle r in rectangles)
         {
-            events.Add ((rect.Left, rect.Top, rect.Bottom, true));
-            events.Add ((rect.Right, rect.Top, rect.Bottom, false));
+            if (!r.IsEmpty)
+            {
+                events.Add ((r.Left, true, r.Top, r.Bottom)); // Start event
+                events.Add ((r.Right, false, r.Top, r.Bottom)); // End event
+            }
         }
 
-        // Sort events by x-coordinate, and by start before end if x-coordinates are equal
-        events.Sort ((a, b) => a.x != b.x ? a.x.CompareTo (b.x) : a.isStart.CompareTo (b.isStart));
+        events.Sort (
+                     (a, b) =>
+                     {
+                         int cmp = a.x.CompareTo (b.x);
 
-        List<(int y1, int y2)> activeIntervals = [];
-        List<Rectangle> mergedRectangles = [];
-        int currentX = events [0].x;
+                         if (cmp != 0)
+                         {
+                             return cmp;
+                         }
 
-        foreach ((int x, int y1, int y2, bool isStart) in events)
+                         return a.isStart.CompareTo (b.isStart); // Start events before end events at same x
+                     });
+
+        List<Rectangle> merged = [];
+
+        SortedSet<(int yTop, int yBottom)> active = new (
+                                                         Comparer<(int yTop, int yBottom)>.Create (
+                                                                                                   (a, b) =>
+                                                                                                   {
+                                                                                                       int cmp = a.yTop.CompareTo (b.yTop);
+
+                                                                                                       return cmp != 0 ? cmp : a.yBottom.CompareTo (b.yBottom);
+                                                                                                   }));
+        int lastX = events [0].x;
+
+        foreach ((int x, bool isStart, int yTop, int yBottom) evt in events)
         {
-            if (x != currentX)
+            // Output rectangles for the previous segment if there are active rectangles
+            if (active.Count > 0 && evt.x > lastX)
             {
-                // Merge active intervals and create rectangles
-                mergedRectangles.AddRange (MergeIntervals (activeIntervals, currentX, x));
-                currentX = x;
+                merged.AddRange (MergeVerticalIntervals (active, lastX, evt.x));
             }
 
-            if (isStart)
+            // Process the event
+            if (evt.isStart)
             {
-                activeIntervals.Add ((y1, y2));
+                active.Add ((evt.yTop, evt.yBottom));
             }
             else
             {
-                activeIntervals.Remove ((y1, y2));
+                active.Remove ((evt.yTop, evt.yBottom));
             }
+
+            lastX = evt.x;
         }
 
-        // Handle the last set of active intervals
-        mergedRectangles.AddRange (MergeIntervals (activeIntervals, currentX, events [^1].x));
-
-        return mergedRectangles;
+        return minimize ? MinimizeRectangles (merged) : merged;
     }
 
     /// <summary>
-    ///     Merges overlapping intervals into a minimal set of non-overlapping intervals and creates rectangles from them.
+    ///     Merges overlapping vertical intervals into a minimal set of non-overlapping rectangles.
     /// </summary>
-    /// <param name="intervals">The list of y-coordinate intervals to merge.</param>
+    /// <param name="active">The set of active vertical intervals.</param>
     /// <param name="startX">The starting x-coordinate for the rectangles.</param>
     /// <param name="endX">The ending x-coordinate for the rectangles.</param>
-    /// <returns>A list of rectangles created from the merged intervals.</returns>
-    private static List<Rectangle> MergeIntervals (List<(int y1, int y2)> intervals, int startX, int endX)
+    /// <returns>A list of merged rectangles.</returns>
+    private static List<Rectangle> MergeVerticalIntervals (SortedSet<(int yTop, int yBottom)> active, int startX, int endX)
     {
-        if (intervals.Count == 0)
+        if (active.Count == 0)
         {
             return [];
         }
 
-        // Sort intervals by their starting y-coordinate
-        intervals.Sort ((a, b) => a.y1.CompareTo (b.y1));
+        List<Rectangle> result = new (active.Count); // Pre-allocate
+        int? currentTop = null;
+        int? currentBottom = null;
 
-        List<(int y1, int y2)> mergedIntervals = [];
-        (int y1, int y2) currentInterval = intervals [0];
-
-        for (var i = 1; i < intervals.Count; i++)
+        foreach ((int yTop, int yBottom) in active)
         {
-            (int y1, int y2) nextInterval = intervals [i];
-
-            if (currentInterval.y2 >= nextInterval.y1)
+            if (currentTop == null)
             {
-                // Merge overlapping intervals
-                currentInterval = (currentInterval.y1, Math.Max (currentInterval.y2, nextInterval.y2));
+                currentTop = yTop;
+                currentBottom = yBottom;
+            }
+            else if (yTop <= currentBottom)
+            {
+                currentBottom = Math.Max (currentBottom.Value, yBottom);
             }
             else
             {
-                mergedIntervals.Add (currentInterval);
-                currentInterval = nextInterval;
+                result.Add (new (startX, currentTop.Value, endX - startX, currentBottom.Value - currentTop.Value));
+                currentTop = yTop;
+                currentBottom = yBottom;
             }
         }
 
-        mergedIntervals.Add (currentInterval);
-
-        // Create rectangles from merged intervals
-        List<Rectangle> rectangles = [];
-
-        foreach ((int y1, int y2) in mergedIntervals)
+        if (currentTop != null)
         {
-            rectangles.Add (new (startX, y1, endX - startX, y2 - y1));
+            result.Add (new (startX, currentTop.Value, endX - startX, currentBottom!.Value - currentTop.Value));
         }
 
-        return rectangles;
+        return result;
+    }
+
+    /// <summary>
+    ///     Minimizes a list of rectangles into the smallest possible set of non-overlapping rectangles
+    ///     by merging adjacent rectangles where possible.
+    /// </summary>
+    /// <param name="rectangles">The list of rectangles to minimize.</param>
+    /// <returns>A list of minimized rectangles.</returns>
+    private static List<Rectangle> MinimizeRectangles (List<Rectangle> rectangles)
+    {
+        if (rectangles.Count <= 1)
+        {
+            return rectangles.ToList ();
+        }
+
+        List<Rectangle> minimized = new (rectangles.Count); // Pre-allocate
+        List<Rectangle> current = new (rectangles); // Work with a copy
+
+        bool changed;
+
+        do
+        {
+            changed = false;
+            minimized.Clear ();
+
+            // Sort by Y then X for consistent processing
+            current.Sort (
+                          (a, b) =>
+                          {
+                              int cmp = a.Top.CompareTo (b.Top);
+
+                              return cmp != 0 ? cmp : a.Left.CompareTo (b.Left);
+                          });
+
+            var i = 0;
+
+            while (i < current.Count)
+            {
+                Rectangle r = current [i];
+                int j = i + 1;
+
+                while (j < current.Count)
+                {
+                    Rectangle next = current [j];
+
+                    // Check if rectangles can be merged horizontally (same Y range, adjacent X)
+                    if (r.Top == next.Top && r.Bottom == next.Bottom && (r.Right == next.Left || next.Right == r.Left || r.IntersectsWith (next)))
+                    {
+                        r = new (
+                                 Math.Min (r.Left, next.Left),
+                                 r.Top,
+                                 Math.Max (r.Right, next.Right) - Math.Min (r.Left, next.Left),
+                                 r.Height
+                                );
+                        current.RemoveAt (j);
+                        changed = true;
+                    }
+
+                    // Check if rectangles can be merged vertically (same X range, adjacent Y)
+                    else if (r.Left == next.Left && r.Right == next.Right && (r.Bottom == next.Top || next.Bottom == r.Top || r.IntersectsWith (next)))
+                    {
+                        r = new (
+                                 r.Left,
+                                 Math.Min (r.Top, next.Top),
+                                 r.Width,
+                                 Math.Max (r.Bottom, next.Bottom) - Math.Min (r.Top, next.Top)
+                                );
+                        current.RemoveAt (j);
+                        changed = true;
+                    }
+                    else
+                    {
+                        j++;
+                    }
+                }
+
+                minimized.Add (r);
+                i++;
+            }
+
+            current = minimized.ToList (); // Prepare for next iteration
+        }
+        while (changed);
+
+        return minimized;
     }
 
     /// <summary>
@@ -499,6 +746,36 @@ public class Region : IDisposable
             {
                 yield return new (subtract.Right, top, original.Right - subtract.Right, bottom - top);
             }
+        }
+    }
+
+    /// <summary>
+    ///     Draws the boundaries of all rectangles in the region.
+    /// </summary>
+    /// <param name="canvas">The canvas to draw on.</param>
+    /// <param name="style">The line style to use for drawing.</param>
+    /// <param name="attribute">The attribute (color/style) to apply.</param>
+    public void Draw (LineCanvas canvas, LineStyle style, Attribute? attribute = null)
+    {
+        if (_rectangles.Count == 0)
+        {
+            return;
+        }
+
+        foreach (Rectangle rect in _rectangles)
+        {
+            if (rect.IsEmpty || rect.Width <= 0 || rect.Height <= 0)
+            {
+                continue;
+            }
+
+            // Add horizontal lines
+            canvas.AddLine (new (rect.Left, rect.Top), rect.Width + 1, Orientation.Horizontal, style, attribute);
+            canvas.AddLine (new (rect.Left, rect.Bottom), rect.Width + 1, Orientation.Horizontal, style, attribute);
+
+            // Add vertical lines 
+            canvas.AddLine (new (rect.Left, rect.Top), rect.Height + 1, Orientation.Vertical, style, attribute);
+            canvas.AddLine (new (rect.Right, rect.Top), rect.Height + 1, Orientation.Vertical, style, attribute);
         }
     }
 }

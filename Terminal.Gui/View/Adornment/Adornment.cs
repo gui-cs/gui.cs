@@ -182,6 +182,7 @@ public class Adornment : View, IDesignable
     /// <inheritdoc/>
     protected override bool OnDrawingSubviews () { return Thickness == Thickness.Empty; }
 
+
     /// <summary>Does nothing for Adornment</summary>
     /// <returns></returns>
     protected override bool OnRenderingLineCanvas () { return true; }
