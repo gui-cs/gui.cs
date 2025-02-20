@@ -683,7 +683,17 @@ public class LineCanvas : IDisposable
     /// <param name="intersects"></param>
     /// <param name="types"></param>
     /// <returns></returns>
-    private bool Has (HashSet<IntersectionType> intersects, params IntersectionType [] types) { return types.All (t => intersects.Contains (t)); }
+    private bool Has (HashSet<IntersectionType> intersects, params IntersectionType [] types)
+    {
+        foreach (var type in types)
+        {
+            if (!intersects.Contains (type))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 
     private class BottomTeeIntersectionRuneResolver : IntersectionRuneResolver
     {
