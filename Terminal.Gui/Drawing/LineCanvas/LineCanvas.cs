@@ -1,4 +1,6 @@
 #nullable enable
+using System.Buffers;
+
 namespace Terminal.Gui;
 
 /// <summary>Facilitates box drawing and line intersection detection and rendering. Does not support diagonal lines.</summary>
@@ -317,7 +319,7 @@ public class LineCanvas : IDisposable
         return sb.ToString ();
     }
 
-    private static bool All (IntersectionDefinition [] intersects, Orientation orientation)
+    private static bool All (ReadOnlySpan<IntersectionDefinition> intersects, Orientation orientation)
     {
         foreach (var intersect in intersects)
         {
@@ -346,7 +348,7 @@ public class LineCanvas : IDisposable
     /// <returns></returns>
     private static bool Exactly (HashSet<IntersectionType> intersects, params IntersectionType [] types) { return intersects.SetEquals (types); }
 
-    private Attribute? GetAttributeForIntersects (IntersectionDefinition [] intersects)
+    private Attribute? GetAttributeForIntersects (ReadOnlySpan<IntersectionDefinition> intersects)
     {
         return Fill?.GetAttribute (intersects [0].Point) ?? intersects [0].Line.Attribute;
     }
@@ -393,9 +395,9 @@ public class LineCanvas : IDisposable
         // TODO: Add other resolvers
     };
 
-    private Cell? GetCellForIntersects (IConsoleDriver? driver, IntersectionDefinition [] intersects)
+    private Cell? GetCellForIntersects (IConsoleDriver? driver, ReadOnlySpan<IntersectionDefinition> intersects)
     {
-        if (!intersects.Any ())
+        if (intersects.IsEmpty)
         {
             return null;
         }
@@ -413,37 +415,28 @@ public class LineCanvas : IDisposable
         return cell;
     }
 
-    private Rune? GetRuneForIntersects (IConsoleDriver? driver, IntersectionDefinition [] intersects)
+    private Rune? GetRuneForIntersects (IConsoleDriver? driver, ReadOnlySpan<IntersectionDefinition> intersects)
     {
-        if (!intersects.Any ())
+        if (intersects.IsEmpty)
         {
             return null;
         }
 
         IntersectionRuneType runeType = GetRuneTypeForIntersects (intersects);
-
         if (_runeResolvers.TryGetValue (runeType, out IntersectionRuneResolver? resolver))
         {
             return resolver.GetRuneForIntersects (driver, intersects);
         }
 
         // TODO: Remove these once we have all of the below ported to IntersectionRuneResolvers
-        bool useDouble = intersects.Any (i => i.Line.Style == LineStyle.Double);
-
-        bool useDashed = intersects.Any (
-                                         i => i.Line.Style == LineStyle.Dashed
-                                              || i.Line.Style == LineStyle.RoundedDashed
-                                        );
-
-        bool useDotted = intersects.Any (
-                                         i => i.Line.Style == LineStyle.Dotted
-                                              || i.Line.Style == LineStyle.RoundedDotted
-                                        );
+        bool useDouble = AnyLineStyles(intersects, [LineStyle.Double]);
+        bool useDashed = AnyLineStyles(intersects, [LineStyle.Dashed, LineStyle.RoundedDashed]);
+        bool useDotted = AnyLineStyles(intersects, [LineStyle.Dotted, LineStyle.RoundedDotted]);
 
         // horiz and vert lines same as Single for Rounded
-        bool useThick = intersects.Any (i => i.Line.Style == LineStyle.Heavy);
-        bool useThickDashed = intersects.Any (i => i.Line.Style == LineStyle.HeavyDashed);
-        bool useThickDotted = intersects.Any (i => i.Line.Style == LineStyle.HeavyDotted);
+        bool useThick = AnyLineStyles(intersects, [LineStyle.Heavy]);
+        bool useThickDashed = AnyLineStyles(intersects, [LineStyle.HeavyDashed]);
+        bool useThickDotted = AnyLineStyles(intersects, [LineStyle.HeavyDotted]);
 
         // TODO: Support ruler
         //var useRuler = intersects.Any (i => i.Line.Style == LineStyle.Ruler && i.Line.Length != 0);
@@ -502,11 +495,31 @@ public class LineCanvas : IDisposable
                            + runeType
                           );
         }
+
+
+        static bool AnyLineStyles (ReadOnlySpan<IntersectionDefinition> intersects, ReadOnlySpan<LineStyle> lineStyles)
+        {
+            foreach (IntersectionDefinition intersect in intersects)
+            {
+                foreach (LineStyle style in lineStyles)
+                {
+                    if (intersect.Line.Style == style)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
     }
 
-    private IntersectionRuneType GetRuneTypeForIntersects (IntersectionDefinition [] intersects)
+    private IntersectionRuneType GetRuneTypeForIntersects (ReadOnlySpan<IntersectionDefinition> intersects)
     {
-        HashSet<IntersectionType> set = new (intersects.Select (i => i.Type));
+        HashSet<IntersectionType> set = new (capacity: intersects.Length);
+        foreach (var intersect in intersects)
+        {
+            set.Add (intersect.Type);
+        }
 
         #region Cross Conditions
 
@@ -746,45 +759,12 @@ public class LineCanvas : IDisposable
         internal Rune _thickV;
         protected IntersectionRuneResolver () { SetGlyphs (); }
 
-        public Rune? GetRuneForIntersects (IConsoleDriver? driver, IntersectionDefinition [] intersects)
+        public Rune? GetRuneForIntersects (IConsoleDriver? driver, ReadOnlySpan<IntersectionDefinition> intersects)
         {
-            bool useRounded = intersects.Any (
-                                              i => i.Line.Length != 0
-                                                   && (
-                                                          i.Line.Style == LineStyle.Rounded
-                                                          || i.Line.Style
-                                                          == LineStyle.RoundedDashed
-                                                          || i.Line.Style
-                                                          == LineStyle.RoundedDotted)
-                                             );
-
             // Note that there aren't any glyphs for intersections of double lines with heavy lines
 
-            bool doubleHorizontal = intersects.Any (
-                                                    l => l.Line.Orientation == Orientation.Horizontal
-                                                         && l.Line.Style == LineStyle.Double
-                                                   );
-
-            bool doubleVertical = intersects.Any (
-                                                  l => l.Line.Orientation == Orientation.Vertical
-                                                       && l.Line.Style == LineStyle.Double
-                                                 );
-
-            bool thickHorizontal = intersects.Any (
-                                                   l => l.Line.Orientation == Orientation.Horizontal
-                                                        && (
-                                                               l.Line.Style == LineStyle.Heavy
-                                                               || l.Line.Style == LineStyle.HeavyDashed
-                                                               || l.Line.Style == LineStyle.HeavyDotted)
-                                                  );
-
-            bool thickVertical = intersects.Any (
-                                                 l => l.Line.Orientation == Orientation.Vertical
-                                                      && (
-                                                             l.Line.Style == LineStyle.Heavy
-                                                             || l.Line.Style == LineStyle.HeavyDashed
-                                                             || l.Line.Style == LineStyle.HeavyDotted)
-                                                );
+            bool doubleHorizontal = AnyWithOrientationAndAnyLineStyle(intersects, Orientation.Horizontal, [LineStyle.Double]);
+            bool doubleVertical = AnyWithOrientationAndAnyLineStyle(intersects, Orientation.Vertical, [LineStyle.Double]);
 
             if (doubleHorizontal)
             {
@@ -796,6 +776,11 @@ public class LineCanvas : IDisposable
                 return _doubleV;
             }
 
+            bool thickHorizontal = AnyWithOrientationAndAnyLineStyle(intersects, Orientation.Horizontal,
+                [LineStyle.Heavy, LineStyle.HeavyDashed, LineStyle.HeavyDotted]);
+            bool thickVertical = AnyWithOrientationAndAnyLineStyle(intersects, Orientation.Vertical,
+                [LineStyle.Heavy, LineStyle.HeavyDashed, LineStyle.HeavyDotted]);
+
             if (thickHorizontal)
             {
                 return thickVertical ? _thickBoth : _thickH;
@@ -806,7 +791,43 @@ public class LineCanvas : IDisposable
                 return _thickV;
             }
 
-            return useRounded ? _round : _normal;
+            return UseRounded (intersects) ? _round : _normal;
+
+            static bool UseRounded (ReadOnlySpan<IntersectionDefinition> intersects)
+            {
+                foreach (var intersect in intersects)
+                {
+                    if (intersect.Line.Length != 0 &&
+                        (intersect.Line.Style == LineStyle.Rounded
+                        || intersect.Line.Style == LineStyle.RoundedDashed
+                        || intersect.Line.Style == LineStyle.RoundedDotted))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            static bool AnyWithOrientationAndAnyLineStyle (ReadOnlySpan<IntersectionDefinition> intersects, Orientation orientation, ReadOnlySpan<LineStyle> lineStyles)
+            {
+                foreach (var i in intersects)
+                {
+                    if (i.Line.Orientation != orientation)
+                    {
+                        continue;
+                    }
+
+                    // Any line style
+                    foreach (var style in lineStyles)
+                    {
+                        if (i.Line.Style == style)
+                        {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
         }
 
         /// <summary>
