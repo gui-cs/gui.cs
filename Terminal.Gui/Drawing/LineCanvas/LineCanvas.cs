@@ -166,10 +166,11 @@ public class LineCanvas : IDisposable
         {
             for (int x = Bounds.X; x < Bounds.X + Bounds.Width; x++)
             {
-                IntersectionDefinition? [] intersects = _lines
-                                                        .Select (l => l.Intersects (x, y))
-                                                        .Where (i => i is { })
-                                                        .ToArray ();
+                IntersectionDefinition [] intersects = _lines
+                    // ! nulls filtered out by the next Where filter
+                    .Select (l => l.Intersects (x, y)!)
+                    .Where (i => i is not null)
+                    .ToArray ();
 
                 Cell? cell = GetCellForIntersects (Application.Driver, intersects);
 
@@ -345,9 +346,9 @@ public class LineCanvas : IDisposable
     /// <returns></returns>
     private static bool Exactly (HashSet<IntersectionType> intersects, params IntersectionType [] types) { return intersects.SetEquals (types); }
 
-    private Attribute? GetAttributeForIntersects (IntersectionDefinition? [] intersects)
+    private Attribute? GetAttributeForIntersects (IntersectionDefinition [] intersects)
     {
-        return Fill?.GetAttribute (intersects [0]!.Point) ?? intersects [0]!.Line.Attribute;
+        return Fill?.GetAttribute (intersects [0].Point) ?? intersects [0].Line.Attribute;
     }
 
     private readonly Dictionary<IntersectionRuneType, IntersectionRuneResolver> _runeResolvers = new ()
@@ -392,7 +393,7 @@ public class LineCanvas : IDisposable
         // TODO: Add other resolvers
     };
 
-    private Cell? GetCellForIntersects (IConsoleDriver? driver, IntersectionDefinition? [] intersects)
+    private Cell? GetCellForIntersects (IConsoleDriver? driver, IntersectionDefinition [] intersects)
     {
         if (!intersects.Any ())
         {
