@@ -1,5 +1,6 @@
 #nullable enable
 using System.Buffers;
+using System.Runtime.InteropServices;
 
 namespace Terminal.Gui;
 
@@ -163,19 +164,25 @@ public class LineCanvas : IDisposable
     {
         Dictionary<Point, Cell?> map = new ();
 
+        List<IntersectionDefinition> intersectionsBufferList = [];
+
         // walk through each pixel of the bitmap
         for (int y = Bounds.Y; y < Bounds.Y + Bounds.Height; y++)
         {
             for (int x = Bounds.X; x < Bounds.X + Bounds.Width; x++)
             {
-                IntersectionDefinition [] intersects = _lines
-                    // ! nulls filtered out by the next Where filter
-                    .Select (l => l.Intersects (x, y)!)
-                    .Where (i => i is not null)
-                    .ToArray ();
-
+                intersectionsBufferList.Clear ();
+                foreach (var line in _lines)
+                {
+                    if (line.Intersects (x, y) is IntersectionDefinition intersect)
+                    {
+                        intersectionsBufferList.Add (intersect);
+                    }
+                }
+                // Safe as long as the list is not modified while the span is in use.
+                ReadOnlySpan<IntersectionDefinition> intersects = CollectionsMarshal.AsSpan(intersectionsBufferList);
                 Cell? cell = GetCellForIntersects (Application.Driver, intersects);
-
+                // TODO: Can we skip the whole nested looping if _exclusionRegion is null?
                 if (cell is { } && _exclusionRegion?.Contains (x, y) is null or false)
                 {
                     map.Add (new (x, y), cell);
