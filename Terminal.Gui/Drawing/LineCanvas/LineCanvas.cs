@@ -746,32 +746,32 @@ public class LineCanvas : IDisposable
         internal Rune _thickV;
         protected IntersectionRuneResolver () { SetGlyphs (); }
 
-        public Rune? GetRuneForIntersects (IConsoleDriver? driver, IntersectionDefinition? [] intersects)
+        public Rune? GetRuneForIntersects (IConsoleDriver? driver, IntersectionDefinition [] intersects)
         {
             bool useRounded = intersects.Any (
-                                              i => i?.Line.Length != 0
+                                              i => i.Line.Length != 0
                                                    && (
-                                                          i?.Line.Style == LineStyle.Rounded
-                                                          || i?.Line.Style
+                                                          i.Line.Style == LineStyle.Rounded
+                                                          || i.Line.Style
                                                           == LineStyle.RoundedDashed
-                                                          || i?.Line.Style
+                                                          || i.Line.Style
                                                           == LineStyle.RoundedDotted)
                                              );
 
             // Note that there aren't any glyphs for intersections of double lines with heavy lines
 
             bool doubleHorizontal = intersects.Any (
-                                                    l => l?.Line.Orientation == Orientation.Horizontal
+                                                    l => l.Line.Orientation == Orientation.Horizontal
                                                          && l.Line.Style == LineStyle.Double
                                                    );
 
             bool doubleVertical = intersects.Any (
-                                                  l => l?.Line.Orientation == Orientation.Vertical
+                                                  l => l.Line.Orientation == Orientation.Vertical
                                                        && l.Line.Style == LineStyle.Double
                                                  );
 
             bool thickHorizontal = intersects.Any (
-                                                   l => l?.Line.Orientation == Orientation.Horizontal
+                                                   l => l.Line.Orientation == Orientation.Horizontal
                                                         && (
                                                                l.Line.Style == LineStyle.Heavy
                                                                || l.Line.Style == LineStyle.HeavyDashed
@@ -779,7 +779,7 @@ public class LineCanvas : IDisposable
                                                   );
 
             bool thickVertical = intersects.Any (
-                                                 l => l?.Line.Orientation == Orientation.Vertical
+                                                 l => l.Line.Orientation == Orientation.Vertical
                                                       && (
                                                              l.Line.Style == LineStyle.Heavy
                                                              || l.Line.Style == LineStyle.HeavyDashed
