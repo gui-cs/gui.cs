@@ -428,22 +428,22 @@ public class LineCanvas : IDisposable
         }
 
         // TODO: Remove these once we have all of the below ported to IntersectionRuneResolvers
-        bool useDouble = intersects.Any (i => i?.Line.Style == LineStyle.Double);
+        bool useDouble = intersects.Any (i => i.Line.Style == LineStyle.Double);
 
         bool useDashed = intersects.Any (
-                                         i => i?.Line.Style == LineStyle.Dashed
-                                              || i?.Line.Style == LineStyle.RoundedDashed
+                                         i => i.Line.Style == LineStyle.Dashed
+                                              || i.Line.Style == LineStyle.RoundedDashed
                                         );
 
         bool useDotted = intersects.Any (
-                                         i => i?.Line.Style == LineStyle.Dotted
-                                              || i?.Line.Style == LineStyle.RoundedDotted
+                                         i => i.Line.Style == LineStyle.Dotted
+                                              || i.Line.Style == LineStyle.RoundedDotted
                                         );
 
         // horiz and vert lines same as Single for Rounded
-        bool useThick = intersects.Any (i => i?.Line.Style == LineStyle.Heavy);
-        bool useThickDashed = intersects.Any (i => i?.Line.Style == LineStyle.HeavyDashed);
-        bool useThickDotted = intersects.Any (i => i?.Line.Style == LineStyle.HeavyDotted);
+        bool useThick = intersects.Any (i => i.Line.Style == LineStyle.Heavy);
+        bool useThickDashed = intersects.Any (i => i.Line.Style == LineStyle.HeavyDashed);
+        bool useThickDotted = intersects.Any (i => i.Line.Style == LineStyle.HeavyDotted);
 
         // TODO: Support ruler
         //var useRuler = intersects.Any (i => i.Line.Style == LineStyle.Ruler && i.Line.Length != 0);
