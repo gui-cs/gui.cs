@@ -1,7 +1,6 @@
 #nullable enable
 
 using System.ComponentModel;
-using System.Text.RegularExpressions;
 
 namespace Terminal.Gui;
 
@@ -61,18 +60,12 @@ public record PosAlign : Pos
     /// <returns></returns>
     public static int CalculateMinDimension (int groupId, IList<View> views, Dimension dimension)
     {
-        // PERF: If this proves a perf issue, consider caching a ref to this list in each item
-        List<View> viewsInGroup = views.Where (v => HasGroupId (v, dimension, groupId)).ToList ();
-
-        if (viewsInGroup.Count == 0)
-        {
-            return 0;
-        }
-
         int dimensionsSum = 0;
-        for (int index = 0; index < viewsInGroup.Count; index++)
+        foreach (var view in views)
         {
-            View view = viewsInGroup [index];
+            if (!HasGroupId (view, dimension, groupId)) {
+                continue;
+            }
 
             PosAlign? posAlign = dimension == Dimension.Width
                 ? view.X as PosAlign
