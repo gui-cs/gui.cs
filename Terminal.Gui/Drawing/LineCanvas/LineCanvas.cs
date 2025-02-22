@@ -820,7 +820,10 @@ public class LineCanvas : IDisposable
                 return false;
             }
 
-            static bool AnyWithOrientationAndAnyLineStyle (ReadOnlySpan<IntersectionDefinition> intersects, Orientation orientation, ReadOnlySpan<LineStyle> lineStyles)
+            static bool AnyWithOrientationAndAnyLineStyle (
+                ReadOnlySpan<IntersectionDefinition> intersects,
+                Orientation orientation,
+                ReadOnlySpan<LineStyle> lineStyles)
             {
                 foreach (var i in intersects)
                 {
