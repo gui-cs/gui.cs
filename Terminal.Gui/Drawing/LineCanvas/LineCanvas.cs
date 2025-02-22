@@ -804,10 +804,15 @@ public class LineCanvas : IDisposable
             {
                 foreach (var intersect in intersects)
                 {
-                    if (intersect.Line.Length != 0 &&
-                        (intersect.Line.Style == LineStyle.Rounded
-                        || intersect.Line.Style == LineStyle.RoundedDashed
-                        || intersect.Line.Style == LineStyle.RoundedDotted))
+                    if (intersect.Line.Length == 0)
+                    {
+                        continue;
+                    }
+
+                    if (intersect.Line.Style is
+                        LineStyle.Rounded or
+                        LineStyle.RoundedDashed or
+                        LineStyle.RoundedDotted)
                     {
                         return true;
                     }
