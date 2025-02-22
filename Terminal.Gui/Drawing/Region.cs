@@ -1,6 +1,6 @@
-﻿using System.Buffers;
+﻿#nullable enable
 
-#nullable enable
+using System.Buffers;
 
 /// <summary>
 ///     Represents a region composed of one or more rectangles, providing methods for union, intersection, exclusion, and
