@@ -176,7 +176,7 @@ internal class WindowsConsole
             _stringBuilder.Clear ();
 
             _stringBuilder.Append (EscSeqUtils.CSI_SaveCursorPosition);
-            _stringBuilder.Append (EscSeqUtils.CSI_SetCursorPosition (0, 0));
+            EscSeqUtils.CSI_AppendCursorPosition (_stringBuilder, 0, 0);
 
             Attribute? prev = null;
 
@@ -187,8 +187,8 @@ internal class WindowsConsole
                 if (attr != prev)
                 {
                     prev = attr;
-                    _stringBuilder.Append (EscSeqUtils.CSI_SetForegroundColorRGB (attr.Foreground.R, attr.Foreground.G, attr.Foreground.B));
-                    _stringBuilder.Append (EscSeqUtils.CSI_SetBackgroundColorRGB (attr.Background.R, attr.Background.G, attr.Background.B));
+                    EscSeqUtils.CSI_AppendForegroundColorRGB (_stringBuilder, attr.Foreground.R, attr.Foreground.G, attr.Foreground.B);
+                    EscSeqUtils.CSI_AppendBackgroundColorRGB (_stringBuilder, attr.Background.R, attr.Background.G, attr.Background.B);
                 }
 
                 if (info.Char != '\x1b')
@@ -710,14 +710,14 @@ internal class WindowsConsole
         public readonly override string ToString ()
         {
             return (EventType switch
-                    {
-                        EventType.Focus => FocusEvent.ToString (),
-                        EventType.Key => KeyEvent.ToString (),
-                        EventType.Menu => MenuEvent.ToString (),
-                        EventType.Mouse => MouseEvent.ToString (),
-                        EventType.WindowBufferSize => WindowBufferSizeEvent.ToString (),
-                        _ => "Unknown event type: " + EventType
-                    })!;
+            {
+                EventType.Focus => FocusEvent.ToString (),
+                EventType.Key => KeyEvent.ToString (),
+                EventType.Menu => MenuEvent.ToString (),
+                EventType.Mouse => MouseEvent.ToString (),
+                EventType.WindowBufferSize => WindowBufferSizeEvent.ToString (),
+                _ => "Unknown event type: " + EventType
+            })!;
         }
     }
 
