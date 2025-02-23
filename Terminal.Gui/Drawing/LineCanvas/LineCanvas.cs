@@ -532,8 +532,8 @@ public class LineCanvas : IDisposable
 
         if (Has (
                  set,
-                 IntersectionType.PassOverHorizontal,
-                 IntersectionType.PassOverVertical
+                 [IntersectionType.PassOverHorizontal,
+                 IntersectionType.PassOverVertical]
                 ))
         {
             return IntersectionRuneType.Cross;
@@ -541,9 +541,9 @@ public class LineCanvas : IDisposable
 
         if (Has (
                  set,
-                 IntersectionType.PassOverVertical,
+                 [IntersectionType.PassOverVertical,
                  IntersectionType.StartLeft,
-                 IntersectionType.StartRight
+                 IntersectionType.StartRight]
                 ))
         {
             return IntersectionRuneType.Cross;
@@ -551,9 +551,9 @@ public class LineCanvas : IDisposable
 
         if (Has (
                  set,
-                 IntersectionType.PassOverHorizontal,
+                 [IntersectionType.PassOverHorizontal,
                  IntersectionType.StartUp,
-                 IntersectionType.StartDown
+                 IntersectionType.StartDown]
                 ))
         {
             return IntersectionRuneType.Cross;
@@ -561,10 +561,10 @@ public class LineCanvas : IDisposable
 
         if (Has (
                  set,
-                 IntersectionType.StartLeft,
+                 [IntersectionType.StartLeft,
                  IntersectionType.StartRight,
                  IntersectionType.StartUp,
-                 IntersectionType.StartDown
+                 IntersectionType.StartDown]
                 ))
         {
             return IntersectionRuneType.Cross;
@@ -616,8 +616,8 @@ public class LineCanvas : IDisposable
 
         if (Has (
                  set,
-                 IntersectionType.PassOverHorizontal,
-                 IntersectionType.StartDown
+                 [IntersectionType.PassOverHorizontal,
+                 IntersectionType.StartDown]
                 ))
         {
             return IntersectionRuneType.TopTee;
@@ -625,9 +625,9 @@ public class LineCanvas : IDisposable
 
         if (Has (
                  set,
-                 IntersectionType.StartRight,
+                 [IntersectionType.StartRight,
                  IntersectionType.StartLeft,
-                 IntersectionType.StartDown
+                 IntersectionType.StartDown]
                 ))
         {
             return IntersectionRuneType.TopTee;
@@ -635,8 +635,8 @@ public class LineCanvas : IDisposable
 
         if (Has (
                  set,
-                 IntersectionType.PassOverHorizontal,
-                 IntersectionType.StartUp
+                 [IntersectionType.PassOverHorizontal,
+                 IntersectionType.StartUp]
                 ))
         {
             return IntersectionRuneType.BottomTee;
@@ -644,9 +644,9 @@ public class LineCanvas : IDisposable
 
         if (Has (
                  set,
-                 IntersectionType.StartRight,
+                 [IntersectionType.StartRight,
                  IntersectionType.StartLeft,
-                 IntersectionType.StartUp
+                 IntersectionType.StartUp]
                 ))
         {
             return IntersectionRuneType.BottomTee;
@@ -654,8 +654,8 @@ public class LineCanvas : IDisposable
 
         if (Has (
                  set,
-                 IntersectionType.PassOverVertical,
-                 IntersectionType.StartRight
+                 [IntersectionType.PassOverVertical,
+                 IntersectionType.StartRight]
                 ))
         {
             return IntersectionRuneType.LeftTee;
@@ -663,9 +663,9 @@ public class LineCanvas : IDisposable
 
         if (Has (
                  set,
-                 IntersectionType.StartRight,
+                 [IntersectionType.StartRight,
                  IntersectionType.StartDown,
-                 IntersectionType.StartUp
+                 IntersectionType.StartUp]
                 ))
         {
             return IntersectionRuneType.LeftTee;
@@ -673,8 +673,8 @@ public class LineCanvas : IDisposable
 
         if (Has (
                  set,
-                 IntersectionType.PassOverVertical,
-                 IntersectionType.StartLeft
+                 [IntersectionType.PassOverVertical,
+                 IntersectionType.StartLeft]
                 ))
         {
             return IntersectionRuneType.RightTee;
@@ -682,9 +682,9 @@ public class LineCanvas : IDisposable
 
         if (Has (
                  set,
-                 IntersectionType.StartLeft,
+                 [IntersectionType.StartLeft,
                  IntersectionType.StartDown,
-                 IntersectionType.StartUp
+                 IntersectionType.StartUp]
                 ))
         {
             return IntersectionRuneType.RightTee;
@@ -712,7 +712,7 @@ public class LineCanvas : IDisposable
     /// <param name="intersects"></param>
     /// <param name="types"></param>
     /// <returns></returns>
-    private bool Has (HashSet<IntersectionType> intersects, params IntersectionType [] types)
+    private bool Has (HashSet<IntersectionType> intersects, ReadOnlySpan<IntersectionType> types)
     {
         foreach (var type in types)
         {
