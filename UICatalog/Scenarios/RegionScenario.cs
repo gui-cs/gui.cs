@@ -1,6 +1,9 @@
 using System;
+using System.Linq;
+using System.Text;
 using Terminal.Gui;
 using UICatalog;
+using UICatalog.Scenarios;
 
 /// <summary>
 ///     Demonstrates creating and drawing regions through mouse dragging.
@@ -14,6 +17,61 @@ public class RegionScenario : Scenario
     private Point? _dragStart;
     private bool _isDragging;
 
+    public class ToolsView : Window
+    {
+        //private Button _addLayerBtn;
+        private readonly AttributeView _colors;
+        //private RadioGroup _stylePicker;
+
+        public Attribute CurrentColor
+        {
+            get => _colors.Value;
+            set => _colors.Value = value;
+        }
+
+        public ToolsView ()
+        {
+            BorderStyle = LineStyle.Dotted;
+            Border.Thickness = new (1, 2, 1, 1);
+            Height = Dim.Auto ();
+            Width = Dim.Auto ();
+
+            _colors = new ();
+            Add (_colors);
+
+        }
+
+        public event Action AddLayer;
+
+        public override void BeginInit ()
+        {
+            base.BeginInit ();
+
+            _colors.ValueChanged += (s, e) => ColorChanged?.Invoke (this, e);
+
+            //_stylePicker = new ()
+            //{
+            //    X = 0, Y = Pos.Bottom (_colors), RadioLabels = Enum.GetNames (typeof (LineStyle)).ToArray ()
+            //};
+            //_stylePicker.SelectedItemChanged += (s, a) => { SetStyle?.Invoke ((LineStyle)a.SelectedItem); };
+            //_stylePicker.SelectedItem = 1;
+
+            //_addLayerBtn = new () { Text = "New Layer", X = Pos.Center (), Y = Pos.Bottom (_stylePicker) };
+
+            //_addLayerBtn.Accepting += (s, a) => AddLayer?.Invoke ();
+            //Add (_colors, _stylePicker, _addLayerBtn);
+        }
+
+        public event EventHandler<Attribute> ColorChanged;
+        public event Action<LineStyle> SetStyle;
+    }
+
+    public Attribute? _attribute;
+
+    public Rune? _previewFillRune = CM.Glyphs.Stipple;
+
+    public Rune? _fillRune = CM.Glyphs.Dot;
+
     public override void Main ()
     {
         Application.Init ();
@@ -24,6 +82,16 @@ public class RegionScenario : Scenario
             TabStop = TabBehavior.TabGroup
         };
 
+        _attribute = app.ColorScheme.Normal;
+
+        var tools = new ToolsView { Title = "Tools", X = Pos.AnchorEnd (), Y = 2 };
+
+        tools.ColorChanged += (s, e) => _attribute = e;
+        //tools.SetStyle += b => canvas.CurrentTool = new DrawLineTool { LineStyle = b };
+        //tools.AddLayer += () => canvas.AddLayer ();
+
+        app.Add (tools);
+
         // Add drag handling to window
         app.MouseEvent += (s, e) =>
                           {
@@ -31,7 +99,7 @@ public class RegionScenario : Scenario
                               {
                                   if (!e.Flags.HasFlag (MouseFlags.ReportMousePosition))
                                   { // Start drag
-                                      _dragStart = e.Position;
+                                      _dragStart = e.ScreenPosition;
                                       _isDragging = true;
                                   }
                                   else
@@ -49,7 +117,7 @@ public class RegionScenario : Scenario
                                   if (_isDragging && _dragStart.HasValue)
                                   {
                                       // Add the new region
-                                      AddRectangleFromPoints (_dragStart.Value, e.Position);
+                                      AddRectangleFromPoints (_dragStart.Value, e.ScreenPosition);
                                       _isDragging = false;
                                       _dragStart = null;
                                   }
@@ -62,16 +130,37 @@ public class RegionScenario : Scenario
         app.DrawingContent += (s, e) =>
                               {
                                   // Draw all regions with single line style
-                                  _region.Draw (app.LineCanvas, LineStyle.Single);
+                                  //_region.FillRectangles (_attribute.Value, _fillRune);
+                                  if (_outer)
+                                  {
+                                      _region.DrawOuterBoundary (app.LineCanvas, LineStyle.Single, _attribute);
+                                  }
+                                  else
+                                  {
+                                      _region.FillRectangles (_attribute.Value, _previewFillRune);
+                                  }
 
                                   // If currently dragging, draw preview rectangle
                                   if (_isDragging && _dragStart.HasValue)
                                   {
-                                      Point currentMousePos = app.ScreenToViewport (Application.GetLastMousePosition ()!.Value);
-                                      var previewRegion = new Region (GetRectFromPoints (_dragStart.Value, currentMousePos));
-                                      previewRegion.Draw (app.LineCanvas, LineStyle.Dashed);
+                                      Point currentMousePos = Application.GetLastMousePosition ()!.Value;
+                                      var previewRect = GetRectFromPoints (_dragStart.Value, currentMousePos);
+                                      var previewRegion = new Region (previewRect);
+
+                                      previewRegion.FillRectangles (_attribute.Value, _previewFillRune);
+
+                                      // previewRegion.DrawBoundaries(app.LineCanvas, LineStyle.Dashed, _attribute);
                                   }
                               };
+
+        app.KeyDown += (s, e) =>
+                       {
+                           if (e.KeyCode == KeyCode.B)
+                           {
+                               _outer = !_outer;
+                               app.SetNeedsDraw ();
+                           }
+                       };
 
         Application.Run (app);
 
@@ -80,23 +169,26 @@ public class RegionScenario : Scenario
         Application.Shutdown ();
     }
 
+    private bool _outer;
+
     private void AddRectangleFromPoints (Point start, Point end)
     {
-        Rectangle rect = GetRectFromPoints (start, end);
-
-        if (!rect.IsEmpty)
-        {
-            _region.Combine (rect, RegionOp.Union);
-        }
+        var rect = GetRectFromPoints (start, end);
+        var region = new Region (rect);
+        _region.Combine (region, RegionOp.MinimalUnion); // Or RegionOp.MinimalUnion if you want minimal rectangles
     }
 
-    private static Rectangle GetRectFromPoints (Point start, Point end)
+    private Rectangle GetRectFromPoints (Point start, Point end)
     {
-        int x = Math.Min (start.X, end.X);
-        int y = Math.Min (start.Y, end.Y);
-        int width = Math.Abs (end.X - start.X);
-        int height = Math.Abs (end.Y - start.Y);
+        int left = Math.Min (start.X, end.X);
+        int top = Math.Min (start.Y, end.Y);
+        int right = Math.Max (start.X, end.X);
+        int bottom = Math.Max (start.Y, end.Y);
 
-        return new (x, y, width, height);
+        // Ensure minimum width and height of 1
+        int width = Math.Max (1, right - left + 1);
+        int height = Math.Max (1, bottom - top + 1);
+
+        return new Rectangle (left, top, width, height);
     }
 }

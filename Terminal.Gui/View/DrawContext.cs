@@ -1,20 +1,14 @@
 ﻿#nullable enable
 namespace Terminal.Gui;
 
-/// <summary>
-/// Provides a context for drawing operations, allowing views to report areas they draw.
-/// </summary>
 public class DrawContext
 {
     private readonly Region _drawnRegion = new Region ();
 
     /// <summary>
-    /// Gets the region drawn so far in this context.
+    /// Gets a copy of the region drawn so far in this context.
     /// </summary>
-    public Region DrawnRegion
-    {
-        get { return _drawnRegion.Clone (); }
-    }
+    public Region GetDrawnRegion () => _drawnRegion.Clone ();
 
     /// <summary>
     /// Reports that a rectangle has been drawn.
@@ -22,7 +16,7 @@ public class DrawContext
     /// <param name="rect">The rectangle that was drawn.</param>
     public void AddDrawnRectangle (Rectangle rect)
     {
-        _drawnRegion.Union (rect);
+        _drawnRegion.Combine (rect, RegionOp.Union);
     }
 
     /// <summary>
@@ -31,9 +25,26 @@ public class DrawContext
     /// <param name="region">The region that was drawn.</param>
     public void AddDrawnRegion (Region region)
     {
-        if (region != null)
-        {
-            _drawnRegion.Union (region);
-        }
+        _drawnRegion.Combine (region, RegionOp.Union);
+    }
+
+    /// <summary>
+    /// Clips (intersects) the drawn region with the specified rectangle.
+    /// This modifies the internal drawn region directly.
+    /// </summary>
+    /// <param name="clipRect">The clipping rectangle.</param>
+    public void ClipDrawnRegion (Rectangle clipRect)
+    {
+        _drawnRegion.Intersect (clipRect);
+    }
+
+    /// <summary>
+    /// Clips (intersects) the drawn region with the specified region.
+    /// This modifies the internal drawn region directly.
+    /// </summary>
+    /// <param name="clipRegion">The clipping region.</param>
+    public void ClipDrawnRegion (Region clipRegion)
+    {
+        _drawnRegion.Intersect (clipRegion);
     }
 }

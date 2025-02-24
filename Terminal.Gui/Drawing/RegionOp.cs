@@ -56,16 +56,17 @@ public enum RegionOp
     ///         (0,0,5,5) and the op is B = (5,0,5,5), the result might include (0,0,5,5) and (5,0,5,5) unless minimized.
     ///     </para>
     ///     <para>
-    ///         By default, this operation uses granular output (preserving detailed rectangles), but it can be configured
-    ///         to minimize the result via the <see cref="Region.Combine(Rectangle,RegionOp)"/>
-    ///         method’s <c>minimize</c> parameter. If the op region
-    ///         is empty or null, the first region remains unchanged.
+    ///         This operation uses granular output (preserving detailed rectangles). To minimize the result use
+    ///         <see cref="MinimalUnion"/> instead.
+    ///     </para>
+    ///     <para>
+    ///         If the op region is empty or null, the first region remains unchanged.
     ///     </para>
     /// </summary>
     Union = 2,
 
     /// <summary>
-    ///     Performs a minimal union of the first region and the second (op) region or rectangle, merging adjacent or
+    ///     Performs a minimal union (inclusive-or) of the first region and the second (op) region or rectangle, merging adjacent or
     ///     overlapping rectangles into the smallest possible set of non-overlapping rectangles that cover the combined
     ///     area.
     ///     <para>
@@ -74,9 +75,10 @@ public enum RegionOp
     ///         the result would be a single rectangle (0,0,10,5), reducing redundancy.
     ///     </para>
     ///     <para>
-    ///         This operation always minimizes the output, regardless of the <c>minimize</c> parameter in
-    ///         <see cref="Region.Combine(Rectangle,RegionOp)"/>. If the op region is empty or
-    ///         null, the first region remains unchanged.
+    ///         This operation always minimizes the output and has lower performance than <see cref="Union"/>.
+    ///     </para>
+    ///     <para>
+    ///         If the op region is empty or null, the first region remains unchanged.
     ///     </para>
     /// </summary>
     MinimalUnion = 3,

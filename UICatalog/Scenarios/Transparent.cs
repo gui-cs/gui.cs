@@ -31,7 +31,7 @@ public sealed class Transparent : Scenario
         appWindow.Add (
                        new Button ()
                        {
-                           X = 15,
+                           X = 10,
                            Y = 4,
                            Title = "_AppButton"
                        });
@@ -58,7 +58,7 @@ public sealed class Transparent : Scenario
         public TransparentView ()
         {
             Title = "Transparent";
-            base.Text = "Text. This should be visible.";
+            //base.Text = "Text.\nSecond Line.";
             Arrangement = ViewArrangement.Overlapped | ViewArrangement.Resizable | ViewArrangement.Movable;
             ViewportSettings |= Terminal.Gui.ViewportSettings.Transparent ;
             base.TextAlignment = Alignment.Center;
@@ -66,59 +66,59 @@ public sealed class Transparent : Scenario
 
             ColorScheme = Colors.ColorSchemes ["Base"];
 
-            // Create 4 sub-views with borders and different colors. Each 3 high/wide. One aligned top, one bottom, one left, one right.
-            View topView = new ()
-            {
-                Title = "Top",
-                Text = "Top View",
-                X = 0,
-                Y = 0,
-                Width = Dim.Fill(),
-                Height = 3,
-                BorderStyle = LineStyle.Single,
-                Arrangement = ViewArrangement.Movable,
-                ColorScheme = Colors.ColorSchemes ["Error"]
-            };
+            //// Create 4 sub-views with borders and different colors. Each 3 high/wide. One aligned top, one bottom, one left, one right.
+            //View topView = new ()
+            //{
+            //    Title = "Top",
+            //    Text = "Top View",
+            //    X = 0,
+            //    Y = 0,
+            //    Width = Dim.Fill(),
+            //    Height = 3,
+            //    BorderStyle = LineStyle.Single,
+            //    Arrangement = ViewArrangement.Movable,
+            //    ColorScheme = Colors.ColorSchemes ["Error"]
+            //};
 
-            View leftView = new ()
-            {
-                Title = "Left",
-                Text = "Left View",
-                X = 0,
-                Y = Pos.Bottom(topView),
-                Width = 3,
-                Height = Dim.Fill (),
-                BorderStyle = LineStyle.Single,
-                Arrangement = ViewArrangement.Movable,
-                ColorScheme = Colors.ColorSchemes ["Base"]
-            };
+            //View leftView = new ()
+            //{
+            //    Title = "Left",
+            //    Text = "Left View",
+            //    X = 0,
+            //    Y = Pos.Bottom(topView),
+            //    Width = 3,
+            //    Height = Dim.Fill (),
+            //    BorderStyle = LineStyle.Single,
+            //    Arrangement = ViewArrangement.Movable,
+            //    ColorScheme = Colors.ColorSchemes ["Base"]
+            //};
 
-            View bottomView = new ()
-            {
-                Title = "Bottom",
-                Text = "Bottom View",
-                X = 0,
-                Y = Pos.AnchorEnd(),
-                Width = Dim.Fill (),
-                Height = 3,
-                BorderStyle = LineStyle.Single,
-                Arrangement = ViewArrangement.Movable,
-                ColorScheme = Colors.ColorSchemes ["Dialog"]
-            };
+            //View bottomView = new ()
+            //{
+            //    Title = "Bottom",
+            //    Text = "Bottom View",
+            //    X = 0,
+            //    Y = Pos.AnchorEnd(),
+            //    Width = Dim.Fill (),
+            //    Height = 3,
+            //    BorderStyle = LineStyle.Single,
+            //    Arrangement = ViewArrangement.Movable,
+            //    ColorScheme = Colors.ColorSchemes ["Dialog"]
+            //};
 
-            View rightView = new () {
-                Title = "Right",
-                Text = "Right View",
-                X = Pos.AnchorEnd (),
-                Y = 0,
-                Width = 3,
-                Height = Dim.Fill (),
-                BorderStyle = LineStyle.Single,
-                Arrangement = ViewArrangement.Movable,
-                ColorScheme = Colors.ColorSchemes ["Toplevel"]
-            };
+            //View rightView = new () {
+            //    Title = "Right",
+            //    Text = "Right View",
+            //    X = Pos.AnchorEnd (),
+            //    Y = 0,
+            //    Width = 3,
+            //    Height = Dim.Fill (),
+            //    BorderStyle = LineStyle.Single,
+            //    Arrangement = ViewArrangement.Movable,
+            //    ColorScheme = Colors.ColorSchemes ["Toplevel"]
+            //};
 
-            base.Add (topView, leftView, bottomView, rightView);
+            //base.Add (topView, leftView, bottomView, rightView);
 
 
 
@@ -149,15 +149,15 @@ public sealed class Transparent : Scenario
             //              Title = "Label..!"
             //          });
             //base.Add (transparentSubView);  
-            //base.Add (
-            //          new Button ()
-            //          {
-            //              Title = "_Okay!",
-            //              X = 4,
-            //              Y = 3,
-            //              ShadowStyle = ShadowStyle.None,
-            //              ColorScheme = Colors.ColorSchemes ["Toplevel"],
-            //          });
+            base.Add (
+                      new Button ()
+                      {
+                          Title = "_Long Button testing...",
+                          X = 4,
+                          Y = 3,
+                          ShadowStyle = ShadowStyle.None,
+                          ColorScheme = Colors.ColorSchemes ["Toplevel"],
+                      });
             //base.Add (
             //          new Label ()
             //          {

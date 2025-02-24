@@ -74,6 +74,17 @@ public partial class View
     public static void ExcludeFromClip (Rectangle rectangle) { Driver?.Clip?.Exclude (rectangle); }
 
     /// <summary>
+    ///     Removes the specified rectangle from the Clip.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         There is a single clip region for the entire application.
+    ///     </para>
+    /// </remarks>
+    /// <param name="region"></param>
+    public static void ExcludeFromClip (Region? region) { Driver?.Clip?.Exclude (region); }
+
+    /// <summary>
     ///     Changes the Clip to the intersection of the current Clip and the <see cref="Frame"/> of this View.
     /// </summary>
     /// <remarks>

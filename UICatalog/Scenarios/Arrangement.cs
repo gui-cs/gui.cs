@@ -342,6 +342,7 @@ public class TransparentView : FrameView
             Height = 6,
             BorderStyle = LineStyle.Dashed,
             Arrangement = ViewArrangement.Movable,
+            ShadowStyle = ShadowStyle.Transparent
             //ViewportSettings = Terminal.Gui.ViewportSettings.Transparent
         };
         transparentSubView.Border.Thickness = new (1, 1, 1, 1);

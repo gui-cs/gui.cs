@@ -430,6 +430,20 @@ public partial class View
         return screen.Location;
     }
 
+    /// <summary>
+    ///     Gets the Viewport rectangle with a screen-relative location.
+    /// </summary>
+    /// <returns>Screen-relative location and size.</returns>
+    public Rectangle ViewportToScreen ()
+    {
+        // Translate bounds to Frame (our SuperView's Viewport-relative coordinates)
+        Rectangle screen = FrameToScreen ();
+        Point viewportOffset = GetViewportOffsetFromFrame ();
+        screen.Offset (viewportOffset.X, viewportOffset.Y);
+
+        return screen;
+    }
+
     /// <summary>Converts a screen-relative coordinate to a Viewport-relative coordinate.</summary>
     /// <returns>The coordinate relative to this view's <see cref="Viewport"/>.</returns>
     /// <remarks>

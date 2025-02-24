@@ -106,24 +106,25 @@ public class Region
         switch (operation)
         {
             case RegionOp.Difference:
-                // Null is same as empty region
-                region ??= new ();
 
-                List<Rectangle> subtracted = new (_rectangles.Count); // Pre-allocate
+                // region is regionB
+                // We'll chain the difference: (regionA - rect1) - rect2 - rect3 ...
+                List<Rectangle> newRectangles = new List<Rectangle> (_rectangles);
 
                 foreach (Rectangle rect in region._rectangles)
                 {
-                    foreach (Rectangle r in _rectangles)
+                    List<Rectangle> temp = new List<Rectangle> ();
+                    foreach (Rectangle r in newRectangles)
                     {
-                        subtracted.AddRange (SubtractRectangle (r, rect));
+                        temp.AddRange (SubtractRectangle (r, rect));
                     }
+                    newRectangles = temp;
                 }
 
                 _rectangles.Clear ();
-                _rectangles.AddRange (subtracted);
-                subtracted.Clear ();
-
+                _rectangles.AddRange (newRectangles);
                 break;
+
 
             case RegionOp.Intersect:
                 List<Rectangle> intersections = new (_rectangles.Count); // Pre-allocate
@@ -157,7 +158,7 @@ public class Region
                 break;
 
             case RegionOp.MinimalUnion:
-                List<Rectangle> mergedMinimalUnion = MergeRectangles ([.. _rectangles, .. region._rectangles]);
+                List<Rectangle> mergedMinimalUnion = MergeRectangles ([.. _rectangles, .. region._rectangles], true);
                 _rectangles.Clear ();
                 _rectangles.AddRange (mergedMinimalUnion);
 
@@ -461,21 +462,13 @@ public class Region
     ///     Adds the specified rectangle to the region. Merges all rectangles into a minimal or granular bounding shape.
     /// </summary>
     /// <param name="rectangle">The rectangle to add to the region.</param>
-    /// <param name="minimize">
-    ///     If <c>true</c>, minimizes the set to the smallest possible number of rectangles; otherwise, uses
-    ///     granular output.
-    /// </param>
-    public void Union (Rectangle rectangle, bool minimize = true) { Combine (rectangle, RegionOp.Union); }
+    public void Union (Rectangle rectangle) { Combine (rectangle, RegionOp.Union); }
 
     /// <summary>
     ///     Adds the specified region to this region. Merges all rectangles into a minimal or granular bounding shape.
     /// </summary>
     /// <param name="region">The region to add to this region.</param>
-    /// <param name="minimize">
-    ///     If <c>true</c>, minimizes the set to the smallest possible number of rectangles; otherwise, uses
-    ///     granular output.
-    /// </param>
-    public void Union (Region? region, bool minimize = true) { Combine (region, RegionOp.Union); }
+    public void Union (Region? region) { Combine (region, RegionOp.Union); }
 
     /// <summary>
     ///     Adds the specified rectangle to the region. Merges all rectangles into the smallest possible bounding shape.
@@ -499,7 +492,7 @@ public class Region
     ///     returns a granular set.
     /// </param>
     /// <returns>A list of merged rectangles.</returns>
-    internal static List<Rectangle> MergeRectangles (List<Rectangle> rectangles, bool minimize = false)
+    internal static List<Rectangle> MergeRectangles (List<Rectangle> rectangles, bool minimize)
     {
         if (rectangles.Count == 0)
         {
@@ -518,29 +511,34 @@ public class Region
             }
         }
 
+        if (events.Count == 0)
+        {
+            return []; // Return empty list if no non-empty rectangles exist
+        }
+
         events.Sort (
-                     (a, b) =>
-                     {
-                         int cmp = a.x.CompareTo (b.x);
+            (a, b) =>
+            {
+                int cmp = a.x.CompareTo (b.x);
 
-                         if (cmp != 0)
-                         {
-                             return cmp;
-                         }
+                if (cmp != 0)
+                {
+                    return cmp;
+                }
 
-                         return a.isStart.CompareTo (b.isStart); // Start events before end events at same x
-                     });
+                return a.isStart.CompareTo (b.isStart); // Start events before end events at same x
+            });
 
         List<Rectangle> merged = [];
 
         SortedSet<(int yTop, int yBottom)> active = new (
-                                                         Comparer<(int yTop, int yBottom)>.Create (
-                                                                                                   (a, b) =>
-                                                                                                   {
-                                                                                                       int cmp = a.yTop.CompareTo (b.yTop);
+            Comparer<(int yTop, int yBottom)>.Create (
+                (a, b) =>
+                {
+                    int cmp = a.yTop.CompareTo (b.yTop);
 
-                                                                                                       return cmp != 0 ? cmp : a.yBottom.CompareTo (b.yBottom);
-                                                                                                   }));
+                    return cmp != 0 ? cmp : a.yBottom.CompareTo (b.yBottom);
+                }));
         int lastX = events [0].x;
 
         foreach ((int x, bool isStart, int yTop, int yBottom) evt in events)
@@ -567,6 +565,7 @@ public class Region
         return minimize ? MinimizeRectangles (merged) : merged;
     }
 
+
     /// <summary>
     ///     Merges overlapping vertical intervals into a minimal set of non-overlapping rectangles.
     /// </summary>
@@ -574,7 +573,7 @@ public class Region
     /// <param name="startX">The starting x-coordinate for the rectangles.</param>
     /// <param name="endX">The ending x-coordinate for the rectangles.</param>
     /// <returns>A list of merged rectangles.</returns>
-    private static List<Rectangle> MergeVerticalIntervals (SortedSet<(int yTop, int yBottom)> active, int startX, int endX)
+    internal static List<Rectangle> MergeVerticalIntervals (SortedSet<(int yTop, int yBottom)> active, int startX, int endX)
     {
         if (active.Count == 0)
         {
@@ -618,7 +617,7 @@ public class Region
     /// </summary>
     /// <param name="rectangles">The list of rectangles to minimize.</param>
     /// <returns>A list of minimized rectangles.</returns>
-    private static List<Rectangle> MinimizeRectangles (List<Rectangle> rectangles)
+    internal static List<Rectangle> MinimizeRectangles (List<Rectangle> rectangles)
     {
         if (rectangles.Count <= 1)
         {
@@ -703,59 +702,94 @@ public class Region
     /// <param name="original">The original rectangle.</param>
     /// <param name="subtract">The rectangle to subtract from the original.</param>
     /// <returns>An enumerable collection of resulting rectangles after subtraction.</returns>
-    private static IEnumerable<Rectangle> SubtractRectangle (Rectangle original, Rectangle subtract)
+    internal static IEnumerable<Rectangle> SubtractRectangle (Rectangle original, Rectangle subtract)
     {
-        if (!original.IntersectsWith (subtract))
+        // Handle empty or invalid rectangles
+        if (original.IsEmpty || original.Width <= 0 || original.Height <= 0)
+        {
+            yield break; // Return empty enumeration for empty or invalid original
+        }
+
+        if (subtract.IsEmpty || subtract.Width <= 0 || subtract.Height <= 0)
         {
             yield return original;
-
             yield break;
         }
 
-        // Top segment
+        // Check for complete overlap (subtract fully contains or equals original)
+        if (subtract.Left <= original.Left && subtract.Top <= original.Top &&
+            subtract.Right >= original.Right && subtract.Bottom >= original.Bottom)
+        {
+            yield break; // Return empty if subtract completely overlaps original
+        }
+
+        // Check for no overlap
+        if (!original.IntersectsWith (subtract))
+        {
+            yield return original;
+            yield break;
+        }
+
+        // Fragment the original rectangle into segments excluding the subtract rectangle
+
+        // Top segment (above subtract)
         if (original.Top < subtract.Top)
         {
-            yield return new (original.Left, original.Top, original.Width, subtract.Top - original.Top);
+            yield return new Rectangle (
+                original.Left,
+                original.Top,
+                original.Width,
+                subtract.Top - original.Top);
         }
 
-        // Bottom segment
+        // Bottom segment (below subtract)
         if (original.Bottom > subtract.Bottom)
         {
-            yield return new (original.Left, subtract.Bottom, original.Width, original.Bottom - subtract.Bottom);
+            yield return new Rectangle (
+                original.Left,
+                subtract.Bottom,
+                original.Width,
+                original.Bottom - subtract.Bottom);
         }
 
-        // Left segment
+        // Left segment (to the left of subtract)
         if (original.Left < subtract.Left)
         {
             int top = Math.Max (original.Top, subtract.Top);
             int bottom = Math.Min (original.Bottom, subtract.Bottom);
-
             if (bottom > top)
             {
-                yield return new (original.Left, top, subtract.Left - original.Left, bottom - top);
+                yield return new Rectangle (
+                    original.Left,
+                    top,
+                    subtract.Left - original.Left,
+                    bottom - top);
             }
         }
 
-        // Right segment
+        // Right segment (to the right of subtract)
         if (original.Right > subtract.Right)
         {
             int top = Math.Max (original.Top, subtract.Top);
             int bottom = Math.Min (original.Bottom, subtract.Bottom);
-
             if (bottom > top)
             {
-                yield return new (subtract.Right, top, original.Right - subtract.Right, bottom - top);
+                yield return new Rectangle (
+                    subtract.Right,
+                    top,
+                    original.Right - subtract.Right,
+                    bottom - top);
             }
         }
     }
 
     /// <summary>
-    ///     Draws the boundaries of all rectangles in the region.
+    ///     Draws the boundaries of all rectangles in the region using the specified attributes, only if the rectangle is big enough.
     /// </summary>
     /// <param name="canvas">The canvas to draw on.</param>
     /// <param name="style">The line style to use for drawing.</param>
-    /// <param name="attribute">The attribute (color/style) to apply.</param>
-    public void Draw (LineCanvas canvas, LineStyle style, Attribute? attribute = null)
+    /// <param name="attribute">The attribute (color/style) to use for the lines. If <c>null</c>.</param>
+    public void DrawBoundaries (LineCanvas canvas, LineStyle style, Attribute? attribute = null)
     {
         if (_rectangles.Count == 0)
         {
@@ -769,13 +803,61 @@ public class Region
                 continue;
             }
 
-            // Add horizontal lines
-            canvas.AddLine (new (rect.Left, rect.Top), rect.Width + 1, Orientation.Horizontal, style, attribute);
-            canvas.AddLine (new (rect.Left, rect.Bottom), rect.Width + 1, Orientation.Horizontal, style, attribute);
+            // Only draw boundaries if the rectangle is "big enough" (e.g., width and height > 1)
+            if (rect.Width > 2 && rect.Height > 2)
+            {
+                // Add horizontal lines
+                canvas.AddLine (new (rect.Left, rect.Top), rect.Width + 1, Orientation.Horizontal, style, attribute);
+                canvas.AddLine (new (rect.Left, rect.Bottom), rect.Width + 1, Orientation.Horizontal, style, attribute);
 
-            // Add vertical lines 
-            canvas.AddLine (new (rect.Left, rect.Top), rect.Height + 1, Orientation.Vertical, style, attribute);
-            canvas.AddLine (new (rect.Right, rect.Top), rect.Height + 1, Orientation.Vertical, style, attribute);
+                // Add vertical lines 
+                canvas.AddLine (new (rect.Left, rect.Top), rect.Height + 1, Orientation.Vertical, style, attribute);
+                canvas.AddLine (new (rect.Right, rect.Top), rect.Height + 1, Orientation.Vertical, style, attribute);
+            }
         }
     }
+
+
+    /// <summary>
+    ///     Fills the interior of all rectangles in the region with the specified attribute and fill rune.
+    /// </summary>
+    /// <param name="attribute">The attribute (color/style) to use.</param>
+    /// <param name="fillRune">The rune to fill the interior of the rectangles with. If <cref langword="null"/> space will be used.</param>
+    public void FillRectangles (Attribute attribute, Rune? fillRune = null)
+    {
+        if (_rectangles.Count == 0)
+        {
+            return;
+        }
+        foreach (Rectangle rect in _rectangles)
+        {
+            if (rect.IsEmpty || rect.Width <= 0 || rect.Height <= 0)
+            {
+                continue;
+            }
+            Application.Driver?.SetAttribute (attribute);
+            for (int y = rect.Top; y < rect.Bottom; y++)
+            {
+                for (int x = rect.Left; x < rect.Right; x++)
+                {
+                    Application.Driver?.Move (x, y);
+                    Application.Driver?.AddRune (fillRune ?? (Rune)' ');
+                }
+            }
+        }
+    }
+
+
+    /// <summary>
+    ///     Draws the outer perimeter of the region to <paramref name="lineCanvas"/> using <paramref name="style"/> and <paramref name="attribute"/>.
+    ///     The outer perimeter follows the shape of the rectangles in the region, even if non-rectangular, by drawing boundaries and excluding internal lines.
+    /// </summary>
+    /// <param name="lineCanvas">The LineCanvas to draw on.</param>
+    /// <param name="style">The line style to use for drawing.</param>
+    /// <param name="attribute">The attribute (color/style) to use for the lines. If <c>null</c>.</param>
+    public void DrawOuterBoundary (LineCanvas lineCanvas, LineStyle style, Attribute? attribute = null)
+    {
+       
+    }
 }
+
