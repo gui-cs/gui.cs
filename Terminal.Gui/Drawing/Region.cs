@@ -792,41 +792,6 @@ public class Region
     }
 
     /// <summary>
-    ///     Draws the boundaries of all rectangles in the region using the specified attributes, only if the rectangle is big
-    ///     enough.
-    /// </summary>
-    /// <param name="canvas">The canvas to draw on.</param>
-    /// <param name="style">The line style to use for drawing.</param>
-    /// <param name="attribute">The attribute (color/style) to use for the lines. If <c>null</c>.</param>
-    public void DrawBoundaries (LineCanvas canvas, LineStyle style, Attribute? attribute = null)
-    {
-        if (_rectangles.Count == 0)
-        {
-            return;
-        }
-
-        foreach (Rectangle rect in _rectangles)
-        {
-            if (rect.IsEmpty || rect.Width <= 0 || rect.Height <= 0)
-            {
-                continue;
-            }
-
-            // Only draw boundaries if the rectangle is "big enough" (e.g., width and height > 1)
-            if (rect.Width > 2 && rect.Height > 2)
-            {
-                // Add horizontal lines
-                canvas.AddLine (new (rect.Left, rect.Top), rect.Width + 1, Orientation.Horizontal, style, attribute);
-                canvas.AddLine (new (rect.Left, rect.Bottom), rect.Width + 1, Orientation.Horizontal, style, attribute);
-
-                // Add vertical lines 
-                canvas.AddLine (new (rect.Left, rect.Top), rect.Height + 1, Orientation.Vertical, style, attribute);
-                canvas.AddLine (new (rect.Right, rect.Top), rect.Height + 1, Orientation.Vertical, style, attribute);
-            }
-        }
-    }
-
-    /// <summary>
     ///     Fills the interior of all rectangles in the region with the specified attribute and fill rune.
     /// </summary>
     /// <param name="attribute">The attribute (color/style) to use.</param>
@@ -861,7 +826,50 @@ public class Region
         }
     }
 
-    // BUGBUG: This does not work right. it draws all regions +1 too tall/wide. It should draw single width/height regions as just a line.
+
+    /// <summary>
+    ///     Draws the boundaries of all rectangles in the region using the specified attributes, only if the rectangle is big
+    ///     enough.
+    /// </summary>
+    /// <param name="canvas">The canvas to draw on.</param>
+    /// <param name="style">The line style to use for drawing.</param>
+    /// <param name="attribute">The attribute (color/style) to use for the lines. If <c>null</c>.</param>
+    public void DrawBoundaries (LineCanvas canvas, LineStyle style, Attribute? attribute = null)
+    {
+        if (_rectangles.Count == 0)
+        {
+            return;
+        }
+
+        foreach (Rectangle rect in _rectangles)
+        {
+            if (rect.IsEmpty || rect.Width <= 0 || rect.Height <= 0)
+            {
+                continue;
+            }
+
+            // Only draw boundaries if the rectangle is "big enough" (e.g., width and height > 1)
+            //if (rect.Width > 2 && rect.Height > 2)
+            {
+                if (rect.Width > 1)
+                {
+                    // Add horizontal lines
+                    canvas.AddLine (new (rect.Left, rect.Top), rect.Width, Orientation.Horizontal, style, attribute);
+                    canvas.AddLine (new (rect.Left, rect.Bottom - 1), rect.Width, Orientation.Horizontal, style, attribute);
+                }
+
+                if (rect.Height > 1)
+                {
+                    // Add vertical lines 
+                    canvas.AddLine (new (rect.Left, rect.Top), rect.Height, Orientation.Vertical, style, attribute);
+                    canvas.AddLine (new (rect.Right - 1, rect.Top), rect.Height, Orientation.Vertical, style, attribute);
+                }
+            }
+        }
+    }
+
+
+    // BUGBUG: DrawOuterBoundary does not work right. it draws all regions +1 too tall/wide. It should draw single width/height regions as just a line.
     //
     // Example: There are 3 regions here. the first is a rect (0,0,1,4). Second is (10, 0, 2, 4). 
     // This is how they should draw:
@@ -879,19 +887,27 @@ public class Region
     // 3││        │ │       │  │     
     // 4││        │ │       │  │     
     // 5└┘        └─┘       └──┘         
-
-
-// THIS ISN"T RIGHT!
+    //
     // Example: There are two rectangles in this region. (0,0,3,3) and (3, 3, 3, 3).
+    // This is fill - correct:
+    // |123456789
+    // 1░░░      
+    // 2░░░      
+    // 3░░░░░    
+    // 4  ░░░    
+    // 5  ░░░    
+    // 6         
+    //
+    // This is what DrawOuterBoundary should draw
     // |123456789|123456789
     // 1┌─┐               
     // 2│ │             
-    // 3│ └─┐             
-    // 4└─┐ │             
-    // 5  │ │             
-    // 6  └─┘             
-
-    // This is what is drawn:
+    // 3└─┼─┐             
+    // 4  │ │             
+    // 5  └─┘             
+    // 6
+    //
+    // This is what DrawOuterBoundary actually draws
     // |123456789|123456789
     // 1┌──┐               
     // 2│  │               

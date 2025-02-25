@@ -84,7 +84,7 @@ public class RegionScenario : Scenario
         };
         app.Padding.Thickness = new (1);
 
-        _attribute = app.ColorScheme.Normal;
+        _attribute = app.ColorScheme.HotFocus;
 
         var tools = new ToolsView { Title = "Tools", X = Pos.AnchorEnd (), Y = 2 };
 
@@ -135,7 +135,8 @@ public class RegionScenario : Scenario
                                   //_region.FillRectangles (_attribute.Value, _fillRune);
                                   if (_outer)
                                   {
-                                      _region.DrawOuterBoundary (app.LineCanvas, LineStyle.Single, _attribute);
+                                      _region.DrawBoundaries (app.LineCanvas, LineStyle.Single, _attribute);
+                                      _region.FillRectangles (_attribute.Value, (Rune)' ');
                                   }
                                   else
                                   {
@@ -149,9 +150,9 @@ public class RegionScenario : Scenario
                                       var previewRect = GetRectFromPoints (_dragStart.Value, currentMousePos);
                                       var previewRegion = new Region (previewRect);
 
-                                      previewRegion.FillRectangles (_attribute.Value, _previewFillRune);
+                                      previewRegion.FillRectangles (_attribute.Value, (Rune)' ');
 
-                                      // previewRegion.DrawBoundaries(app.LineCanvas, LineStyle.Dashed, _attribute);
+                                      previewRegion.DrawBoundaries (app.LineCanvas, LineStyle.Dashed, new (_attribute.Value.Foreground.GetHighlightColor(), _attribute.Value.Background));
                                   }
                               };
 
