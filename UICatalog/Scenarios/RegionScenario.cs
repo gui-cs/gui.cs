@@ -79,8 +79,10 @@ public class RegionScenario : Scenario
         Window app = new ()
         {
             Title = GetQuitKeyAndName (),
-            TabStop = TabBehavior.TabGroup
+            TabStop = TabBehavior.TabGroup,
+
         };
+        app.Padding.Thickness = new (1);
 
         _attribute = app.ColorScheme.Normal;
 
@@ -122,7 +124,7 @@ public class RegionScenario : Scenario
                                       _dragStart = null;
                                   }
 
-                                  app.SetNeedsDraw ();
+                                  app.SetNeedsDraw (); 
                               }
                           };
 

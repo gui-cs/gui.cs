@@ -14,15 +14,18 @@ namespace Terminal.Gui;
 ///         The <see cref="Region"/> class adopts a philosophy of efficiency and flexibility, balancing performance with
 ///         usability for GUI applications. It maintains a list of <see cref="Rectangle"/> objects, representing disjoint
 ///         (non-overlapping) rectangular areas, and supports operations inspired by set theory. These operations allow
-///         combining regions in various ways, such as merging areas (<see cref="RegionOp.Union"/> or <see cref="RegionOp.MinimalUnion"/>),
-///         finding common areas (<see cref="RegionOp.Intersect"/>), or removing portions (<see cref="RegionOp.Difference"/> or
+///         combining regions in various ways, such as merging areas (<see cref="RegionOp.Union"/> or
+///         <see cref="RegionOp.MinimalUnion"/>),
+///         finding common areas (<see cref="RegionOp.Intersect"/>), or removing portions (
+///         <see cref="RegionOp.Difference"/> or
 ///         <see cref="Exclude(Rectangle)"/>).
 ///     </para>
 ///     <para>
 ///         To achieve high performance, the class employs a sweep-line algorithm for merging rectangles, which efficiently
 ///         processes large sets of rectangles in O(n log n) time by scanning along the x-axis and tracking active vertical
 ///         intervals. This approach ensures scalability for typical GUI scenarios with moderate numbers of rectangles. For
-///         operations like <see cref="RegionOp.Union"/> and <see cref="RegionOp.MinimalUnion"/>, an optional minimization step (
+///         operations like <see cref="RegionOp.Union"/> and <see cref="RegionOp.MinimalUnion"/>, an optional minimization
+///         step (
 ///         <see
 ///             cref="MinimizeRectangles"/>
 ///         ) is used to reduce the number of rectangles to a minimal set, producing the smallest
@@ -32,7 +35,8 @@ namespace Terminal.Gui;
 ///     </para>
 ///     <para>
 ///         The class is immutable in its operations (returning new regions or modifying in-place via methods like
-///         <see cref="Combine(Rectangle,RegionOp)"/>), supports nullability for robustness, and implements <see cref="IDisposable"/> to manage
+///         <see cref="Combine(Rectangle,RegionOp)"/>), supports nullability for robustness, and implements
+///         <see cref="IDisposable"/> to manage
 ///         resources by clearing internal state. Developers can choose between granular (detailed) or minimal (compact)
 ///         outputs for union operations via <see cref="RegionOp.Union"/> and <see cref="RegionOp.MinimalUnion"/>, catering
 ///         to diverse use cases such as rendering optimization, event handling, or visualization.
@@ -109,22 +113,24 @@ public class Region
 
                 // region is regionB
                 // We'll chain the difference: (regionA - rect1) - rect2 - rect3 ...
-                List<Rectangle> newRectangles = new List<Rectangle> (_rectangles);
+                List<Rectangle> newRectangles = new (_rectangles);
 
                 foreach (Rectangle rect in region._rectangles)
                 {
-                    List<Rectangle> temp = new List<Rectangle> ();
+                    List<Rectangle> temp = new ();
+
                     foreach (Rectangle r in newRectangles)
                     {
                         temp.AddRange (SubtractRectangle (r, rect));
                     }
+
                     newRectangles = temp;
                 }
 
                 _rectangles.Clear ();
                 _rectangles.AddRange (newRectangles);
-                break;
 
+                break;
 
             case RegionOp.Intersect:
                 List<Rectangle> intersections = new (_rectangles.Count); // Pre-allocate
@@ -517,28 +523,28 @@ public class Region
         }
 
         events.Sort (
-            (a, b) =>
-            {
-                int cmp = a.x.CompareTo (b.x);
+                     (a, b) =>
+                     {
+                         int cmp = a.x.CompareTo (b.x);
 
-                if (cmp != 0)
-                {
-                    return cmp;
-                }
+                         if (cmp != 0)
+                         {
+                             return cmp;
+                         }
 
-                return a.isStart.CompareTo (b.isStart); // Start events before end events at same x
-            });
+                         return a.isStart.CompareTo (b.isStart); // Start events before end events at same x
+                     });
 
         List<Rectangle> merged = [];
 
         SortedSet<(int yTop, int yBottom)> active = new (
-            Comparer<(int yTop, int yBottom)>.Create (
-                (a, b) =>
-                {
-                    int cmp = a.yTop.CompareTo (b.yTop);
+                                                         Comparer<(int yTop, int yBottom)>.Create (
+                                                                                                   (a, b) =>
+                                                                                                   {
+                                                                                                       int cmp = a.yTop.CompareTo (b.yTop);
 
-                    return cmp != 0 ? cmp : a.yBottom.CompareTo (b.yBottom);
-                }));
+                                                                                                       return cmp != 0 ? cmp : a.yBottom.CompareTo (b.yBottom);
+                                                                                                   }));
         int lastX = events [0].x;
 
         foreach ((int x, bool isStart, int yTop, int yBottom) evt in events)
@@ -564,7 +570,6 @@ public class Region
 
         return minimize ? MinimizeRectangles (merged) : merged;
     }
-
 
     /// <summary>
     ///     Merges overlapping vertical intervals into a minimal set of non-overlapping rectangles.
@@ -713,12 +718,12 @@ public class Region
         if (subtract.IsEmpty || subtract.Width <= 0 || subtract.Height <= 0)
         {
             yield return original;
+
             yield break;
         }
 
         // Check for complete overlap (subtract fully contains or equals original)
-        if (subtract.Left <= original.Left && subtract.Top <= original.Top &&
-            subtract.Right >= original.Right && subtract.Bottom >= original.Bottom)
+        if (subtract.Left <= original.Left && subtract.Top <= original.Top && subtract.Right >= original.Right && subtract.Bottom >= original.Bottom)
         {
             yield break; // Return empty if subtract completely overlaps original
         }
@@ -727,6 +732,7 @@ public class Region
         if (!original.IntersectsWith (subtract))
         {
             yield return original;
+
             yield break;
         }
 
@@ -735,21 +741,21 @@ public class Region
         // Top segment (above subtract)
         if (original.Top < subtract.Top)
         {
-            yield return new Rectangle (
-                original.Left,
-                original.Top,
-                original.Width,
-                subtract.Top - original.Top);
+            yield return new (
+                              original.Left,
+                              original.Top,
+                              original.Width,
+                              subtract.Top - original.Top);
         }
 
         // Bottom segment (below subtract)
         if (original.Bottom > subtract.Bottom)
         {
-            yield return new Rectangle (
-                original.Left,
-                subtract.Bottom,
-                original.Width,
-                original.Bottom - subtract.Bottom);
+            yield return new (
+                              original.Left,
+                              subtract.Bottom,
+                              original.Width,
+                              original.Bottom - subtract.Bottom);
         }
 
         // Left segment (to the left of subtract)
@@ -757,13 +763,14 @@ public class Region
         {
             int top = Math.Max (original.Top, subtract.Top);
             int bottom = Math.Min (original.Bottom, subtract.Bottom);
+
             if (bottom > top)
             {
-                yield return new Rectangle (
-                    original.Left,
-                    top,
-                    subtract.Left - original.Left,
-                    bottom - top);
+                yield return new (
+                                  original.Left,
+                                  top,
+                                  subtract.Left - original.Left,
+                                  bottom - top);
             }
         }
 
@@ -772,19 +779,21 @@ public class Region
         {
             int top = Math.Max (original.Top, subtract.Top);
             int bottom = Math.Min (original.Bottom, subtract.Bottom);
+
             if (bottom > top)
             {
-                yield return new Rectangle (
-                    subtract.Right,
-                    top,
-                    original.Right - subtract.Right,
-                    bottom - top);
+                yield return new (
+                                  subtract.Right,
+                                  top,
+                                  original.Right - subtract.Right,
+                                  bottom - top);
             }
         }
     }
 
     /// <summary>
-    ///     Draws the boundaries of all rectangles in the region using the specified attributes, only if the rectangle is big enough.
+    ///     Draws the boundaries of all rectangles in the region using the specified attributes, only if the rectangle is big
+    ///     enough.
     /// </summary>
     /// <param name="canvas">The canvas to draw on.</param>
     /// <param name="style">The line style to use for drawing.</param>
@@ -817,25 +826,30 @@ public class Region
         }
     }
 
-
     /// <summary>
     ///     Fills the interior of all rectangles in the region with the specified attribute and fill rune.
     /// </summary>
     /// <param name="attribute">The attribute (color/style) to use.</param>
-    /// <param name="fillRune">The rune to fill the interior of the rectangles with. If <cref langword="null"/> space will be used.</param>
+    /// <param name="fillRune">
+    ///     The rune to fill the interior of the rectangles with. If <cref langword="null"/> space will be
+    ///     used.
+    /// </param>
     public void FillRectangles (Attribute attribute, Rune? fillRune = null)
     {
         if (_rectangles.Count == 0)
         {
             return;
         }
+
         foreach (Rectangle rect in _rectangles)
         {
             if (rect.IsEmpty || rect.Width <= 0 || rect.Height <= 0)
             {
                 continue;
             }
+
             Application.Driver?.SetAttribute (attribute);
+
             for (int y = rect.Top; y < rect.Bottom; y++)
             {
                 for (int x = rect.Left; x < rect.Right; x++)
@@ -847,17 +861,199 @@ public class Region
         }
     }
 
+    // BUGBUG: This does not work right. it draws all regions +1 too tall/wide. It should draw single width/height regions as just a line.
+    //
+    // Example: There are 3 regions here. the first is a rect (0,0,1,4). Second is (10, 0, 2, 4). 
+    // This is how they should draw:
+    //
+    // |123456789|123456789|123456789
+    // 1 │        ┌┐        ┌─┐ 
+    // 2 │        ││        │ │ 
+    // 3 │        ││        │ │ 
+    // 4 │        └┘        └─┘
+    // 
+    // But this is what it draws:
+    // |123456789|123456789|123456789
+    // 1┌┐        ┌─┐       ┌──┐     
+    // 2││        │ │       │  │     
+    // 3││        │ │       │  │     
+    // 4││        │ │       │  │     
+    // 5└┘        └─┘       └──┘         
+
+
+// THIS ISN"T RIGHT!
+    // Example: There are two rectangles in this region. (0,0,3,3) and (3, 3, 3, 3).
+    // |123456789|123456789
+    // 1┌─┐               
+    // 2│ │             
+    // 3│ └─┐             
+    // 4└─┐ │             
+    // 5  │ │             
+    // 6  └─┘             
+
+    // This is what is drawn:
+    // |123456789|123456789
+    // 1┌──┐               
+    // 2│  │               
+    // 3│  └─┐             
+    // 4└─┐  │             
+    // 5  │  │             
+    // 6  └──┘             
 
     /// <summary>
-    ///     Draws the outer perimeter of the region to <paramref name="lineCanvas"/> using <paramref name="style"/> and <paramref name="attribute"/>.
-    ///     The outer perimeter follows the shape of the rectangles in the region, even if non-rectangular, by drawing boundaries and excluding internal lines.
+    ///     Draws the outer perimeter of the region to <paramref name="lineCanvas"/> using <paramref name="style"/> and
+    ///     <paramref name="attribute"/>.
+    ///     The outer perimeter follows the shape of the rectangles in the region, even if non-rectangular, by drawing
+    ///     boundaries and excluding internal lines.
     /// </summary>
     /// <param name="lineCanvas">The LineCanvas to draw on.</param>
     /// <param name="style">The line style to use for drawing.</param>
     /// <param name="attribute">The attribute (color/style) to use for the lines. If <c>null</c>.</param>
     public void DrawOuterBoundary (LineCanvas lineCanvas, LineStyle style, Attribute? attribute = null)
     {
-       
+        if (_rectangles.Count == 0)
+        {
+            return;
+        }
+
+        // Get the bounds of the region
+        Rectangle bounds = GetBounds ();
+
+        // Create a grid to track which cells are inside the region
+        var insideRegion = new bool [bounds.Width + 1, bounds.Height + 1];
+
+        // Fill the grid based on rectangles
+        foreach (Rectangle rect in _rectangles)
+        {
+            if (rect.IsEmpty || rect.Width <= 0 || rect.Height <= 0)
+            {
+                continue;
+            }
+
+            for (int x = rect.Left; x < rect.Right; x++)
+            {
+                for (int y = rect.Top; y < rect.Bottom; y++)
+                {
+                    // Adjust coordinates to grid space
+                    int gridX = x - bounds.Left;
+                    int gridY = y - bounds.Top;
+
+                    if (gridX >= 0 && gridX < bounds.Width && gridY >= 0 && gridY < bounds.Height)
+                    {
+                        insideRegion [gridX, gridY] = true;
+                    }
+                }
+            }
+        }
+
+        // Find horizontal boundary lines
+        for (var y = 0; y <= bounds.Height; y++)
+        {
+            int startX = -1;
+
+            for (var x = 0; x <= bounds.Width; x++)
+            {
+                bool above = y > 0 && insideRegion [x, y - 1];
+                bool below = y < bounds.Height && insideRegion [x, y];
+
+                // A boundary exists where one side is inside and the other is outside
+                bool isBoundary = above != below;
+
+                if (isBoundary)
+                {
+                    // Start a new segment or continue the current one
+                    if (startX == -1)
+                    {
+                        startX = x;
+                    }
+                }
+                else
+                {
+                    // End the current segment if one exists
+                    if (startX != -1)
+                    {
+                        int length = x - startX + 1; // Add 1 to make sure lines connect
+
+                        lineCanvas.AddLine (
+                                            new (startX + bounds.Left, y + bounds.Top),
+                                            length,
+                                            Orientation.Horizontal,
+                                            style,
+                                            attribute
+                                           );
+                        startX = -1;
+                    }
+                }
+            }
+
+            // End any segment that reaches the right edge
+            if (startX != -1)
+            {
+                int length = bounds.Width + 1 - startX + 1; // Add 1 to make sure lines connect
+
+                lineCanvas.AddLine (
+                                    new (startX + bounds.Left, y + bounds.Top),
+                                    length,
+                                    Orientation.Horizontal,
+                                    style,
+                                    attribute
+                                   );
+            }
+        }
+
+        // Find vertical boundary lines
+        for (var x = 0; x <= bounds.Width; x++)
+        {
+            int startY = -1;
+
+            for (var y = 0; y <= bounds.Height; y++)
+            {
+                bool left = x > 0 && insideRegion [x - 1, y];
+                bool right = x < bounds.Width && insideRegion [x, y];
+
+                // A boundary exists where one side is inside and the other is outside
+                bool isBoundary = left != right;
+
+                if (isBoundary)
+                {
+                    // Start a new segment or continue the current one
+                    if (startY == -1)
+                    {
+                        startY = y;
+                    }
+                }
+                else
+                {
+                    // End the current segment if one exists
+                    if (startY != -1)
+                    {
+                        int length = y - startY + 1; // Add 1 to make sure lines connect
+
+                        lineCanvas.AddLine (
+                                            new (x + bounds.Left, startY + bounds.Top),
+                                            length,
+                                            Orientation.Vertical,
+                                            style,
+                                            attribute
+                                           );
+                        startY = -1;
+                    }
+                }
+            }
+
+            // End any segment that reaches the bottom edge
+            if (startY != -1)
+            {
+                int length = bounds.Height + 1 - startY + 1; // Add 1 to make sure lines connect
+
+                lineCanvas.AddLine (
+                                    new (x + bounds.Left, startY + bounds.Top),
+                                    length,
+                                    Orientation.Vertical,
+                                    style,
+                                    attribute
+                                   );
+            }
+        }
     }
 }
-
