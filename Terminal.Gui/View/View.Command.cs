@@ -106,6 +106,12 @@ public partial class View // Command APIs
             {
                 return SuperView?.InvokeCommand<KeyBinding> (Command.Accept, new ([Command.Accept], null, this)) is true;
             }
+            //else
+            //{
+            //    // If there's no superview, we're at the top level, so we should return true to stop processing
+            //    // See https://github.com/gui-cs/Terminal.Gui/issues/3905
+            //    return true;
+            //}
         }
 
         return Accepting is null ? null : args.Cancel;

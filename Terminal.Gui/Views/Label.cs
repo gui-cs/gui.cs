@@ -74,12 +74,15 @@ public class Label : View, IDesignable
             return true;
         }
 
-        int me = SuperView?.Subviews.IndexOf (this) ?? -1;
-
-        if (me != -1 && me < SuperView?.Subviews.Count - 1)
+        if (HotKey.IsValid)
         {
+            int me = SuperView?.Subviews.IndexOf (this) ?? -1;
 
-            return SuperView?.Subviews [me + 1].InvokeCommand (Command.HotKey) == true;
+            if (me != -1 && me < SuperView?.Subviews.Count - 1)
+            {
+
+                return SuperView?.Subviews [me + 1].InvokeCommand (Command.HotKey) == true;
+            }
         }
 
         return false;

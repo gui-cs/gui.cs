@@ -10,7 +10,7 @@ public class ViewCommandTests
         var view = new ViewEventTester ();
         Assert.False (view.HasFocus);
 
-        Assert.False (view.InvokeCommand (Command.Accept)); // false means it was not handled
+        Assert.False (view.InvokeCommand (Command.Accept)); // there's no superview, so it should return true?
 
         Assert.Equal (1, view.OnAcceptedCount);
 
@@ -122,6 +122,148 @@ public class ViewCommandTests
         view.NewMouseEvent (new () { Flags = MouseFlags.Button1Clicked, Position = Point.Empty, View = view });
 
         Assert.Equal (0, view.OnAcceptedCount);
+    }
+
+    // See https://github.com/gui-cs/Terminal.Gui/issues/3913
+    [Fact]
+    public void Button_IsDefault_Raises_Accepted_Correctly ()
+    {
+        int A_AcceptedCount = 0;
+        bool A_CancelAccepting = false;
+
+        int B_AcceptedCount = 0;
+        bool B_CancelAccepting = false;
+
+        var w = new Window ()
+        {
+            BorderStyle = LineStyle.None,
+            Width = 10,
+            Height = 10
+        };
+
+        var btnA = new Button ()
+        {
+            Width = 3,
+            IsDefault = true
+        };
+        btnA.Accepting += (s, e) =>
+                          {
+                              A_AcceptedCount++;
+                              e.Cancel = A_CancelAccepting;
+                          };
+
+        var btnB = new Button ()
+        {
+            Width = 3,
+            X = Pos.Right (btnA)
+        };
+
+        btnB.Accepting += (s, e) =>
+                          {
+                              B_AcceptedCount++;
+                              e.Cancel = B_CancelAccepting;
+                          };
+        w.Add (btnA, btnB);
+
+        w.LayoutSubviews ();
+
+        Application.Begin (w);
+        Assert.Same (Application.Top, w);
+
+        // Click button 2
+        var btn2Frame = btnB.FrameToScreen ();
+
+        Application.RaiseMouseEvent (
+                         new MouseEventArgs ()
+                         {
+                             ScreenPosition = btn2Frame.Location,
+                             Flags = MouseFlags.Button1Clicked
+                         });
+
+        // Button A should have been accepted because B didn't cancel and A IsDefault
+        Assert.Equal (1, A_AcceptedCount);
+        Assert.Equal (1, B_AcceptedCount);
+
+        B_CancelAccepting = true;
+        Application.RaiseMouseEvent (
+                                     new MouseEventArgs ()
+                                     {
+                                         ScreenPosition = btn2Frame.Location,
+                                         Flags = MouseFlags.Button1Clicked
+                                     });
+
+        // Button A (IsDefault) should NOT have been accepted because B canceled
+        Assert.Equal (1, A_AcceptedCount);
+        Assert.Equal (2, B_AcceptedCount);
+    }
+
+    // See: https://github.com/gui-cs/Terminal.Gui/issues/3905
+    [Fact]
+    public void Button_CanFocus_False_Raises_Accepted_Correctly ()
+    {
+        int wAcceptedCount = 0;
+        bool wCancelAccepting = false;
+        var w = new Window ()
+        {
+            Title = "Window",
+            BorderStyle = LineStyle.None,
+            Width = 10,
+            Height = 10
+        };
+
+        w.Accepting += (s, e) =>
+                       {
+                           wAcceptedCount++;
+                           e.Cancel = wCancelAccepting;
+                       };
+
+        int btnAcceptedCount = 0;
+        bool btnCancelAccepting = false;
+        var btn = new Button ()
+        {
+            Title = "Button",
+            Width = 3,
+            IsDefault = true,
+        };
+        btn.CanFocus = false;
+
+        btn.Accepting += (s, e) =>
+                         {
+                             btnAcceptedCount++;
+                             e.Cancel = btnCancelAccepting;
+                         };
+
+        w.Add (btn);
+
+        w.LayoutSubviews ();
+
+        Application.Begin (w);
+
+        // Click button just like a driver would
+        var btnFrame = btn.FrameToScreen ();
+        Application.RaiseMouseEvent (
+                                     new MouseEventArgs ()
+                                     {
+                                         ScreenPosition = btnFrame.Location,
+                                         Flags = MouseFlags.Button1Pressed
+                                     });
+
+        Application.RaiseMouseEvent (
+                                     new MouseEventArgs ()
+                                     {
+                                         ScreenPosition = btnFrame.Location,
+                                         Flags = MouseFlags.Button1Released
+                                     });
+
+        Application.RaiseMouseEvent (
+                                     new MouseEventArgs ()
+                                     {
+                                         ScreenPosition = btnFrame.Location,
+                                         Flags = MouseFlags.Button1Clicked
+                                     });
+
+        Assert.Equal (1, wAcceptedCount);
+        Assert.Equal (1, btnAcceptedCount);
     }
 
     #endregion OnAccept/Accept tests
