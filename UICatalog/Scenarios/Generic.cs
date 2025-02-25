@@ -23,7 +23,7 @@ public sealed class Generic : Scenario
         button.Accepting += (s, e) =>
                             {
                                 // Anytime Accepting is handled, make sure to set e.Cancel to false.
-                                e.Cancel = false;
+                                e.Cancel = true;
                                 MessageBox.ErrorQuery ("Error", "You pressed the button!", "_Ok");
                             };
 

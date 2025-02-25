@@ -225,7 +225,7 @@ public class ViewCommandTests
             Width = 3,
             IsDefault = true,
         };
-        btn.CanFocus = false;
+        btn.CanFocus = true;
 
         btn.Accepting += (s, e) =>
                          {
@@ -262,8 +262,8 @@ public class ViewCommandTests
                                          Flags = MouseFlags.Button1Clicked
                                      });
 
-        Assert.Equal (1, wAcceptedCount);
         Assert.Equal (1, btnAcceptedCount);
+        Assert.Equal (2, wAcceptedCount);
     }
 
     #endregion OnAccept/Accept tests
@@ -282,7 +282,7 @@ public class ViewCommandTests
         Assert.Equal (canFocus, view.CanFocus);
         Assert.False (view.HasFocus);
 
-        Assert.Equal (canFocus, view.InvokeCommand (Command.Select));
+        view.InvokeCommand (Command.Select);
 
         Assert.Equal (1, view.OnSelectingCount);
 

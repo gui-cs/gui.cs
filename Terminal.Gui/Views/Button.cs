@@ -93,7 +93,7 @@ public class Button : View, IDesignable
         // If Accept was not handled...
         if (cachedIsDefault && SuperView is { })
         {
-           // return SuperView.InvokeCommand (Command.Accept);
+            return SuperView.InvokeCommand (Command.Accept);
         }
 
         return false;
