@@ -902,6 +902,23 @@ public class RuneTests
         Assert.Equal (3, splitOnComma.Length);
     }
 
+    [Theory]
+    [InlineData ("a", "utf-8", 1)]
+    [InlineData ("a", "utf-16", 1)]
+    [InlineData ("a", "utf-32", 3)]
+    [InlineData ("𝔹", "utf-8", 4)]
+    [InlineData ("𝔹", "utf-16", 4)]
+    [InlineData ("𝔹", "utf-32", 3)]
+    public void GetEncodingLength_ReturnsLengthBasedOnSelectedEncoding (string runeStr, string encodingName, int expectedLength)
+    {
+        Rune rune = runeStr.EnumerateRunes ().Single ();
+        var encoding = Encoding.GetEncoding (encodingName);
+
+        int actualLength = rune.GetEncodingLength (encoding);
+
+        Assert.Equal (expectedLength, actualLength);
+    }
+
     private int CountLettersInString (string s)
     {
         var letterCount = 0;
