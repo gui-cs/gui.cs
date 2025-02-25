@@ -19,21 +19,15 @@ public sealed class Generic : Scenario
         };
 
         var button = new Button { Id = "button", X = Pos.Center (), Y = 1, Text = "_Press me!" };
-        button.CanFocus = false;
 
         button.Accepting += (s, e) =>
                             {
+                                // Anytime Accepting is handled, make sure to set e.Cancel to false.
                                 e.Cancel = false;
                                 MessageBox.ErrorQuery ("Error", "You pressed the button!", "_Ok");
                             };
 
-        var label = new Label ()
-        {
-            Title = "Press the _button or use Alt+P to press it.",
-            X = Pos.Center (),
-            Y = Pos.Bottom (button) + 1,
-        };
-        appWindow.Add (label, button);
+        appWindow.Add (button);
 
         // Run - Start the application.
         Application.Run (appWindow);
