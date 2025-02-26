@@ -574,38 +574,22 @@ public class LineCanvas : IDisposable
 
         #region Corner Conditions
 
-        if (Exactly (
-                     set,
-                     IntersectionType.StartRight,
-                     IntersectionType.StartDown
-                    ))
+        if (Exactly (set, CornerIntersections.UpperLeft))
         {
             return IntersectionRuneType.ULCorner;
         }
 
-        if (Exactly (
-                     set,
-                     IntersectionType.StartLeft,
-                     IntersectionType.StartDown
-                    ))
+        if (Exactly (set, CornerIntersections.UpperRight))
         {
             return IntersectionRuneType.URCorner;
         }
 
-        if (Exactly (
-                     set,
-                     IntersectionType.StartUp,
-                     IntersectionType.StartLeft
-                    ))
+        if (Exactly (set, CornerIntersections.LowerRight))
         {
             return IntersectionRuneType.LRCorner;
         }
 
-        if (Exactly (
-                     set,
-                     IntersectionType.StartUp,
-                     IntersectionType.StartRight
-                    ))
+        if (Exactly (set, CornerIntersections.LowerLeft))
         {
             return IntersectionRuneType.LLCorner;
         }
@@ -722,6 +706,25 @@ public class LineCanvas : IDisposable
             }
         }
         return true;
+    }
+
+
+    /// <summary>
+    /// Preallocated arrays for <see cref="GetRuneTypeForIntersects"/> calls to <see cref="Exactly"/>.
+    /// </summary>
+    /// <remarks>
+    /// Optimization to avoid array allocation for each call from array params. Please do not edit the arrays at runtime. :)
+    /// 
+    /// More ideal solution would be to change <see cref="Exactly"/> to take ReadOnlySpan instead of an array
+    /// but that would require replacing the HashSet.SetEquals call.
+    /// </remarks>
+    private static class CornerIntersections
+    {
+        // Names matching #region "Corner Conditions" IntersectionRuneType
+        internal static readonly IntersectionType[] UpperLeft = [IntersectionType.StartRight, IntersectionType.StartDown];
+        internal static readonly IntersectionType[] UpperRight = [IntersectionType.StartLeft, IntersectionType.StartDown];
+        internal static readonly IntersectionType[] LowerRight = [IntersectionType.StartUp, IntersectionType.StartLeft];
+        internal static readonly IntersectionType[] LowerLeft = [IntersectionType.StartUp, IntersectionType.StartRight];
     }
 
     private class BottomTeeIntersectionRuneResolver : IntersectionRuneResolver
