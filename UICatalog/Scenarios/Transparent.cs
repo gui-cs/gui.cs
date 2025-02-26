@@ -19,7 +19,7 @@ public sealed class Transparent : Scenario
         appWindow.BorderStyle = LineStyle.None;
         appWindow.ColorScheme = Colors.ColorSchemes ["Error"];
 
-        appWindow.Text = "Transparent Tester.\n2nd Line of Text.\n3rd Line of Text.";
+        appWindow.Text = "App Text - Centered Vertically and Horizontally.\n2nd Line of Text.\n3rd Line of Text.";
         appWindow.TextAlignment = Alignment.Center;
         appWindow.VerticalTextAlignment = Alignment.Center;
         appWindow.ClearingViewport += (s, e) =>
@@ -27,21 +27,28 @@ public sealed class Transparent : Scenario
                                         appWindow!.FillRect (appWindow!.Viewport, CM.Glyphs.Dot);
                                         e.Cancel = true;
                                     };
+        ViewportSettingsEditor viewportSettingsEditor = new ViewportSettingsEditor ()
+        {
+            Y = Pos.AnchorEnd (),
+            //X = Pos.Right (adornmentsEditor),
+            AutoSelectViewToEdit = true
+        };
+        appWindow.Add (viewportSettingsEditor);
 
         appWindow.Add (
                        new Button ()
                        {
                            X = 10,
                            Y = 4,
-                           Title = "_AppButton"
+                           Title = "_AppButton",
                        });
 
         var tv = new TransparentView ()
         {
-            X = 0,
-            Y = 0,
-            Width = 25,
-            Height = 10
+            X = 3,
+            Y = 3,
+            Width = 50,
+            Height = 15
         };
         appWindow.Add (tv);
 
@@ -57,116 +64,47 @@ public sealed class Transparent : Scenario
     {
         public TransparentView ()
         {
-            Title = "Transparent";
-            //base.Text = "Text.\nSecond Line.";
+            Title = "Transparent View";
+            base.Text = "View.Text.\nThis should be opaque.\nNote how clipping works?";
+            TextFormatter.Alignment = Alignment.Center;
+            TextFormatter.VerticalAlignment = Alignment.Center;
             Arrangement = ViewArrangement.Overlapped | ViewArrangement.Resizable | ViewArrangement.Movable;
-            ViewportSettings |= Terminal.Gui.ViewportSettings.Transparent ;
-            base.TextAlignment = Alignment.Center;
-            base.VerticalTextAlignment = Alignment.Center;
+            ViewportSettings |= Terminal.Gui.ViewportSettings.Transparent;
+            BorderStyle = LineStyle.RoundedDotted;
+            base.ColorScheme = Colors.ColorSchemes ["Base"];
 
-            ColorScheme = Colors.ColorSchemes ["Base"];
+            var transparentSubView = new View ()
+            {
+                Text = "Sizable/Movable View with border. Should be opaque. The shadow should be semi-opaque.",
+                Id = "transparentSubView",
+                X = 4,
+                Y = 8,
+                Width = 20,
+                Height = 8,
+                BorderStyle = LineStyle.Dashed,
+                Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
+                ShadowStyle = ShadowStyle.Transparent,
+                //ViewportSettings = Terminal.Gui.ViewportSettings.Transparent
+            };
+            transparentSubView.Border.Thickness = new (1, 1, 1, 1);
+            transparentSubView.ColorScheme = Colors.ColorSchemes ["Dialog"];
 
-            //// Create 4 sub-views with borders and different colors. Each 3 high/wide. One aligned top, one bottom, one left, one right.
-            //View topView = new ()
-            //{
-            //    Title = "Top",
-            //    Text = "Top View",
-            //    X = 0,
-            //    Y = 0,
-            //    Width = Dim.Fill(),
-            //    Height = 3,
-            //    BorderStyle = LineStyle.Single,
-            //    Arrangement = ViewArrangement.Movable,
-            //    ColorScheme = Colors.ColorSchemes ["Error"]
-            //};
+            Button button = new Button ()
+            {
+                Title = "_Opaque Shadows No Worky",
+                X = Pos.Center (),
+                Y = 4,
+                ColorScheme = Colors.ColorSchemes ["Dialog"],
+            };
 
-            //View leftView = new ()
-            //{
-            //    Title = "Left",
-            //    Text = "Left View",
-            //    X = 0,
-            //    Y = Pos.Bottom(topView),
-            //    Width = 3,
-            //    Height = Dim.Fill (),
-            //    BorderStyle = LineStyle.Single,
-            //    Arrangement = ViewArrangement.Movable,
-            //    ColorScheme = Colors.ColorSchemes ["Base"]
-            //};
-
-            //View bottomView = new ()
-            //{
-            //    Title = "Bottom",
-            //    Text = "Bottom View",
-            //    X = 0,
-            //    Y = Pos.AnchorEnd(),
-            //    Width = Dim.Fill (),
-            //    Height = 3,
-            //    BorderStyle = LineStyle.Single,
-            //    Arrangement = ViewArrangement.Movable,
-            //    ColorScheme = Colors.ColorSchemes ["Dialog"]
-            //};
-
-            //View rightView = new () {
-            //    Title = "Right",
-            //    Text = "Right View",
-            //    X = Pos.AnchorEnd (),
-            //    Y = 0,
-            //    Width = 3,
-            //    Height = Dim.Fill (),
-            //    BorderStyle = LineStyle.Single,
-            //    Arrangement = ViewArrangement.Movable,
-            //    ColorScheme = Colors.ColorSchemes ["Toplevel"]
-            //};
-
-            //base.Add (topView, leftView, bottomView, rightView);
+            button.ClearingViewport += (sender, args) =>
+                                       {
+                                           args.Cancel = true;
+                                       };
 
 
-
-
-            //var transparentSubView = new View ()
-            //{
-            //    Title = "TS",
-            //    Text = "0123456989",
-            //    Id = "transparentSubView",
-            //    X = -5,
-            //    Y = 0,
-            //    Width = 10,
-            //    Height = 3,
-            //    BorderStyle = LineStyle.Dashed,
-            //    Arrangement = ViewArrangement.Movable,
-            //    //ViewportSettings = Terminal.Gui.ViewportSettings.Transparent
-            //};
-            //transparentSubView.Border.Thickness = new (0, 1, 0, 0);
-            //transparentSubView.ColorScheme = Colors.ColorSchemes ["Dialog"];
-
-            //base.Add (
-            //          new Label ()
-            //          {
-            //              X = 4, 
-            //              Y = 0,
-            //              Width = 15,
-            //              Height = 1,
-            //              Title = "Label..!"
-            //          });
-            //base.Add (transparentSubView);  
-            base.Add (
-                      new Button ()
-                      {
-                          Title = "_Long Button testing...",
-                          X = 4,
-                          Y = 3,
-                          ShadowStyle = ShadowStyle.None,
-                          ColorScheme = Colors.ColorSchemes ["Toplevel"],
-                      });
-            //base.Add (
-            //          new Label ()
-            //          {
-            //              X = 12,
-            //              Y = 0,
-            //              Width = 1,
-            //              Height = 10,
-            //              Title = "Vert..."
-            //          });
+            base.Add (button);
+            base.Add (transparentSubView);
         }
 
         /// <inheritdoc />

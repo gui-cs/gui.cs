@@ -343,6 +343,7 @@ public partial class View // Drawing APIs
 
         if (dev.Cancel)
         {
+            SetNeedsDraw ();
             return;
         }
 

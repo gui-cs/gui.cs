@@ -67,16 +67,15 @@ public class Arrangement : Scenario
         tiledView3.Height = Dim.Height (tiledView1);
         View tiledView4 = CreateTiledView (3, Pos.Left (tiledView1), Pos.Bottom (tiledView1) - 1);
         tiledView4.Width = Dim.Func (() => tiledView3.Frame.Width + tiledView2.Frame.Width + tiledView1.Frame.Width - 2);
-        testFrame.Add (tiledView4, tiledView3, tiledView2, tiledView1);
 
-        View overlappedView1 = CreateOverlappedView (2, 0, 13);
-        overlappedView1.Title = "Movable _& Sizable";
+        View movableSizeableWithProgress = CreateOverlappedView (2, 10, 8);
+        movableSizeableWithProgress.Title = "Movable _& Sizable";
         View tiledSubView = CreateTiledView (4, 0, 2);
         tiledSubView.Arrangement = ViewArrangement.Fixed;
-        overlappedView1.Add (tiledSubView);
+        movableSizeableWithProgress.Add (tiledSubView);
         tiledSubView = CreateTiledView (5, Pos.Right (tiledSubView), Pos.Top (tiledSubView));
         tiledSubView.Arrangement = ViewArrangement.Fixed;
-        overlappedView1.Add (tiledSubView);
+        movableSizeableWithProgress.Add (tiledSubView);
 
         ProgressBar progressBar = new ()
         {
@@ -84,7 +83,7 @@ public class Arrangement : Scenario
             Width = Dim.Fill (),
             Id = "progressBar"
         };
-        overlappedView1.Add (progressBar);
+        movableSizeableWithProgress.Add (progressBar);
 
         Timer timer = new (10)
         {
@@ -171,9 +170,6 @@ public class Arrangement : Scenario
         overlappedView2.Add (colorPicker);
         overlappedView2.Width = 50;
 
-        testFrame.Add (overlappedView1);
-        testFrame.Add (overlappedView2);
-
         DatePicker datePicker = new ()
         {
             X = 30,
@@ -186,17 +182,20 @@ public class Arrangement : Scenario
             TabStop = TabBehavior.TabGroup,
             Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped
         };
-        testFrame.Add (datePicker);
 
         TransparentView transparentView = new ()
         {
             Id = "transparentView",
-            X = 5,
-            Y = 11,
+            X = 30,
+            Y = 5,
             Width = 35,
             Height = 15
         };
 
+        testFrame.Add (tiledView4, tiledView3, tiledView2, tiledView1);
+        testFrame.Add (overlappedView2);
+        testFrame.Add (datePicker);
+        testFrame.Add (movableSizeableWithProgress);
         testFrame.Add (transparentView);
 
         adornmentsEditor.AutoSelectSuperView = testFrame;
@@ -204,11 +203,6 @@ public class Arrangement : Scenario
 
         testFrame.SetFocus ();
 
-        testFrame.Add (
-                       new Button ()
-                       {
-                           Title = "Hey",
-                       });
         Application.Run (app);
         timer.Close ();
         app.Dispose ();
@@ -324,8 +318,10 @@ public class TransparentView : FrameView
 {
     public TransparentView ()
     {
-        Title = "Transparent";
-        base.Text = "Text. This should be visible in the Viewport.";
+        Title = "Transparent View";
+        base.Text = "View.Text.\nThis should be opaque.\nNote how clipping works?";
+        TextFormatter.Alignment = Alignment.Center;
+        TextFormatter.VerticalAlignment = Alignment.Center;
         Arrangement = ViewArrangement.Overlapped | ViewArrangement.Resizable | ViewArrangement.Movable;
         ViewportSettings |= Terminal.Gui.ViewportSettings.Transparent;
         BorderStyle = LineStyle.RoundedDotted;
@@ -333,13 +329,12 @@ public class TransparentView : FrameView
 
         var transparentSubView = new View ()
         {
-            //Title = "SubView",
-            Text = "This is a View with border.",
+            Text = "Sizable/Movable View with border. Should be opaque. The shadow should be semi-opaque.",
             Id = "transparentSubView",
             X = 4,
-            Y = 6,
-            Width = 10,
-            Height = 6,
+            Y = 8,
+            Width = 20,
+            Height = 8,
             BorderStyle = LineStyle.Dashed,
             Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
             ShadowStyle = ShadowStyle.Transparent,
@@ -350,10 +345,9 @@ public class TransparentView : FrameView
 
         Button button = new Button ()
         {
-            Title = "_Button in Transparent View",
+            Title = "_Opaque Shadows No Worky",
             X = Pos.Center (),
             Y = 4,
-            ShadowStyle = ShadowStyle.None,
             ColorScheme = Colors.ColorSchemes ["Dialog"],
         };
 

@@ -12,17 +12,17 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Adornments")]
 public class ViewportSettings : Scenario
 {
-    public class ScrollingDemoView : FrameView
+    public class ViewportSettingsDemoView : FrameView
     {
-        public ScrollingDemoView ()
+        public ViewportSettingsDemoView ()
         {
-            Id = "ScrollingDemoView";
+            Id = "ViewportSettingsDemoView";
             Width = Dim.Fill ();
             Height = Dim.Fill ();
             base.ColorScheme = Colors.ColorSchemes ["Base"];
 
             base.Text =
-                "Text (ScrollingDemoView.Text). This is long text.\nThe second line.\n3\n4\n5th line\nLine 6. This is a longer line that should wrap automatically.";
+                "Text (ViewportSettingsDemoView.Text). This is long text.\nThe second line.\n3\n4\n5th line\nLine 6. This is a longer line that should wrap automatically.";
             CanFocus = true;
             BorderStyle = LineStyle.Rounded;
             Arrangement = ViewArrangement.Resizable;
@@ -103,29 +103,30 @@ public class ViewportSettings : Scenario
             Title = GetQuitKeyAndName (),
 
             // Use a different colorscheme so ViewSettings.ClearContentOnly is obvious
-            ColorScheme = Colors.ColorSchemes ["Toplevel"]
+            ColorScheme = Colors.ColorSchemes ["Toplevel"],
+            BorderStyle = LineStyle.None
         };
 
-        var editor = new AdornmentsEditor
+        var adornmentsEditor = new AdornmentsEditor
         {
+            X = Pos.AnchorEnd(),
             AutoSelectViewToEdit = true,
             ShowViewIdentifier = true
         };
-        app.Add (editor);
+        app.Add (adornmentsEditor);
 
         ViewportSettingsEditor viewportSettingsEditor = new ViewportSettingsEditor ()
         {
-            X = Pos.Right (editor),
+            Y = Pos.AnchorEnd(),
+            //X = Pos.Right (adornmentsEditor),
         };
         app.Add (viewportSettingsEditor);
 
-        var view = new ScrollingDemoView
+        var view = new ViewportSettingsDemoView
         {
-            Title = "Demo View",
-            X = Pos.Right (editor),
-            Y = Pos.Bottom (viewportSettingsEditor),
-            Width = Dim.Fill (),
-            Height = Dim.Fill ()
+            Title = "ViewportSettings Demo View",
+            Width = Dim.Fill (Dim.Func (() => app.IsInitialized ? adornmentsEditor.Frame.Width+1: 1)),
+            Height = Dim.Fill (Dim.Func (() => app.IsInitialized ? viewportSettingsEditor.Frame.Height : 1))
         };
 
         app.Add (view);
@@ -211,14 +212,14 @@ public class ViewportSettings : Scenario
         };
         view.Add (slider);
 
-        editor.Initialized += (s, e) =>
+        adornmentsEditor.Initialized += (s, e) =>
                               {
-                                  editor.ViewToEdit = view;
+                                  adornmentsEditor.ViewToEdit = view;
                               };
 
-        editor.AutoSelectViewToEdit = true;
-        editor.AutoSelectSuperView = view;
-        editor.AutoSelectAdornments = false;
+        adornmentsEditor.AutoSelectViewToEdit = true;
+        adornmentsEditor.AutoSelectSuperView = view;
+        adornmentsEditor.AutoSelectAdornments = false;
 
         view.Initialized += (s, e) =>
                                               {
