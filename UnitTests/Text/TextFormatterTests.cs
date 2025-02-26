@@ -235,7 +235,7 @@ public class TextFormatterTests
     }
 
     public static IEnumerable<object []> CMGlyphs =>
-        new List<object []> { new object [] { $"{CM.Glyphs.LeftBracket} Say Hello 你 {CM.Glyphs.RightBracket}", 16, 15 } };
+        new List<object []> { new object [] { $"{Glyphs.LeftBracket} Say Hello 你 {Glyphs.RightBracket}", 16, 15 } };
 
     [SetupFakeDriver]
     [Theory]

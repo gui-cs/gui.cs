@@ -3,7 +3,7 @@ using System.Text.Json;
 
 namespace Terminal.Gui.ConfigurationTests;
 
-public class RunJsonConverterTests
+public class RuneJsonConverterTests
 {
     [Theory]
     [InlineData ("aa")]
