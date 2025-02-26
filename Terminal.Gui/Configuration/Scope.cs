@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Diagnostics;
 using System.Reflection;
 
 namespace Terminal.Gui;
@@ -51,6 +52,10 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
     /// <returns></returns>
     internal virtual bool Apply ()
     {
+        // Start stopwatch
+        Stopwatch stopwatch = new Stopwatch ();
+        stopwatch.Start ();
+
         var set = false;
 
         foreach (KeyValuePair<string, ConfigProperty> p in this.Where (
@@ -63,6 +68,8 @@ public class Scope<T> : Dictionary<string, ConfigProperty>
                 set = true;
             }
         }
+
+        Debug.WriteLine ($"{GetType().Name}.Apply () took {stopwatch.ElapsedMilliseconds} ms");
 
         return set;
     }
