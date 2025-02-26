@@ -163,10 +163,6 @@ public static class ConfigurationManager
         var themes = false;
         var appSettings = false;
 
-        // Start stopwatch
-        Stopwatch stopwatch = new Stopwatch ();
-        stopwatch.Start ();
-
         try
         {
             if (string.IsNullOrEmpty (ThemeManager.SelectedTheme))
@@ -203,10 +199,6 @@ public static class ConfigurationManager
             {
                 OnApplied ();
             }
-            // Stop stopwatch
-            stopwatch.Stop ();
-
-            Debug.WriteLine ($"CM.Apply () took {stopwatch.ElapsedMilliseconds} ms");
         }
     }
 
