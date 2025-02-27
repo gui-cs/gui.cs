@@ -810,7 +810,7 @@ public partial class View // Mouse APIs
             {
                 if (start.InternalSubviews [i].Visible
                     && start.InternalSubviews [i].Contains (new (startOffsetX + start.Viewport.X, startOffsetY + start.Viewport.Y))
-                    && (!ignoreTransparent || !start.InternalSubviews [i].ViewportSettings.HasFlag (ViewportSettings.Transparent)))
+                    && (!ignoreTransparent || !start.InternalSubviews [i].ViewportSettings.HasFlag (ViewportSettings.TransparentMouse)))
                 {
                     subview = start.InternalSubviews [i];
                     currentLocation.X = startOffsetX + start.Viewport.X;
@@ -823,7 +823,7 @@ public partial class View // Mouse APIs
 
             if (subview is null)
             {
-                if (start.ViewportSettings.HasFlag (ViewportSettings.Transparent))
+                if (start.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse))
                 {
                     viewsUnderMouse.AddRange (View.GetViewsUnderMouse (location, true));
 

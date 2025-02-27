@@ -147,6 +147,18 @@ public enum ViewportSettings
     ///         NOTE: Only the topmost View in a Subview Hierarchy can be transparent. Any subviews of the topmost transparent view
     ///         will have indeterminate draw behavior.
     ///     </para>
+    ///     <para>
+    ///         Combine this with <see cref="TransparentMouse"/> to get a view that is both visually transparent and transparent to the mouse.
+    ///     </para>
     /// </summary>
     Transparent = 0b_0001_0000_0000,
+
+    /// <summary>
+    ///     If set the View will be transparent to mouse events: Any mouse event that occurs over the View (and it's Subviews) will be passed to the
+    ///     Views below it.
+    ///     <para>
+    ///         Combine this with <see cref="Transparent"/> to get a view that is both visually transparent and transparent to the mouse.
+    ///     </para>
+    /// </summary>
+    TransparentMouse = 0b_0010_0000_0000,
 }

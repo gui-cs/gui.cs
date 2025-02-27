@@ -323,7 +323,7 @@ public class TransparentView : FrameView
         TextFormatter.Alignment = Alignment.Center;
         TextFormatter.VerticalAlignment = Alignment.Center;
         Arrangement = ViewArrangement.Overlapped | ViewArrangement.Resizable | ViewArrangement.Movable;
-        ViewportSettings |= Terminal.Gui.ViewportSettings.Transparent;
+        ViewportSettings |= Terminal.Gui.ViewportSettings.Transparent | Terminal.Gui.ViewportSettings.TransparentMouse;
         BorderStyle = LineStyle.RoundedDotted;
         base.ColorScheme = Colors.ColorSchemes ["Menu"];
 
