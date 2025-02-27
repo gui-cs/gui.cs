@@ -24,7 +24,7 @@ public sealed class Transparent : Scenario
         appWindow.VerticalTextAlignment = Alignment.Center;
         appWindow.ClearingViewport += (s, e) =>
                                     {
-                                        appWindow!.FillRect (appWindow!.Viewport, CM.Glyphs.Stipple);
+                                        appWindow!.FillRect (appWindow!.Viewport, Glyphs.Stipple);
                                         e.Cancel = true;
                                     };
         ViewportSettingsEditor viewportSettingsEditor = new ViewportSettingsEditor ()

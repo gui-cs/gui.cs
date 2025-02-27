@@ -401,44 +401,44 @@ public class WizardTests ()
         d.SetBufferSize (width, height);
 
         //	var btnBackText = "Back";
-        var btnBack = string.Empty; // $"{CM.Glyphs.LeftBracket} {btnBackText} {CM.Glyphs.RightBracket}";
+        var btnBack = string.Empty; // $"{Glyphs.LeftBracket} {btnBackText} {Glyphs.RightBracket}";
         var btnNextText = "Finish"; // "Next";
 
         var btnNext =
             $"{
-                CM.Glyphs.LeftBracket
+                Glyphs.LeftBracket
             }{
-                CM.Glyphs.LeftDefaultIndicator
+                Glyphs.LeftDefaultIndicator
             } {
                 btnNextText
             } {
-                CM.Glyphs.RightDefaultIndicator
+                Glyphs.RightDefaultIndicator
             }{
-                CM.Glyphs.RightBracket
+                Glyphs.RightBracket
             }";
 
         var topRow =
             $"{
-                CM.Glyphs.ULCornerDbl
+                Glyphs.ULCornerDbl
             }╡{
                 title
             } - {
                 stepTitle
             }╞{
-                new (CM.Glyphs.HLineDbl.ToString () [0], width - title.Length - stepTitle.Length - 7)
+                new (Glyphs.HLineDbl.ToString () [0], width - title.Length - stepTitle.Length - 7)
             }{
-                CM.Glyphs.URCornerDbl
+                Glyphs.URCornerDbl
             }";
-        var row2 = $"{CM.Glyphs.VLineDbl}{new (' ', width - 2)}{CM.Glyphs.VLineDbl}";
+        var row2 = $"{Glyphs.VLineDbl}{new (' ', width - 2)}{Glyphs.VLineDbl}";
         string row3 = row2;
         string row4 = row3;
 
         var separatorRow =
-            $"{CM.Glyphs.VLineDbl}{new (CM.Glyphs.HLine.ToString () [0], width - 2)}{CM.Glyphs.VLineDbl}";
+            $"{Glyphs.VLineDbl}{new (Glyphs.HLine.ToString () [0], width - 2)}{Glyphs.VLineDbl}";
 
         var buttonRow =
             $"{
-                CM.Glyphs.VLineDbl
+                Glyphs.VLineDbl
             }{
                 btnBack
             }{
@@ -446,16 +446,16 @@ public class WizardTests ()
             }{
                 btnNext
             }{
-                CM.Glyphs.VLineDbl
+                Glyphs.VLineDbl
             }";
 
         var bottomRow =
             $"{
-                CM.Glyphs.LLCornerDbl
+                Glyphs.LLCornerDbl
             }{
-                new (CM.Glyphs.HLineDbl.ToString () [0], width - 2)
+                new (Glyphs.HLineDbl.ToString () [0], width - 2)
             }{
-                CM.Glyphs.LRCornerDbl
+                Glyphs.LRCornerDbl
             }";
 
         var wizard = new Wizard { Title = title, Width = width, Height = height };
@@ -494,45 +494,45 @@ public class WizardTests ()
 
         var btnNext =
             $"{
-                CM.Glyphs.LeftBracket
+                Glyphs.LeftBracket
             }{
-                CM.Glyphs.LeftDefaultIndicator
+                Glyphs.LeftDefaultIndicator
             } {
                 btnNextText
             } {
-                CM.Glyphs.RightDefaultIndicator
+                Glyphs.RightDefaultIndicator
             }{
-                CM.Glyphs.RightBracket
+                Glyphs.RightBracket
             }";
 
         var topRow =
             $"{
-                CM.Glyphs.ULCornerDbl
+                Glyphs.ULCornerDbl
             }╡{
                 title
             }{
                 stepTitle
             }╞{
-                new (CM.Glyphs.HLineDbl.ToString () [0], width - title.Length - stepTitle.Length - 4)
+                new (Glyphs.HLineDbl.ToString () [0], width - title.Length - stepTitle.Length - 4)
             }{
-                CM.Glyphs.URCornerDbl
+                Glyphs.URCornerDbl
             }";
 
         var separatorRow =
-            $"{CM.Glyphs.VLineDbl}{new (CM.Glyphs.HLine.ToString () [0], width - 2)}{CM.Glyphs.VLineDbl}";
+            $"{Glyphs.VLineDbl}{new (Glyphs.HLine.ToString () [0], width - 2)}{Glyphs.VLineDbl}";
 
         // Once this is fixed, revert to commented out line: https://github.com/gui-cs/Terminal.Gui/issues/1791
         var buttonRow =
-            $"{CM.Glyphs.VLineDbl}{new (' ', width - btnNext.Length - 2)}{btnNext}{CM.Glyphs.VLineDbl}";
+            $"{Glyphs.VLineDbl}{new (' ', width - btnNext.Length - 2)}{btnNext}{Glyphs.VLineDbl}";
 
-        //var buttonRow = $"{CM.Glyphs.VDLine}{new String (' ', width - btnNext.Length - 2)}{btnNext}{CM.Glyphs.VDLine}";
+        //var buttonRow = $"{Glyphs.VDLine}{new String (' ', width - btnNext.Length - 2)}{btnNext}{Glyphs.VDLine}";
         var bottomRow =
             $"{
-                CM.Glyphs.LLCornerDbl
+                Glyphs.LLCornerDbl
             }{
-                new (CM.Glyphs.HLineDbl.ToString () [0], width - 2)
+                new (Glyphs.HLineDbl.ToString () [0], width - 2)
             }{
-                CM.Glyphs.LRCornerDbl
+                Glyphs.LRCornerDbl
             }";
 
         var wizard = new Wizard { Title = title, Width = width, Height = height };
@@ -655,43 +655,43 @@ public class WizardTests ()
         d.SetBufferSize (width, height);
 
         var btnBackText = "Back";
-        var btnBack = $"{CM.Glyphs.LeftBracket} {btnBackText} {CM.Glyphs.RightBracket}";
+        var btnBack = $"{Glyphs.LeftBracket} {btnBackText} {Glyphs.RightBracket}";
         var btnNextText = "Finish";
 
         var btnNext =
             $"{
-                CM.Glyphs.LeftBracket
+                Glyphs.LeftBracket
             }{
-                CM.Glyphs.LeftDefaultIndicator
+                Glyphs.LeftDefaultIndicator
             } {
                 btnNextText
             } {
-                CM.Glyphs.RightDefaultIndicator
+                Glyphs.RightDefaultIndicator
             }{
-                CM.Glyphs.RightBracket
+                Glyphs.RightBracket
             }";
 
         var topRow =
             $"{
-                CM.Glyphs.ULCornerDbl
+                Glyphs.ULCornerDbl
             }╡{
                 title
             }{
                 stepTitle
             }╞{
-                new (CM.Glyphs.HLineDbl.ToString () [0], width - title.Length - stepTitle.Length - 4)
+                new (Glyphs.HLineDbl.ToString () [0], width - title.Length - stepTitle.Length - 4)
             }{
-                CM.Glyphs.URCornerDbl
+                Glyphs.URCornerDbl
             }";
-        var row2 = $"{CM.Glyphs.VLineDbl}{new (' ', width - 2)}{CM.Glyphs.VLineDbl}";
+        var row2 = $"{Glyphs.VLineDbl}{new (' ', width - 2)}{Glyphs.VLineDbl}";
         string row3 = row2;
 
         var separatorRow =
-            $"{CM.Glyphs.VLineDbl}{new (CM.Glyphs.HLine.ToString () [0], width - 2)}{CM.Glyphs.VLineDbl}";
+            $"{Glyphs.VLineDbl}{new (Glyphs.HLine.ToString () [0], width - 2)}{Glyphs.VLineDbl}";
 
         var buttonRow =
             $"{
-                CM.Glyphs.VLineDbl
+                Glyphs.VLineDbl
             }{
                 btnBack
             }{
@@ -699,16 +699,16 @@ public class WizardTests ()
             }{
                 btnNext
             }{
-                CM.Glyphs.VLineDbl
+                Glyphs.VLineDbl
             }";
 
         var bottomRow =
             $"{
-                CM.Glyphs.LLCornerDbl
+                Glyphs.LLCornerDbl
             }{
-                new (CM.Glyphs.HLineDbl.ToString () [0], width - 2)
+                new (Glyphs.HLineDbl.ToString () [0], width - 2)
             }{
-                CM.Glyphs.LRCornerDbl
+                Glyphs.LRCornerDbl
             }";
 
         var wizard = new Wizard { Title = title, Width = width, Height = height };

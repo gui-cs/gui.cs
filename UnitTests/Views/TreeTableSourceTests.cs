@@ -13,16 +13,16 @@ public class TreeTableSourceTests : IDisposable
     {
         _output = output;
 
-        _origChecked = ConfigurationManager.Glyphs.CheckStateChecked;
-        _origUnchecked = ConfigurationManager.Glyphs.CheckStateUnChecked;
-        ConfigurationManager.Glyphs.CheckStateChecked = new Rune ('☑');
-        ConfigurationManager.Glyphs.CheckStateUnChecked = new Rune ('☐');
+        _origChecked = Glyphs.CheckStateChecked;
+        _origUnchecked = Glyphs.CheckStateUnChecked;
+        Glyphs.CheckStateChecked = new Rune ('☑');
+        Glyphs.CheckStateUnChecked = new Rune ('☐');
     }
 
     public void Dispose ()
     {
-        ConfigurationManager.Glyphs.CheckStateChecked = _origChecked;
-        ConfigurationManager.Glyphs.CheckStateUnChecked = _origUnchecked;
+        Glyphs.CheckStateChecked = _origChecked;
+        Glyphs.CheckStateUnChecked = _origUnchecked;
     }
 
     [Fact]
