@@ -147,6 +147,8 @@ public class WindowTests
         Assert.Null (defaultWindow.MostFocused);
         Assert.Equal (TextDirection.LeftRight_TopBottom, defaultWindow.TextDirection);
 
+        Assert.Equal (ViewArrangement.Overlapped, defaultWindow.Arrangement);
+
         // Empty Rect
         using var windowWithFrameRectEmpty = new Window { Frame = Rectangle.Empty, Title = "title" };
         windowWithFrameRectEmpty.Layout ();
