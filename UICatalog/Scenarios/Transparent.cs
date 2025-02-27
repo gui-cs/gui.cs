@@ -24,7 +24,7 @@ public sealed class Transparent : Scenario
         appWindow.VerticalTextAlignment = Alignment.Center;
         appWindow.ClearingViewport += (s, e) =>
                                     {
-                                        appWindow!.FillRect (appWindow!.Viewport, CM.Glyphs.Dot);
+                                        appWindow!.FillRect (appWindow!.Viewport, CM.Glyphs.Stipple);
                                         e.Cancel = true;
                                     };
         ViewportSettingsEditor viewportSettingsEditor = new ViewportSettingsEditor ()
@@ -35,13 +35,15 @@ public sealed class Transparent : Scenario
         };
         appWindow.Add (viewportSettingsEditor);
 
-        appWindow.Add (
-                       new Button ()
-                       {
-                           X = 10,
-                           Y = 4,
-                           Title = "_AppButton",
-                       });
+        Button appButton = new Button ()
+        {
+            X = 10,
+            Y = 4,
+            Title = "_AppButton",
+        };
+        appButton.Accepting += (sender, args) => MessageBox.Query ("AppButton", "Transparency is cool!", "_Ok");
+        appWindow.Add (appButton);
+
 
         var tv = new TransparentView ()
         {
@@ -84,7 +86,6 @@ public sealed class Transparent : Scenario
                 BorderStyle = LineStyle.Dashed,
                 Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
                 ShadowStyle = ShadowStyle.Transparent,
-                //ViewportSettings = Terminal.Gui.ViewportSettings.Transparent
             };
             transparentSubView.Border.Thickness = new (1, 1, 1, 1);
             transparentSubView.ColorScheme = Colors.ColorSchemes ["Dialog"];
