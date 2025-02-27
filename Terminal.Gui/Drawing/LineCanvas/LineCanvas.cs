@@ -532,8 +532,8 @@ public class LineCanvas : IDisposable
 
         if (Has (
                  set,
-                 IntersectionType.PassOverHorizontal,
-                 IntersectionType.PassOverVertical
+                 [IntersectionType.PassOverHorizontal,
+                 IntersectionType.PassOverVertical]
                 ))
         {
             return IntersectionRuneType.Cross;
@@ -541,9 +541,9 @@ public class LineCanvas : IDisposable
 
         if (Has (
                  set,
-                 IntersectionType.PassOverVertical,
+                 [IntersectionType.PassOverVertical,
                  IntersectionType.StartLeft,
-                 IntersectionType.StartRight
+                 IntersectionType.StartRight]
                 ))
         {
             return IntersectionRuneType.Cross;
@@ -551,9 +551,9 @@ public class LineCanvas : IDisposable
 
         if (Has (
                  set,
-                 IntersectionType.PassOverHorizontal,
+                 [IntersectionType.PassOverHorizontal,
                  IntersectionType.StartUp,
-                 IntersectionType.StartDown
+                 IntersectionType.StartDown]
                 ))
         {
             return IntersectionRuneType.Cross;
@@ -561,10 +561,10 @@ public class LineCanvas : IDisposable
 
         if (Has (
                  set,
-                 IntersectionType.StartLeft,
+                 [IntersectionType.StartLeft,
                  IntersectionType.StartRight,
                  IntersectionType.StartUp,
-                 IntersectionType.StartDown
+                 IntersectionType.StartDown]
                 ))
         {
             return IntersectionRuneType.Cross;
@@ -574,38 +574,22 @@ public class LineCanvas : IDisposable
 
         #region Corner Conditions
 
-        if (Exactly (
-                     set,
-                     IntersectionType.StartRight,
-                     IntersectionType.StartDown
-                    ))
+        if (Exactly (set, CornerIntersections.UpperLeft))
         {
             return IntersectionRuneType.ULCorner;
         }
 
-        if (Exactly (
-                     set,
-                     IntersectionType.StartLeft,
-                     IntersectionType.StartDown
-                    ))
+        if (Exactly (set, CornerIntersections.UpperRight))
         {
             return IntersectionRuneType.URCorner;
         }
 
-        if (Exactly (
-                     set,
-                     IntersectionType.StartUp,
-                     IntersectionType.StartLeft
-                    ))
+        if (Exactly (set, CornerIntersections.LowerRight))
         {
             return IntersectionRuneType.LRCorner;
         }
 
-        if (Exactly (
-                     set,
-                     IntersectionType.StartUp,
-                     IntersectionType.StartRight
-                    ))
+        if (Exactly (set, CornerIntersections.LowerLeft))
         {
             return IntersectionRuneType.LLCorner;
         }
@@ -616,8 +600,8 @@ public class LineCanvas : IDisposable
 
         if (Has (
                  set,
-                 IntersectionType.PassOverHorizontal,
-                 IntersectionType.StartDown
+                 [IntersectionType.PassOverHorizontal,
+                 IntersectionType.StartDown]
                 ))
         {
             return IntersectionRuneType.TopTee;
@@ -625,9 +609,9 @@ public class LineCanvas : IDisposable
 
         if (Has (
                  set,
-                 IntersectionType.StartRight,
+                 [IntersectionType.StartRight,
                  IntersectionType.StartLeft,
-                 IntersectionType.StartDown
+                 IntersectionType.StartDown]
                 ))
         {
             return IntersectionRuneType.TopTee;
@@ -635,8 +619,8 @@ public class LineCanvas : IDisposable
 
         if (Has (
                  set,
-                 IntersectionType.PassOverHorizontal,
-                 IntersectionType.StartUp
+                 [IntersectionType.PassOverHorizontal,
+                 IntersectionType.StartUp]
                 ))
         {
             return IntersectionRuneType.BottomTee;
@@ -644,9 +628,9 @@ public class LineCanvas : IDisposable
 
         if (Has (
                  set,
-                 IntersectionType.StartRight,
+                 [IntersectionType.StartRight,
                  IntersectionType.StartLeft,
-                 IntersectionType.StartUp
+                 IntersectionType.StartUp]
                 ))
         {
             return IntersectionRuneType.BottomTee;
@@ -654,8 +638,8 @@ public class LineCanvas : IDisposable
 
         if (Has (
                  set,
-                 IntersectionType.PassOverVertical,
-                 IntersectionType.StartRight
+                 [IntersectionType.PassOverVertical,
+                 IntersectionType.StartRight]
                 ))
         {
             return IntersectionRuneType.LeftTee;
@@ -663,9 +647,9 @@ public class LineCanvas : IDisposable
 
         if (Has (
                  set,
-                 IntersectionType.StartRight,
+                 [IntersectionType.StartRight,
                  IntersectionType.StartDown,
-                 IntersectionType.StartUp
+                 IntersectionType.StartUp]
                 ))
         {
             return IntersectionRuneType.LeftTee;
@@ -673,8 +657,8 @@ public class LineCanvas : IDisposable
 
         if (Has (
                  set,
-                 IntersectionType.PassOverVertical,
-                 IntersectionType.StartLeft
+                 [IntersectionType.PassOverVertical,
+                 IntersectionType.StartLeft]
                 ))
         {
             return IntersectionRuneType.RightTee;
@@ -682,9 +666,9 @@ public class LineCanvas : IDisposable
 
         if (Has (
                  set,
-                 IntersectionType.StartLeft,
+                 [IntersectionType.StartLeft,
                  IntersectionType.StartDown,
-                 IntersectionType.StartUp
+                 IntersectionType.StartUp]
                 ))
         {
             return IntersectionRuneType.RightTee;
@@ -712,7 +696,7 @@ public class LineCanvas : IDisposable
     /// <param name="intersects"></param>
     /// <param name="types"></param>
     /// <returns></returns>
-    private bool Has (HashSet<IntersectionType> intersects, params IntersectionType [] types)
+    private bool Has (HashSet<IntersectionType> intersects, ReadOnlySpan<IntersectionType> types)
     {
         foreach (var type in types)
         {
@@ -722,6 +706,25 @@ public class LineCanvas : IDisposable
             }
         }
         return true;
+    }
+
+
+    /// <summary>
+    /// Preallocated arrays for <see cref="GetRuneTypeForIntersects"/> calls to <see cref="Exactly"/>.
+    /// </summary>
+    /// <remarks>
+    /// Optimization to avoid array allocation for each call from array params. Please do not edit the arrays at runtime. :)
+    /// 
+    /// More ideal solution would be to change <see cref="Exactly"/> to take ReadOnlySpan instead of an array
+    /// but that would require replacing the HashSet.SetEquals call.
+    /// </remarks>
+    private static class CornerIntersections
+    {
+        // Names matching #region "Corner Conditions" IntersectionRuneType
+        internal static readonly IntersectionType[] UpperLeft = [IntersectionType.StartRight, IntersectionType.StartDown];
+        internal static readonly IntersectionType[] UpperRight = [IntersectionType.StartLeft, IntersectionType.StartDown];
+        internal static readonly IntersectionType[] LowerRight = [IntersectionType.StartUp, IntersectionType.StartLeft];
+        internal static readonly IntersectionType[] LowerLeft = [IntersectionType.StartUp, IntersectionType.StartRight];
     }
 
     private class BottomTeeIntersectionRuneResolver : IntersectionRuneResolver
