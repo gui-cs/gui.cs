@@ -15,7 +15,7 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.Equal ("Hello", view.TitleTextFormatter.Text);
 
         Assert.Equal ("Hello", view.Text);
-        Assert.Equal ($"{CM.Glyphs.LeftBracket} Hello {CM.Glyphs.RightBracket}", view.TextFormatter.Text);
+        Assert.Equal ($"{Glyphs.LeftBracket} Hello {Glyphs.RightBracket}", view.TextFormatter.Text);
         view.Dispose ();
     }
 
@@ -25,7 +25,7 @@ public class ButtonTests (ITestOutputHelper output)
         var view = new Button ();
         view.Text = "Hello";
         Assert.Equal ("Hello", view.Text);
-        Assert.Equal ($"{CM.Glyphs.LeftBracket} Hello {CM.Glyphs.RightBracket}", view.TextFormatter.Text);
+        Assert.Equal ($"{Glyphs.LeftBracket} Hello {Glyphs.RightBracket}", view.TextFormatter.Text);
 
         Assert.Equal ("Hello", view.Title);
         Assert.Equal ("Hello", view.TitleTextFormatter.Text);
@@ -158,14 +158,14 @@ public class ButtonTests (ITestOutputHelper output)
         btn.EndInit ();
         btn.SetRelativeLayout (new (100, 100));
 
-        Assert.Equal ($"{CM.Glyphs.LeftBracket}  {CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
+        Assert.Equal ($"{Glyphs.LeftBracket}  {Glyphs.RightBracket}", btn.TextFormatter.Text);
         Assert.False (btn.IsDefault);
         Assert.Equal (Alignment.Center, btn.TextAlignment);
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
         Assert.True (btn.CanFocus);
         Assert.Equal (new (0, 0, 4, 1), btn.Viewport);
         Assert.Equal (new (0, 0, 4, 1), btn.Frame);
-        Assert.Equal ($"{CM.Glyphs.LeftBracket}  {CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
+        Assert.Equal ($"{Glyphs.LeftBracket}  {Glyphs.RightBracket}", btn.TextFormatter.Text);
         Assert.False (btn.IsDefault);
         Assert.Equal (Alignment.Center, btn.TextAlignment);
         Assert.Equal ('_', btn.HotKeySpecifier.Value);
@@ -179,7 +179,7 @@ public class ButtonTests (ITestOutputHelper output)
         btn.Draw ();
 
         var expected = @$"
-{CM.Glyphs.LeftBracket}  {CM.Glyphs.RightBracket}
+{Glyphs.LeftBracket}  {Glyphs.RightBracket}
 ";
         TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         btn.Dispose ();
@@ -197,7 +197,7 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.Equal ("_Test", btn.Text);
 
         Assert.Equal (
-                      $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Test {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}",
+                      $"{Glyphs.LeftBracket}{Glyphs.LeftDefaultIndicator} Test {Glyphs.RightDefaultIndicator}{Glyphs.RightBracket}",
                       btn.TextFormatter.Format ()
                      );
         Assert.True (btn.IsDefault);
@@ -224,7 +224,7 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.Equal (Key.A, btn.HotKey);
 
         Assert.Equal (
-                      $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} abc {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}",
+                      $"{Glyphs.LeftBracket}{Glyphs.LeftDefaultIndicator} abc {Glyphs.RightDefaultIndicator}{Glyphs.RightBracket}",
                       btn.TextFormatter.Format ()
                      );
         Assert.True (btn.IsDefault);
@@ -236,7 +236,7 @@ public class ButtonTests (ITestOutputHelper output)
         btn.Draw ();
 
         expected = @$"
- {CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} abc {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}
+ {Glyphs.LeftBracket}{Glyphs.LeftDefaultIndicator} abc {Glyphs.RightDefaultIndicator}{Glyphs.RightBracket}
 ";
         TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
 
@@ -576,9 +576,9 @@ public class ButtonTests (ITestOutputHelper output)
 
         Assert.True (btn.IsInitialized);
         Assert.Equal ("Say Hello 你", btn.Text);
-        Assert.Equal ($"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}", btn.TextFormatter.Text);
+        Assert.Equal ($"{Glyphs.LeftBracket} {btn.Text} {Glyphs.RightBracket}", btn.TextFormatter.Text);
         Assert.Equal (new (0, 0, 16, 1), btn.Viewport);
-        var btnTxt = $"{CM.Glyphs.LeftBracket} {btn.Text} {CM.Glyphs.RightBracket}";
+        var btnTxt = $"{Glyphs.LeftBracket} {btn.Text} {Glyphs.RightBracket}";
 
         var expected = @$"
 ┌────────────────────────────┐

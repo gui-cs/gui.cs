@@ -111,14 +111,6 @@ public static class ConfigurationManager
     public static AppScope? AppSettings { get; set; }
 
     /// <summary>
-    ///     The set of glyphs used to draw checkboxes, lines, borders, etc...See also
-    ///     <seealso cref="Terminal.Gui.GlyphDefinitions"/>.
-    /// </summary>
-    [SerializableConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
-    [JsonPropertyName ("Glyphs")]
-    public static GlyphDefinitions Glyphs { get; set; } = new ();
-
-    /// <summary>
     ///     Gets and sets the locations where <see cref="ConfigurationManager"/> will look for config files. The value is
     ///     <see cref="ConfigLocations.All"/>.
     /// </summary>
@@ -301,6 +293,7 @@ public static class ConfigurationManager
     public static void OnApplied ()
     {
         Debug.WriteLine ("ConfigurationManager.OnApplied()");
+
         Applied?.Invoke (null, new ());
 
         // TODO: Refactor ConfigurationManager to not use an event handler for this.
