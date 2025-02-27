@@ -178,13 +178,6 @@ namespace Terminal.Gui;
 ///                     methods for formatting text with horizontal and vertical alignment, word wrapping, and hotkeys.
 ///                 </para>
 ///                 <para>
-///                     Terminal.Gui supports rendering glyphs using the @Terminal.Gui.Glyph class. The @Terminal.Gui.Glyph
-///                     class represents a single glyph. It contains a character and an attribute. The character is of type
-///                     Rune and the attribute is of type Attribute. A set of static properties are provided for the
-///                     standard glyphs used for standard views (e.g. the default indicator for @Terminal.Gui.Button) and
-///                     line drawing (e.g. @Terminal.Gui.LineCanvas).
-///                 </para>
-///                 <para>
 ///                     See the
 ///                     <see href="../docs/navigation.html">
 ///                         Navigation
