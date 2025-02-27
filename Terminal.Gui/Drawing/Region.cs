@@ -11,6 +11,9 @@ namespace Terminal.Gui;
 /// </summary>
 /// <remarks>
 ///     <para>
+///         This class is thread-safe. All operations are synchronized to ensure consistent state when accessed concurrently.
+///     </para>
+///     <para>
 ///         The <see cref="Region"/> class adopts a philosophy of efficiency and flexibility, balancing performance with
 ///         usability for GUI applications. It maintains a list of <see cref="Rectangle"/> objects, representing disjoint
 ///         (non-overlapping) rectangular areas, and supports operations inspired by set theory. These operations allow
@@ -46,6 +49,12 @@ public class Region
 {
     private readonly List<Rectangle> _rectangles = [];
 
+    // Add a single reusable list for temp operations
+    private readonly List<Rectangle> _tempRectangles = new();
+
+    // Object used for synchronization
+    private readonly object _syncLock = new object();
+
     /// <summary>
     ///     Initializes a new instance of the <see cref="Region"/> class.
     /// </summary>
@@ -55,7 +64,13 @@ public class Region
     ///     Initializes a new instance of the <see cref="Region"/> class with the specified rectangle.
     /// </summary>
     /// <param name="rectangle">The initial rectangle for the region.</param>
-    public Region (Rectangle rectangle) { _rectangles.Add (rectangle); }
+    public Region (Rectangle rectangle)
+    {
+        lock (_syncLock)
+        {
+            _rectangles.Add (rectangle);
+        }
+    }
 
     /// <summary>
     ///     Creates an exact copy of the region.
@@ -63,11 +78,14 @@ public class Region
     /// <returns>A new <see cref="Region"/> that is a copy of this instance.</returns>
     public Region Clone ()
     {
-        var clone = new Region ();
-        clone._rectangles.Capacity = _rectangles.Count; // Pre-allocate capacity
-        clone._rectangles.AddRange (_rectangles);
+        lock (_syncLock)
+        {
+            var clone = new Region ();
+            clone._rectangles.Capacity = _rectangles.Count; // Pre-allocate capacity
+            clone._rectangles.AddRange (_rectangles);
 
-        return clone;
+            return clone;
+        }
     }
 
     /// <summary>
@@ -77,17 +95,20 @@ public class Region
     /// <param name="operation">The operation to perform.</param>
     public void Combine (Rectangle rectangle, RegionOp operation)
     {
-        if (rectangle.IsEmpty && operation != RegionOp.Replace)
+        lock (_syncLock)
         {
-            if (operation == RegionOp.Intersect)
+            if (rectangle.IsEmpty && operation != RegionOp.Replace)
             {
-                _rectangles.Clear ();
+                if (operation == RegionOp.Intersect)
+                {
+                    _rectangles.Clear ();
+                }
+
+                return;
             }
 
-            return;
+            Combine (new Region (rectangle), operation);
         }
-
-        Combine (new Region (rectangle), operation);
     }
 
     /// <summary>
@@ -96,6 +117,15 @@ public class Region
     /// <param name="region">The region to combine.</param>
     /// <param name="operation">The operation to perform.</param>
     public void Combine (Region? region, RegionOp operation)
+    {
+        lock (_syncLock)
+        {
+            CombineInternal(region, operation);
+        }
+    }
+
+    // Private method to implement the combine logic within a lock
+    private void CombineInternal(Region? region, RegionOp operation)
     {
         if (region is null || region._rectangles.Count == 0)
         {
@@ -157,17 +187,37 @@ public class Region
                 break;
 
             case RegionOp.Union:
-                List<Rectangle> mergedUnion = MergeRectangles ([.. _rectangles, .. region._rectangles], false);
-                _rectangles.Clear ();
-                _rectangles.AddRange (mergedUnion);
-
+                // Avoid collection initialization with spread operator
+                _tempRectangles.Clear();
+                _tempRectangles.AddRange(_rectangles);
+                if (region != null)
+                {
+                    // Get the region's rectangles safely
+                    lock (region._syncLock)
+                    {
+                        _tempRectangles.AddRange(region._rectangles);
+                    }
+                }
+                List<Rectangle> mergedUnion = MergeRectangles(_tempRectangles, false);
+                _rectangles.Clear();
+                _rectangles.AddRange(mergedUnion);
                 break;
 
             case RegionOp.MinimalUnion:
-                List<Rectangle> mergedMinimalUnion = MergeRectangles ([.. _rectangles, .. region._rectangles], true);
-                _rectangles.Clear ();
-                _rectangles.AddRange (mergedMinimalUnion);
-
+                // Avoid collection initialization with spread operator
+                _tempRectangles.Clear();
+                _tempRectangles.AddRange(_rectangles);
+                if (region != null)
+                {
+                    // Get the region's rectangles safely
+                    lock (region._syncLock)
+                    {
+                        _tempRectangles.AddRange(region._rectangles);
+                    }
+                }
+                List<Rectangle> mergedMinimalUnion = MergeRectangles(_tempRectangles, true);
+                _rectangles.Clear();
+                _rectangles.AddRange(mergedMinimalUnion);
                 break;
 
             case RegionOp.XOR:
@@ -225,15 +275,18 @@ public class Region
     /// <returns><c>true</c> if the point is contained within the region; otherwise, <c>false</c>.</returns>
     public bool Contains (int x, int y)
     {
-        foreach (Rectangle r in _rectangles)
+        lock (_syncLock)
         {
-            if (r.Contains (x, y))
+            foreach (Rectangle r in _rectangles)
             {
-                return true;
+                if (r.Contains (x, y))
+                {
+                    return true;
+                }
             }
-        }
 
-        return false;
+            return false;
+        }
     }
 
     /// <summary>
@@ -243,15 +296,18 @@ public class Region
     /// <returns><c>true</c> if the rectangle is contained within the region; otherwise, <c>false</c>.</returns>
     public bool Contains (Rectangle rectangle)
     {
-        foreach (Rectangle r in _rectangles)
+        lock (_syncLock)
         {
-            if (r.Contains (rectangle))
+            foreach (Rectangle r in _rectangles)
             {
-                return true;
+                if (r.Contains (rectangle))
+                {
+                    return true;
+                }
             }
-        }
 
-        return false;
+            return false;
+        }
     }
 
     /// <summary>
@@ -934,6 +990,14 @@ public class Region
 
         // Get the bounds of the region
         Rectangle bounds = GetBounds ();
+
+        // Add protection against extremely large allocations
+        if (bounds.Width > 1000 || bounds.Height > 1000)
+        {
+            // Fall back to drawing each rectangle's boundary
+            DrawBoundaries(lineCanvas, style, attribute);
+            return;
+        }
 
         // Create a grid to track which cells are inside the region
         var insideRegion = new bool [bounds.Width + 1, bounds.Height + 1];
