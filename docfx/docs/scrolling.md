@@ -24,7 +24,7 @@ Scrolling with the mouse and keyboard are enabled by:
 1) Making the [View.Viewport](~/api/Terminal.Gui.View.Viewport.yml) size smaller than the size returned by [View.GetContentSize()](~/api/Terminal.Gui.View.GetContentSize.yml). 
 2) Creating key bindings for the appropriate directional keys (e.g. [Key.CursorDown](~/api/Terminal.Gui.Key)), and calling [View.ScrollHorizontal()](~/api/Terminal.Gui.View.ScrollHorizontal.yml)/[ScrollVertical()](~/api/Terminal.Gui.View.ScrollVertical.yml) as needed.
 3) Subscribing to [View.MouseEvent](~/api/Terminal.Gui.View.MouseEvent.yml) and calling calling [View.ScrollHorizontal()](~/api/Terminal.Gui.View.ScrollHorizontal.yml)/[ScrollVertical()](~/api/Terminal.Gui.View.ScrollVertical.yml) as needed.
-4) Enabling the [ScrollBar](~/api/Terminal.Gui.ScrollBar.yml)s built into View ([View.HorizontalScrollBar/VerticalScrollBar](~/api/Terminal.Gui.View.HorizontalScrollBar.yml)) by either enabling automatic show/hide behavior (@Terminal.Gui.ScrollBar.AutoShow) or explicitly making them visible (@Terminal.Gui.View.Visible).
+4) Enabling the [ScrollBar](~/api/Terminal.Gui.ScrollBar.yml)s built into View ([View.HorizontalScrollBar/VerticalScrollBar](~/api/Terminal.Gui.View.HorizontalScrollBar.yml)) by either enabling automatic show/hide behavior (see @Terminal.Gui.ScrollBar.AutoShow) or explicitly making them visible (see @Terminal.Gui.View.Visible).
 
 While *[ScrollBar](~/api/Terminal.Gui.ScrollBar.yml)* can be used in a standalone manner to provide proportional scrolling, it is typically enabled automatically via the [View.HorizontalScrollBar](~/api/Terminal.Gui.View.HorizontalScrollBar.yml) and  [View.VerticalScrollBar](~/api/Terminal.Gui.View.VerticalScrollBar.yml) properties.
 
@@ -40,7 +40,7 @@ These Scenarios illustrate Terminal.Gui scrolling:
 
 ## [Viewport Settings](~/api/Terminal.Gui.ViewportSettings.yml)
 
-Use  @Terminal.Gui.ViewporSettings to adjust the behavior of scrolling. 
+Use @Terminal.Gui.ViewportSettings to adjust the behavior of scrolling. 
 
 * `AllowNegativeX/Y` - If set, Viewport.Size can be set to negative coordinates enabling scrolling beyond the top-left of the content area.
 

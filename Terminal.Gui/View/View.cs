@@ -8,8 +8,13 @@ namespace Terminal.Gui;
 
 /// <summary>
 ///     View is the base class all visible elements. View can render itself and
-///     contains zero or more nested views, called SubViews. View provides basic functionality for layout, positioning, and
-///     drawing. In addition, View provides keyboard and mouse event handling.
+///     contains zero or more nested views, called SubViews. View provides basic functionality for layout, arrangement, and
+///     drawing. In addition, View provides keyboard and mouse event handling. See the
+///     <see href="../docs/view.html">
+///         View
+///         Deep Dive
+///     </see>
+///     for more.
 /// </summary>
 /// <remarks>
 ///     <list type="table">
@@ -27,73 +32,229 @@ namespace Terminal.Gui;
 ///         <item>
 ///             <term>SuperView</term><description>The View that is a container for SubViews.</description>
 ///         </item>
+///         <item>
+///             <term>Input</term>
+///             <description>
+///                 <para>
+///                     Key Bindings is the preferred way of handling keyboard input in View implementations.
+///                     The View calls
+///                     <see cref="AddCommand(Terminal.Gui.Command,Terminal.Gui.View.CommandImplementation)"/> to declare
+///                     it supports a particular command and then uses <see cref="KeyBindings"/>
+///                     to indicate which key presses will invoke the command.
+///                 </para>
+///                 <para>
+///                     Mouse Bindings is the preferred way of handling mouse input in View implementations. The View calls
+///                     <see cref="AddCommand(Terminal.Gui.Command,Terminal.Gui.View.CommandImplementation)"/> to declare
+///                     it supports a
+///                     particular command and then uses <see cref="MouseBindings"/> to indicate which mouse events will
+///                     invoke the command.
+///                 </para>
+///                 <para>
+///                     See the
+///                     <see href="../docs/mouse.html">
+///                         Mouse
+///                         Deep Dive
+///                     </see>
+///                     and
+///                     <see href="../docs/keyboard.html">
+///                         Keyboard
+///                         Deep Dive
+///                     </see>
+///                     for more information.
+///                 </para>
+///             </description>
+///         </item>
+///         <item>
+///             <term>Layout</term>
+///             <description>
+///                 <para>
+///                     Terminal.Gui provides a rich system for how View objects are laid out relative to each other. The
+///                     layout system also defines how coordinates are specified.
+///                 </para>
+///                 <para>
+///                     The <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/> properties are
+///                     <see cref="Dim"/> and <see cref="Pos"/> objects that dynamically update the position of a view. The
+///                     X and Y properties are of type <see cref="Pos"/> and you can use either absolute positions,
+///                     percentages, or anchor points. The Width and Height properties are of type <see cref="Dim"/> and
+///                     can use absolute position, percentages, and anchors. These are useful as they will take care of
+///                     repositioning views when view's adornments are resized or if the terminal size changes.
+///                 </para>
+///                 <para>
+///                     See the
+///                     <see href="../docs/layout.html">
+///                         Layout
+///                         Deep Dive
+///                     </see>
+///                     for more information.
+///                 </para>
+///             </description>
+///         </item>
+///         <item>
+///             <term>Arrangement</term>
+///             <description>
+///                 <para>
+///                     Complimenting the Layout system, <see cref="Arrangement"/> controls how the user can use the mouse
+///                     and keyboard to arrange views and enables either Tiled or Overlapped layouts.
+///                 </para>
+///                 <para>
+///                     See the
+///                     <see href="../docs/arrangement.html">
+///                         Arrangement
+///                         Deep Dive
+///                     </see>
+///                     for more information.
+///                 </para>
+///             </description>
+///         </item>
+///         <item>
+///             <term>Drawing</term>
+///             <description>
+///                 <para>
+///                     Apps draw using the <see cref="Move"/> and <see cref="AddRune(Rune)"/> APIs. Move selects the
+///                     column and row of the Cell and AddRune places
+///                     the specified glyph in that cell using the <see cref="Attribute"/> that was most recently set via
+///                     <see cref="SetAttribute"/>.
+///                     The ConsoleDriver caches all changed Cells and efficiently outputs them to the terminal each
+///                     iteration of the Application. In other words, Terminal.Gui uses deferred rendering.
+///                 </para>
+///                 <para>
+///                     The View draw APIs all take coordinates specified in Viewport-Relative coordinates. That is,
+///                     <c>(0,0)</c> is the top-left cell visible to the user.
+///                 </para>
+///                 <para>
+///                     If a View need to redraw because something changed within it's Content Area it can call
+///                     <see cref="SetNeedsDraw()"/>.
+///                 </para>
+///                 <para>
+///                     Terminal.Gui supports the full range of Unicode/wide characters.
+///                     This includes emoji, CJK characters, and other wide characters. For Unicode characters that require
+///                     more than one cell,
+///                     AddRune and the ConsoleDriver automatically manage the cells. Extension methods to Rune are
+///                     provided to determine if a Rune is a wide character and to get the width of a Rune.
+///                 </para>
+///                 <para>
+///                     The <see cref="ColorScheme"/> provides consistent colors across all views. The
+///                     <see cref="ColorScheme"/> is inherited from the <see cref="SuperView"/>. The
+///                     <see cref="ColorScheme"/> is used to set the <see cref="Attribute"/> for drawing.
+///                 </para>
+///                 The <see cref="Color"/> class represents a color. It provides automatic mapping between the legacy
+///                 4-bit (16-color) system and 24-bit colors. It contains properties for the red, green, and blue
+///                 components of the color.
+///                 The Color class also contains a static property for each of the 16 ANSI colors. Use
+///                 <see cref="SetAttribute"/> to change the colors used when drawing.</para>
+///                 <para>
+///                 </para>
+///                 <para>
+///                     Clipping enables better performance by ensuring on regions of the terminal that need to be drawn
+///                     actually get drawn by the ConsoleDriver. Terminal.Gui supports non-rectangular clip regions with
+///                     <see cref="Region"/>.
+///                     There is an <see cref="Application"/>-managed clip region. Developers cannot change this directly,
+///                     but can use <see cref="ClipFrame"/>, <see cref="ClipViewport"/>, and <see cref="SetClip"/> to
+///                     modify the clip region.
+///                 </para>
+///                 <para>
+///                     <see cref="LineCanvas"/> provides auto join, a smart TUI drawing system that automatically selects
+///                     the correct line/box drawing glyphs for intersections making drawing complex shapes easy.
+///                 </para>
+///                 <para>
+///                     A set of static properties are provided for the common glyphs used in TUI apps. See
+///                     <see cref="Glyphs"/>.
+///                 </para>
+///                 <para>
+///                     See the
+///                     <see href="../docs/drawing.html">
+///                         Drawing
+///                         Deep Dive
+///                     </see>
+///                     for more information.
+///                 </para>
+///             </description>
+///         </item>
+///         <item>
+///             <term>Text</term>
+///             <description>
+///                 <para>
+///                     A rich text formatting engine is provided in <see cref="TextFormatter"/>. TextFormatter provides
+///                     methods for formatting text with horizontal and vertical alignment, word wrapping, and hotkeys.
+///                 </para>
+///                 <para>
+///                     Terminal.Gui supports rendering glyphs using the @Terminal.Gui.Glyph class. The @Terminal.Gui.Glyph
+///                     class represents a single glyph. It contains a character and an attribute. The character is of type
+///                     Rune and the attribute is of type Attribute. A set of static properties are provided for the
+///                     standard glyphs used for standard views (e.g. the default indicator for @Terminal.Gui.Button) and
+///                     line drawing (e.g. @Terminal.Gui.LineCanvas).
+///                 </para>
+///                 <para>
+///                     See the
+///                     <see href="../docs/navigation.html">
+///                         Navigation
+///                         Deep Dive
+///                     </see>
+///                     for more information.
+///                 </para>
+///             </description>
+///         </item>
+///         <item>
+///             <term>Navigation</term>
+///             <description>
+///                 <para>
+///                     Navigation refers to the user experience for moving focus between views in the application
+///                     view-hierarchy. Focus is a concept that is used to describe which View is currently receiving user
+///                     input. Only
+///                     Views that are
+///                     <see cref="Enabled"/>, <see cref="Visible"/>, and <see cref="CanFocus"/> will receive focus. NOTE:
+///                     <see cref="CanFocus"/> is <see langword="false"/> by default.
+///                 </para>
+///                 <para>
+///                     Views that are focusable should override <see cref="PositionCursor"/> to make sure that the cursor
+///                     is
+///                     placed in a location that makes sense. Some terminals do not have a way of hiding the cursor, so it
+///                     can be
+///                     distracting to have the cursor left at the last focused view. So views should make sure that they
+///                     place the
+///                     cursor in a visually sensible place. The default implementation of <see cref="PositionCursor"/>
+///                     will place the
+///                     cursor at either the hotkey (if defined) or <c>0,0</c>.
+///                 </para>
+///                 <para>
+///                     See the
+///                     <see href="../docs/navigation.html">
+///                         Navigation
+///                         Deep Dive
+///                     </see>
+///                     for more information.
+///                 </para>
+///             </description>
+///         </item>
+///         <item>
+///             <term>Scrolling</term>
+///             <description>
+///                 <para>
+///                     The ability to scroll content is built into View. The <see cref="Viewport"/> represents the
+///                     scrollable "viewport" into the View's Content Area (which is defined by the return value of
+///                     <see cref="GetContentSize"/>).
+///                 </para>
+///                 <para>
+///                     Terminal.Gui also provides the ability show a visual scroll bar that responds to mouse input. This
+///                     ability is not enabled by default given how precious TUI screen real estate is.
+///                     Use <see cref="VerticalScrollBar"/> and <see cref="HorizontalScrollBar"/> to enable this feature.
+///                 </para>
+///                 <para>
+///                     Use <see cref="ViewportSettings"/> to adjust the behavior of scrolling.
+///                 </para>
+///                 <para>
+///                     See the
+///                     <see href="../docs/scrolling.html">
+///                         Scrolling
+///                         Deep Dive
+///                     </see>
+///                     for more information.
+///                 </para>
+///             </description>
+///         </item>
 ///     </list>
 ///     <para>
-///         Focus is a concept that is used to describe which View is currently receiving user input. Only Views that are
-///         <see cref="Enabled"/>, <see cref="Visible"/>, and <see cref="CanFocus"/> will receive focus.
-///     </para>
-///     <para>
-///         Views that are focusable should override <see cref="PositionCursor"/> to make sure that the cursor is
-///         placed in a location that makes sense. Some terminals do not have a way of hiding the cursor, so it can be
-///         distracting to have the cursor left at the last focused view. So views should make sure that they place the
-///         cursor in a visually sensible place. The default implementation of <see cref="PositionCursor"/> will place the
-///         cursor at either the hotkey (if defined) or <c>0,0</c>.
-///     </para>
-///     <para>
-///         The View defines the base functionality for user interface elements in Terminal.Gui. Views can contain one or
-///         more subviews, can respond to user input and render themselves on the screen.
-///     </para>
-///     <para>
-///         To create a View using Absolute layout, call a constructor that takes a Rect parameter to specify the
-///         absolute position and size or simply set <see cref="View.Frame "/>). To create a View using Computed layout use
-///         a constructor that does not take a Rect parameter and set the X, Y, Width and Height properties on the view to
-///         non-absolute values. Both approaches use coordinates that are relative to the <see cref="Viewport"/> of the
-///         <see cref="SuperView"/> the View is added to.
-///     </para>
-///     <para>
-///         Computed layout is more flexible and supports dynamic console apps where controls adjust layout as the
-///         terminal resizes or other Views change size or position. The <see cref="X"/>, <see cref="Y"/>,
-///         <see cref="Width"/>, and <see cref="Height"/> properties are <see cref="Dim"/> and <see cref="Pos"/> objects
-///         that dynamically update the position of a view. The X and Y properties are of type <see cref="Pos"/> and you
-///         can use either absolute positions, percentages, or anchor points. The Width and Height properties are of type
-///         <see cref="Dim"/> and can use absolute position, percentages, and anchors. These are useful as they will take
-///         care of repositioning views when view's adornments are resized or if the terminal size changes.
-///     </para>
-///     <para>
-///         Absolute layout requires specifying coordinates and sizes of Views explicitly, and the View will typically
-///         stay in a fixed position and size. To change the position and size use the <see cref="Frame"/> property.
-///     </para>
-///     <para>
-///         Subviews (child views) can be added to a View by calling the <see cref="Add(View)"/> method. The container of
-///         a View can be accessed with the <see cref="SuperView"/> property.
-///     </para>
-///     <para>
-///         To flag a region of the View's <see cref="Viewport"/> to be redrawn call
-///         <see cref="SetNeedsDraw(System.Drawing.Rectangle)"/>
-///         .
-///         To flag the entire view for redraw call <see cref="SetNeedsDraw()"/>.
-///     </para>
-///     <para>
-///         The <see cref="SetNeedsLayout"/> method is called when the size or layout of a view has changed. The
-///         <see cref="MainLoop"/> will
-///         cause <see cref="Layout()"/> to be called on the next <see cref="Application.Iteration"/> so there is normally
-///         no reason to direclty call
-///         see <see cref="Layout()"/>.
-///     </para>
-///     <para>
-///         Views have a <see cref="ColorScheme"/> property that defines the default colors that subviews should use for
-///         rendering. This ensures that the views fit in the context where they are being used, and allows for themes to
-///         be plugged in. For example, the default colors for windows and Toplevels uses a blue background, while it uses
-///         a white background for dialog boxes and a red background for errors.
-///     </para>
-///     <para>
-///         Subclasses should not rely on <see cref="ColorScheme"/> being set at construction time. If a
-///         <see cref="ColorScheme"/> is not set on a view, the view will inherit the value from its
-///         <see cref="SuperView"/> and the value might only be valid once a view has been added to a SuperView.
-///     </para>
-///     <para>By using  <see cref="ColorScheme"/> applications will work both in color as well as black and white displays.</para>
-///     <para>
-///         Views can also opt-in to more sophisticated initialization by implementing overrides to
+///         Views can opt in to more sophisticated initialization by implementing overrides to
 ///         <see cref="ISupportInitialize.BeginInit"/> and <see cref="ISupportInitialize.EndInit"/> which will be called
 ///         when the view is added to a <see cref="SuperView"/>.
 ///     </para>
@@ -369,6 +530,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
             SetNeedsLayout ();
             SuperView?.SetNeedsLayout ();
             SetNeedsDraw ();
+
             if (SuperView is { })
             {
                 SuperView?.SetNeedsDraw ();
@@ -576,7 +738,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
     }
 
     /// <summary>
-    ///     Riased when the <see cref="View"/> is being disposed. 
+    ///     Riased when the <see cref="View"/> is being disposed.
     /// </summary>
     public event EventHandler? Disposing;
 
