@@ -392,14 +392,14 @@ public class ConsoleKeyMappingTests
         bool shift,
         bool alt,
         bool control,
-        KeyCode excpectedKeyCode
+        KeyCode expectedKeyCode
     )
     {
         ConsoleModifiers modifiers = GetModifiers (shift, alt, control);
         var keyCode = (KeyCode)keyChar;
         keyCode = MapToKeyCodeModifiers (modifiers, keyCode);
 
-        Assert.Equal (keyCode, excpectedKeyCode);
+        Assert.Equal (keyCode, expectedKeyCode);
     }
 
     [Theory]
@@ -480,36 +480,11 @@ public class ConsoleKeyMappingTests
     }
 
     [Theory]
-    [InlineData ('a', 'A', KeyCode.A | KeyCode.ShiftMask)]
-    [InlineData ('z', 'Z', KeyCode.Z | KeyCode.ShiftMask)]
-    [InlineData ('á', 'Á', (KeyCode)'Á' | KeyCode.ShiftMask)]
-    [InlineData ('à', 'À', (KeyCode)'À' | KeyCode.ShiftMask)]
-    [InlineData ('ý', 'Ý', (KeyCode)'Ý' | KeyCode.ShiftMask)]
-    [InlineData ('1', '!', (KeyCode)'!' | KeyCode.ShiftMask)]
-    [InlineData ('2', '"', (KeyCode)'"' | KeyCode.ShiftMask)]
-    [InlineData ('3', '#', (KeyCode)'#' | KeyCode.ShiftMask)]
-    [InlineData ('4', '$', (KeyCode)'$' | KeyCode.ShiftMask)]
-    [InlineData ('5', '%', (KeyCode)'%' | KeyCode.ShiftMask)]
-    [InlineData ('6', '&', (KeyCode)'&' | KeyCode.ShiftMask)]
-    [InlineData ('7', '/', (KeyCode)'/' | KeyCode.ShiftMask)]
-    [InlineData ('8', '(', (KeyCode)'(' | KeyCode.ShiftMask)]
-    [InlineData ('9', ')', (KeyCode)')' | KeyCode.ShiftMask)]
-    [InlineData ('0', '=', (KeyCode)'=' | KeyCode.ShiftMask)]
-    [InlineData ('\\', '|', (KeyCode)'|' | KeyCode.ShiftMask)]
-    [InlineData ('\'', '?', (KeyCode)'?' | KeyCode.ShiftMask)]
-    [InlineData ('«', '»', (KeyCode)'»' | KeyCode.ShiftMask)]
-    [InlineData ('+', '*', (KeyCode)'*' | KeyCode.ShiftMask)]
-    [InlineData ('´', '`', (KeyCode)'`' | KeyCode.ShiftMask)]
-    [InlineData ('º', 'ª', (KeyCode)'ª' | KeyCode.ShiftMask)]
-    [InlineData ('~', '^', (KeyCode)'^' | KeyCode.ShiftMask)]
-    [InlineData ('<', '>', (KeyCode)'>' | KeyCode.ShiftMask)]
-    [InlineData (',', ';', (KeyCode)';' | KeyCode.ShiftMask)]
-    [InlineData ('.', ':', (KeyCode)':' | KeyCode.ShiftMask)]
-    [InlineData ('-', '_', (KeyCode)'_' | KeyCode.ShiftMask)]
+    [MemberData (nameof (UnShiftedChars))]
     public void GetKeyChar_Shifted_Char_From_UnShifted_Char (
         char unicodeChar,
         char expectedKeyChar,
-        KeyCode excpectedKeyCode
+        KeyCode expectedKeyCode
     )
     {
         ConsoleModifiers modifiers = GetModifiers (true, false, false);
@@ -519,40 +494,46 @@ public class ConsoleKeyMappingTests
         var keyCode = (KeyCode)keyChar;
         keyCode = MapToKeyCodeModifiers (modifiers, keyCode);
 
-        Assert.Equal (keyCode, excpectedKeyCode);
+        Assert.Equal (keyCode, expectedKeyCode);
     }
 
+    public static IEnumerable<object []> UnShiftedChars =>
+        new List<object []>
+        {
+            new object[] { 'a', 'A', KeyCode.A | KeyCode.ShiftMask },
+            new object[] { 'z', 'Z', KeyCode.Z | KeyCode.ShiftMask },
+            new object[] { 'á', 'Á', (KeyCode)'Á' | KeyCode.ShiftMask },
+            new object[] { 'à', 'À', (KeyCode)'À' | KeyCode.ShiftMask },
+            new object[]{ 'ý', 'Ý', (KeyCode)'Ý' | KeyCode.ShiftMask },
+            new object[]{ '1', '!', (KeyCode)'!' | KeyCode.ShiftMask },
+            new object[]{ '2', '"', (KeyCode)'"' | KeyCode.ShiftMask },
+            new object[]{ '3', '#', (KeyCode)'#' | KeyCode.ShiftMask },
+            new object[]{ '4', '$', (KeyCode)'$' | KeyCode.ShiftMask },
+            new object[]{ '5', '%', (KeyCode)'%' | KeyCode.ShiftMask },
+            new object[]{ '6', '&', (KeyCode)'&' | KeyCode.ShiftMask },
+            new object[]{ '7', '/', (KeyCode)'/' | KeyCode.ShiftMask },
+            new object[]{ '8', '(', (KeyCode)'(' | KeyCode.ShiftMask },
+            new object[]{ '9', ')', (KeyCode)')' | KeyCode.ShiftMask },
+            new object[]{ '0', '=', (KeyCode)'=' | KeyCode.ShiftMask },
+            new object[]{ '\\', '|', (KeyCode)'|' | KeyCode.ShiftMask },
+            new object[]{ '\'', '?', (KeyCode)'?' | KeyCode.ShiftMask },
+            new object[]{ '«', '»', (KeyCode)'»' | KeyCode.ShiftMask },
+            new object[]{ '+', '*', (KeyCode)'*' | KeyCode.ShiftMask },
+            new object[]{ '´', '`', (KeyCode)'`' | KeyCode.ShiftMask },
+            new object[]{ 'º', 'ª', (KeyCode)'ª' | KeyCode.ShiftMask },
+            new object[]{ '~', '^', (KeyCode)'^' | KeyCode.ShiftMask },
+            new object[]{ '<', '>', (KeyCode)'>' | KeyCode.ShiftMask },
+            new object[]{ ',', ';', (KeyCode)';' | KeyCode.ShiftMask },
+            new object[]{ '.', ':', (KeyCode)':' | KeyCode.ShiftMask },
+            new object[]{ '-', '_', (KeyCode)'_' | KeyCode.ShiftMask },
+        };
+
     [Theory]
-    [InlineData ('A', 'a', (KeyCode)'a')]
-    [InlineData ('Z', 'z', (KeyCode)'z')]
-    [InlineData ('Á', 'á', (KeyCode)'á')]
-    [InlineData ('À', 'à', (KeyCode)'à')]
-    [InlineData ('Ý', 'ý', (KeyCode)'ý')]
-    [InlineData ('!', '1', KeyCode.D1)]
-    [InlineData ('"', '2', KeyCode.D2)]
-    [InlineData ('#', '3', KeyCode.D3)]
-    [InlineData ('$', '4', KeyCode.D4)]
-    [InlineData ('%', '5', KeyCode.D5)]
-    [InlineData ('&', '6', KeyCode.D6)]
-    [InlineData ('/', '7', KeyCode.D7)]
-    [InlineData ('(', '8', KeyCode.D8)]
-    [InlineData (')', '9', KeyCode.D9)]
-    [InlineData ('=', '0', KeyCode.D0)]
-    [InlineData ('|', '\\', (KeyCode)'\\')]
-    [InlineData ('?', '\'', (KeyCode)'\'')]
-    [InlineData ('»', '«', (KeyCode)'«')]
-    [InlineData ('*', '+', (KeyCode)'+')]
-    [InlineData ('`', '´', (KeyCode)'´')]
-    [InlineData ('ª', 'º', (KeyCode)'º')]
-    [InlineData ('^', '~', (KeyCode)'~')]
-    [InlineData ('>', '<', (KeyCode)'<')]
-    [InlineData (';', ',', (KeyCode)',')]
-    [InlineData (':', '.', (KeyCode)'.')]
-    [InlineData ('_', '-', (KeyCode)'-')]
+    [MemberData (nameof (ShiftedChars))]
     public void GetKeyChar_UnShifted_Char_From_Shifted_Char (
         char unicodeChar,
         char expectedKeyChar,
-        KeyCode excpectedKeyCode
+        KeyCode expectedKeyCode
     )
     {
         ConsoleModifiers modifiers = GetModifiers (false, false, false);
@@ -562,6 +543,37 @@ public class ConsoleKeyMappingTests
         var keyCode = (KeyCode)keyChar;
         keyCode = MapToKeyCodeModifiers (modifiers, keyCode);
 
-        Assert.Equal (keyCode, excpectedKeyCode);
+        Assert.Equal (keyCode, expectedKeyCode);
     }
+
+    public static IEnumerable<object []> ShiftedChars =>
+        new List<object []>
+        {
+            new object[] { 'A', 'a', (KeyCode)'a' },
+            new object[] { 'Z', 'z', (KeyCode)'z' },
+            new object[] { 'Á', 'á', (KeyCode)'á' },
+            new object[] { 'À', 'à', (KeyCode)'à' },
+            new object[] { 'Ý', 'ý', (KeyCode)'ý' },
+            new object[] { '!', '1', KeyCode.D1 },
+            new object[] { '"', '2', KeyCode.D2 },
+            new object[] { '#', '3', KeyCode.D3 },
+            new object[] { '$', '4', KeyCode.D4 },
+            new object[] { '%', '5', KeyCode.D5 },
+            new object[] { '&', '6', KeyCode.D6 },
+            new object[] { '/', '7', KeyCode.D7 },
+            new object[] { '(', '8', KeyCode.D8 },
+            new object[] { ')', '9', KeyCode.D9 },
+            new object[] { '=', '0', KeyCode.D0 },
+            new object[] { '|', '\\', (KeyCode)'\\' },
+            new object[] { '?', '\'', (KeyCode)'\'' },
+            new object[] { '»', '«', (KeyCode)'«' },
+            new object[] { '*', '+', (KeyCode)'+' },
+            new object[] { '`', '´', (KeyCode)'´' },
+            new object[] { 'ª', 'º', (KeyCode)'º' },
+            new object[] { '^', '~', (KeyCode)'~' },
+            new object[] { '>', '<', (KeyCode)'<' },
+            new object[] { ';', ',', (KeyCode)',' },
+            new object[] { ':', '.', (KeyCode)'.' },
+            new object[] { '_', '-', (KeyCode)'-' }
+        };
 }
