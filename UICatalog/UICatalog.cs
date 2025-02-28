@@ -16,9 +16,14 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Serilog;
 using Terminal.Gui;
 using static Terminal.Gui.ConfigurationManager;
 using Command = Terminal.Gui.Command;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
 
 #nullable enable
@@ -118,6 +123,8 @@ public class UICatalogApp
 
     private static int Main (string [] args)
     {
+        Logging.Logger = CreateLogger ();
+
         Console.OutputEncoding = Encoding.Default;
 
         if (Debugger.IsAttached)
@@ -202,6 +209,28 @@ public class UICatalogApp
         UICatalogMain (_options);
 
         return 0;
+    }
+
+    private static ILogger CreateLogger ()
+    {
+        // Configure Serilog to write logs to a file
+        Log.Logger = new LoggerConfiguration ()
+                     .MinimumLevel.Verbose () // Verbose includes Trace and Debug
+                     .Enrich.FromLogContext () // Enables dynamic enrichment
+                     .WriteTo.File ("logs/logfile.txt", rollingInterval: RollingInterval.Day,
+                                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+                     .CreateLogger ();
+
+        // Create a logger factory compatible with Microsoft.Extensions.Logging
+        using var loggerFactory = LoggerFactory.Create (builder =>
+                                                        {
+                                                            builder
+                                                                .AddSerilog (dispose: true) // Integrate Serilog with ILogger
+                                                                .SetMinimumLevel (LogLevel.Trace); // Set minimum log level
+                                                        });
+
+        // Get an ILogger instance
+        return loggerFactory.CreateLogger ("Global Logger");
     }
 
     private static void OpenUrl (string url)
@@ -896,6 +925,12 @@ public class UICatalogApp
 
         public void ConfigChanged ()
         {
+            if (MenuBar == null)
+            {
+                // View is probably disposed
+                return;
+            }
+
             if (_topLevelColorScheme == null || !Colors.ColorSchemes.ContainsKey (_topLevelColorScheme))
             {
                 _topLevelColorScheme = "Base";

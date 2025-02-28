@@ -3364,6 +3364,29 @@ A B C
         Application.Top.Dispose ();
     }
 
+    [Theory]
+    [InlineData (true, 0, 1)]
+    [InlineData (true, 1, 1)]
+    [InlineData (false, 0, 1)]
+    [InlineData (false, 1, 0)]
+    public void TableCollectionNavigator_FullRowSelect_True_False (bool fullRowSelect, int selectedCol, int expectedRow)
+    {
+        TableView tableView = new () { FullRowSelect = fullRowSelect, SelectedColumn = selectedCol};
+        tableView.BeginInit ();
+        tableView.EndInit ();
+
+        DataTable dt = new ();
+        dt.Columns.Add ("A");
+        dt.Columns.Add ("B");
+
+        dt.Rows.Add (1, 2);
+        dt.Rows.Add (3, 4);
+        tableView.Table = new DataTableSource (dt);
+        tableView.SelectedColumn = selectedCol;
+
+        Assert.Equal (expectedRow, tableView.CollectionNavigator.GetNextMatchingItem (0, "3".ToCharArray () [0]));
+    }
+
     /// <summary>
     /// Creates 3 views on <see cref="Application.Current"/> with the focus in the
     /// <see cref="TableView"/>.  This is a helper method to setup tests that want to
