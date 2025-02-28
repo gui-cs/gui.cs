@@ -31,7 +31,7 @@ using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironm
 namespace UICatalog;
 
 /// <summary>
-///     UI Catalog is a comprehensive sample library for Terminal.Gui. It provides a simple UI for adding to the
+///     UI Catalog is a comprehensive sample library and test app for Terminal.Gui. It provides a simple UI for adding to the
 ///     catalog of scenarios.
 /// </summary>
 /// <remarks>
@@ -188,7 +188,7 @@ public class UICatalogApp
                                                                                         .ToArray ()
                                                                              );
 
-        var rootCommand = new RootCommand ("A comprehensive sample library for Terminal.Gui")
+        var rootCommand = new RootCommand ("A comprehensive sample library and test app for Terminal.Gui")
         {
             scenarioArgument, debugLogLevel, benchmarkFlag, benchmarkTimeout, resultsFile, driverOption
         };
