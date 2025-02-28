@@ -74,7 +74,8 @@ public class UICatalogApp
     private static Options _options;
     private static ObservableCollection<Scenario>? _scenarios;
 
-    private const string LOG_FILE = "logs/uicatalog.log";
+    private const string LOGFILE_LOCATION = "./logs";
+    private static string _logFilePath = string.Empty;
     private static readonly LoggingLevelSwitch _logLevelSwitch = new ();
 
     // If set, holds the scenario the user selected
@@ -167,7 +168,9 @@ public class UICatalogApp
         resultsFile.AddAlias ("-f");
         resultsFile.AddAlias ("--f");
 
-        Option<string> debugLogLevel = new Option<string> ("--debug-log-level", $"The level to use for logging (debug console and {LOG_FILE})").FromAmong (
+        // what's the app name?
+        _logFilePath = $"{LOGFILE_LOCATION}/{Assembly.GetExecutingAssembly ().GetName ().Name}.log";
+        Option<string> debugLogLevel = new Option<string> ("--debug-log-level", $"The level to use for logging (debug console and {_logFilePath})").FromAmong (
              Enum.GetNames<LogEventLevel> ()
             );
         debugLogLevel.SetDefaultValue("Warning");
@@ -239,7 +242,7 @@ public class UICatalogApp
                      .Enrich.FromLogContext () // Enables dynamic enrichment
                      .WriteTo.Debug ()
                      .WriteTo.File (
-                                    LOG_FILE,
+                                    _logFilePath,
                                     rollingInterval: RollingInterval.Day,
                                     outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
                      .CreateLogger ();
@@ -1331,7 +1334,7 @@ public class UICatalogApp
             menuItems.Add (
                            new ()
                            {
-                               Title = $"Log file location: {LOG_FILE}",
+                               Title = $"Log file: {_logFilePath}"
                                //CanExecute = () => false
                            });
 
