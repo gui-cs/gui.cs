@@ -254,20 +254,20 @@ public static partial class Application // Mouse handling
 
 #pragma warning disable CS1574 // XML comment has cref attribute that could not be resolved
     /// <summary>
-    /// Raised when a mouse event occurs. Can be cancelled by setting <see cref="MouseEventArgs.Handled"/> to <see langword="true"/>.
+    /// Raised when a mouse event occurs. Can be cancelled by setting <see cref="HandledEventArgs.Handled"/> to <see langword="true"/>.
     /// </summary>
     /// <remarks>
     ///     <para>
     ///         <see cref="MouseEventArgs.ScreenPosition"/> coordinates are screen-relative.
     ///     </para>
     ///     <para>
-    ///         <see cref="MouseEventArgs.View"/> will be the deepest view under the under the mouse.
+    ///         <see cref="MouseEventArgs.View"/> will be the deepest view under the mouse.
     ///     </para>
     ///     <para>
     ///         <see cref="MouseEventArgs.Position"/> coordinates are view-relative. Only valid if <see cref="MouseEventArgs.View"/> is set.
     ///     </para>
     ///     <para>
-    ///         Use this evento to handle mouse events at the application level, before View-specific handling.
+    ///         Use this even to handle mouse events at the application level, before View-specific handling.
     ///     </para>
     /// </remarks>
     public static event EventHandler<MouseEventArgs>? MouseEvent;

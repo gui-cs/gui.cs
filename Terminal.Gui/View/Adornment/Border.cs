@@ -12,36 +12,24 @@ namespace Terminal.Gui;
 ///     <para>
 ///         The <see cref="View.Title"/> of <see cref="Adornment.Parent"/> will be drawn based on the value of
 ///         <see cref="Thickness.Top"/>:
+///         <example>
+///             // If Thickness.Top is 1:
+///             ┌┤1234├──┐
+///             │        │
+///             └────────┘
+///             // If Thickness.Top is 2:
+///              ┌────┐
+///             ┌┤1234├──┐
+///             │        │
+///             └────────┘
+///             If Thickness.Top is 3:
+///              ┌────┐
+///             ┌┤1234├──┐
+///             │└────┘  │
+///             │        │
+///             └────────┘
+///         </example>
 ///     </para>
-///     <para>
-///         If <c>1</c>:
-///         <code>
-/// ┌┤1234├──┐
-/// │        │
-/// └────────┘
-/// </code>
-///     </para>
-///     <para>
-///         If <c>2</c>:
-///         <code>
-///  ┌────┐
-/// ┌┤1234├──┐
-/// │        │
-/// └────────┘
-/// </code>
-///     </para>
-///     <para>
-///         If <c>3</c>:
-///         <code>
-///  ┌────┐
-/// ┌┤1234├──┐
-/// │└────┘  │
-/// │        │
-/// └────────┘
-/// </code>
-///     </para>
-///     <para/>
-///     <para>See the <see cref="Adornment"/> class.</para>
 /// </remarks>
 public class Border : Adornment
 {
@@ -77,13 +65,14 @@ public class Border : Adornment
             ShowHideDrawIndicator ();
         }
     }
+
     private void ShowHideDrawIndicator ()
     {
         if (View.Diagnostics.HasFlag (ViewDiagnosticFlags.DrawIndicator) && Thickness != Thickness.Empty)
         {
             if (DrawIndicator is null)
             {
-                DrawIndicator = new SpinnerView ()
+                DrawIndicator = new()
                 {
                     Id = "DrawIndicator",
                     X = 1,
@@ -282,7 +271,6 @@ public class Border : Adornment
             ColorScheme = cs;
         }
 
-
         if (e.NewValue == HighlightStyle.None && _savedForeColor.HasValue)
         {
             var cs = new ColorScheme (ColorScheme)
@@ -304,9 +292,10 @@ public class Border : Adornment
     {
         // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/3312
         if (!_dragPosition.HasValue && mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed)
-                                // HACK: Prevents Window from being draggable if it's Top
-                                //&& Parent is Toplevel { Modal: true }
-                                )
+
+            // HACK: Prevents Window from being draggable if it's Top
+            //&& Parent is Toplevel { Modal: true }
+           )
         {
             Parent!.SetFocus ();
 
@@ -501,8 +490,9 @@ public class Border : Adornment
                                                            parentLoc.Y - _startGrabPoint.Y,
                                                            out int nx,
                                                            out int ny
-                                                          //,
-                                                          // out _
+
+                                                           //,
+                                                           // out _
                                                           );
 
                         Parent.X = parentLoc.X - _startGrabPoint.X;
@@ -712,7 +702,12 @@ public class Border : Adornment
             }
         }
 
-        if (Parent is { } && canDrawBorder && Thickness.Top > 0 && maxTitleWidth > 0 && Settings.FastHasFlags (BorderSettings.Title) && !string.IsNullOrEmpty (Parent?.Title))
+        if (Parent is { }
+            && canDrawBorder
+            && Thickness.Top > 0
+            && maxTitleWidth > 0
+            && Settings.FastHasFlags (BorderSettings.Title)
+            && !string.IsNullOrEmpty (Parent?.Title))
         {
             Attribute focus = Parent.GetNormalColor ();
 
@@ -723,11 +718,12 @@ public class Border : Adornment
             }
 
             Rectangle titleRect = new (borderBounds.X + 2, titleY, maxTitleWidth, 1);
-            Parent.TitleTextFormatter.Draw (titleRect
-                                           ,
+
+            Parent.TitleTextFormatter.Draw (
+                                            titleRect,
                                             Parent.HasFocus ? focus : GetNormalColor (),
                                             Parent.HasFocus ? focus : GetHotNormalColor ());
-            Parent?.LineCanvas.Exclude(new(titleRect));
+            Parent?.LineCanvas.Exclude (new (titleRect));
         }
 
         if (canDrawBorder && LineStyle != LineStyle.None)
@@ -944,13 +940,15 @@ public class Border : Adornment
             }
         }
 
-        return true; ;
+        return true;
+
+        ;
     }
 
     /// <summary>
     ///     Gets the subview used to render <see cref="ViewDiagnosticFlags.DrawIndicator"/>.
     /// </summary>
-    public SpinnerView? DrawIndicator { get; private set; } = null;
+    public SpinnerView? DrawIndicator { get; private set; }
 
     private void SetupGradientLineCanvas (LineCanvas lc, Rectangle rect)
     {
@@ -1392,13 +1390,13 @@ public class Border : Adornment
 
         HotKeyBindings.Add (Key.Esc, Command.Quit);
         HotKeyBindings.Add (Application.ArrangeKey, Command.Quit);
-        HotKeyBindings.Add (Key.CursorUp,  Command.Up);
+        HotKeyBindings.Add (Key.CursorUp, Command.Up);
         HotKeyBindings.Add (Key.CursorDown, Command.Down);
         HotKeyBindings.Add (Key.CursorLeft, Command.Left);
         HotKeyBindings.Add (Key.CursorRight, Command.Right);
 
         HotKeyBindings.Add (Key.Tab, Command.Tab);
-        HotKeyBindings.Add (Key.Tab.WithShift,  Command.BackTab);
+        HotKeyBindings.Add (Key.Tab.WithShift, Command.BackTab);
     }
 
     private void ApplicationOnMouseEvent (object? sender, MouseEventArgs e)

@@ -8,6 +8,7 @@ public class ApplicationScreenTests (ITestOutputHelper output)
     public void ClearScreenNextIteration_Resets_To_False_After_LayoutAndDraw ()
     {
         // Arrange
+        Application.ResetState (true);
         Application.Init ();
 
         // Act
@@ -64,6 +65,8 @@ public class ApplicationScreenTests (ITestOutputHelper output)
         Application.Top.Dispose ();
         Application.Top = null;
         Application.Shutdown ();
+        Application.ResetState (true);
+
     }
 
     [Fact]
