@@ -19,7 +19,7 @@ public class CSI_SetVsAppend
 {
     [Benchmark (Baseline = true)]
     [ArgumentsSource (nameof (StringBuilderSource))]
-    public StringBuilder GetStringAndAppend (StringBuilder stringBuilder)
+    public StringBuilder Set (StringBuilder stringBuilder)
     {
         stringBuilder.Append (Tui.EscSeqUtils.CSI_SetBackgroundColorRGB (1, 2, 3));
         stringBuilder.Append (Tui.EscSeqUtils.CSI_SetForegroundColorRGB (3, 2, 1));
@@ -31,7 +31,7 @@ public class CSI_SetVsAppend
 
     [Benchmark]
     [ArgumentsSource (nameof (StringBuilderSource))]
-    public StringBuilder OnlyAppend (StringBuilder stringBuilder)
+    public StringBuilder Append (StringBuilder stringBuilder)
     {
         Tui.EscSeqUtils.CSI_AppendBackgroundColorRGB (stringBuilder, 1, 2, 3);
         Tui.EscSeqUtils.CSI_AppendForegroundColorRGB (stringBuilder, 3, 2, 1);
