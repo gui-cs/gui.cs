@@ -9,6 +9,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Layout")]
 [ScenarioCategory ("Arrangement")]
 [ScenarioCategory ("Tests")]
+[ScenarioCategory ("Drawing")]
 public class Clipping : Scenario
 {
     private int _hotkeyCount;

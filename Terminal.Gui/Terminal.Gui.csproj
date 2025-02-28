@@ -58,6 +58,7 @@
     <PackageReference Include="Microsoft.CodeAnalysis" Version="[4.10,5)" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="[4.10,5)" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="[4.10,5)" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
     <!-- Enable Nuget Source Link for github -->
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="[8,9)" PrivateAssets="all" />
     <PackageReference Include="System.IO.Abstractions" Version="[21.0.22,22)" />
@@ -80,6 +81,7 @@
   <ItemGroup>
     <InternalsVisibleTo Include="UnitTests" />
     <InternalsVisibleTo Include="TerminalGuiDesigner" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
   </ItemGroup>
   <!-- =================================================================== -->
   <!-- API Documentation -->

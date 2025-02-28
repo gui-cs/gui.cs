@@ -153,7 +153,7 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
             null,
             new []
             {
-                new StepExpectation ('\u001b',AnsiResponseParserState.ExpectingBracket,string.Empty)
+                new StepExpectation ('\u001b',AnsiResponseParserState.ExpectingEscapeSequence,string.Empty)
             }
         ];
 
@@ -163,13 +163,13 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
             'c',
             new []
             {
-                new StepExpectation ('\u001b',AnsiResponseParserState.ExpectingBracket,string.Empty),
-                new StepExpectation ('H',AnsiResponseParserState.Normal,"\u001bH"), // H is known terminator and not expected one so here we release both chars
-                new StepExpectation ('\u001b',AnsiResponseParserState.ExpectingBracket,string.Empty),
+                new StepExpectation ('\u001b',AnsiResponseParserState.ExpectingEscapeSequence,string.Empty),
+                new StepExpectation ('H',AnsiResponseParserState.InResponse,string.Empty), // H is known terminator and not expected one so here we release both chars
+                new StepExpectation ('\u001b',AnsiResponseParserState.ExpectingEscapeSequence,"\u001bH"),
                 new StepExpectation ('[',AnsiResponseParserState.InResponse,string.Empty),
                 new StepExpectation ('0',AnsiResponseParserState.InResponse,string.Empty),
                 new StepExpectation ('c',AnsiResponseParserState.Normal,string.Empty,"\u001b[0c"), // c is expected terminator so here we swallow input and populate expected response
-                new StepExpectation ('\u001b',AnsiResponseParserState.ExpectingBracket,string.Empty),
+                new StepExpectation ('\u001b',AnsiResponseParserState.ExpectingEscapeSequence,string.Empty),
             }
         ];
     }
@@ -227,8 +227,10 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         {
             parser.ExpectResponse (terminator.Value.ToString (),(s)=> response = s,null, false);
         }
+        int step= 0;
         foreach (var state in expectedStates)
         {
+            step++;
             // If we expect the response to be detected at this step
             if (!string.IsNullOrWhiteSpace (state.ExpectedAnsiResponse))
             {
@@ -247,6 +249,8 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
                 // And after passing input it shuld be the expected value
                 Assert.Equal (state.ExpectedAnsiResponse, response);
             }
+
+            output.WriteLine ($"Step {step} passed");
         }
     }
 
@@ -260,8 +264,8 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         AssertConsumed (input,ref i);
 
         // We should know when the state changed
-        Assert.Equal (AnsiResponseParserState.ExpectingBracket, _parser1.State);
-        Assert.Equal (AnsiResponseParserState.ExpectingBracket, _parser2.State);
+        Assert.Equal (AnsiResponseParserState.ExpectingEscapeSequence, _parser1.State);
+        Assert.Equal (AnsiResponseParserState.ExpectingEscapeSequence, _parser2.State);
 
         Assert.Equal (DateTime.Now.Date, _parser1.StateChangedAt.Date);
         Assert.Equal (DateTime.Now.Date, _parser2.StateChangedAt.Date);
@@ -287,35 +291,6 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
 
         // It should be the second escape that gets released (i.e. index 1)
         AssertManualReleaseIs ("\u001b",1);
-    }
-
-    [Fact]
-    public void TwoExcapesInARowWithTextBetween ()
-    {
-        // Example user presses Esc key and types at the speed of light (normally the consumer should be handling Esc timeout)
-        // then a DAR comes in.
-        string input = "\u001bfish\u001b";
-        int i = 0;
-
-        // First Esc gets grabbed
-        AssertConsumed (input, ref i); // Esc
-        Assert.Equal (AnsiResponseParserState.ExpectingBracket,_parser1.State);
-        Assert.Equal (AnsiResponseParserState.ExpectingBracket, _parser2.State);
-
-        // Because next char is 'f' we do not see a bracket so release both
-        AssertReleased (input, ref i, "\u001bf", 0,1); // f
-
-        Assert.Equal (AnsiResponseParserState.Normal, _parser1.State);
-        Assert.Equal (AnsiResponseParserState.Normal, _parser2.State);
-
-        AssertReleased (input, ref i,"i",2);
-        AssertReleased (input, ref i, "s", 3);
-        AssertReleased (input, ref i, "h", 4);
-
-        AssertConsumed (input, ref i); // Second Esc
-
-        // Assume 50ms or something has passed, lets force release as no new content
-        AssertManualReleaseIs ("\u001b", 5);
     }
 
     [Fact]
@@ -472,6 +447,191 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         // Assert that the UnexpectedResponseHandler was called with the correct unknown responses
         Assert.Equal (expectedUnknownResponses.Count, unknownResponses.Count);
         Assert.Equal (expectedUnknownResponses, unknownResponses);
+    }
+
+    [Fact]
+    public void ParserDetectsMouse ()
+    {
+        // ANSI escape sequence for mouse down (using a generic format example)
+        const string MOUSE_DOWN = "\u001B[<0;12;32M";
+
+        // ANSI escape sequence for Device Attribute Response (e.g., Terminal identifying itself)
+        const string DEVICE_ATTRIBUTE_RESPONSE = "\u001B[?1;2c";
+
+        // ANSI escape sequence for mouse up (using a generic format example)
+        const string MOUSE_UP = "\u001B[<0;25;50m";
+
+        var parser = new AnsiResponseParser ();
+
+        parser.HandleMouse = true;
+        string? foundDar = null;
+        List<MouseEventArgs> mouseEventArgs = new ();
+
+        parser.Mouse += (s, e) => mouseEventArgs.Add (e);
+        parser.ExpectResponse ("c", (dar) => foundDar = dar, null, false);
+        var released = parser.ProcessInput ("a" + MOUSE_DOWN + "asdf" + DEVICE_ATTRIBUTE_RESPONSE + "bbcc" + MOUSE_UP + "sss");
+
+        Assert.Equal ("aasdfbbccsss", released);
+
+        Assert.Equal (2, mouseEventArgs.Count);
+
+        Assert.NotNull (foundDar);
+        Assert.Equal (DEVICE_ATTRIBUTE_RESPONSE,foundDar);
+
+        Assert.True (mouseEventArgs [0].IsPressed);
+        // Mouse positions in ANSI are 1 based so actual Terminal.Gui Screen positions are x-1,y-1
+        Assert.Equal (11,mouseEventArgs [0].Position.X);
+        Assert.Equal (31, mouseEventArgs [0].Position.Y);
+
+        Assert.True (mouseEventArgs [1].IsReleased);
+        Assert.Equal (24, mouseEventArgs [1].Position.X);
+        Assert.Equal (49, mouseEventArgs [1].Position.Y);
+    }
+
+
+    [Fact]
+    public void ParserDetectsKeyboard ()
+    {
+
+        // ANSI escape sequence for cursor left
+        const string LEFT = "\u001b[D";
+
+        // ANSI escape sequence for Device Attribute Response (e.g., Terminal identifying itself)
+        const string DEVICE_ATTRIBUTE_RESPONSE = "\u001B[?1;2c";
+
+        // ANSI escape sequence for cursor up (while shift held down)
+        const string SHIFT_UP = "\u001b[1;2A";
+
+        var parser = new AnsiResponseParser ();
+
+        parser.HandleKeyboard = true;
+        string? foundDar = null;
+        List<Key> keys = new ();
+
+        parser.Keyboard += (s, e) => keys.Add (e);
+        parser.ExpectResponse ("c", (dar) => foundDar = dar, null, false);
+        var released = parser.ProcessInput ("a" + LEFT + "asdf" + DEVICE_ATTRIBUTE_RESPONSE + "bbcc" + SHIFT_UP + "sss");
+
+        Assert.Equal ("aasdfbbccsss", released);
+
+        Assert.Equal (2, keys.Count);
+
+        Assert.NotNull (foundDar);
+        Assert.Equal (DEVICE_ATTRIBUTE_RESPONSE, foundDar);
+
+        Assert.Equal (Key.CursorLeft,keys [0]);
+        Assert.Equal (Key.CursorUp.WithShift, keys [1]);
+    }
+
+    public static IEnumerable<object []> ParserDetects_FunctionKeys_Cases ()
+    {
+        // These are VT100 escape codes for F1-4
+        yield return
+        [
+            "\u001bOP",
+            Key.F1
+        ];
+
+        yield return
+        [
+            "\u001bOQ",
+            Key.F2
+        ];
+
+        yield return
+        [
+            "\u001bOR",
+            Key.F3
+        ];
+
+        yield return
+        [
+            "\u001bOS",
+            Key.F4
+        ];
+
+
+        // These are also F keys
+        yield return [
+                         "\u001b[11~",
+                         Key.F1
+                     ];
+
+        yield return [
+                         "\u001b[12~",
+                         Key.F2
+                     ];
+
+        yield return [
+                         "\u001b[13~",
+                         Key.F3
+                     ];
+
+        yield return [
+                         "\u001b[14~",
+                         Key.F4
+                     ];
+
+        yield return [
+                         "\u001b[15~",
+                         Key.F5
+                     ];
+
+        yield return [
+                         "\u001b[17~",
+                         Key.F6
+                     ];
+
+        yield return [
+                         "\u001b[18~",
+                         Key.F7
+                     ];
+
+        yield return [
+                         "\u001b[19~",
+                         Key.F8
+                     ];
+
+        yield return [
+                         "\u001b[20~",
+                         Key.F9
+                     ];
+
+        yield return [
+                         "\u001b[21~",
+                         Key.F10
+                     ];
+
+        yield return [
+                         "\u001b[23~",
+                         Key.F11
+                     ];
+
+        yield return [
+                         "\u001b[24~",
+                         Key.F12
+                     ];
+    }
+
+    [MemberData (nameof (ParserDetects_FunctionKeys_Cases))]
+
+    [Theory]
+    public void ParserDetects_FunctionKeys (string input, Key expectedKey)
+    {
+        var parser = new AnsiResponseParser ();
+
+        parser.HandleKeyboard = true;
+        List<Key> keys = new ();
+
+        parser.Keyboard += (s, e) => keys.Add (e);
+
+        foreach (var ch in input.ToCharArray ())
+        {
+            parser.ProcessInput (new (ch,1));
+        }
+        var k = Assert.Single (keys);
+
+        Assert.Equal (k,expectedKey);
     }
 
     private Tuple<char, int> [] StringToBatch (string batch)

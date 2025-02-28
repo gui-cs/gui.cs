@@ -36,7 +36,7 @@ internal class WindowsConsole
         newConsoleMode &= ~(uint)ConsoleModes.EnableProcessedInput;
         ConsoleMode = newConsoleMode;
 
-        _inputReadyCancellationTokenSource = new ();
+        _inputReadyCancellationTokenSource = new (); 
         Task.Run (ProcessInputQueue, _inputReadyCancellationTokenSource.Token);
     }
 
@@ -918,7 +918,7 @@ internal class WindowsConsole
 
     // TODO: This API is obsolete. See https://learn.microsoft.com/en-us/windows/console/writeconsoleoutput
     [DllImport ("kernel32.dll", EntryPoint = "WriteConsoleOutputW", SetLastError = true, CharSet = CharSet.Unicode)]
-    private static extern bool WriteConsoleOutput (
+    public static extern bool WriteConsoleOutput (
         nint hConsoleOutput,
         CharInfo [] lpBuffer,
         Coord dwBufferSize,

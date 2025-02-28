@@ -1,5 +1,7 @@
 ﻿#nullable enable
 
+namespace Terminal.Gui;
+
 using System.Buffers;
 
 /// <summary>
@@ -96,7 +98,7 @@ public class Region : IDisposable
         {
             foreach (Rectangle rect2 in region._rectangles)
             {
-                Rectangle intersected = Rectangle.Intersect (rect1, rect2);
+                Rectangle intersected = Rectangle.Intersect (rect1, rect2); 
 
                 if (!intersected.IsEmpty)
                 {

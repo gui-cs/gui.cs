@@ -70,7 +70,7 @@ internal class WindowsDriver : ConsoleDriver
 
     public WindowsConsole? WinConsole { get; private set; }
 
-    public WindowsConsole.KeyEventRecord FromVKPacketToKeyEventRecord (WindowsConsole.KeyEventRecord keyEvent)
+    public static WindowsConsole.KeyEventRecord FromVKPacketToKeyEventRecord (WindowsConsole.KeyEventRecord keyEvent)
     {
         if (keyEvent.wVirtualKeyCode != (VK)ConsoleKey.Packet)
         {
@@ -203,7 +203,7 @@ internal class WindowsDriver : ConsoleDriver
 
     #endregion
 
-    public WindowsConsole.ConsoleKeyInfoEx ToConsoleKeyInfoEx (WindowsConsole.KeyEventRecord keyEvent)
+    public static WindowsConsole.ConsoleKeyInfoEx ToConsoleKeyInfoEx (WindowsConsole.KeyEventRecord keyEvent)
     {
         WindowsConsole.ControlKeyState state = keyEvent.dwControlKeyState;
 
@@ -582,7 +582,7 @@ internal class WindowsDriver : ConsoleDriver
 
     public IEnumerable<WindowsConsole.InputRecord> ShouldReleaseParserHeldKeys ()
     {
-        if (_parser.State == AnsiResponseParserState.ExpectingBracket &&
+        if (_parser.State == AnsiResponseParserState.ExpectingEscapeSequence &&
             DateTime.Now - _parser.StateChangedAt > EscTimeout)
         {
             return _parser.Release ().Select (o => o.Item2);
@@ -627,7 +627,7 @@ internal class WindowsDriver : ConsoleDriver
     }
 #endif
 
-    private KeyCode MapKey (WindowsConsole.ConsoleKeyInfoEx keyInfoEx)
+    public static KeyCode MapKey (WindowsConsole.ConsoleKeyInfoEx keyInfoEx)
     {
         ConsoleKeyInfo keyInfo = keyInfoEx.ConsoleKeyInfo;
 

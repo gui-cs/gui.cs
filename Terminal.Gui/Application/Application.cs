@@ -24,7 +24,7 @@ namespace Terminal.Gui;
 public static partial class Application
 {
     /// <summary>Gets all cultures supported by the application without the invariant language.</summary>
-    public static List<CultureInfo>? SupportedCultures { get; private set; }
+    public static List<CultureInfo>? SupportedCultures { get; private set; } = GetSupportedCultures ();
 
     /// <summary>
     ///     Gets a string representation of the Application as rendered by <see cref="Driver"/>.
@@ -224,5 +224,10 @@ public static partial class Application
         SynchronizationContext.SetSynchronizationContext (null);
     }
 
-    // Only return true if the Current has changed.
+
+    /// <summary>
+    ///     Adds specified idle handler function to main iteration processing. The handler function will be called
+    ///     once per iteration of the main loop after other events have been handled.
+    /// </summary>
+    public static void AddIdle (Func<bool> func) => ApplicationImpl.Instance.AddIdle (func);
 }

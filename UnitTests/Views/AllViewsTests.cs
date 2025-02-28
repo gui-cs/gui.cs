@@ -12,8 +12,12 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
 
     [Theory]
     [MemberData (nameof (AllViewTypes))]
+    [SetupFakeDriver] // Required for spinner view that wants to register timeouts
     public void AllViews_Center_Properly (Type viewType)
     {
+        // Required for spinner view that wants to register timeouts
+        Application.MainLoop = new MainLoop (new FakeMainLoop (Application.Driver));
+
         var view = (View)CreateInstanceIfNotGeneric (viewType);
         // See https://github.com/gui-cs/Terminal.Gui/issues/3156
 
@@ -62,6 +66,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
 
     [Theory]
     [MemberData (nameof (AllViewTypes))]
+    [SetupFakeDriver] // Required for spinner view that wants to register timeouts
     public void AllViews_Tests_All_Constructors (Type viewType)
     {
         Assert.True (Test_All_Constructors_Of_Type (viewType));
@@ -97,8 +102,12 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
 
     [Theory]
     [MemberData (nameof (AllViewTypes))]
+    [SetupFakeDriver] // Required for spinner view that wants to register timeouts
     public void AllViews_Command_Select_Raises_Selecting (Type viewType)
     {
+        // Required for spinner view that wants to register timeouts
+        Application.MainLoop = new MainLoop (new FakeMainLoop (Application.Driver));
+
         var view = (View)CreateInstanceIfNotGeneric (viewType);
 
         if (view == null)
@@ -131,9 +140,13 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
     }
 
     [Theory]
+    [SetupFakeDriver] // Required for spinner view that wants to register timeouts
     [MemberData (nameof (AllViewTypes))]
     public void AllViews_Command_Accept_Raises_Accepted (Type viewType)
     {
+        // Required for spinner view that wants to register timeouts
+        Application.MainLoop = new MainLoop (new FakeMainLoop (Application.Driver));
+
         var view = (View)CreateInstanceIfNotGeneric (viewType);
 
         if (view == null)
@@ -168,8 +181,12 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
 
     [Theory]
     [MemberData (nameof (AllViewTypes))]
+    [SetupFakeDriver] // Required for spinner view that wants to register timeouts
     public void AllViews_Command_HotKey_Raises_HandlingHotKey (Type viewType)
     {
+        // Required for spinner view that wants to register timeouts
+        Application.MainLoop = new MainLoop (new FakeMainLoop (Application.Driver));
+
         var view = (View)CreateInstanceIfNotGeneric (viewType);
 
         if (view == null)

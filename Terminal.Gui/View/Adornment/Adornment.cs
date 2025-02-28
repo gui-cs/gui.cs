@@ -1,6 +1,6 @@
 ﻿#nullable enable
-using Terminal.Gui;
-using Attribute = Terminal.Gui.Attribute;
+namespace Terminal.Gui;
+
 
 /// <summary>
 ///     Adornments are a special form of <see cref="View"/> that appear outside the <see cref="View.Viewport"/>:

@@ -305,7 +305,8 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     /// <returns>The created <see cref="Toplevel"/> object. The caller is responsible for disposing this object.</returns>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public static Toplevel Run (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null) { return Run<Toplevel> (errorHandler, driver); }
+    public static Toplevel Run (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null) =>
+        ApplicationImpl.Instance.Run (errorHandler, driver);
 
     /// <summary>
     ///     Runs the application by creating a <see cref="Toplevel"/>-derived object of type <c>T</c> and calling
@@ -331,20 +332,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     public static T Run<T> (Func<Exception, bool>? errorHandler = null, IConsoleDriver? driver = null)
-        where T : Toplevel, new()
-    {
-        if (!Initialized)
-        {
-            // Init() has NOT been called.
-            InternalInit (driver, null, true);
-        }
-
-        var top = new T ();
-
-        Run (top, errorHandler);
-
-        return top;
-    }
+        where T : Toplevel, new() => ApplicationImpl.Instance.Run<T> (errorHandler, driver);
 
     /// <summary>Runs the Application using the provided <see cref="Toplevel"/> view.</summary>
     /// <remarks>
@@ -385,73 +373,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     ///     rethrows when null).
     /// </param>
     public static void Run (Toplevel view, Func<Exception, bool>? errorHandler = null)
-    {
-        ArgumentNullException.ThrowIfNull (view);
-
-        if (Initialized)
-        {
-            if (Driver is null)
-            {
-                // Disposing before throwing
-                view.Dispose ();
-
-                // This code path should be impossible because Init(null, null) will select the platform default driver
-                throw new InvalidOperationException (
-                                                     "Init() completed without a driver being set (this should be impossible); Run<T>() cannot be called."
-                                                    );
-            }
-        }
-        else
-        {
-            // Init() has NOT been called.
-            throw new InvalidOperationException (
-                                                 "Init() has not been called. Only Run() or Run<T>() can be used without calling Init()."
-                                                );
-        }
-
-        var resume = true;
-
-        while (resume)
-        {
-#if !DEBUG
-            try
-            {
-#endif
-            resume = false;
-            RunState runState = Begin (view);
-
-            // If EndAfterFirstIteration is true then the user must dispose of the runToken
-            // by using NotifyStopRunState event.
-            RunLoop (runState);
-
-            if (runState.Toplevel is null)
-            {
-#if DEBUG_IDISPOSABLE
-                Debug.Assert (TopLevels.Count == 0);
-#endif
-                runState.Dispose ();
-
-                return;
-            }
-
-            if (!EndAfterFirstIteration)
-            {
-                End (runState);
-            }
-#if !DEBUG
-            }
-            catch (Exception error)
-            {
-                if (errorHandler is null)
-                {
-                    throw;
-                }
-
-                resume = errorHandler (error);
-            }
-#endif
-        }
-    }
+        => ApplicationImpl.Instance.Run (view, errorHandler);
 
     /// <summary>Adds a timeout to the application.</summary>
     /// <remarks>
@@ -459,36 +381,23 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     ///     reset, repeating the invocation. If it returns false, the timeout will stop and be removed. The returned value is a
     ///     token that can be used to stop the timeout by calling <see cref="RemoveTimeout(object)"/>.
     /// </remarks>
-    public static object? AddTimeout (TimeSpan time, Func<bool> callback)
-    {
-        return MainLoop?.AddTimeout (time, callback) ?? null;
-    }
+    public static object? AddTimeout (TimeSpan time, Func<bool> callback) => ApplicationImpl.Instance.AddTimeout (time, callback);
 
     /// <summary>Removes a previously scheduled timeout</summary>
     /// <remarks>The token parameter is the value returned by <see cref="AddTimeout"/>.</remarks>
     /// Returns
-    /// <c>true</c>
+    /// <see langword="true"/>
     /// if the timeout is successfully removed; otherwise,
-    /// <c>false</c>
+    /// <see langword="false"/>
     /// .
     /// This method also returns
-    /// <c>false</c>
+    /// <see langword="false"/>
     /// if the timeout is not found.
-    public static bool RemoveTimeout (object token) { return MainLoop?.RemoveTimeout (token) ?? false; }
+    public static bool RemoveTimeout (object token) => ApplicationImpl.Instance.RemoveTimeout (token);
 
     /// <summary>Runs <paramref name="action"/> on the thread that is processing events</summary>
     /// <param name="action">the action to be invoked on the main processing thread.</param>
-    public static void Invoke (Action action)
-    {
-        MainLoop?.AddIdle (
-                           () =>
-                           {
-                               action ();
-
-                               return false;
-                           }
-                          );
-    }
+    public static void Invoke (Action action) => ApplicationImpl.Instance.Invoke (action);
 
     // TODO: Determine if this is really needed. The only code that calls WakeUp I can find
     // is ProgressBarStyles, and it's not clear it needs to.
@@ -517,8 +426,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
         View.SetClipToScreen ();
         View.Draw (TopLevels, neededLayout || forceDraw);
-        View.SetClipToScreen ();
-
+        View.SetClipToScreen (); 
         Driver?.Refresh ();
     }
 
@@ -528,7 +436,7 @@ public static partial class Application // Run (Begin, Run, End, Stop)
 
     /// <summary>The <see cref="MainLoop"/> driver for the application</summary>
     /// <value>The main loop.</value>
-    internal static MainLoop? MainLoop { get; private set; }
+    internal static MainLoop? MainLoop { get; set; }
 
     /// <summary>
     ///     Set to true to cause <see cref="End"/> to be called after the first iteration. Set to false (the default) to
@@ -612,31 +520,8 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     ///         property on the currently running <see cref="Toplevel"/> to false.
     ///     </para>
     /// </remarks>
-    public static void RequestStop (Toplevel? top = null)
-    {
-        if (top is null)
-        {
-            top = Top;
-        }
-
-        if (!top!.Running)
-        {
-            return;
-        }
-
-        var ev = new ToplevelClosingEventArgs (top);
-        top.OnClosing (ev);
-
-        if (ev.Cancel)
-        {
-            return;
-        }
-
-        top.Running = false;
-        OnNotifyStopRunState (top);
-    }
-
-    private static void OnNotifyStopRunState (Toplevel top)
+    public static void RequestStop (Toplevel? top = null) => ApplicationImpl.Instance.RequestStop (top);
+    internal static void OnNotifyStopRunState (Toplevel top)
     {
         if (EndAfterFirstIteration)
         {
