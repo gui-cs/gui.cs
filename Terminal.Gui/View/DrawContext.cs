@@ -1,6 +1,10 @@
 ﻿#nullable enable
 namespace Terminal.Gui;
 
+/// <summary>
+///     Tracks the region that has been drawn during <see cref="View.Draw"/>. This is primarily
+///     in support of <see cref="ViewportSettings.Transparent"/>.
+/// </summary>
 public class DrawContext
 {
     private readonly Region _drawnRegion = new Region ();

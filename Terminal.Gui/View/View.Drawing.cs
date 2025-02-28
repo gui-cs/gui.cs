@@ -1,8 +1,5 @@
 ﻿#nullable enable
 using System.ComponentModel;
-using System.Diagnostics;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Terminal.Gui;
 
@@ -16,11 +13,13 @@ public partial class View // Drawing APIs
     internal static void Draw (IEnumerable<View> views, bool force)
     {
         IEnumerable<View> viewsArray = views as View [] ?? views.ToArray ();
+
+        // The draw context is used to track the region drawn by each view.
         DrawContext context = new DrawContext ();
 
         foreach (View view in viewsArray)
         {
-            if (force || view.ViewportSettings.HasFlag (ViewportSettings.Transparent))
+            if (force)
             {
                 view.SetNeedsDraw ();
             }
@@ -81,7 +80,9 @@ public partial class View // Drawing APIs
             // Get our Viewport in screen coordinates
             originalClip = AddViewportToClip ();
 
+            // If no context ...
             context ??= new DrawContext ();
+
             // TODO: Simplify/optimize SetAttribute system.
             DoSetAttribute ();
             DoClearViewport ();
@@ -611,20 +612,7 @@ public partial class View // Drawing APIs
                 view.SetNeedsDraw ();
             }
             view.Draw (context);
-
-            //if (context != null && ViewportSettings.HasFlag (ViewportSettings.Transparent))
-            //{
-            //    // Get the subview's drawn region from its Draw call
-            //    Region? subviewDrawn = view.GetDrawnRegion (context);
-            //    if (subviewDrawn != null)
-            //    {
-            //        // Limit to the superview's viewport to ensure only viewport-drawn areas are included
-            //        Region subviewDrawnInViewport = subviewDrawn.Clone ();
-            //        subviewDrawnInViewport.Intersect (ViewportToScreen (Viewport));
-            //        context.AddDrawnRegion (subviewDrawnInViewport);
-            //    }
-            //}
-
+            
             if (view.SuperViewRendersLineCanvas)
             {
                 LineCanvas.Merge (view.LineCanvas);
