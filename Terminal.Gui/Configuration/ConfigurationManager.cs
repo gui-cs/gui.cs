@@ -8,6 +8,7 @@ using System.Runtime.Versioning;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Logging;
 
 #nullable enable
 
@@ -65,7 +66,7 @@ public static class ConfigurationManager
     internal static Dictionary<string, ConfigProperty>? _allConfigProperties;
 
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    internal static readonly JsonSerializerOptions _serializerOptions = new ()
+    internal static readonly JsonSerializerOptions SerializerOptions = new ()
     {
         ReadCommentHandling = JsonCommentHandling.Skip,
         PropertyNameCaseInsensitive = true,
@@ -87,7 +88,7 @@ public static class ConfigurationManager
     };
 
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    internal static readonly SourceGenerationContext _serializerContext = new (_serializerOptions);
+    internal static readonly SourceGenerationContext SerializerContext = new (SerializerOptions);
 
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     internal static StringBuilder _jsonErrors = new ();
@@ -209,7 +210,7 @@ public static class ConfigurationManager
         var emptyScope = new SettingsScope ();
         emptyScope.Clear ();
 
-        return JsonSerializer.Serialize (emptyScope, typeof (SettingsScope), _serializerContext);
+        return JsonSerializer.Serialize (emptyScope, typeof (SettingsScope), SerializerContext);
     }
 
     /// <summary>
@@ -235,7 +236,7 @@ public static class ConfigurationManager
     [RequiresDynamicCode ("AOT")]
     public static void Load (bool reset = false)
     {
-        Debug.WriteLine ("ConfigurationManager.Load()");
+        Logging.Trace ($"reset = {reset}");
 
         if (reset)
         {
@@ -292,7 +293,7 @@ public static class ConfigurationManager
     /// </summary>
     public static void OnApplied ()
     {
-        Debug.WriteLine ("ConfigurationManager.OnApplied()");
+        //Logging.Trace ("");
 
         Applied?.Invoke (null, new ());
 
@@ -308,7 +309,7 @@ public static class ConfigurationManager
     /// </summary>
     public static void OnUpdated ()
     {
-        Debug.WriteLine (@"ConfigurationManager.OnUpdated()");
+        //Logging.Trace (@"");
         Updated?.Invoke (null, new ());
     }
 
@@ -324,6 +325,18 @@ public static class ConfigurationManager
         }
     }
 
+
+    public static void LogJsonErrors ()
+    {
+        if (_jsonErrors.Length > 0)
+        {
+            Logging.Warning (
+                               @"Encountered the following errors while deserializing configuration files:"
+                              );
+            Logging.Warning (_jsonErrors.ToString ());
+        }
+    }
+
     /// <summary>
     ///     Resets the state of <see cref="ConfigurationManager"/>. Should be called whenever a new app session (e.g. in
     ///     <see cref="Application.Init"/> starts. Called by <see cref="Load"/> if the <c>reset</c> parameter is
@@ -334,7 +347,7 @@ public static class ConfigurationManager
     [RequiresDynamicCode ("AOT")]
     public static void Reset ()
     {
-        Debug.WriteLine (@"ConfigurationManager.Reset()");
+        Logging.Trace ($"_allConfigProperties = {_allConfigProperties}");
 
         if (_allConfigProperties is null)
         {
@@ -369,7 +382,7 @@ public static class ConfigurationManager
 
     internal static void AddJsonError (string error)
     {
-        Debug.WriteLine ($"ConfigurationManager: {error}");
+        Logging.Trace ($"error = {error}");
         _jsonErrors.AppendLine (error);
     }
 
@@ -541,8 +554,8 @@ public static class ConfigurationManager
             classesWithConfigProps.Add (classWithConfig.Name, classWithConfig);
         }
 
-        //Debug.WriteLine ($"ConfigManager.getConfigProperties found {classesWithConfigProps.Count} classes:");
-        classesWithConfigProps.ToList ().ForEach (x => Debug.WriteLine ($"  Class: {x.Key}"));
+        //Logging.Trace ($"ConfigManager.getConfigProperties found {classesWithConfigProps.Count} classes:");
+        classesWithConfigProps.ToList ().ForEach (x => Logging.Trace ($"  Class: {x.Key}"));
 
         foreach (PropertyInfo? p in from c in classesWithConfigProps
                                     let props = c.Value
@@ -595,9 +608,9 @@ public static class ConfigurationManager
                                                                    StringComparer.InvariantCultureIgnoreCase
                                                                   );
 
-        //Debug.WriteLine ($"ConfigManager.Initialize found {_allConfigProperties.Count} properties:");
+        //Logging.Trace ($"Found {_allConfigProperties.Count} properties:");
 
-        //_allConfigProperties.ToList ().ForEach (x => Debug.WriteLine ($"  Property: {x.Key}"));
+        //_allConfigProperties.ToList ().ForEach (x => Logging.Trace ($"  Property: {x.Key}"));
 
         AppSettings = new ();
     }
@@ -608,16 +621,16 @@ public static class ConfigurationManager
     [RequiresDynamicCode ("AOT")]
     internal static string ToJson ()
     {
-        //Debug.WriteLine ("ConfigurationManager.ToJson()");
+        //Logging.Trace ("ConfigurationManager.ToJson()");
 
-        return JsonSerializer.Serialize (Settings!, typeof (SettingsScope), _serializerContext);
+        return JsonSerializer.Serialize (Settings!, typeof (SettingsScope), SerializerContext);
     }
 
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
     internal static Stream ToStream ()
     {
-        string json = JsonSerializer.Serialize (Settings!, typeof (SettingsScope), _serializerContext);
+        string json = JsonSerializer.Serialize (Settings!, typeof (SettingsScope), SerializerContext);
 
         // turn it into a stream
         var stream = new MemoryStream ();

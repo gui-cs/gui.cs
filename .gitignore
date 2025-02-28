@@ -58,3 +58,5 @@ demo.*
 *.tui/
 
 *.dotCover
+
+logs/
