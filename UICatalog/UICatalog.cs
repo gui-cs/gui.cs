@@ -16,10 +16,10 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Core;
+using Serilog.Events;
 using Terminal.Gui;
 using static Terminal.Gui.ConfigurationManager;
 using Command = Terminal.Gui.Command;
@@ -60,15 +60,22 @@ public class UICatalogApp
     private static int _cachedScenarioIndex;
     private static string? _cachedTheme = string.Empty;
     private static ObservableCollection<string>? _categories;
+
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     private static readonly FileSystemWatcher _currentDirWatcher = new ();
+
     private static ViewDiagnosticFlags _diagnosticFlags;
     private static string _forceDriver = string.Empty;
+
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
     private static readonly FileSystemWatcher _homeDirWatcher = new ();
+
     private static bool _isFirstRunning = true;
     private static Options _options;
     private static ObservableCollection<Scenario>? _scenarios;
+
+    private const string LOG_FILE = "logs/logfile.txt";
+    private static readonly LoggingLevelSwitch _logLevelSwitch = new ();
 
     // If set, holds the scenario the user selected
     private static Scenario? _selectedScenario;
@@ -81,7 +88,7 @@ public class UICatalogApp
     public static bool ShowStatusBar { get; set; } = true;
 
     /// <summary>
-    /// Gets the message displayed in the About Box. `public` so it can be used from Unit tests.
+    ///     Gets the message displayed in the About Box. `public` so it can be used from Unit tests.
     /// </summary>
     /// <returns></returns>
     public static string GetAboutBoxMessage ()
@@ -92,7 +99,8 @@ public class UICatalogApp
         msg.AppendLine ("UI Catalog: A comprehensive sample library for");
         msg.AppendLine ();
 
-        msg.AppendLine ("""
+        msg.AppendLine (
+                        """
                          _______                  _             _   _____       _ 
                         |__   __|                (_)           | | / ____|     (_)
                            | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _ 
@@ -123,8 +131,6 @@ public class UICatalogApp
 
     private static int Main (string [] args)
     {
-        Logging.Logger = CreateLogger ();
-
         Console.OutputEncoding = Encoding.Default;
 
         if (Debugger.IsAttached)
@@ -136,7 +142,7 @@ public class UICatalogApp
         _categories = Scenario.GetAllCategories ();
 
         // Process command line args
-        // "UICatalog [--driver <driver>] [--benchmark] [scenario name]"
+
         // If no driver is provided, the default driver is used.
         Option<string> driverOption = new Option<string> ("--driver", "The IConsoleDriver to use.").FromAmong (
              Application.GetDriverTypes ()
@@ -146,21 +152,31 @@ public class UICatalogApp
         driverOption.AddAlias ("-d");
         driverOption.AddAlias ("--d");
 
-        Option<bool> benchmarkFlag = new Option<bool> ("--benchmark", "Enables benchmarking. If a Scenario is specified, just that Scenario will be benchmarked.");
+        Option<bool> benchmarkFlag = new ("--benchmark", "Enables benchmarking. If a Scenario is specified, just that Scenario will be benchmarked.");
         benchmarkFlag.AddAlias ("-b");
         benchmarkFlag.AddAlias ("--b");
 
-        Option<uint> benchmarkTimeout = new Option<uint> ("--timeout", getDefaultValue: () => Scenario.BenchmarkTimeout, $"The maximum time in milliseconds to run a benchmark for. Default is {Scenario.BenchmarkTimeout}ms.");
+        Option<uint> benchmarkTimeout = new (
+                                             "--timeout",
+                                             () => Scenario.BenchmarkTimeout,
+                                             $"The maximum time in milliseconds to run a benchmark for. Default is {Scenario.BenchmarkTimeout}ms.");
         benchmarkTimeout.AddAlias ("-t");
         benchmarkTimeout.AddAlias ("--t");
 
-        Option<string> resultsFile = new Option<string> ("--file", "The file to save benchmark results to. If not specified, the results will be displayed in a TableView.");
+        Option<string> resultsFile = new ("--file", "The file to save benchmark results to. If not specified, the results will be displayed in a TableView.");
         resultsFile.AddAlias ("-f");
         resultsFile.AddAlias ("--f");
 
+        Option<string> debugLogLevel = new Option<string> ("--log-debug", "The LogEventLevel to use for logging to the Debug console.").FromAmong (
+             Enum.GetNames<LogEventLevel> ()
+            );
+        driverOption.AddAlias ("-dl");
+        driverOption.AddAlias ("--debug-log-level");
+
         Argument<string> scenarioArgument = new Argument<string> (
-                                                                  name: "scenario",
-                                                                  description: "The name of the Scenario to run. If not provided, the UI Catalog UI will be shown.",
+                                                                  "scenario",
+                                                                  description:
+                                                                  "The name of the Scenario to run. If not provided, the UI Catalog UI will be shown.",
                                                                   getDefaultValue: () => "none"
                                                                  ).FromAmong (
                                                                               _scenarios.Select (s => s.GetName ())
@@ -168,10 +184,9 @@ public class UICatalogApp
                                                                                         .ToArray ()
                                                                              );
 
-
         var rootCommand = new RootCommand ("A comprehensive sample library for Terminal.Gui")
         {
-            scenarioArgument, benchmarkFlag, benchmarkTimeout, resultsFile, driverOption,
+            scenarioArgument, benchmarkFlag, benchmarkTimeout, resultsFile, driverOption
         };
 
         rootCommand.SetHandler (
@@ -184,6 +199,7 @@ public class UICatalogApp
                                         Benchmark = context.ParseResult.GetValueForOption (benchmarkFlag),
                                         BenchmarkTimeout = context.ParseResult.GetValueForOption (benchmarkTimeout),
                                         ResultsFile = context.ParseResult.GetValueForOption (resultsFile) ?? string.Empty,
+                                        DebugLogLevel = context.ParseResult.GetValueForOption (debugLogLevel) ?? "Warning"
                                         /* etc. */
                                     };
 
@@ -192,10 +208,11 @@ public class UICatalogApp
                                 }
                                );
 
-        bool helpShown = false;
-        var parser = new CommandLineBuilder (rootCommand)
-                     .UseHelp (ctx => helpShown = true)
-                     .Build ();
+        var helpShown = false;
+
+        Parser parser = new CommandLineBuilder (rootCommand)
+                        .UseHelp (ctx => helpShown = true)
+                        .Build ();
 
         parser.Invoke (args);
 
@@ -206,6 +223,8 @@ public class UICatalogApp
 
         Scenario.BenchmarkTimeout = _options.BenchmarkTimeout;
 
+        Logging.Logger = CreateLogger ();
+
         UICatalogMain (_options);
 
         return 0;
@@ -215,19 +234,23 @@ public class UICatalogApp
     {
         // Configure Serilog to write logs to a file
         Log.Logger = new LoggerConfiguration ()
-                     .MinimumLevel.Verbose () // Verbose includes Trace and Debug
+                     .MinimumLevel.ControlledBy (_logLevelSwitch)
                      .Enrich.FromLogContext () // Enables dynamic enrichment
-                     .WriteTo.File ("logs/logfile.txt", rollingInterval: RollingInterval.Day,
+                     .WriteTo.Debug ()
+                     .WriteTo.File (
+                                    LOG_FILE,
+                                    rollingInterval: RollingInterval.Day,
                                     outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
                      .CreateLogger ();
 
         // Create a logger factory compatible with Microsoft.Extensions.Logging
-        using var loggerFactory = LoggerFactory.Create (builder =>
-                                                        {
-                                                            builder
-                                                                .AddSerilog (dispose: true) // Integrate Serilog with ILogger
-                                                                .SetMinimumLevel (LogLevel.Trace); // Set minimum log level
-                                                        });
+        using ILoggerFactory loggerFactory = LoggerFactory.Create (
+                                                                   builder =>
+                                                                   {
+                                                                       builder
+                                                                           .AddSerilog (dispose: true) // Integrate Serilog with ILogger
+                                                                           .SetMinimumLevel (LogLevel.Trace); // Set minimum log level
+                                                                   });
 
         // Get an ILogger instance
         return loggerFactory.CreateLogger ("Global Logger");
@@ -354,7 +377,6 @@ public class UICatalogApp
         _homeDirWatcher.Created -= ConfigFileChanged;
     }
 
-
     private static void UICatalogMain (Options options)
     {
         StartConfigFileWatcher ();
@@ -362,7 +384,6 @@ public class UICatalogApp
         // By setting _forceDriver we ensure that if the user has specified a driver on the command line, it will be used
         // regardless of what's in a config file.
         Application.ForceDriver = _forceDriver = options.Driver;
-
 
         // If a Scenario name has been provided on the commandline
         // run it and exit when done.
@@ -378,13 +399,17 @@ public class UICatalogApp
                                                                        )!);
             _selectedScenario = (Scenario)Activator.CreateInstance (_scenarios [item].GetType ())!;
 
-            var results = RunScenario (_selectedScenario, options.Benchmark);
+            BenchmarkResults? results = RunScenario (_selectedScenario, options.Benchmark);
+
             if (results is { })
             {
-                Console.WriteLine (JsonSerializer.Serialize (results, new JsonSerializerOptions ()
-                {
-                    WriteIndented = true
-                }));
+                Console.WriteLine (
+                                   JsonSerializer.Serialize (
+                                                             results,
+                                                             new JsonSerializerOptions
+                                                             {
+                                                                 WriteIndented = true
+                                                             }));
             }
 
             VerifyObjectsWereDisposed ();
@@ -408,6 +433,7 @@ public class UICatalogApp
             scenario.TopLevelColorScheme = _topLevelColorScheme;
 
 #if DEBUG_IDISPOSABLE
+
             // Measure how long it takes for the app to shut down
             var sw = new Stopwatch ();
             string scenarioName = scenario.GetName ();
@@ -435,7 +461,7 @@ public class UICatalogApp
                 else
                 {
                     sw.Stop ();
-                    Debug.WriteLine ($"Shutdown of {scenarioName} Scenario took {sw.ElapsedMilliseconds}ms");
+                    Logging.Trace ($"Shutdown of {scenarioName} Scenario took {sw.ElapsedMilliseconds}ms");
                 }
             }
 #endif
@@ -443,8 +469,6 @@ public class UICatalogApp
 
         StopConfigFileWatcher ();
         VerifyObjectsWereDisposed ();
-
-        return;
     }
 
     private static BenchmarkResults? RunScenario (Scenario scenario, bool benchmark)
@@ -473,20 +497,19 @@ public class UICatalogApp
 
         scenario.Dispose ();
 
-
         // TODO: Throw if shutdown was not called already
         Application.Shutdown ();
 
         return results;
     }
 
-
     private static void BenchmarkAllScenarios ()
     {
-        List<BenchmarkResults> resultsList = new List<BenchmarkResults> ();
+        List<BenchmarkResults> resultsList = new ();
 
-        int maxScenarios = 5;
-        foreach (var s in _scenarios!)
+        var maxScenarios = 5;
+
+        foreach (Scenario s in _scenarios!)
         {
             resultsList.Add (RunScenario (s, true)!);
             maxScenarios--;
@@ -501,24 +524,25 @@ public class UICatalogApp
         {
             if (!string.IsNullOrEmpty (_options.ResultsFile))
             {
-                var output = JsonSerializer.Serialize (
-                                                       resultsList,
-                                                       new JsonSerializerOptions ()
-                                                       {
-                                                           WriteIndented = true
-                                                       });
+                string output = JsonSerializer.Serialize (
+                                                          resultsList,
+                                                          new JsonSerializerOptions
+                                                          {
+                                                              WriteIndented = true
+                                                          });
 
-                using var file = File.CreateText (_options.ResultsFile);
+                using StreamWriter file = File.CreateText (_options.ResultsFile);
                 file.Write (output);
                 file.Close ();
+
                 return;
             }
 
             Application.Init ();
 
-            var benchmarkWindow = new Window ()
+            var benchmarkWindow = new Window
             {
-                Title = "Benchmark Results",
+                Title = "Benchmark Results"
             };
 
             if (benchmarkWindow.Border is { })
@@ -529,7 +553,7 @@ public class UICatalogApp
             TableView resultsTableView = new ()
             {
                 Width = Dim.Fill (),
-                Height = Dim.Fill (),
+                Height = Dim.Fill ()
             };
 
             // TableView provides many options for table headers. For simplicity we turn all 
@@ -544,17 +568,17 @@ public class UICatalogApp
             resultsTableView.Style.ShowVerticalHeaderLines = true;
 
             /* By default TableView lays out columns at render time and only
-                 * measures y rows of data at a time.  Where y is the height of the
-                 * console. This is for the following reasons:
-                 *
-                 * - Performance, when tables have a large amount of data
-                 * - Defensive, prevents a single wide cell value pushing other
-                 *   columns off screen (requiring horizontal scrolling
-                 *
-                 * In the case of UICatalog here, such an approach is overkill so
-                 * we just measure all the data ourselves and set the appropriate
-                 * max widths as ColumnStyles
-                 */
+             * measures y rows of data at a time.  Where y is the height of the
+             * console. This is for the following reasons:
+             *
+             * - Performance, when tables have a large amount of data
+             * - Defensive, prevents a single wide cell value pushing other
+             *   columns off screen (requiring horizontal scrolling
+             *
+             * In the case of UICatalog here, such an approach is overkill so
+             * we just measure all the data ourselves and set the appropriate
+             * max widths as ColumnStyles
+             */
             //int longestName = _scenarios!.Max (s => s.GetName ().Length);
 
             //resultsTableView.Style.ColumnStyles.Add (
@@ -586,7 +610,7 @@ public class UICatalogApp
             dt.Columns.Add (new DataColumn ("Updated", typeof (int)));
             dt.Columns.Add (new DataColumn ("Iterations", typeof (int)));
 
-            foreach (var r in resultsList)
+            foreach (BenchmarkResults r in resultsList)
             {
                 dt.Rows.Add (
                              r.Scenario,
@@ -603,24 +627,25 @@ public class UICatalogApp
             BenchmarkResults totalRow = new ()
             {
                 Scenario = "TOTAL",
-                Duration = new TimeSpan (resultsList.Sum (r => r.Duration.Ticks)),
+                Duration = new (resultsList.Sum (r => r.Duration.Ticks)),
                 RefreshedCount = resultsList.Sum (r => r.RefreshedCount),
                 LaidOutCount = resultsList.Sum (r => r.LaidOutCount),
                 ClearedContentCount = resultsList.Sum (r => r.ClearedContentCount),
                 DrawCompleteCount = resultsList.Sum (r => r.DrawCompleteCount),
                 UpdatedCount = resultsList.Sum (r => r.UpdatedCount),
-                IterationCount = resultsList.Sum (r => r.IterationCount),
+                IterationCount = resultsList.Sum (r => r.IterationCount)
             };
+
             dt.Rows.Add (
-                        totalRow.Scenario,
-                        totalRow.Duration,
-                        totalRow.RefreshedCount,
-                        totalRow.LaidOutCount,
-                        totalRow.ClearedContentCount,
-                        totalRow.DrawCompleteCount,
-                        totalRow.UpdatedCount,
-                        totalRow.IterationCount
-                       );
+                         totalRow.Scenario,
+                         totalRow.Duration,
+                         totalRow.RefreshedCount,
+                         totalRow.LaidOutCount,
+                         totalRow.ClearedContentCount,
+                         totalRow.DrawCompleteCount,
+                         totalRow.UpdatedCount,
+                         totalRow.IterationCount
+                        );
 
             dt.DefaultView.Sort = "Duration";
             DataTable sortedCopy = dt.DefaultView.ToTable ();
@@ -711,6 +736,7 @@ public class UICatalogApp
                         ),
                     _themeMenuBarItem,
                     new ("Diag_nostics", CreateDiagnosticMenuItems ()),
+                    new ("_Logging", CreateLoggingMenuItems ()),
                     new (
                          "_Help",
                          new MenuItem []
@@ -735,8 +761,8 @@ public class UICatalogApp
                                   "_About...",
                                   "About UI Catalog",
                                   () => MessageBox.Query (
-                                                          title: "",
-                                                          message: GetAboutBoxMessage (),
+                                                          "",
+                                                          GetAboutBoxMessage (),
                                                           wrapMessage: false,
                                                           buttons: "_Ok"
                                                          ),
@@ -760,20 +786,21 @@ public class UICatalogApp
             ShVersion = new ()
             {
                 Title = "Version Info",
-                CanFocus = false,
+                CanFocus = false
             };
 
             var statusBarShortcut = new Shortcut
             {
                 Key = Key.F10,
                 Title = "Show/Hide Status Bar",
-                CanFocus = false,
+                CanFocus = false
             };
+
             statusBarShortcut.Accepting += (sender, args) =>
-                                        {
-                                            _statusBar.Visible = !_statusBar.Visible;
-                                            args.Cancel = true;
-                                        };
+                                           {
+                                               _statusBar.Visible = !_statusBar.Visible;
+                                               args.Cancel = true;
+                                           };
 
             ShForce16Colors = new ()
             {
@@ -790,25 +817,25 @@ public class UICatalogApp
             };
 
             ((CheckBox)ShForce16Colors.CommandView).CheckedStateChanging += (sender, args) =>
-                                                              {
-                                                                  Application.Force16Colors = args.NewValue == CheckState.Checked;
-                                                                  MiForce16Colors!.Checked = Application.Force16Colors;
-                                                                  Application.LayoutAndDraw ();
-                                                              };
+                                                                            {
+                                                                                Application.Force16Colors = args.NewValue == CheckState.Checked;
+                                                                                MiForce16Colors!.Checked = Application.Force16Colors;
+                                                                                Application.LayoutAndDraw ();
+                                                                            };
 
             _statusBar.Add (
-                           new Shortcut
-                           {
-                               CanFocus = false,
-                               Title = "Quit",
-                               Key = Application.QuitKey
-                           },
-                           statusBarShortcut,
-                           ShForce16Colors,
+                            new Shortcut
+                            {
+                                CanFocus = false,
+                                Title = "Quit",
+                                Key = Application.QuitKey
+                            },
+                            statusBarShortcut,
+                            ShForce16Colors,
 
-                           //ShDiagnostics,
-                           ShVersion
-                          );
+                            //ShDiagnostics,
+                            ShVersion
+                           );
 
             // Create the Category list view. This list never changes.
             CategoryList = new ()
@@ -816,13 +843,17 @@ public class UICatalogApp
                 X = 0,
                 Y = Pos.Bottom (menuBar),
                 Width = Dim.Auto (),
-                Height = Dim.Fill (Dim.Func (() =>
+                Height = Dim.Fill (
+                                   Dim.Func (
+                                             () =>
                                              {
                                                  if (_statusBar.NeedsLayout)
                                                  {
-                                                       throw new LayoutException ("DimFunc.Fn aborted because dependent View needs layout.");
+                                                     throw new LayoutException ("DimFunc.Fn aborted because dependent View needs layout.");
+
                                                      //_statusBar.Layout ();
                                                  }
+
                                                  return _statusBar.Frame.Height;
                                              })),
                 AllowsMarking = false,
@@ -846,21 +877,27 @@ public class UICatalogApp
                 X = Pos.Right (CategoryList) - 1,
                 Y = Pos.Bottom (menuBar),
                 Width = Dim.Fill (),
-                Height = Dim.Fill (Dim.Func (() =>
+                Height = Dim.Fill (
+                                   Dim.Func (
+                                             () =>
                                              {
                                                  if (_statusBar.NeedsLayout)
                                                  {
                                                      throw new LayoutException ("DimFunc.Fn aborted because dependent View needs layout.");
+
                                                      //_statusBar.Layout ();
                                                  }
+
                                                  return _statusBar.Frame.Height;
                                              })),
+
                 //AllowsMarking = false,
                 CanFocus = true,
                 Title = "_Scenarios",
                 BorderStyle = CategoryList.BorderStyle,
                 SuperViewRendersLineCanvas = true
             };
+
             //ScenarioList.VerticalScrollBar.AutoHide = false;
             //ScenarioList.HorizontalScrollBar.AutoHide = false;
 
@@ -1095,12 +1132,18 @@ public class UICatalogApp
 
                                    if (item.Title == t && item.Checked == false)
                                    {
-                                       _diagnosticFlags &= ~(ViewDiagnosticFlags.Thickness | ViewDiagnosticFlags.Ruler | ViewDiagnosticFlags.Hover | ViewDiagnosticFlags.DrawIndicator);
+                                       _diagnosticFlags &= ~(ViewDiagnosticFlags.Thickness
+                                                             | ViewDiagnosticFlags.Ruler
+                                                             | ViewDiagnosticFlags.Hover
+                                                             | ViewDiagnosticFlags.DrawIndicator);
                                        item.Checked = true;
                                    }
                                    else if (item.Title == t && item.Checked == true)
                                    {
-                                       _diagnosticFlags |= ViewDiagnosticFlags.Thickness | ViewDiagnosticFlags.Ruler | ViewDiagnosticFlags.Hover | ViewDiagnosticFlags.DrawIndicator;
+                                       _diagnosticFlags |= ViewDiagnosticFlags.Thickness
+                                                           | ViewDiagnosticFlags.Ruler
+                                                           | ViewDiagnosticFlags.Hover
+                                                           | ViewDiagnosticFlags.DrawIndicator;
                                        item.Checked = false;
                                    }
                                    else
@@ -1235,6 +1278,65 @@ public class UICatalogApp
             return menuItems;
         }
 
+        private List<MenuItem []> CreateLoggingMenuItems ()
+        {
+            List<MenuItem []> menuItems = new ()
+            {
+                CreateLoggingFlagsMenuItems ()
+            };
+
+            return menuItems;
+        }
+
+        [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+        private MenuItem [] CreateLoggingFlagsMenuItems ()
+        {
+            string [] logLevelMenuStrings = Enum.GetNames<LogEventLevel> ().Select (n => n = "_" + n).ToArray ();
+            LogEventLevel [] logLevels = Enum.GetValues<LogEventLevel> ();
+
+            List<MenuItem?> menuItems = new ();
+
+            foreach (LogEventLevel logLevel in logLevels)
+            {
+                var item = new MenuItem
+                {
+                    Title = logLevelMenuStrings [(int)logLevel]
+                };
+                item.CheckType |= MenuItemCheckStyle.Checked;
+                item.Checked = Enum.Parse<LogEventLevel> (_options.DebugLogLevel) == logLevel;
+
+                item.Action += () =>
+                               {
+                                   foreach (MenuItem? menuItem in menuItems.Where (mi => mi is { } && logLevelMenuStrings.Contains (mi.Title)))
+                                   {
+                                       menuItem!.Checked = false;
+                                   }
+
+                                   if (item.Title == logLevelMenuStrings [(int)logLevel] && item.Checked == false)
+                                   {
+                                       _options.DebugLogLevel = Enum.GetName (logLevel)!;
+                                       _logLevelSwitch.MinimumLevel = Enum.Parse<LogEventLevel> (_options.DebugLogLevel);
+                                       item.Checked = true;
+                                   }
+
+                                   Diagnostics = _diagnosticFlags;
+                               };
+                menuItems.Add (item);
+            }
+
+            // add a separator
+            menuItems.Add (null!);
+
+            menuItems.Add (
+                           new ()
+                           {
+                               Title = $"Log file location: {LOG_FILE}",
+                               //CanExecute = () => false
+                           });
+
+            return menuItems.ToArray ();
+        }
+
         // TODO: This should be an ConfigurationManager setting
         private MenuItem [] CreateDisabledEnabledMenuBorder ()
         {
@@ -1250,8 +1352,8 @@ public class UICatalogApp
                                                  MiIsMenuBorderDisabled.Checked = (bool)!MiIsMenuBorderDisabled.Checked!;
 
                                                  MenuBar!.MenusBorderStyle = !(bool)MiIsMenuBorderDisabled.Checked
-                                                                                ? LineStyle.Single
-                                                                                : LineStyle.None;
+                                                                                 ? LineStyle.Single
+                                                                                 : LineStyle.None;
                                              };
             menuItems.Add (MiIsMenuBorderDisabled);
 
@@ -1284,9 +1386,9 @@ public class UICatalogApp
             MiUseSubMenusSingleFrame = new () { Title = "Enable _Sub-Menus Single Frame" };
 
             MiUseSubMenusSingleFrame.ShortcutKey = KeyCode.CtrlMask
-                                                | KeyCode.AltMask
-                                                | (KeyCode)MiUseSubMenusSingleFrame!.Title!.Substring (8, 1) [
-                                                 0];
+                                                   | KeyCode.AltMask
+                                                   | (KeyCode)MiUseSubMenusSingleFrame!.Title!.Substring (8, 1) [
+                                                    0];
             MiUseSubMenusSingleFrame.CheckType |= MenuItemCheckStyle.Checked;
 
             MiUseSubMenusSingleFrame.Action += () =>
@@ -1367,10 +1469,7 @@ public class UICatalogApp
 
             if (_statusBar is { })
             {
-                _statusBar.VisibleChanged += (s, e) =>
-                                            {
-                                                ShowStatusBar = _statusBar.Visible;
-                                            };
+                _statusBar.VisibleChanged += (s, e) => { ShowStatusBar = _statusBar.Visible; };
             }
 
             Loaded -= LoadedHandler;
@@ -1423,6 +1522,8 @@ public class UICatalogApp
         public bool Benchmark;
 
         public string ResultsFile;
+
+        public string DebugLogLevel;
         /* etc. */
     }
 }

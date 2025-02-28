@@ -13,7 +13,7 @@ namespace Terminal.Gui;
 /// <remarks>
 ///     Also contains the
 ///     <see cref="Meter"/> instance that should be used for internal metrics
-///     (iteration timing etc).
+///     (iteration timing etc.).
 /// </remarks>
 public static class Logging
 {
@@ -64,5 +64,21 @@ public static class Logging
     {
         string className = Path.GetFileNameWithoutExtension (filePath);
         Logger.LogTrace ($"[{className}] [{caller}] {message}");
+    }
+
+    /// <summary>
+    ///     Logs a warning message including the
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="caller"></param>
+    /// <param name="filePath"></param>
+    public static void Warning (
+        string message,
+        [CallerMemberName] string caller = "",
+        [CallerFilePath] string filePath = ""
+    )
+    {
+        string className = Path.GetFileNameWithoutExtension (filePath);
+        Logger.LogWarning($"[{className}] [{caller}] {message}");
     }
 }
