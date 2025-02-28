@@ -51,7 +51,71 @@ public static class Logging
     public static readonly Histogram<int> DrainInputStream = Meter.CreateHistogram<int> ("Drain Input (ms)");
 
     /// <summary>
-    ///     Logs a trace message including the
+    ///     Logs an error message including the class and method name.
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="caller"></param>
+    /// <param name="filePath"></param>
+    public static void Error (
+        string message,
+        [CallerMemberName] string caller = "",
+        [CallerFilePath] string filePath = ""
+    )
+    {
+        string className = Path.GetFileNameWithoutExtension (filePath);
+        Logger.LogError ($"[{className}] [{caller}] {message}");
+    }
+
+    /// <summary>
+    ///     Logs a critical message including the class and method name.
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="caller"></param>
+    /// <param name="filePath"></param>
+    public static void Critical (
+        string message,
+        [CallerMemberName] string caller = "",
+        [CallerFilePath] string filePath = ""
+    )
+    {
+        string className = Path.GetFileNameWithoutExtension (filePath);
+        Logger.LogCritical ($"[{className}] [{caller}] {message}");
+    }
+
+    /// <summary>
+    ///     Logs a debug message including the class and method name.
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="caller"></param>
+    /// <param name="filePath"></param>
+    public static void Debug (
+        string message,
+        [CallerMemberName] string caller = "",
+        [CallerFilePath] string filePath = ""
+    )
+    {
+        string className = Path.GetFileNameWithoutExtension (filePath);
+        Logger.LogDebug ($"[{className}] [{caller}] {message}");
+    }
+
+    /// <summary>
+    ///     Logs an informational message including the class and method name.
+    /// </summary>
+    /// <param name="message"></param>
+    /// <param name="caller"></param>
+    /// <param name="filePath"></param>
+    public static void Information (
+        string message,
+        [CallerMemberName] string caller = "",
+        [CallerFilePath] string filePath = ""
+    )
+    {
+        string className = Path.GetFileNameWithoutExtension (filePath);
+        Logger.LogInformation ($"[{className}] [{caller}] {message}");
+    }
+
+    /// <summary>
+    ///     Logs a trace message including the class and method name.
     /// </summary>
     /// <param name="message"></param>
     /// <param name="caller"></param>
@@ -67,7 +131,7 @@ public static class Logging
     }
 
     /// <summary>
-    ///     Logs a warning message including the
+    ///     Logs a warning message including the class and method name.
     /// </summary>
     /// <param name="message"></param>
     /// <param name="caller"></param>
@@ -79,6 +143,6 @@ public static class Logging
     )
     {
         string className = Path.GetFileNameWithoutExtension (filePath);
-        Logger.LogWarning($"[{className}] [{caller}] {message}");
+        Logger.LogWarning ($"[{className}] [{caller}] {message}");
     }
 }

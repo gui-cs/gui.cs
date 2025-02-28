@@ -74,7 +74,7 @@ public class UICatalogApp
     private static Options _options;
     private static ObservableCollection<Scenario>? _scenarios;
 
-    private const string LOG_FILE = "logs/logfile.txt";
+    private const string LOG_FILE = "logs/uicatalog.log";
     private static readonly LoggingLevelSwitch _logLevelSwitch = new ();
 
     // If set, holds the scenario the user selected
@@ -96,7 +96,7 @@ public class UICatalogApp
         // NOTE: Do not use multiline verbatim strings here.
         // WSL gets all confused.
         StringBuilder msg = new ();
-        msg.AppendLine ("UI Catalog: A comprehensive sample library for");
+        msg.AppendLine ("UI Catalog: A comprehensive sample library and test app for");
         msg.AppendLine ();
 
         msg.AppendLine (
@@ -167,11 +167,12 @@ public class UICatalogApp
         resultsFile.AddAlias ("-f");
         resultsFile.AddAlias ("--f");
 
-        Option<string> debugLogLevel = new Option<string> ("--log-debug", "The LogEventLevel to use for logging to the Debug console.").FromAmong (
+        Option<string> debugLogLevel = new Option<string> ("--debug-log-level", $"The level to use for logging (debug console and {LOG_FILE})").FromAmong (
              Enum.GetNames<LogEventLevel> ()
             );
-        driverOption.AddAlias ("-dl");
-        driverOption.AddAlias ("--debug-log-level");
+        debugLogLevel.SetDefaultValue("Warning");
+        debugLogLevel.AddAlias ("-dl");
+        debugLogLevel.AddAlias ("--dl");
 
         Argument<string> scenarioArgument = new Argument<string> (
                                                                   "scenario",
@@ -186,7 +187,7 @@ public class UICatalogApp
 
         var rootCommand = new RootCommand ("A comprehensive sample library for Terminal.Gui")
         {
-            scenarioArgument, benchmarkFlag, benchmarkTimeout, resultsFile, driverOption
+            scenarioArgument, debugLogLevel, benchmarkFlag, benchmarkTimeout, resultsFile, driverOption
         };
 
         rootCommand.SetHandler (
