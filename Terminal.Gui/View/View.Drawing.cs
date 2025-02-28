@@ -55,24 +55,14 @@ public partial class View // Drawing APIs
         // TODO: clearing, drawing text, drawing content, etc. if it is true.
         if (NeedsDraw || SubViewNeedsDraw)
         {
+            // ------------------------------------
             // Draw the Border and Padding.
-            if (this is Adornment)
-            {
-                AddFrameToClip ();
-            }
-            else
-            {
-                // Set the clip to be just the thicknesses of the adornments
-                // TODO: Put this union logic in a method on View? 
-                Region? clipAdornments = Margin!.Thickness.AsRegion (Margin!.FrameToScreen ());
-                clipAdornments?.Combine (Border!.Thickness.AsRegion (Border!.FrameToScreen ()), RegionOp.Union);
-                clipAdornments?.Combine (Padding!.Thickness.AsRegion (Padding!.FrameToScreen ()), RegionOp.Union);
-                clipAdornments?.Combine (originalClip, RegionOp.Intersect);
-                SetClip (clipAdornments);
-            }
-            DoDrawBorderAndPadding ();
+            // Note Margin is special-cased and drawn in a separate pass to support
+            // transparent shadows.
+            DoDrawBorderAndPadding (originalClip);
             SetClip (originalClip);
 
+            // ------------------------------------
             // Clear the Viewport
             // By default, we clip to the viewport preventing drawing outside the viewport
             // We also clip to the content, but if a developer wants to draw outside the viewport, they can do
@@ -87,6 +77,7 @@ public partial class View // Drawing APIs
             DoSetAttribute ();
             DoClearViewport ();
 
+            // ------------------------------------
             // Draw the subviews first (order matters: Subviews, Text, Content)
             if (SubViewNeedsDraw)
             {
@@ -94,75 +85,48 @@ public partial class View // Drawing APIs
                 DoDrawSubviews (context);
             }
 
+            // ------------------------------------
             // Draw the text
             DoSetAttribute ();
             DoDrawText (context);
 
+            // ------------------------------------
             // Draw the content
             DoSetAttribute ();
             DoDrawContent (context);
 
+            // ------------------------------------
+            // Draw the line canvas
             // Restore the clip before rendering the line canvas and adornment subviews
             // because they may draw outside the viewport.
             SetClip (originalClip);
-
             originalClip = AddFrameToClip ();
-
-            // Draw the line canvas
             DoRenderLineCanvas ();
 
+            // ------------------------------------
             // Re-draw the border and padding subviews
             // HACK: This is a hack to ensure that the border and padding subviews are drawn after the line canvas.
             DoDrawBorderAndPaddingSubViews ();
 
+            // ------------------------------------
             // Advance the diagnostics draw indicator
             Border?.AdvanceDrawIndicator ();
 
             ClearNeedsDraw ();
         }
 
+        // ------------------------------------
         // This causes the Margin to be drawn in a second pass
         // PERFORMANCE: If there is a Margin, it will be redrawn each iteration of the main loop.
         Margin?.CacheClip ();
 
-        // We're done drawing
-        DoDrawComplete ();
-
+        // ------------------------------------
         // Reset the clip to what it was when we started
         SetClip (originalClip);
 
-        if (this is not Adornment)
-        {
-            if (ViewportSettings.HasFlag (ViewportSettings.Transparent))
-            {
-                // context!.DrawnRegion is the region that was drawn by this view. It may include regions outside
-                // the Viewport. We need to clip it to the Viewport.
-                context!.ClipDrawnRegion(ViewportToScreen (Viewport));
-
-                // Exclude the drawn region from the clip
-                ExcludeFromClip (context!.GetDrawnRegion ());
-
-                // Exclude the Border and Padding from the clip
-                ExcludeFromClip (Border?.Thickness.AsRegion (FrameToScreen()));
-                ExcludeFromClip (Padding?.Thickness.AsRegion (FrameToScreen()));
-            }
-            else
-            {
-                // Exclude this view (not including Margin) from the Clip
-                Rectangle borderFrame = FrameToScreen ();
-
-                if (Border is { })
-                {
-                    borderFrame = Border.FrameToScreen ();
-                }
-
-                // In the non-transparent (typical case), we want to exclude the entire view area (borderFrame) from the clip
-                ExcludeFromClip (borderFrame);
-
-                // Update context.DrawnRegion to include the entire view (borderFrame), but clipped to our SuperView's viewport
-                context?.AddDrawnRectangle (borderFrame);
-            }
-        }
+        // ------------------------------------
+        // We're done drawing - The Clip is reset to what it was before we started.
+        DoDrawComplete (context);
     }
 
     #region DrawAdornments
@@ -200,8 +164,23 @@ public partial class View // Drawing APIs
         }
     }
 
-    private void DoDrawBorderAndPadding ()
+    private void DoDrawBorderAndPadding (Region? originalClip)
     {
+        if (this is Adornment)
+        {
+            AddFrameToClip ();
+        }
+        else
+        {
+            // Set the clip to be just the thicknesses of the adornments
+            // TODO: Put this union logic in a method on View? 
+            Region? clipAdornments = Margin!.Thickness.AsRegion (Margin!.FrameToScreen ());
+            clipAdornments?.Combine (Border!.Thickness.AsRegion (Border!.FrameToScreen ()), RegionOp.Union);
+            clipAdornments?.Combine (Padding!.Thickness.AsRegion (Padding!.FrameToScreen ()), RegionOp.Union);
+            clipAdornments?.Combine (originalClip, RegionOp.Intersect);
+            SetClip (clipAdornments);
+        }
+
         if (Margin?.NeedsLayout == true)
         {
             Margin.NeedsLayout = false;
@@ -339,7 +318,7 @@ public partial class View // Drawing APIs
             return;
         }
 
-        var dev = new DrawEventArgs (Viewport, Rectangle.Empty);
+        var dev = new DrawEventArgs (Viewport, Rectangle.Empty, null);
         ClearingViewport?.Invoke (this, dev);
 
         if (dev.Cancel)
@@ -351,7 +330,7 @@ public partial class View // Drawing APIs
         ClearViewport ();
 
         OnClearedViewport ();
-        ClearedViewport?.Invoke (this, new (Viewport, Viewport));
+        ClearedViewport?.Invoke (this, new (Viewport, Viewport, null));
     }
 
     /// <summary>
@@ -373,7 +352,7 @@ public partial class View // Drawing APIs
     /// <summary>
     ///     Called when the <see cref="Viewport"/> has been cleared
     /// </summary>
-    protected virtual void OnClearedViewport () {  }
+    protected virtual void OnClearedViewport () { }
 
     /// <summary>Event invoked when the <see cref="Viewport"/> has been cleared.</summary>
     public event EventHandler<DrawEventArgs>? ClearedViewport;
@@ -428,7 +407,7 @@ public partial class View // Drawing APIs
             return;
         }
 
-        var dev = new DrawEventArgs (Viewport, Rectangle.Empty);
+        var dev = new DrawEventArgs (Viewport, Rectangle.Empty, context);
         DrawingText?.Invoke (this, dev);
 
         if (dev.Cancel)
@@ -490,7 +469,6 @@ public partial class View // Drawing APIs
                              Rectangle.Empty
                             );
 
-
         // We assume that the text has been drawn over the entire area; ensure that the subviews are redrawn.
         SetSubViewNeedsDraw ();
     }
@@ -510,7 +488,7 @@ public partial class View // Drawing APIs
             return;
         }
 
-        var dev = new DrawEventArgs (Viewport, Rectangle.Empty);
+        var dev = new DrawEventArgs (Viewport, Rectangle.Empty, context);
         DrawingContent?.Invoke (this, dev);
 
         if (dev.Cancel)
@@ -560,7 +538,7 @@ public partial class View // Drawing APIs
             return;
         }
 
-        var dev = new DrawEventArgs (Viewport, Rectangle.Empty);
+        var dev = new DrawEventArgs (Viewport, Rectangle.Empty, context);
         DrawingSubviews?.Invoke (this, dev);
 
         if (dev.Cancel)
@@ -618,23 +596,13 @@ public partial class View // Drawing APIs
                 view.SetNeedsDraw ();
             }
             view.Draw (context);
-            
+
             if (view.SuperViewRendersLineCanvas)
             {
                 LineCanvas.Merge (view.LineCanvas);
                 view.LineCanvas.Clear ();
             }
         }
-    }
-
-    /// <summary>
-    ///     Gets the region drawn by this view, based on the provided context.
-    /// </summary>
-    /// <param name="context">The draw context used during drawing.</param>
-    /// <returns>The region drawn, or null if not tracked.</returns>
-    private Region? GetDrawnRegion (DrawContext? context)
-    {
-        return (context?.GetDrawnRegion ()).Clone ();
     }
 
     #endregion DrawSubviews
@@ -708,19 +676,56 @@ public partial class View // Drawing APIs
 
     #region DrawComplete
 
-    private void DoDrawComplete ()
+    private void DoDrawComplete (DrawContext? context)
     {
-        OnDrawComplete ();
+        OnDrawComplete (context);
+        DrawComplete?.Invoke (this, new (Viewport, Viewport, context));
 
-        DrawComplete?.Invoke (this, new (Viewport, Viewport));
+        // Now, update the clip to exclude this view (not including Margin)
+        if (this is not Adornment)
+        {
+            if (ViewportSettings.HasFlag (ViewportSettings.Transparent))
+            {
+                // context!.DrawnRegion is the region that was drawn by this view. It may include regions outside
+                // the Viewport. We need to clip it to the Viewport.
+                context!.ClipDrawnRegion (ViewportToScreen (Viewport));
 
-        // Default implementation does nothing.
+                // Exclude the drawn region from the clip
+                ExcludeFromClip (context!.GetDrawnRegion ());
+
+                // Exclude the Border and Padding from the clip
+                ExcludeFromClip (Border?.Thickness.AsRegion (FrameToScreen ()));
+                ExcludeFromClip (Padding?.Thickness.AsRegion (FrameToScreen ()));
+            }
+            else
+            {
+                // Exclude this view (not including Margin) from the Clip
+                Rectangle borderFrame = FrameToScreen ();
+
+                if (Border is { })
+                {
+                    borderFrame = Border.FrameToScreen ();
+                }
+
+                // In the non-transparent (typical case), we want to exclude the entire view area (borderFrame) from the clip
+                ExcludeFromClip (borderFrame);
+
+                // Update context.DrawnRegion to include the entire view (borderFrame), but clipped to our SuperView's viewport
+                // This enables the SuperView to know what was drawn by this view.
+                context?.AddDrawnRectangle (borderFrame);
+            }
+        }
+
+        // TODO: Determine if we need another event that conveys the FINAL DrawContext
     }
 
     /// <summary>
     ///     Called when the View is completed drawing.
     /// </summary>
-    protected virtual void OnDrawComplete () { }
+    /// <remarks>
+    ///     The <paramref name="context"/> parameter provides the drawn region of the View.
+    /// </remarks>
+    protected virtual void OnDrawComplete (DrawContext? context) { }
 
     /// <summary>Raised when the View is completed drawing.</summary>
     /// <remarks>

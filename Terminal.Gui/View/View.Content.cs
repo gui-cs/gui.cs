@@ -385,7 +385,7 @@ public partial class View
 
     private void RaiseViewportChangedEvent (Rectangle oldViewport)
     {
-        var args = new DrawEventArgs (IsInitialized ? Viewport : Rectangle.Empty, oldViewport);
+        var args = new DrawEventArgs (IsInitialized ? Viewport : Rectangle.Empty, oldViewport, null);
         OnViewportChanged (args);
         ViewportChanged?.Invoke (this, args);
     }

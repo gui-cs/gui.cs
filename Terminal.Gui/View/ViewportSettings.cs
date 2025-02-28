@@ -1,7 +1,7 @@
 ﻿namespace Terminal.Gui;
 
 /// <summary>
-///     Settings for how the <see cref="View.Viewport"/> behaves relative to the View's Content area.
+///     Settings for how the <see cref="View.Viewport"/> behaves.
 /// </summary>
 /// <remarks>
 ///     See the Layout Deep Dive for more information:
@@ -144,7 +144,7 @@ public enum ViewportSettings
     ///     If set the View will be transparent: The <see cref="View.Viewport"/> will not be cleared when the View is drawn and the clip region
     ///     will be set to clip the View's <see cref="View.Text"/> and <see cref="View.Subviews"/>.
     ///     <para>
-    ///         NOTE: Only the topmost View in a Subview Hierarchy can be transparent. Any subviews of the topmost transparent view
+    ///         Only the topmost View in a Subview Hierarchy can be transparent. Any subviews of the topmost transparent view
     ///         will have indeterminate draw behavior.
     ///     </para>
     ///     <para>

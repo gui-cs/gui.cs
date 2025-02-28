@@ -197,9 +197,6 @@ public class Adornment : View, IDesignable
         set => throw new InvalidOperationException (@"Adornment can only render to their Parent or Parent's Superview.");
     }
 
-    /// <inheritdoc/>
-    protected override void OnDrawComplete () { }
-
     /// <summary>
     ///     Indicates whether the specified Parent's SuperView-relative coordinates are within the Adornment's Thickness.
     /// </summary>
