@@ -1,4 +1,5 @@
-﻿using Xunit.Abstractions;
+﻿using System.Diagnostics;
+using Xunit.Abstractions;
 using static Terminal.Gui.ConfigurationManager;
 
 // Alias Console to MockConsole so we don't accidentally use Console
@@ -201,6 +202,10 @@ public class ApplicationTests
     [Fact]
     public void Init_Begin_End_Cleans_Up ()
     {
+        // Start stopwatch
+        Stopwatch stopwatch = new Stopwatch ();
+        stopwatch.Start ();
+
         Init ();
 
         // Begin will cause Run() to be called, which will call Begin(). Thus will block the tests
@@ -237,6 +242,12 @@ public class ApplicationTests
         Assert.Null (Application.Top);
         Assert.Null (Application.MainLoop);
         Assert.Null (Application.Driver);
+
+        // Stop stopwatch
+        stopwatch.Stop ();
+
+        _output.WriteLine ($"Load took {stopwatch.ElapsedMilliseconds} ms");
+
     }
 
     [Theory]

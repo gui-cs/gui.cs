@@ -18,12 +18,12 @@ public class DialogTests
 
         var title = "1234";
         var btn1Text = "yes";
-        var btn1 = $"{CM.Glyphs.LeftBracket} {btn1Text} {CM.Glyphs.RightBracket}";
+        var btn1 = $"{Glyphs.LeftBracket} {btn1Text} {Glyphs.RightBracket}";
         var btn2Text = "no";
-        var btn2 = $"{CM.Glyphs.LeftBracket} {btn2Text} {CM.Glyphs.RightBracket}";
+        var btn2 = $"{Glyphs.LeftBracket} {btn2Text} {Glyphs.RightBracket}";
 
         // We test with one button first, but do this to get the width right for 2
-        int width = $@"{CM.Glyphs.VLine} {btn1} {btn2} {CM.Glyphs.VLine}".Length;
+        int width = $@"{Glyphs.VLine} {btn1} {btn2} {Glyphs.VLine}".Length;
         d.SetBufferSize (width, 1);
 
         // Override CM
@@ -45,14 +45,14 @@ public class DialogTests
         // Create with no top or bottom border to simplify testing button layout (no need to account for title etc..)
         dlg.Border.Thickness = new (1, 0, 1, 0);
         runstate = Begin (dlg);
-        var buttonRow = $"{CM.Glyphs.VLine}    {btn1}     {CM.Glyphs.VLine}";
+        var buttonRow = $"{Glyphs.VLine}    {btn1}     {Glyphs.VLine}";
 
         RunIteration (ref runstate);
 
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
 
         // Now add a second button
-        buttonRow = $"{CM.Glyphs.VLine} {btn1} {btn2} {CM.Glyphs.VLine}";
+        buttonRow = $"{Glyphs.VLine} {btn1} {btn2} {Glyphs.VLine}";
         dlg.AddButton (new () { Text = btn2Text });
 
         RunIteration (ref runstate);
@@ -76,11 +76,11 @@ public class DialogTests
 
         RunIteration (ref runstate);
 
-        buttonRow = $"{CM.Glyphs.VLine}{btn1}         {CM.Glyphs.VLine}";
+        buttonRow = $"{Glyphs.VLine}{btn1}         {Glyphs.VLine}";
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
 
         // Now add a second button
-        buttonRow = $"{CM.Glyphs.VLine}{btn1}   {btn2}{CM.Glyphs.VLine}";
+        buttonRow = $"{Glyphs.VLine}{btn1}   {btn2}{Glyphs.VLine}";
         dlg.AddButton (new () { Text = btn2Text });
         RunIteration (ref runstate);
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
@@ -103,11 +103,11 @@ public class DialogTests
 
         RunIteration (ref runstate);
 
-        buttonRow = $"{CM.Glyphs.VLine}{new (' ', width - btn1.Length - 2)}{btn1}{CM.Glyphs.VLine}";
+        buttonRow = $"{Glyphs.VLine}{new (' ', width - btn1.Length - 2)}{btn1}{Glyphs.VLine}";
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
 
         // Now add a second button
-        buttonRow = $"{CM.Glyphs.VLine}  {btn1} {btn2}{CM.Glyphs.VLine}";
+        buttonRow = $"{Glyphs.VLine}  {btn1} {btn2}{Glyphs.VLine}";
         dlg.AddButton (new () { Text = btn2Text });
 
         RunIteration (ref runstate);
@@ -130,11 +130,11 @@ public class DialogTests
         runstate = Begin (dlg);
         RunIteration (ref runstate);
 
-        buttonRow = $"{CM.Glyphs.VLine}{btn1}{new (' ', width - btn1.Length - 2)}{CM.Glyphs.VLine}";
+        buttonRow = $"{Glyphs.VLine}{btn1}{new (' ', width - btn1.Length - 2)}{Glyphs.VLine}";
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
 
         // Now add a second button
-        buttonRow = $"{CM.Glyphs.VLine}{btn1} {btn2}  {CM.Glyphs.VLine}";
+        buttonRow = $"{Glyphs.VLine}{btn1} {btn2}  {Glyphs.VLine}";
         dlg.AddButton (new () { Text = btn2Text });
 
         RunIteration (ref runstate);
@@ -157,15 +157,15 @@ public class DialogTests
 
         // E.g "|[ yes ][ no ][ maybe ]|"
         var btn1Text = "yes";
-        var btn1 = $"{CM.Glyphs.LeftBracket} {btn1Text} {CM.Glyphs.RightBracket}";
+        var btn1 = $"{Glyphs.LeftBracket} {btn1Text} {Glyphs.RightBracket}";
         var btn2Text = "no";
-        var btn2 = $"{CM.Glyphs.LeftBracket} {btn2Text} {CM.Glyphs.RightBracket}";
+        var btn2 = $"{Glyphs.LeftBracket} {btn2Text} {Glyphs.RightBracket}";
         var btn3Text = "maybe";
-        var btn3 = $"{CM.Glyphs.LeftBracket} {btn3Text} {CM.Glyphs.RightBracket}";
+        var btn3 = $"{Glyphs.LeftBracket} {btn3Text} {Glyphs.RightBracket}";
         var btn4Text = "never";
-        var btn4 = $"{CM.Glyphs.LeftBracket} {btn4Text} {CM.Glyphs.RightBracket}";
+        var btn4 = $"{Glyphs.LeftBracket} {btn4Text} {Glyphs.RightBracket}";
 
-        var buttonRow = $"{CM.Glyphs.VLine} {btn1} {btn2} {btn3} {btn4} {CM.Glyphs.VLine}";
+        var buttonRow = $"{Glyphs.VLine} {btn1} {btn2} {btn3} {btn4} {Glyphs.VLine}";
         int width = buttonRow.Length;
         d.SetBufferSize (buttonRow.Length, 3);
 
@@ -184,7 +184,7 @@ public class DialogTests
         dlg.Dispose ();
 
         // Justify
-        buttonRow = $"{CM.Glyphs.VLine}{btn1}  {btn2}  {btn3} {btn4}{CM.Glyphs.VLine}";
+        buttonRow = $"{Glyphs.VLine}{btn1}  {btn2}  {btn3} {btn4}{Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
         (runstate, dlg) = BeginButtonTestDialog (
@@ -201,7 +201,7 @@ public class DialogTests
         dlg.Dispose ();
 
         // Right
-        buttonRow = $"{CM.Glyphs.VLine}  {btn1} {btn2} {btn3} {btn4}{CM.Glyphs.VLine}";
+        buttonRow = $"{Glyphs.VLine}  {btn1} {btn2} {btn3} {btn4}{Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
         (runstate, dlg) = BeginButtonTestDialog (
@@ -218,7 +218,7 @@ public class DialogTests
         dlg.Dispose ();
 
         // Left
-        buttonRow = $"{CM.Glyphs.VLine}{btn1} {btn2} {btn3} {btn4}  {CM.Glyphs.VLine}";
+        buttonRow = $"{Glyphs.VLine}{btn1} {btn2} {btn3} {btn4}  {Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
         (runstate, dlg) = BeginButtonTestDialog (
@@ -249,13 +249,13 @@ public class DialogTests
 
         // E.g "|[ yes ][ no ][ maybe ][ never ]|"
         var btn1Text = "yes";
-        var btn1 = $"{CM.Glyphs.LeftBracket} {btn1Text} {CM.Glyphs.RightBracket}";
+        var btn1 = $"{Glyphs.LeftBracket} {btn1Text} {Glyphs.RightBracket}";
         var btn2Text = "no";
-        var btn2 = $"{CM.Glyphs.LeftBracket} {btn2Text} {CM.Glyphs.RightBracket}";
+        var btn2 = $"{Glyphs.LeftBracket} {btn2Text} {Glyphs.RightBracket}";
         var btn3Text = "maybe";
-        var btn3 = $"{CM.Glyphs.LeftBracket} {btn3Text} {CM.Glyphs.RightBracket}";
+        var btn3 = $"{Glyphs.LeftBracket} {btn3Text} {Glyphs.RightBracket}";
         var btn4Text = "never";
-        var btn4 = $"{CM.Glyphs.LeftBracket} {btn4Text} {CM.Glyphs.RightBracket}";
+        var btn4 = $"{Glyphs.LeftBracket} {btn4Text} {Glyphs.RightBracket}";
         var buttonRow = string.Empty;
 
         var width = 30;
@@ -263,7 +263,7 @@ public class DialogTests
 
         // Default - Center
         buttonRow =
-            $"{CM.Glyphs.VLine} yes {CM.Glyphs.RightBracket}{btn2}{btn3}{CM.Glyphs.LeftBracket} never{CM.Glyphs.VLine}";
+            $"{Glyphs.VLine} yes {Glyphs.RightBracket}{btn2}{btn3}{Glyphs.LeftBracket} never{Glyphs.VLine}";
 
         (runstate, Dialog dlg) = BeginButtonTestDialog (
                                                       title,
@@ -281,7 +281,7 @@ public class DialogTests
 
         // Justify
         buttonRow =
-            $"{CM.Glyphs.VLine}{CM.Glyphs.LeftBracket} yes {CM.Glyphs.LeftBracket} no {CM.Glyphs.LeftBracket} maybe {CM.Glyphs.LeftBracket} never {CM.Glyphs.RightBracket}{CM.Glyphs.VLine}";
+            $"{Glyphs.VLine}{Glyphs.LeftBracket} yes {Glyphs.LeftBracket} no {Glyphs.LeftBracket} maybe {Glyphs.LeftBracket} never {Glyphs.RightBracket}{Glyphs.VLine}";
 
         (runstate, dlg) = BeginButtonTestDialog (
                                                title,
@@ -297,7 +297,7 @@ public class DialogTests
         dlg.Dispose ();
 
         // Right
-        buttonRow = $"{CM.Glyphs.VLine}es {CM.Glyphs.RightBracket}{btn2}{btn3}{btn4}{CM.Glyphs.VLine}";
+        buttonRow = $"{Glyphs.VLine}es {Glyphs.RightBracket}{btn2}{btn3}{btn4}{Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
         (runstate, dlg) = BeginButtonTestDialog (
@@ -314,7 +314,7 @@ public class DialogTests
         dlg.Dispose ();
 
         // Left
-        buttonRow = $"{CM.Glyphs.VLine}{btn1}{btn2}{btn3}{CM.Glyphs.LeftBracket} neve{CM.Glyphs.VLine}";
+        buttonRow = $"{Glyphs.VLine}{btn1}{btn2}{btn3}{Glyphs.LeftBracket} neve{Glyphs.VLine}";
 
         (runstate, dlg) = BeginButtonTestDialog (
                                                title,
@@ -344,17 +344,17 @@ public class DialogTests
 
         // E.g "|[ yes ][ no ][ maybe ]|"
         var btn1Text = "really long button 1";
-        var btn1 = $"{CM.Glyphs.LeftBracket} {btn1Text} {CM.Glyphs.RightBracket}";
+        var btn1 = $"{Glyphs.LeftBracket} {btn1Text} {Glyphs.RightBracket}";
         var btn2Text = "really long button 2";
-        var btn2 = $"{CM.Glyphs.LeftBracket} {btn2Text} {CM.Glyphs.RightBracket}";
+        var btn2 = $"{Glyphs.LeftBracket} {btn2Text} {Glyphs.RightBracket}";
         var btn3Text = "really long button 3";
-        var btn3 = $"{CM.Glyphs.LeftBracket} {btn3Text} {CM.Glyphs.RightBracket}";
+        var btn3 = $"{Glyphs.LeftBracket} {btn3Text} {Glyphs.RightBracket}";
         var btn4Text = "really long button 44"; // 44 is intentional to make length different than rest
-        var btn4 = $"{CM.Glyphs.LeftBracket} {btn4Text} {CM.Glyphs.RightBracket}";
+        var btn4 = $"{Glyphs.LeftBracket} {btn4Text} {Glyphs.RightBracket}";
 
         // Note extra spaces to make dialog even wider
         //                         123456                          1234567
-        var buttonRow = $"{CM.Glyphs.VLine}      {btn1} {btn2} {btn3} {btn4}      {CM.Glyphs.VLine}";
+        var buttonRow = $"{Glyphs.VLine}      {btn1} {btn2} {btn3} {btn4}      {Glyphs.VLine}";
         int width = buttonRow.Length;
         d.SetBufferSize (buttonRow.Length, 1);
 
@@ -373,7 +373,7 @@ public class DialogTests
         dlg.Dispose ();
 
         // Justify
-        buttonRow = $"{CM.Glyphs.VLine}{btn1}     {btn2}     {btn3}     {btn4}{CM.Glyphs.VLine}";
+        buttonRow = $"{Glyphs.VLine}{btn1}     {btn2}     {btn3}     {btn4}{Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
         (runstate, dlg) = BeginButtonTestDialog (
@@ -390,7 +390,7 @@ public class DialogTests
         dlg.Dispose ();
 
         // Right
-        buttonRow = $"{CM.Glyphs.VLine}            {btn1} {btn2} {btn3} {btn4}{CM.Glyphs.VLine}";
+        buttonRow = $"{Glyphs.VLine}            {btn1} {btn2} {btn3} {btn4}{Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
         (runstate, dlg) = BeginButtonTestDialog (
@@ -407,7 +407,7 @@ public class DialogTests
         dlg.Dispose ();
 
         // Left
-        buttonRow = $"{CM.Glyphs.VLine}{btn1} {btn2} {btn3} {btn4}            {CM.Glyphs.VLine}";
+        buttonRow = $"{Glyphs.VLine}{btn1} {btn2} {btn3} {btn4}            {Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
         (runstate, dlg) = BeginButtonTestDialog (
@@ -438,19 +438,19 @@ public class DialogTests
 
         // E.g "|[ yes ][ no ][ maybe ]|"
         var btn1Text = "yes";
-        var btn1 = $"{CM.Glyphs.LeftBracket} {btn1Text} {CM.Glyphs.RightBracket}";
+        var btn1 = $"{Glyphs.LeftBracket} {btn1Text} {Glyphs.RightBracket}";
         var btn2Text = "no";
-        var btn2 = $"{CM.Glyphs.LeftBracket} {btn2Text} {CM.Glyphs.RightBracket}";
+        var btn2 = $"{Glyphs.LeftBracket} {btn2Text} {Glyphs.RightBracket}";
         var btn3Text = "你你你你你"; // This is a wide char
-        var btn3 = $"{CM.Glyphs.LeftBracket} {btn3Text} {CM.Glyphs.RightBracket}";
+        var btn3 = $"{Glyphs.LeftBracket} {btn3Text} {Glyphs.RightBracket}";
 
         // Requires a Nerd Font
         var btn4Text = "\uE36E\uE36F\uE370\uE371\uE372\uE373";
-        var btn4 = $"{CM.Glyphs.LeftBracket} {btn4Text} {CM.Glyphs.RightBracket}";
+        var btn4 = $"{Glyphs.LeftBracket} {btn4Text} {Glyphs.RightBracket}";
 
         // Note extra spaces to make dialog even wider
         //                         123456                           123456
-        var buttonRow = $"{CM.Glyphs.VLine}      {btn1} {btn2} {btn3} {btn4}      {CM.Glyphs.VLine}";
+        var buttonRow = $"{Glyphs.VLine}      {btn1} {btn2} {btn3} {btn4}      {Glyphs.VLine}";
         int width = buttonRow.GetColumns ();
         d.SetBufferSize (width, 3);
 
@@ -469,7 +469,7 @@ public class DialogTests
         dlg.Dispose ();
 
         // Justify
-        buttonRow = $"{CM.Glyphs.VLine}{btn1}     {btn2}     {btn3}     {btn4}{CM.Glyphs.VLine}";
+        buttonRow = $"{Glyphs.VLine}{btn1}     {btn2}     {btn3}     {btn4}{Glyphs.VLine}";
         Assert.Equal (width, buttonRow.GetColumns ());
 
         (runstate, dlg) = BeginButtonTestDialog (
@@ -486,7 +486,7 @@ public class DialogTests
         dlg.Dispose ();
 
         // Right
-        buttonRow = $"{CM.Glyphs.VLine}            {btn1} {btn2} {btn3} {btn4}{CM.Glyphs.VLine}";
+        buttonRow = $"{Glyphs.VLine}            {btn1} {btn2} {btn3} {btn4}{Glyphs.VLine}";
         Assert.Equal (width, buttonRow.GetColumns ());
 
         (runstate, dlg) = BeginButtonTestDialog (
@@ -503,7 +503,7 @@ public class DialogTests
         dlg.Dispose ();
 
         // Left
-        buttonRow = $"{CM.Glyphs.VLine}{btn1} {btn2} {btn3} {btn4}            {CM.Glyphs.VLine}";
+        buttonRow = $"{Glyphs.VLine}{btn1} {btn2} {btn3} {btn4}            {Glyphs.VLine}";
         Assert.Equal (width, buttonRow.GetColumns ());
 
         (runstate, dlg) = BeginButtonTestDialog (
@@ -535,7 +535,7 @@ public class DialogTests
         var btnText = "ok";
 
         var buttonRow =
-            $"{CM.Glyphs.VLine}  {CM.Glyphs.LeftBracket} {btnText} {CM.Glyphs.RightBracket}  {CM.Glyphs.VLine}";
+            $"{Glyphs.VLine}  {Glyphs.LeftBracket} {btnText} {Glyphs.RightBracket}  {Glyphs.VLine}";
         int width = buttonRow.Length;
 
         d.SetBufferSize (width, 1);
@@ -554,7 +554,7 @@ public class DialogTests
 
         // Justify 
         buttonRow =
-            $"{CM.Glyphs.VLine}{CM.Glyphs.LeftBracket} {btnText} {CM.Glyphs.RightBracket}    {CM.Glyphs.VLine}";
+            $"{Glyphs.VLine}{Glyphs.LeftBracket} {btnText} {Glyphs.RightBracket}    {Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
         (runstate, dlg) = BeginButtonTestDialog (
@@ -569,7 +569,7 @@ public class DialogTests
 
         // Right
         buttonRow =
-            $"{CM.Glyphs.VLine}    {CM.Glyphs.LeftBracket} {btnText} {CM.Glyphs.RightBracket}{CM.Glyphs.VLine}";
+            $"{Glyphs.VLine}    {Glyphs.LeftBracket} {btnText} {Glyphs.RightBracket}{Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
         (runstate, dlg) = BeginButtonTestDialog (
@@ -584,7 +584,7 @@ public class DialogTests
 
         // Left
         buttonRow =
-            $"{CM.Glyphs.VLine}{CM.Glyphs.LeftBracket} {btnText} {CM.Glyphs.RightBracket}    {CM.Glyphs.VLine}";
+            $"{Glyphs.VLine}{Glyphs.LeftBracket} {btnText} {Glyphs.RightBracket}    {Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
         (runstate, dlg) = BeginButtonTestDialog (
@@ -599,7 +599,7 @@ public class DialogTests
 
         // Wider
         buttonRow =
-            $"{CM.Glyphs.VLine}   {CM.Glyphs.LeftBracket} {btnText} {CM.Glyphs.RightBracket}   {CM.Glyphs.VLine}";
+            $"{Glyphs.VLine}   {Glyphs.LeftBracket} {btnText} {Glyphs.RightBracket}   {Glyphs.VLine}";
         width = buttonRow.Length;
 
         d.SetBufferSize (width, 1);
@@ -616,7 +616,7 @@ public class DialogTests
 
         // Justify
         buttonRow =
-            $"{CM.Glyphs.VLine}{CM.Glyphs.LeftBracket} {btnText} {CM.Glyphs.RightBracket}      {CM.Glyphs.VLine}";
+            $"{Glyphs.VLine}{Glyphs.LeftBracket} {btnText} {Glyphs.RightBracket}      {Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
         (runstate, dlg) = BeginButtonTestDialog (
@@ -631,7 +631,7 @@ public class DialogTests
 
         // Right
         buttonRow =
-            $"{CM.Glyphs.VLine}      {CM.Glyphs.LeftBracket} {btnText} {CM.Glyphs.RightBracket}{CM.Glyphs.VLine}";
+            $"{Glyphs.VLine}      {Glyphs.LeftBracket} {btnText} {Glyphs.RightBracket}{Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
         (runstate, dlg) = BeginButtonTestDialog (
@@ -646,7 +646,7 @@ public class DialogTests
 
         // Left
         buttonRow =
-            $"{CM.Glyphs.VLine}{CM.Glyphs.LeftBracket} {btnText} {CM.Glyphs.RightBracket}      {CM.Glyphs.VLine}";
+            $"{Glyphs.VLine}{Glyphs.LeftBracket} {btnText} {Glyphs.RightBracket}      {Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
         (runstate, dlg) = BeginButtonTestDialog (
@@ -674,13 +674,13 @@ public class DialogTests
 
         // E.g "|[ yes ][ no ][ maybe ]|"
         var btn1Text = "yes";
-        var btn1 = $"{CM.Glyphs.LeftBracket} {btn1Text} {CM.Glyphs.RightBracket}";
+        var btn1 = $"{Glyphs.LeftBracket} {btn1Text} {Glyphs.RightBracket}";
         var btn2Text = "no";
-        var btn2 = $"{CM.Glyphs.LeftBracket} {btn2Text} {CM.Glyphs.RightBracket}";
+        var btn2 = $"{Glyphs.LeftBracket} {btn2Text} {Glyphs.RightBracket}";
         var btn3Text = "maybe";
-        var btn3 = $"{CM.Glyphs.LeftBracket} {btn3Text} {CM.Glyphs.RightBracket}";
+        var btn3 = $"{Glyphs.LeftBracket} {btn3Text} {Glyphs.RightBracket}";
 
-        var buttonRow = $@"{CM.Glyphs.VLine} {btn1} {btn2} {btn3} {CM.Glyphs.VLine}";
+        var buttonRow = $@"{Glyphs.VLine} {btn1} {btn2} {btn3} {Glyphs.VLine}";
         int width = buttonRow.Length;
 
         d.SetBufferSize (buttonRow.Length, 3);
@@ -698,7 +698,7 @@ public class DialogTests
         dlg.Dispose ();
 
         // Justify
-        buttonRow = $@"{CM.Glyphs.VLine}{btn1}  {btn2}  {btn3}{CM.Glyphs.VLine}";
+        buttonRow = $@"{Glyphs.VLine}{btn1}  {btn2}  {btn3}{Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
         (runstate, dlg) = BeginButtonTestDialog (
@@ -714,7 +714,7 @@ public class DialogTests
         dlg.Dispose ();
 
         // Right
-        buttonRow = $@"{CM.Glyphs.VLine}  {btn1} {btn2} {btn3}{CM.Glyphs.VLine}";
+        buttonRow = $@"{Glyphs.VLine}  {btn1} {btn2} {btn3}{Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
         (runstate, dlg) = BeginButtonTestDialog (
@@ -730,7 +730,7 @@ public class DialogTests
         dlg.Dispose ();
 
         // Left
-        buttonRow = $@"{CM.Glyphs.VLine}{btn1} {btn2} {btn3}  {CM.Glyphs.VLine}";
+        buttonRow = $@"{Glyphs.VLine}{btn1} {btn2} {btn3}  {Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
         (runstate, dlg) = BeginButtonTestDialog (
@@ -760,11 +760,11 @@ public class DialogTests
 
         // E.g "|[ yes ][ no ]|"
         var btn1Text = "yes";
-        var btn1 = $"{CM.Glyphs.LeftBracket} {btn1Text} {CM.Glyphs.RightBracket}";
+        var btn1 = $"{Glyphs.LeftBracket} {btn1Text} {Glyphs.RightBracket}";
         var btn2Text = "no";
-        var btn2 = $"{CM.Glyphs.LeftBracket} {btn2Text} {CM.Glyphs.RightBracket}";
+        var btn2 = $"{Glyphs.LeftBracket} {btn2Text} {Glyphs.RightBracket}";
 
-        var buttonRow = $@"{CM.Glyphs.VLine} {btn1} {btn2} {CM.Glyphs.VLine}";
+        var buttonRow = $@"{Glyphs.VLine} {btn1} {btn2} {Glyphs.VLine}";
         int width = buttonRow.Length;
 
         d.SetBufferSize (buttonRow.Length, 3);
@@ -781,7 +781,7 @@ public class DialogTests
         dlg.Dispose ();
 
         // Justify
-        buttonRow = $@"{CM.Glyphs.VLine}{btn1}   {btn2}{CM.Glyphs.VLine}";
+        buttonRow = $@"{Glyphs.VLine}{btn1}   {btn2}{Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
         (runstate, dlg) = BeginButtonTestDialog (
@@ -796,7 +796,7 @@ public class DialogTests
         dlg.Dispose ();
 
         // Right
-        buttonRow = $@"{CM.Glyphs.VLine}  {btn1} {btn2}{CM.Glyphs.VLine}";
+        buttonRow = $@"{Glyphs.VLine}  {btn1} {btn2}{Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
         (runstate, dlg) = BeginButtonTestDialog (
@@ -811,7 +811,7 @@ public class DialogTests
         dlg.Dispose ();
 
         // Left
-        buttonRow = $@"{CM.Glyphs.VLine}{btn1} {btn2}  {CM.Glyphs.VLine}";
+        buttonRow = $@"{Glyphs.VLine}{btn1} {btn2}  {Glyphs.VLine}";
         Assert.Equal (width, buttonRow.Length);
 
         (runstate, dlg) = BeginButtonTestDialog (
@@ -841,11 +841,11 @@ public class DialogTests
 
         // E.g "|[ yes ][ no ]|"
         var btn1Text = "yes";
-        var btn1 = $"{CM.Glyphs.LeftBracket} {btn1Text} {CM.Glyphs.RightBracket}";
+        var btn1 = $"{Glyphs.LeftBracket} {btn1Text} {Glyphs.RightBracket}";
         var btn2Text = "no";
-        var btn2 = $"{CM.Glyphs.LeftBracket} {btn2Text} {CM.Glyphs.RightBracket}";
+        var btn2 = $"{Glyphs.LeftBracket} {btn2Text} {Glyphs.RightBracket}";
 
-        var buttonRow = $@"{CM.Glyphs.VLine} {btn1} {btn2} {CM.Glyphs.VLine}";
+        var buttonRow = $@"{Glyphs.VLine} {btn1} {btn2} {Glyphs.VLine}";
         int width = buttonRow.Length;
 
         d.SetBufferSize (buttonRow.Length, 3);
@@ -859,7 +859,7 @@ public class DialogTests
         (runstate, dlg) = BeginButtonTestDialog (title, width, Alignment.Center, button1, button2);
         button1.Visible = false;
         RunIteration (ref runstate, firstIteration);
-        buttonRow = $@"{CM.Glyphs.VLine}         {btn2} {CM.Glyphs.VLine}";
+        buttonRow = $@"{Glyphs.VLine}         {btn2} {Glyphs.VLine}";
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -871,7 +871,7 @@ public class DialogTests
         (runstate, dlg) = BeginButtonTestDialog (title, width, Alignment.Fill, button1, button2);
         button1.Visible = false;
         RunIteration (ref runstate, firstIteration);
-        buttonRow = $@"{CM.Glyphs.VLine}          {btn2}{CM.Glyphs.VLine}";
+        buttonRow = $@"{Glyphs.VLine}          {btn2}{Glyphs.VLine}";
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -894,7 +894,7 @@ public class DialogTests
         (runstate, dlg) = BeginButtonTestDialog (title, width, Alignment.Start, button1, button2);
         button1.Visible = false;
         RunIteration (ref runstate, firstIteration);
-        buttonRow = $@"{CM.Glyphs.VLine}        {btn2}  {CM.Glyphs.VLine}";
+        buttonRow = $@"{Glyphs.VLine}        {btn2}  {Glyphs.VLine}";
         TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
         End (runstate);
         dlg.Dispose ();
@@ -924,7 +924,7 @@ public class DialogTests
                              RequestStop ();
                          }
                      };
-        var btn = $"{CM.Glyphs.LeftBracket} Ok {CM.Glyphs.RightBracket}";
+        var btn = $"{Glyphs.LeftBracket} Ok {Glyphs.RightBracket}";
 
         win.Loaded += (s, a) =>
                       {
@@ -1096,7 +1096,7 @@ public class DialogTests
                        };
 
         var btn =
-            $"{CM.Glyphs.LeftBracket}{CM.Glyphs.LeftDefaultIndicator} Ok {CM.Glyphs.RightDefaultIndicator}{CM.Glyphs.RightBracket}";
+            $"{Glyphs.LeftBracket}{Glyphs.LeftDefaultIndicator} Ok {Glyphs.RightDefaultIndicator}{Glyphs.RightBracket}";
 
         int iterations = -1;
 
@@ -1127,7 +1127,7 @@ public class DialogTests
   │                       │
   │                       │
   │                       │
-  │{CM.Glyphs.LeftBracket} Show Sub {CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Close {CM.Glyphs.RightBracket} │
+  │{Glyphs.LeftBracket} Show Sub {Glyphs.RightBracket} {Glyphs.LeftBracket} Close {Glyphs.RightBracket} │
   └───────────────────────┘";
                                  TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
 
@@ -1145,7 +1145,7 @@ public class DialogTests
   │  │                  │ │
   │  │     {btn}     │ │
   │  └──────────────────┘ │
-  │{CM.Glyphs.LeftBracket} Show Sub {CM.Glyphs.RightBracket} {CM.Glyphs.LeftBracket} Close {CM.Glyphs.RightBracket} │
+  │{Glyphs.LeftBracket} Show Sub {Glyphs.RightBracket} {Glyphs.LeftBracket} Close {Glyphs.RightBracket} │
   └───────────────────────┘",
                                                                                _output
                                                                               );
@@ -1266,7 +1266,7 @@ public class DialogTests
         var btnText = "ok";
 
         var buttonRow =
-            $"{CM.Glyphs.VLine}   {CM.Glyphs.LeftBracket} {btnText} {CM.Glyphs.RightBracket}   {CM.Glyphs.VLine}";
+            $"{Glyphs.VLine}   {Glyphs.LeftBracket} {btnText} {Glyphs.RightBracket}   {Glyphs.VLine}";
 
         int width = buttonRow.Length;
         d.SetBufferSize (buttonRow.Length, 10);
@@ -1326,7 +1326,7 @@ public class DialogTests
 
         var title = "1234";
 
-        var buttonRow = $"{CM.Glyphs.VLine}        {CM.Glyphs.VLine}";
+        var buttonRow = $"{Glyphs.VLine}        {Glyphs.VLine}";
         int width = buttonRow.Length;
         d.SetBufferSize (buttonRow.Length, 3);
 
