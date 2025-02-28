@@ -398,14 +398,12 @@ public partial class View // Drawing APIs
     protected virtual bool OnDrawingText () { return false; }
 
 
-#pragma warning disable CS1574 // XML comment has cref attribute that could not be resolved
     /// <summary>Raised when the <see cref="Text"/> of the View is to be drawn.</summary>
     /// <returns>
-    ///     Set <see cref="DrawEventArgs.Cancel"/> to <see langword="true"/> to stop further drawing of
+    ///     Set <see cref="CancelEventArgs.Cancel"/> to <see langword="true"/> to stop further drawing of
     ///     <see cref="Text"/>.
     /// </returns>
     public event EventHandler<DrawEventArgs>? DrawingText;
-#pragma warning restore CS1574 // XML comment has cref attribute that could not be resolved
 
     /// <summary>
     ///     Draws the <see cref="Text"/> of the View using the <see cref="TextFormatter"/>.
@@ -503,16 +501,14 @@ public partial class View // Drawing APIs
     protected virtual bool OnDrawingSubviews () { return false; }
 
 
-#pragma warning disable CS1574 // XML comment has cref attribute that could not be resolved
     /// <summary>Raised when the <see cref="Subviews"/> are to be drawn.</summary>
     /// <remarks>
     /// </remarks>
     /// <returns>
-    ///     Set <see cref="DrawEventArgs.Cancel"/> to <see langword="true"/> to stop further drawing of
+    ///     Set <see cref="CancelEventArgs.Cancel"/> to <see langword="true"/> to stop further drawing of
     ///     <see cref="Subviews"/>.
     /// </returns>
     public event EventHandler<DrawEventArgs>? DrawingSubviews;
-#pragma warning restore CS1574 // XML comment has cref attribute that could not be resolved
 
     /// <summary>
     ///     Draws the <see cref="Subviews"/>.

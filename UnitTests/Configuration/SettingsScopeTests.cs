@@ -30,6 +30,7 @@ public class SettingsScopeTests
 
         // clean up
         Locations = ConfigLocations.All;
+        Reset ();
     }
 
     [Fact]
@@ -63,7 +64,7 @@ public class SettingsScopeTests
         Assert.Equal (Key.F, Application.NextTabGroupKey);
         Assert.Equal (Key.B, Application.PrevTabGroupKey);
 
-        Locations = ConfigLocations.Default;
+        Locations = ConfigLocations.All;
         Reset ();
 
     }
@@ -109,6 +110,7 @@ public class SettingsScopeTests
         Assert.True (Settings ["Themes"].PropertyValue is Dictionary<string, ThemeScope>);
         Assert.Single ((Dictionary<string, ThemeScope>)Settings ["Themes"].PropertyValue);
 
-        Locations = savedLocations;
+        Locations = ConfigLocations.All;
+        Reset ();
     }
 }
