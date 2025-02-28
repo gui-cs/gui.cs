@@ -222,15 +222,20 @@ public class ScenarioTests : TestsAllViews
                 initialized = true;
                 Application.Iteration += OnApplicationOnIteration;
                 Application.Driver!.ClearedContents += (sender, args) => clearedContentCount++;
-                Application.Driver!.Refreshed += (sender, args) =>
-                                                 {
-                                                     refreshedCount++;
 
-                                                     if (args.CurrentValue)
-                                                     {
-                                                         updatedCount++;
-                                                     }
-                                                 };
+                if (Application.Driver is ConsoleDriver cd)
+                {
+                    cd!.Refreshed += (sender, args) =>
+                                     {
+                                         refreshedCount++;
+
+                                         if (args.CurrentValue)
+                                         {
+                                             updatedCount++;
+                                         }
+                                     };
+                }
+
                 Application.NotifyNewRunState += OnApplicationNotifyNewRunState;
 
                 stopwatch = Stopwatch.StartNew ();
@@ -800,7 +805,7 @@ public class ScenarioTests : TestsAllViews
             if (token == null)
             {
                 // Timeout only must start at first iteration
-                token = Application.MainLoop.AddTimeout (TimeSpan.FromMilliseconds (ms), abortCallback);
+                token = Application.AddTimeout (TimeSpan.FromMilliseconds (ms), abortCallback);
             }
 
             iterations++;

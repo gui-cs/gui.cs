@@ -154,6 +154,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     }
 
     [Theory]
+    [SetupFakeDriver] // Required for spinner view that wants to register timeouts
     [MemberData (nameof (AllViewTypes))]
     public void AllViews_NewMouseEvent_Enabled_False_Does_Not_Set_Handled (Type viewType)
     {
@@ -173,6 +174,7 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
     }
 
     [Theory]
+    [SetupFakeDriver] // Required for spinner view that wants to register timeouts
     [MemberData (nameof (AllViewTypes))]
     public void AllViews_NewMouseEvent_Clicked_Enabled_False_Does_Not_Set_Handled (Type viewType)
     {

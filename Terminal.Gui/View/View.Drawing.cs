@@ -831,7 +831,8 @@ public partial class View // Drawing APIs
             adornment.Parent?.SetSubViewNeedsDraw ();
         }
 
-        foreach (View subview in Subviews)
+        // There was multiple enumeration error here, so calling ToArray - probably a stop gap
+        foreach (View subview in Subviews.ToArray ())
         {
             if (subview.Frame.IntersectsWith (viewPortRelativeRegion))
             {
