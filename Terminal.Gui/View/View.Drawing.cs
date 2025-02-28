@@ -327,7 +327,7 @@ public partial class View // Drawing APIs
 
     #region ClearViewport
 
-    private void DoClearViewport ()
+    internal void DoClearViewport ()
     {
         if (ViewportSettings.HasFlag (ViewportSettings.Transparent))
         {
@@ -348,12 +348,10 @@ public partial class View // Drawing APIs
             return;
         }
 
-        //if (!NeedsDraw)
-        //{
-        //   return;
-        //}
-
         ClearViewport ();
+
+        OnClearedViewport ();
+        ClearedViewport?.Invoke (this, new (Viewport, Viewport));
     }
 
     /// <summary>
@@ -362,7 +360,7 @@ public partial class View // Drawing APIs
     /// <returns><see langword="true"/> to stop further clearing.</returns>
     protected virtual bool OnClearingViewport () { return false; }
 
-    /// <summary>Event invoked when the content area of the View is to be drawn.</summary>
+    /// <summary>Event invoked when the <see cref="Viewport"/> is to be cleared.</summary>
     /// <remarks>
     ///     <para>Will be invoked before any subviews added with <see cref="Add(View)"/> have been drawn.</para>
     ///     <para>
@@ -371,6 +369,14 @@ public partial class View // Drawing APIs
     ///     </para>
     /// </remarks>
     public event EventHandler<DrawEventArgs>? ClearingViewport;
+
+    /// <summary>
+    ///     Called when the <see cref="Viewport"/> has been cleared
+    /// </summary>
+    protected virtual void OnClearedViewport () {  }
+
+    /// <summary>Event invoked when the <see cref="Viewport"/> has been cleared.</summary>
+    public event EventHandler<DrawEventArgs>? ClearedViewport;
 
     /// <summary>Clears <see cref="Viewport"/> with the normal background.</summary>
     /// <remarks>

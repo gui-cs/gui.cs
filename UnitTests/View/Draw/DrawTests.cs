@@ -1,5 +1,6 @@
 #nullable enable
 using System.Text;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
@@ -7,248 +8,6 @@ namespace Terminal.Gui.ViewTests;
 [Trait ("Category", "Output")]
 public class DrawTests (ITestOutputHelper _output)
 {
-
-    [Fact]
-    [SetupFakeDriver]
-    public void Move_Is_Not_Constrained_To_Viewport ()
-    {
-        var view = new View
-        {
-            X = 1,
-            Y = 1,
-            Width = 3, Height = 3
-        };
-        view.Margin!.Thickness = new (1);
-
-        view.Move (0, 0);
-        Assert.Equal (new (2, 2), new Point (Application.Driver!.Col, Application.Driver!.Row));
-
-        view.Move (-1, -1);
-        Assert.Equal (new (1, 1), new Point (Application.Driver!.Col, Application.Driver!.Row));
-
-        view.Move (1, 1);
-        Assert.Equal (new (3, 3), new Point (Application.Driver!.Col, Application.Driver!.Row));
-    }
-
-    [Fact]
-    [SetupFakeDriver]
-    public void AddRune_Is_Constrained_To_Viewport ()
-    {
-        var view = new View
-        {
-            X = 1,
-            Y = 1,
-            Width = 3, Height = 3
-        };
-        view.Padding!.Thickness = new (1);
-        view.Padding.Diagnostics = ViewDiagnosticFlags.Thickness;
-        view.BeginInit ();
-        view.EndInit ();
-        view.Draw ();
-
-        // Only valid location w/in Viewport is 0, 0 (view) - 2, 2 (screen)
-        Assert.Equal ((Rune)' ', Application.Driver?.Contents! [2, 2].Rune);
-
-        // When we exit Draw, the view is excluded from the clip. So drawing at 0,0, is not valid and is clipped.
-        view.AddRune (0, 0, Rune.ReplacementChar);
-        Assert.Equal ((Rune)' ', Application.Driver?.Contents! [2, 2].Rune);
-
-        view.AddRune (-1, -1, Rune.ReplacementChar);
-        Assert.Equal ((Rune)'P', Application.Driver?.Contents! [1, 1].Rune);
-
-        view.AddRune (1, 1, Rune.ReplacementChar);
-        Assert.Equal ((Rune)'P', Application.Driver?.Contents! [3, 3].Rune);
-    }
-
-    [Theory]
-    [InlineData (0, 0, 1, 1)]
-    [InlineData (0, 0, 2, 2)]
-    [InlineData (-1, -1, 2, 2)]
-    [SetupFakeDriver]
-    public void FillRect_Fills_HonorsClip (int x, int y, int width, int height)
-    {
-        var superView = new View { Width = Dim.Fill (), Height = Dim.Fill () };
-
-        var view = new View
-        {
-            Text = "X",
-            X = 1, Y = 1,
-            Width = 3, Height = 3,
-            BorderStyle = LineStyle.Single
-        };
-        superView.Add (view);
-        superView.BeginInit ();
-        superView.EndInit ();
-        superView.LayoutSubviews ();
-
-        superView.Draw ();
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- ┌─┐
- │X│
- └─┘",
-                                                      _output);
-
-        Rectangle toFill = new (x, y, width, height);
-        View.SetClipToScreen ();
-        view.FillRect (toFill);
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- ┌─┐
- │ │
- └─┘",
-                                                      _output);
-
-        // Now try to clear beyond Viewport (invalid; clipping should prevent)
-        superView.SetNeedsDraw ();
-        superView.Draw ();
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- ┌─┐
- │X│
- └─┘",
-                                                      _output);
-        toFill = new (-width, -height, width, height);
-        view.FillRect (toFill);
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- ┌─┐
- │X│
- └─┘",
-                                                      _output);
-
-        // Now try to clear beyond Viewport (valid)
-        superView.SetNeedsDraw ();
-        superView.Draw ();
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- ┌─┐
- │X│
- └─┘",
-                                                      _output);
-        toFill = new (-1, -1, width + 1, height + 1);
-
-        View.SetClipToScreen ();
-        view.FillRect (toFill);
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- ┌─┐
- │ │
- └─┘",
-                                                      _output);
-
-        // Now clear too much size
-        superView.SetNeedsDraw ();
-        superView.Draw ();
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- ┌─┐
- │X│
- └─┘",
-                                                      _output);
-        toFill = new (0, 0, width * 2, height * 2);
-        View.SetClipToScreen ();
-        view.FillRect (toFill);
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- ┌─┐
- │ │
- └─┘",
-                                                      _output);
-    }
-
-    [Fact]
-    [SetupFakeDriver]
-    public void Clear_ClearsEntireViewport ()
-    {
-        var superView = new View { Width = Dim.Fill (), Height = Dim.Fill () };
-
-        var view = new View
-        {
-            Text = "X",
-            X = 1, Y = 1,
-            Width = 3, Height = 3,
-            BorderStyle = LineStyle.Single
-        };
-        superView.Add (view);
-        superView.BeginInit ();
-        superView.EndInit ();
-        superView.LayoutSubviews ();
-
-        superView.Draw ();
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- ┌─┐
- │X│
- └─┘",
-                                                      _output);
-
-        // On Draw exit the view is excluded from the clip, so this will do nothing.
-        view.ClearViewport ();
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- ┌─┐
- │X│
- └─┘",
-                                                      _output);
-
-        View.SetClipToScreen ();
-
-        view.ClearViewport ();
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- ┌─┐
- │ │
- └─┘",
-                                                      _output);
-    }
-
-    [Fact]
-    [SetupFakeDriver]
-    public void Clear_WithClearVisibleContentOnly_ClearsVisibleContentOnly ()
-    {
-        var superView = new View { Width = Dim.Fill (), Height = Dim.Fill () };
-
-        var view = new View
-        {
-            Text = "X",
-            X = 1, Y = 1,
-            Width = 3, Height = 3,
-            BorderStyle = LineStyle.Single,
-            ViewportSettings = ViewportSettings.ClearContentOnly
-        };
-        superView.Add (view);
-        superView.BeginInit ();
-        superView.EndInit ();
-        superView.LayoutSubviews ();
-
-        superView.Draw ();
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- ┌─┐
- │X│
- └─┘",
-                                                      _output);
-        View.SetClipToScreen ();
-        view.ClearViewport ();
-
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
- ┌─┐
- │ │
- └─┘",
-                                                      _output);
-    }
 
     [Fact]
     [AutoInitShutdown]
@@ -289,72 +48,6 @@ public class DrawTests (ITestOutputHelper _output)
         // This test has nothing to do with color - removing as it is not relevant and fragile
         top.Dispose ();
     }
-
-    // TODO: Simplify this test to just use AddRune directly
-    [Fact]
-    [SetupFakeDriver]
-    [Trait ("Category", "Unicode")]
-    public void Clipping_Wide_Runes ()
-    {
-        ((FakeDriver)Application.Driver!).SetBufferSize (30, 1);
-
-        var top = new View ()
-        {
-            Id = "top",
-            Width = Dim.Fill (),
-            Height = Dim.Fill (),
-        };
-        var frameView = new View ()
-        {
-            Id = "frameView",
-            Width = Dim.Fill (),
-            Height = Dim.Fill (),
-            Text = """
-                   これは広いルーンラインです。
-                   """,
-        };
-        frameView.Border!.LineStyle = LineStyle.Single;
-        frameView.Border.Thickness = new (1, 0, 0, 0);
-
-        top.Add (frameView);
-        View.SetClipToScreen ();
-        top.Layout ();
-        top.Draw ();
-
-        string expectedOutput = """
-                                      │これは広いルーンラインです。
-                                      """;
-
-        TestHelpers.AssertDriverContentsWithFrameAre (expectedOutput, _output);
-
-        var view = new View
-        {
-            Text = "0123456789",
-            //Text = "ワイドルー。",
-            X = 2,
-            Height = Dim.Auto (),
-            Width = Dim.Auto (),
-            BorderStyle = LineStyle.Single
-        };
-        view.Border!.Thickness = new (1, 0, 1, 0);
-
-        top.Add (view);
-        top.Layout ();
-        View.SetClipToScreen ();
-        top.Draw ();
-        //                            012345678901234567890123456789012345678
-        //                            012 34 56 78 90 12 34 56 78 90 12 34 56 78
-        //                            │こ れ  は 広 い  ル ー ン  ラ イ ン で  す 。
-        //                            01 2345678901234 56 78 90 12 34 56 
-        //                            │� |0123456989│� ン  ラ イ ン で  す 。
-        expectedOutput = """
-                         │�│0123456789│�ンラインです。
-                         """;
-
-        TestHelpers.AssertDriverContentsWithFrameAre (expectedOutput, _output);
-    }
-
-    // TODO: Add more AddRune tests to cover all the cases where wide runes are clipped
 
     [Fact]
     [AutoInitShutdown]
@@ -942,74 +635,6 @@ public class DrawTests (ITestOutputHelper _output)
     }
 
     [Fact]
-    [SetupFakeDriver]
-    public void SetClip_ClipVisibleContentOnly_VisibleContentIsClipped ()
-    {
-        // Screen is 25x25
-        // View is 25x25
-        // Viewport is (0, 0, 23, 23)
-        // ContentSize is (10, 10)
-        // ViewportToScreen is (1, 1, 23, 23)
-        // Visible content is (1, 1, 10, 10)
-        // Expected clip is (1, 1, 10, 10) - same as visible content
-        Rectangle expectedClip = new (1, 1, 10, 10);
-
-        // Arrange
-        var view = new View
-        {
-            Width = Dim.Fill (),
-            Height = Dim.Fill (),
-            ViewportSettings = ViewportSettings.ClipContentOnly
-        };
-        view.SetContentSize (new Size (10, 10));
-        view.Border!.Thickness = new (1);
-        view.BeginInit ();
-        view.EndInit ();
-        Assert.Equal (view.Frame, View.GetClip ()!.GetBounds ());
-
-        // Act
-        view.AddViewportToClip ();
-
-        // Assert
-        Assert.Equal (expectedClip, View.GetClip ()!.GetBounds ());
-        view.Dispose ();
-    }
-
-    [Fact]
-    [SetupFakeDriver]
-    public void SetClip_Default_ClipsToViewport ()
-    {
-        // Screen is 25x25
-        // View is 25x25
-        // Viewport is (0, 0, 23, 23)
-        // ContentSize is (10, 10)
-        // ViewportToScreen is (1, 1, 23, 23)
-        // Visible content is (1, 1, 10, 10)
-        // Expected clip is (1, 1, 23, 23) - same as Viewport
-        Rectangle expectedClip = new (1, 1, 23, 23);
-
-        // Arrange
-        var view = new View
-        {
-            Width = Dim.Fill (),
-            Height = Dim.Fill ()
-        };
-        view.SetContentSize (new Size (10, 10));
-        view.Border!.Thickness = new (1);
-        view.BeginInit ();
-        view.EndInit ();
-        Assert.Equal (view.Frame, View.GetClip ()!.GetBounds ());
-        view.Viewport = view.Viewport with { X = 1, Y = 1 };
-
-        // Act
-        view.AddViewportToClip ();
-
-        // Assert
-        Assert.Equal (expectedClip, View.GetClip ()!.GetBounds ());
-        view.Dispose ();
-    }
-
-    [Fact]
     [TestRespondersDisposed]
     public void Draw_Throws_IndexOutOfRangeException_With_Negative_Bounds ()
     {
@@ -1041,5 +666,267 @@ public class DrawTests (ITestOutputHelper _output)
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
+    }
+
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Correct_Redraw_Viewport_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Frame ()
+    {
+        var label = new Label { Text = "At 0,0" };
+
+        var view = new DerivedView
+        {
+            X = 2,
+            Y = 2,
+            Width = 30,
+            Height = 2,
+            Text = "A text with some long width\n and also with two lines."
+        };
+        Toplevel top = new ();
+        top.Add (label, view);
+        RunState runState = Application.Begin (top);
+        Application.RunIteration (ref runState);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+At 0,0                       
+                             
+  A text with some long width
+   and also with two lines.  "
+        ,
+                                                      _output
+                                                     );
+
+        view.Frame = new (3, 3, 10, 1);
+        Assert.Equal (new (3, 3, 10, 1), view.Frame);
+        Assert.Equal (new (0, 0, 10, 1), view.Viewport);
+        Assert.Equal (new (0, 0, 10, 1), view._needsDrawRect);
+        //Application.Refresh();
+        top.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+        @"
+At 0,0       
+             
+             
+   A text wit",
+                                                      _output
+                                                     );
+        Application.End (runState);
+        top.Dispose ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Correct_Redraw_Viewport_NeedDisplay_On_Shrink_And_Move_Down_Right_Using_Pos_Dim ()
+    {
+        var label = new Label { Text = "At 0,0" };
+
+        var view = new DerivedView
+        {
+            X = 2,
+            Y = 2,
+            Width = 30,
+            Height = 2,
+            Text = "A text with some long width\n and also with two lines."
+        };
+        Toplevel top = new ();
+        top.Add (label, view);
+        RunState runState = Application.Begin (top);
+
+        top.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+At 0,0                       
+                             
+  A text with some long width
+   and also with two lines.  "
+        ,
+                                                      _output
+                                                     );
+
+        view.X = 3;
+        view.Y = 3;
+        view.Width = 10;
+        view.Height = 1;
+        Assert.Equal (new (3, 3, 10, 1), view.Frame);
+        Assert.Equal (new (0, 0, 10, 1), view.Viewport);
+        Assert.Equal (new (0, 0, 10, 1), view._needsDrawRect);
+        View.SetClipToScreen ();
+        top.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+At 0,0       
+             
+             
+   A text wit"
+        ,
+                                                      _output
+                                                     );
+        Application.End (runState);
+        top.Dispose ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Correct_Redraw_Viewport_NeedDisplay_On_Shrink_And_Move_Up_Left_Using_Frame ()
+    {
+        var label = new Label { Text = "At 0,0" };
+
+        var view = new DerivedView
+        {
+            X = 2,
+            Y = 2,
+            Width = 30,
+            Height = 2,
+            Text = "A text with some long width\n and also with two lines."
+        };
+        Toplevel top = new ();
+        top.Add (label, view);
+        RunState runState = Application.Begin (top);
+        Application.RunIteration (ref runState);
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+At 0,0                       
+                             
+  A text with some long width
+   and also with two lines.  "
+        ,
+                                                      _output
+                                                     );
+
+        view.Frame = new (1, 1, 10, 1);
+        Assert.Equal (new (1, 1, 10, 1), view.Frame);
+        Assert.Equal (new (0, 0, 10, 1), view.Viewport);
+        Assert.Equal (new (0, 0, 10, 1), view._needsDrawRect);
+        top.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+        @"
+At 0,0     
+ A text wit"
+        ,
+                                                      _output
+                                                     );
+        Application.End (runState);
+        top.Dispose ();
+    }
+
+    [Fact]
+    [AutoInitShutdown]
+    public void Correct_Redraw_Viewport_NeedDisplay_On_Shrink_And_Move_Up_Left_Using_Pos_Dim ()
+    {
+        var label = new Label { Text = "At 0,0" };
+
+        var view = new DerivedView
+        {
+            X = 2,
+            Y = 2,
+            Width = 30,
+            Height = 2,
+            Text = "A text with some long width\n and also with two lines."
+        };
+        Toplevel top = new ();
+        top.Add (label, view);
+        RunState runState = Application.Begin (top);
+
+        top.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+At 0,0                       
+                             
+  A text with some long width
+   and also with two lines.  "
+        ,
+                                                      _output
+                                                     );
+
+        view.X = 1;
+        view.Y = 1;
+        view.Width = 10;
+        view.Height = 1;
+        Assert.Equal (new (1, 1, 10, 1), view.Frame);
+        Assert.Equal (new (0, 0, 10, 1), view.Viewport);
+        Assert.Equal (new (0, 0, 10, 1), view._needsDrawRect);
+        View.SetClipToScreen ();
+
+        top.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+At 0,0     
+ A text wit"
+        ,
+                                                      _output
+                                                     );
+        Application.End (runState);
+        top.Dispose ();
+    }
+    public class DerivedView : View
+    {
+        public DerivedView () { CanFocus = true; }
+        public bool IsKeyDown { get; set; }
+        public bool IsKeyPress { get; set; }
+        public bool IsKeyUp { get; set; }
+        public override string Text { get; set; }
+
+        protected override bool OnDrawingContent ()
+        {
+            var idx = 0;
+
+            // BUGBUG: v2 - this should use Viewport, not Frame
+            for (var r = 0; r < Frame.Height; r++)
+            {
+                for (var c = 0; c < Frame.Width; c++)
+                {
+                    if (idx < Text.Length)
+                    {
+                        char rune = Text [idx];
+
+                        if (rune != '\n')
+                        {
+                            AddRune (c, r, (Rune)Text [idx]);
+                        }
+
+                        idx++;
+
+                        if (rune == '\n')
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+
+            ClearNeedsDraw ();
+
+            return true;
+        }
+
+        protected override bool OnKeyDown (Key keyEvent)
+        {
+            IsKeyDown = true;
+
+            return true;
+        }
+
+        public override bool OnKeyUp (Key keyEvent)
+        {
+            IsKeyUp = true;
+
+            return true;
+        }
+
+        protected override bool OnKeyDownNotHandled (Key keyEvent)
+        {
+            IsKeyPress = true;
+
+            return true;
+        }
     }
 }

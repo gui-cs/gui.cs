@@ -1299,4 +1299,19 @@ w ";
 
         pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
     }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void SetText_RendersCorrectly ()
+    {
+        View view;
+        var text = "test";
+
+        view = new Label { Text = text };
+        view.BeginInit ();
+        view.EndInit ();
+        view.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (text, output);
+    }
 }
