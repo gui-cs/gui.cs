@@ -13,29 +13,36 @@ namespace Terminal.Gui.Benchmarks.ConsoleDrivers.EscSeqUtils;
 /// </remarks>
 [MemoryDiagnoser]
 [BenchmarkCategory (nameof (Tui.EscSeqUtils))]
+// Hide useless empty column from results.
+[HideColumns ("stringBuilder")]
 public class CSI_SetVsAppend
 {
-    private readonly StringBuilder _stringBuilder = new();
-
     [Benchmark (Baseline = true)]
-    public StringBuilder ReturnStringAndAppend ()
+    [ArgumentsSource (nameof (StringBuilderSource))]
+    public StringBuilder GetStringAndAppend (StringBuilder stringBuilder)
     {
-        _stringBuilder.Append (Tui.EscSeqUtils.CSI_SetBackgroundColorRGB (1, 2, 3));
-        _stringBuilder.Append (Tui.EscSeqUtils.CSI_SetForegroundColorRGB (3, 2, 1));
-        _stringBuilder.Append (Tui.EscSeqUtils.CSI_SetCursorPosition (4, 2));
+        stringBuilder.Append (Tui.EscSeqUtils.CSI_SetBackgroundColorRGB (1, 2, 3));
+        stringBuilder.Append (Tui.EscSeqUtils.CSI_SetForegroundColorRGB (3, 2, 1));
+        stringBuilder.Append (Tui.EscSeqUtils.CSI_SetCursorPosition (4, 2));
         // Clear to prevent out of memory exception from consecutive iterations.
-        _stringBuilder.Clear ();
-        return _stringBuilder;
+        stringBuilder.Clear ();
+        return stringBuilder;
     }
 
     [Benchmark]
-    public StringBuilder AppendDirectlyToStringBuilder ()
+    [ArgumentsSource (nameof (StringBuilderSource))]
+    public StringBuilder OnlyAppend (StringBuilder stringBuilder)
     {
-        Tui.EscSeqUtils.CSI_AppendBackgroundColorRGB (_stringBuilder, 1, 2, 3);
-        Tui.EscSeqUtils.CSI_AppendForegroundColorRGB (_stringBuilder, 3, 2, 1);
-        Tui.EscSeqUtils.CSI_AppendCursorPosition (_stringBuilder, 4, 2);
+        Tui.EscSeqUtils.CSI_AppendBackgroundColorRGB (stringBuilder, 1, 2, 3);
+        Tui.EscSeqUtils.CSI_AppendForegroundColorRGB (stringBuilder, 3, 2, 1);
+        Tui.EscSeqUtils.CSI_AppendCursorPosition (stringBuilder, 4, 2);
         // Clear to prevent out of memory exception from consecutive iterations.
-        _stringBuilder.Clear ();
-        return _stringBuilder;
+        stringBuilder.Clear ();
+        return stringBuilder;
+    }
+
+    public static IEnumerable<object> StringBuilderSource ()
+    {
+        return [new StringBuilder ()];
     }
 }
