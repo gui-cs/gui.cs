@@ -67,7 +67,7 @@ public static class Logging
     }
 
     /// <summary>
-    ///     Logs a critical message including the class and method name.
+    ///     Logs a fatal/critical message including the class and method name.
     /// </summary>
     /// <param name="message"></param>
     /// <param name="caller"></param>
@@ -115,7 +115,7 @@ public static class Logging
     }
 
     /// <summary>
-    ///     Logs a trace message including the class and method name.
+    ///     Logs a trace/verbose message including the class and method name.
     /// </summary>
     /// <param name="message"></param>
     /// <param name="caller"></param>

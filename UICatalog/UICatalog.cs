@@ -17,14 +17,14 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
+using static Terminal.Gui.ConfigurationManager;
+using Command = Terminal.Gui.Command;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
-using Terminal.Gui;
-using static Terminal.Gui.ConfigurationManager;
-using Command = Terminal.Gui.Command;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 using RuntimeEnvironment = Microsoft.DotNet.PlatformAbstractions.RuntimeEnvironment;
+using Terminal.Gui;
 
 #nullable enable
 
@@ -171,7 +171,7 @@ public class UICatalogApp
         // what's the app name?
         _logFilePath = $"{LOGFILE_LOCATION}/{Assembly.GetExecutingAssembly ().GetName ().Name}.log";
         Option<string> debugLogLevel = new Option<string> ("--debug-log-level", $"The level to use for logging (debug console and {_logFilePath})").FromAmong (
-             Enum.GetNames<LogEventLevel> ()
+             Enum.GetNames<LogLevel> ()
             );
         debugLogLevel.SetDefaultValue("Warning");
         debugLogLevel.AddAlias ("-dl");
@@ -234,9 +234,25 @@ public class UICatalogApp
         return 0;
     }
 
+    private static LogEventLevel LogLevelToLogEventLevel (LogLevel logLevel)
+    {
+        return logLevel switch
+               {
+                   LogLevel.Trace => LogEventLevel.Verbose,
+                   LogLevel.Debug => LogEventLevel.Debug,
+                   LogLevel.Information => LogEventLevel.Information,
+                   LogLevel.Warning => LogEventLevel.Warning,
+                   LogLevel.Error => LogEventLevel.Error,
+                   LogLevel.Critical => LogEventLevel.Fatal,
+                   LogLevel.None => LogEventLevel.Fatal, // Default to Fatal if None is specified
+                   _ => LogEventLevel.Fatal // Default to Information for any unspecified LogLevel
+               };
+    }
+
     private static ILogger CreateLogger ()
     {
         // Configure Serilog to write logs to a file
+        _logLevelSwitch.MinimumLevel = LogLevelToLogEventLevel(Enum.Parse<LogLevel> (_options.DebugLogLevel));
         Log.Logger = new LoggerConfiguration ()
                      .MinimumLevel.ControlledBy (_logLevelSwitch)
                      .Enrich.FromLogContext () // Enables dynamic enrichment
@@ -1295,19 +1311,19 @@ public class UICatalogApp
         [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
         private MenuItem [] CreateLoggingFlagsMenuItems ()
         {
-            string [] logLevelMenuStrings = Enum.GetNames<LogEventLevel> ().Select (n => n = "_" + n).ToArray ();
-            LogEventLevel [] logLevels = Enum.GetValues<LogEventLevel> ();
+            string [] logLevelMenuStrings = Enum.GetNames<LogLevel> ().Select (n => n = "_" + n).ToArray ();
+            LogLevel [] logLevels = Enum.GetValues<LogLevel> ();
 
             List<MenuItem?> menuItems = new ();
 
-            foreach (LogEventLevel logLevel in logLevels)
+            foreach (LogLevel logLevel in logLevels)
             {
                 var item = new MenuItem
                 {
                     Title = logLevelMenuStrings [(int)logLevel]
                 };
                 item.CheckType |= MenuItemCheckStyle.Checked;
-                item.Checked = Enum.Parse<LogEventLevel> (_options.DebugLogLevel) == logLevel;
+                item.Checked = Enum.Parse<LogLevel> (_options.DebugLogLevel) == logLevel;
 
                 item.Action += () =>
                                {
@@ -1319,7 +1335,7 @@ public class UICatalogApp
                                    if (item.Title == logLevelMenuStrings [(int)logLevel] && item.Checked == false)
                                    {
                                        _options.DebugLogLevel = Enum.GetName (logLevel)!;
-                                       _logLevelSwitch.MinimumLevel = Enum.Parse<LogEventLevel> (_options.DebugLogLevel);
+                                       _logLevelSwitch.MinimumLevel = LogLevelToLogEventLevel (Enum.Parse<LogLevel> (_options.DebugLogLevel)); 
                                        item.Checked = true;
                                    }
 
