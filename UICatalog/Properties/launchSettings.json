@@ -39,6 +39,14 @@
       "commandName": "Project",
       "commandLineArgs": "--driver NetDriver --benchmark"
     },
+    "Benchmark All --driver v2win": {
+      "commandName": "Project",
+      "commandLineArgs": "--driver v2win --benchmark"
+    },
+    "Benchmark All --driver v2net": {
+      "commandName": "Project",
+      "commandLineArgs": "--driver v2net --benchmark"
+    },
     "WSL: Benchmark All": {
       "commandName": "Executable",
       "executablePath": "wsl",
