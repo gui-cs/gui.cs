@@ -466,7 +466,7 @@ public class UICatalogApp
                 else
                 {
                     sw.Stop ();
-                    Logging.Trace ($"Shutdown of {scenarioName} Scenario took {sw.ElapsedMilliseconds}ms");
+                    Logging.Verbose ($"Shutdown of {scenarioName} Scenario took {sw.ElapsedMilliseconds}ms");
                 }
             }
 #endif

@@ -276,7 +276,7 @@ public class Scenario : IDisposable
             }
         }
 
-        Logging.Trace ($@"  Failed to Quit with {Application.QuitKey} after {BenchmarkTimeout}ms and {BenchmarkResults.IterationCount} iterations. Force quit.");
+        Logging.Verbose ($@"  Failed to Quit with {Application.QuitKey} after {BenchmarkTimeout}ms and {BenchmarkResults.IterationCount} iterations. Force quit.");
 
         Application.RequestStop ();
 

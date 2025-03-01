@@ -61,21 +61,21 @@ public abstract class CollectionNavigatorBase
             var candidateState = "";
             var elapsedTime = DateTime.Now - _lastKeystroke;
 
-            Logging.Trace($"CollectionNavigator began processing '{keyStruck}', it has been {elapsedTime} since last keystroke");
+            Logging.Verbose($"CollectionNavigator began processing '{keyStruck}', it has been {elapsedTime} since last keystroke");
 
             // is it a second or third (etc) keystroke within a short time
             if (SearchString.Length > 0 && elapsedTime < TimeSpan.FromMilliseconds (TypingDelay))
             {
                 // "dd" is a candidate
                 candidateState = SearchString + keyStruck;
-                Logging.Trace($"Appending, search is now for '{candidateState}'");
+                Logging.Verbose($"Appending, search is now for '{candidateState}'");
             }
             else
             {
                 // its a fresh keystroke after some time
                 // or its first ever key press
                 SearchString = new string (keyStruck, 1);
-                Logging.Trace($"It has been too long since last key press so beginning new search");
+                Logging.Verbose($"It has been too long since last key press so beginning new search");
             }
 
             int idxCandidate = GetNextMatchingItem (
@@ -86,14 +86,14 @@ public abstract class CollectionNavigatorBase
                                                     candidateState.Length > 1
                                                    );
 
-            Logging.Trace($"CollectionNavigator searching (preferring minimum movement) matched:{idxCandidate}");
+            Logging.Verbose($"CollectionNavigator searching (preferring minimum movement) matched:{idxCandidate}");
             if (idxCandidate != -1)
             {
                 // found "dd" so candidate search string is accepted
                 _lastKeystroke = DateTime.Now;
                 SearchString = candidateState;
 
-                Logging.Trace($"Found collection item that matched search:{idxCandidate}");
+                Logging.Verbose($"Found collection item that matched search:{idxCandidate}");
                 return idxCandidate;
             }
 
@@ -102,13 +102,13 @@ public abstract class CollectionNavigatorBase
             _lastKeystroke = DateTime.Now;
             idxCandidate = GetNextMatchingItem (currentIndex, candidateState);
 
-            Logging.Trace($"CollectionNavigator searching (any match) matched:{idxCandidate}");
+            Logging.Verbose($"CollectionNavigator searching (any match) matched:{idxCandidate}");
 
             // if a match wasn't found, the user typed a 'wrong' key in their search ("can" + 'z'
             // instead of "can" + 'd').
             if (SearchString.Length > 1 && idxCandidate == -1)
             {
-                Logging.Trace("CollectionNavigator ignored key and returned existing index");
+                Logging.Verbose("CollectionNavigator ignored key and returned existing index");
                 // ignore it since we're still within the typing delay
                 // don't add it to SearchString either
                 return currentIndex;
@@ -117,7 +117,7 @@ public abstract class CollectionNavigatorBase
             // if no changes to current state manifested
             if (idxCandidate == currentIndex || idxCandidate == -1)
             {
-                Logging.Trace("CollectionNavigator found no changes to current index, so clearing search");
+                Logging.Verbose("CollectionNavigator found no changes to current index, so clearing search");
 
                 // clear history and treat as a fresh letter
                 ClearSearchString ();
@@ -126,17 +126,17 @@ public abstract class CollectionNavigatorBase
                 SearchString = new string (keyStruck, 1);
                 idxCandidate = GetNextMatchingItem (currentIndex, SearchString);
 
-                Logging.Trace($"CollectionNavigator new SearchString {SearchString} matched index:{idxCandidate}" );
+                Logging.Verbose($"CollectionNavigator new SearchString {SearchString} matched index:{idxCandidate}" );
 
                 return idxCandidate == -1 ? currentIndex : idxCandidate;
             }
 
-            Logging.Trace($"CollectionNavigator final answer was:{idxCandidate}" );
+            Logging.Verbose($"CollectionNavigator final answer was:{idxCandidate}" );
             // Found another "d" or just leave index as it was
             return idxCandidate;
         }
 
-        Logging.Trace("CollectionNavigator found key press was not actionable so clearing search and returning -1");
+        Logging.Verbose("CollectionNavigator found key press was not actionable so clearing search and returning -1");
 
         // clear state because keypress was a control char
         ClearSearchString ();
