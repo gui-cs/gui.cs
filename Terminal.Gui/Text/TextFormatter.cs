@@ -934,37 +934,37 @@ public class TextFormatter
             // When text is justified, we lost left or right, so we use the direction to align. 
             int x = 0, y = 0;
 
-            // Horizontal Alignment
-            if (Alignment is Alignment.End)
+            switch (Alignment)
             {
-                if (isVertical)
+                // Horizontal Alignment
+                case Alignment.End when isVertical:
                 {
                     int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, line, linesFormatted.Count - line, TabWidth);
                     x = screen.Right - runesWidth;
+
+                    break;
                 }
-                else
+                case Alignment.End:
                 {
                     int runesWidth = StringExtensions.ToString (runes).GetColumns ();
                     x = screen.Right - runesWidth;
+
+                    break;
                 }
-            }
-            else if (Alignment is Alignment.Start)
-            {
-                if (isVertical)
+                case Alignment.Start when isVertical:
                 {
                     int runesWidth = line > 0
                                          ? GetColumnsRequiredForVerticalText (linesFormatted, 0, line, TabWidth)
                                          : 0;
                     x = screen.Left + runesWidth;
+
+                    break;
                 }
-                else
-                {
+                case Alignment.Start:
                     x = screen.Left;
-                }
-            }
-            else if (Alignment is Alignment.Fill)
-            {
-                if (isVertical)
+
+                    break;
+                case Alignment.Fill when isVertical:
                 {
                     int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, linesFormatted.Count, TabWidth);
                     int prevLineWidth = line > 0 ? GetColumnsRequiredForVerticalText (linesFormatted, line - 1, 1, TabWidth) : 0;
@@ -977,88 +977,84 @@ public class TextFormatter
                             : line < linesFormatted.Count - 1
                                 ? screen.Width - runesWidth <= lastLineWidth ? screen.Left + prevLineWidth : screen.Left + line * interval
                                 : screen.Right - lastLineWidth;
+
+                    break;
                 }
-                else
-                {
+                case Alignment.Fill:
                     x = screen.Left;
-                }
-            }
-            else if (Alignment is Alignment.Center)
-            {
-                if (isVertical)
+
+                    break;
+                case Alignment.Center when isVertical:
                 {
                     int runesWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, linesFormatted.Count, TabWidth);
                     int linesWidth = GetColumnsRequiredForVerticalText (linesFormatted, 0, line, TabWidth);
                     x = screen.Left + linesWidth + (screen.Width - runesWidth) / 2;
+
+                    break;
                 }
-                else
+                case Alignment.Center:
                 {
                     int runesWidth = StringExtensions.ToString (runes).GetColumns ();
                     x = screen.Left + (screen.Width - runesWidth) / 2;
+
+                    break;
                 }
-            }
-            else
-            {
-                Debug.WriteLine ($"Unsupported Alignment: {nameof (VerticalAlignment)}");
+                default:
+                    Debug.WriteLine ($"Unsupported Alignment: {nameof (VerticalAlignment)}");
 
-                return drawnRegion;
+                    return drawnRegion;
             }
 
-            // Vertical Alignment
-            if (VerticalAlignment is Alignment.End)
+            switch (VerticalAlignment)
             {
-                if (isVertical)
-                {
+                // Vertical Alignment
+                case Alignment.End when isVertical:
                     y = screen.Bottom - runes.Length;
-                }
-                else
-                {
+
+                    break;
+                case Alignment.End:
                     y = screen.Bottom - linesFormatted.Count + line;
-                }
-            }
-            else if (VerticalAlignment is Alignment.Start)
-            {
-                if (isVertical)
-                {
+
+                    break;
+                case Alignment.Start when isVertical:
                     y = screen.Top;
-                }
-                else
-                {
+
+                    break;
+                case Alignment.Start:
                     y = screen.Top + line;
-                }
-            }
-            else if (VerticalAlignment is Alignment.Fill)
-            {
-                if (isVertical)
-                {
+
+                    break;
+                case Alignment.Fill when isVertical:
                     y = screen.Top;
-                }
-                else
+
+                    break;
+                case Alignment.Fill:
                 {
                     var interval = (int)Math.Round ((double)(screen.Height + 2) / linesFormatted.Count);
 
                     y = line == 0 ? screen.Top :
                         line < linesFormatted.Count - 1 ? screen.Height - interval <= 1 ? screen.Top + 1 : screen.Top + line * interval : screen.Bottom - 1;
+
+                    break;
                 }
-            }
-            else if (VerticalAlignment is Alignment.Center)
-            {
-                if (isVertical)
+                case Alignment.Center when isVertical:
                 {
                     int s = (screen.Height - runes.Length) / 2;
                     y = screen.Top + s;
+
+                    break;
                 }
-                else
+                case Alignment.Center:
                 {
                     int s = (screen.Height - linesFormatted.Count) / 2;
                     y = screen.Top + line + s;
-                }
-            }
-            else
-            {
-                Debug.WriteLine ($"Unsupported Alignment: {nameof (VerticalAlignment)}");
 
-                return drawnRegion;
+                    break;
+                }
+                default:
+                    Debug.WriteLine ($"Unsupported Alignment: {nameof (VerticalAlignment)}");
+
+                    return drawnRegion;
             }
 
             int colOffset = screen.X < 0 ? Math.Abs (screen.X) : 0;
