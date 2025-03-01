@@ -149,7 +149,7 @@ public class Scenario : IDisposable
     public virtual void Main () { }
 
     private const uint BENCHMARK_MAX_NATURAL_ITERATIONS = 500; // not including needed for demo keys
-    private const int BENCHMARK_KEY_PACING = 1; // Must be non-zero
+    private const int BENCHMARK_KEY_PACING = 100; // Must be non-zero
 
     public static uint BenchmarkTimeout { get; set; } = 2500;
 
