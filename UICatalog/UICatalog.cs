@@ -237,6 +237,7 @@ public class UICatalogApp
     private static ILogger CreateLogger ()
     {
         // Configure Serilog to write logs to a file
+        _logLevelSwitch.MinimumLevel = Enum.Parse<LogEventLevel> (_options.DebugLogLevel);
         Log.Logger = new LoggerConfiguration ()
                      .MinimumLevel.ControlledBy (_logLevelSwitch)
                      .Enrich.FromLogContext () // Enables dynamic enrichment
