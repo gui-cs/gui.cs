@@ -47,7 +47,7 @@ public class SettingsScope : Scope<SettingsScope>
         {
             Update ((SettingsScope)JsonSerializer.Deserialize (stream, typeof (SettingsScope), SerializerOptions)!);
             OnUpdated ();
-            Logging.Verbose ($"Read from \"{source}\"");
+            Logging.Trace ($"Read from \"{source}\"");
             if (!Sources.ContainsValue (source))
             {
                 Sources.Add (location, source);

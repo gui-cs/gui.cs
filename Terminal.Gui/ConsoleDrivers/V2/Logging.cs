@@ -67,19 +67,18 @@ public static class Logging
     }
 
     /// <summary>
-    ///     Logs a fatal message including the class and method name.
+    ///     Logs a fatal/critical message including the class and method name.
     /// </summary>
     /// <param name="message"></param>
     /// <param name="caller"></param>
     /// <param name="filePath"></param>
-    public static void Fatal (
+    public static void Critical (
         string message,
         [CallerMemberName] string caller = "",
         [CallerFilePath] string filePath = ""
     )
     {
         string className = Path.GetFileNameWithoutExtension (filePath);
-        // We use Serilog's naming convention for fatal messages
         Logger.LogCritical ($"[{className}] [{caller}] {message}");
     }
 
@@ -116,19 +115,18 @@ public static class Logging
     }
 
     /// <summary>
-    ///     Logs a verbose trace message including the class and method name.
+    ///     Logs a trace/verbose message including the class and method name.
     /// </summary>
     /// <param name="message"></param>
     /// <param name="caller"></param>
     /// <param name="filePath"></param>
-    public static void Verbose (
+    public static void Trace (
         string message,
         [CallerMemberName] string caller = "",
         [CallerFilePath] string filePath = ""
     )
     {
         string className = Path.GetFileNameWithoutExtension (filePath);
-        // We use Serilog's naming convention for verbose messages
         Logger.LogTrace ($"[{className}] [{caller}] {message}");
     }
 

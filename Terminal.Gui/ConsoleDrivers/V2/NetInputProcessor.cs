@@ -28,7 +28,7 @@ public class NetInputProcessor : InputProcessor<ConsoleKeyInfo>
         // For building test cases
         if (GenerateTestCasesForKeyPresses)
         {
-            Logging.Verbose (FormatConsoleKeyInfoForTestCase (consoleKeyInfo));
+            Logging.Trace (FormatConsoleKeyInfoForTestCase (consoleKeyInfo));
         }
 
         foreach (Tuple<char, ConsoleKeyInfo> released in Parser.ProcessInput (Tuple.Create (consoleKeyInfo.KeyChar, consoleKeyInfo)))

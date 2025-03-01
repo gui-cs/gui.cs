@@ -236,7 +236,7 @@ public static class ConfigurationManager
     [RequiresDynamicCode ("AOT")]
     public static void Load (bool reset = false)
     {
-        Logging.Verbose ($"reset = {reset}");
+        Logging.Trace ($"reset = {reset}");
 
         if (reset)
         {
@@ -347,7 +347,7 @@ public static class ConfigurationManager
     [RequiresDynamicCode ("AOT")]
     public static void Reset ()
     {
-        Logging.Verbose ($"_allConfigProperties = {_allConfigProperties}");
+        Logging.Trace ($"_allConfigProperties = {_allConfigProperties}");
 
         if (_allConfigProperties is null)
         {
@@ -382,7 +382,7 @@ public static class ConfigurationManager
 
     internal static void AddJsonError (string error)
     {
-        Logging.Verbose ($"error = {error}");
+        Logging.Trace ($"error = {error}");
         _jsonErrors.AppendLine (error);
     }
 
@@ -555,7 +555,7 @@ public static class ConfigurationManager
         }
 
         //Logging.Trace ($"ConfigManager.getConfigProperties found {classesWithConfigProps.Count} classes:");
-        classesWithConfigProps.ToList ().ForEach (x => Logging.Verbose ($"  Class: {x.Key}"));
+        classesWithConfigProps.ToList ().ForEach (x => Logging.Trace ($"  Class: {x.Key}"));
 
         foreach (PropertyInfo? p in from c in classesWithConfigProps
                                     let props = c.Value
