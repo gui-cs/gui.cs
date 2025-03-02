@@ -229,13 +229,20 @@ public class Scenario : IDisposable
         }
     }
 
+    private HashSet<Scenario> _scenariosRun = new HashSet<Scenario> ();
     private void OnApplicationNotifyNewRunState (object? sender, RunStateEventArgs e)
     {
+        // We are just returning to the same scenario
+        if (!_scenariosRun.Add (this))
+        {
+            return;
+        }
+
         SubscribeAllSubviews (Application.Top!);
 
         _currentDemoKey = 0;
         _demoKeys = GetDemoKeyStrokes ();
-
+        
         Application.AddTimeout (
                                 new TimeSpan (0, 0, 0, 0, BENCHMARK_KEY_PACING),
                                 () =>

@@ -516,6 +516,11 @@ public static partial class Application // Run (Begin, Run, End, Stop)
         return firstIteration;
     }
 
+    internal static void RaiseIteration ()
+    {
+        Iteration?.Invoke (null, new IterationEventArgs ());
+    }
+
     /// <summary>Stops the provided <see cref="Toplevel"/>, causing or the <paramref name="top"/> if provided.</summary>
     /// <param name="top">The <see cref="Toplevel"/> to stop.</param>
     /// <remarks>

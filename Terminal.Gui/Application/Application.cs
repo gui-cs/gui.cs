@@ -27,6 +27,15 @@ public static partial class Application
     public static List<CultureInfo>? SupportedCultures { get; private set; } = GetSupportedCultures ();
 
     /// <summary>
+    /// Maximum number of iterations of the main loop (and hence draws)
+    /// to allow to occur per second. Defaults to 25 which is a 40ms sleep
+    /// after iteration (factoring in how long iteration took to run).
+    /// <remarks>Note that not ever iteration draws (see <see cref="View.NeedsDraw"/>).
+    /// Only affects v2 drivers.</remarks>
+    /// </summary>
+    public static ushort MaximumIterationsPerSecond = 25;
+
+    /// <summary>
     ///     Gets a string representation of the Application as rendered by <see cref="Driver"/>.
     /// </summary>
     /// <returns>A string representation of the Application </returns>
