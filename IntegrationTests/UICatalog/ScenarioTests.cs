@@ -1,9 +1,11 @@
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Reflection;
+using Terminal.Gui;
+using UICatalog;
 using Xunit.Abstractions;
 
-namespace UICatalog.Tests;
+namespace IntegrationTests.UICatalog;
 
 public class ScenarioTests : TestsAllViews
 {

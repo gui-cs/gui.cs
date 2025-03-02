@@ -12,6 +12,7 @@
 	    <ImplicitUsings>enable</ImplicitUsings>
 	    <NoLogo>true</NoLogo>
 	    <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
+        
     </PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
 		<DefineDebug>true</DefineDebug>
