@@ -483,6 +483,12 @@ public partial class View // Drawing APIs
             return;
         }
 
+        // TODO: Upgrade all overrides of OnDrawingContent to use DrawContext and remove this override
+        if (OnDrawingContent ())
+        {
+            return;
+        }
+
         var dev = new DrawEventArgs (Viewport, Rectangle.Empty, context);
         DrawingContent?.Invoke (this, dev);
 
