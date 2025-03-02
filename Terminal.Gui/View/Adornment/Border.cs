@@ -313,7 +313,7 @@ public class Border : Adornment
             // Adornment.Contains takes Parent SuperView=relative coords.
             if (Contains (new (mouseEvent.Position.X + Parent.Frame.X + Frame.X, mouseEvent.Position.Y + Parent.Frame.Y + Frame.Y)))
             {
-                if (_arranging != ViewArrangement.Fixed)
+                if (Arranging != ViewArrangement.Fixed)
                 {
                     EndArrangeMode ();
                 }
@@ -480,7 +480,7 @@ public class Border : Adornment
                 int minWidth = Thickness.Horizontal + Parent!.Margin!.Thickness.Right;
 
                 // TODO: This code can be refactored to be more readable and maintainable.
-                switch (_arranging)
+                switch (Arranging)
                 {
                     case ViewArrangement.Movable:
 
@@ -979,7 +979,7 @@ public class Border : Adornment
         steps = [15];
     }
 
-    private ViewArrangement _arranging;
+    internal ViewArrangement Arranging { get; set; }
 
     private Button? _moveButton; // always top-left
     private Button? _allSizeButton;
@@ -1000,7 +1000,7 @@ public class Border : Adornment
     /// <returns></returns>
     public bool? EnterArrangeMode (ViewArrangement arrangement)
     {
-        Debug.Assert (_arranging == ViewArrangement.Fixed);
+        Debug.Assert (Arranging == ViewArrangement.Fixed);
 
         if (!Parent!.Arrangement.HasFlag (ViewArrangement.Movable)
             && !Parent!.Arrangement.HasFlag (ViewArrangement.BottomResizable)
@@ -1163,16 +1163,16 @@ public class Border : Adornment
                 _allSizeButton!.Visible = true;
             }
 
-            _arranging = ViewArrangement.Movable;
+            Arranging = ViewArrangement.Movable;
             CanFocus = true;
             SetFocus ();
         }
         else
         {
             // Mouse mode
-            _arranging = arrangement;
+            Arranging = arrangement;
 
-            switch (_arranging)
+            switch (Arranging)
             {
                 case ViewArrangement.Movable:
                     _moveButton!.Visible = true;
@@ -1247,13 +1247,13 @@ public class Border : Adornment
             }
         }
 
-        if (_arranging != ViewArrangement.Fixed)
+        if (Arranging != ViewArrangement.Fixed)
         {
             if (arrangement == ViewArrangement.Fixed)
             {
                 // Keyboard mode - enable nav
                 // TODO: Keyboard mode only supports sizing from bottom/right.
-                _arranging = (ViewArrangement)(Focused?.Data ?? ViewArrangement.Fixed);
+                Arranging = (ViewArrangement)(Focused?.Data ?? ViewArrangement.Fixed);
             }
 
             return true;
@@ -1278,12 +1278,12 @@ public class Border : Adornment
                             return false;
                         }
 
-                        if (_arranging == ViewArrangement.Movable)
+                        if (Arranging == ViewArrangement.Movable)
                         {
                             Parent!.Y = Parent.Y - 1;
                         }
 
-                        if (_arranging == ViewArrangement.Resizable)
+                        if (Arranging == ViewArrangement.Resizable)
                         {
                             if (Parent!.Viewport.Height > 0)
                             {
@@ -1303,12 +1303,12 @@ public class Border : Adornment
                             return false;
                         }
 
-                        if (_arranging == ViewArrangement.Movable)
+                        if (Arranging == ViewArrangement.Movable)
                         {
                             Parent!.Y = Parent.Y + 1;
                         }
 
-                        if (_arranging == ViewArrangement.Resizable)
+                        if (Arranging == ViewArrangement.Resizable)
                         {
                             Parent!.Height = Parent.Height! + 1;
                         }
@@ -1325,12 +1325,12 @@ public class Border : Adornment
                             return false;
                         }
 
-                        if (_arranging == ViewArrangement.Movable)
+                        if (Arranging == ViewArrangement.Movable)
                         {
                             Parent!.X = Parent.X - 1;
                         }
 
-                        if (_arranging == ViewArrangement.Resizable)
+                        if (Arranging == ViewArrangement.Resizable)
                         {
                             if (Parent!.Viewport.Width > 0)
                             {
@@ -1350,12 +1350,12 @@ public class Border : Adornment
                             return false;
                         }
 
-                        if (_arranging == ViewArrangement.Movable)
+                        if (Arranging == ViewArrangement.Movable)
                         {
                             Parent!.X = Parent.X + 1;
                         }
 
-                        if (_arranging == ViewArrangement.Resizable)
+                        if (Arranging == ViewArrangement.Resizable)
                         {
                             Parent!.Width = Parent.Width! + 1;
                         }
@@ -1373,7 +1373,7 @@ public class Border : Adornment
                         // BUGBUG: the view hierachy.
 
                         AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
-                        _arranging = (ViewArrangement)(Focused?.Data ?? ViewArrangement.Fixed);
+                        Arranging = (ViewArrangement)(Focused?.Data ?? ViewArrangement.Fixed);
 
                         return true; // Always eat
                     });
@@ -1383,7 +1383,7 @@ public class Border : Adornment
                     () =>
                     {
                         AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop);
-                        _arranging = (ViewArrangement)(Focused?.Data ?? ViewArrangement.Fixed);
+                        Arranging = (ViewArrangement)(Focused?.Data ?? ViewArrangement.Fixed);
 
                         return true; // Always eat
                     });
@@ -1419,7 +1419,7 @@ public class Border : Adornment
     private bool? EndArrangeMode ()
     {
         // Debug.Assert (_arranging != ViewArrangement.Fixed);
-        _arranging = ViewArrangement.Fixed;
+        Arranging = ViewArrangement.Fixed;
 
         Application.MouseEvent -= ApplicationOnMouseEvent;
 

@@ -763,7 +763,7 @@ public partial class View // Mouse APIs
     /// </summary>
     /// <param name="location"></param>
     /// <returns></returns>
-    internal static List<View?> GetViewsUnderMouse (in Point location)
+    internal static List<View?> GetViewsUnderMouse (in Point location, bool ignoreTransparent = false)
     {
         List<View?> viewsUnderMouse = new ();
 
@@ -810,7 +810,8 @@ public partial class View // Mouse APIs
             for (int i = start.InternalSubviews.Count - 1; i >= 0; i--)
             {
                 if (start.InternalSubviews [i].Visible
-                    && start.InternalSubviews [i].Contains (new (startOffsetX + start.Viewport.X, startOffsetY + start.Viewport.Y)))
+                    && start.InternalSubviews [i].Contains (new (startOffsetX + start.Viewport.X, startOffsetY + start.Viewport.Y))
+                    && (!ignoreTransparent || !start.InternalSubviews [i].ViewportSettings.HasFlag (ViewportSettings.TransparentMouse)))
                 {
                     subview = start.InternalSubviews [i];
                     currentLocation.X = startOffsetX + start.Viewport.X;
@@ -823,6 +824,15 @@ public partial class View // Mouse APIs
 
             if (subview is null)
             {
+                if (start.ViewportSettings.HasFlag (ViewportSettings.TransparentMouse))
+                {
+                    viewsUnderMouse.AddRange (View.GetViewsUnderMouse (location, true));
+
+                    // De-dupe viewsUnderMouse
+                    HashSet<View?> dedupe = [..viewsUnderMouse];
+                    viewsUnderMouse = [..dedupe];
+                }
+
                 // No subview was found that's under the mouse, so we're done
                 return viewsUnderMouse;
             }

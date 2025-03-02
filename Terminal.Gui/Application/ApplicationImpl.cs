@@ -294,4 +294,10 @@ public class ApplicationImpl : IApplication
     { 
         return Application.MainLoop?.TimedEvents.RemoveTimeout (token) ?? false;
     }
+
+    /// <inheritdoc />
+    public virtual void LayoutAndDraw (bool forceDraw)
+    {
+        Application.LayoutAndDrawImpl (forceDraw);
+    }
 }

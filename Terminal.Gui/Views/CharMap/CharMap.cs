@@ -96,8 +96,8 @@ public class CharMap : View, IDesignable
                            };
 
         // Set up the vertical scrollbar. Turn off AutoShow since it's always visible.
-        VerticalScrollBar.AutoShow = false;
-        VerticalScrollBar.Visible = true; // Force always visible
+        VerticalScrollBar.AutoShow = true;
+        VerticalScrollBar.Visible = false;
         VerticalScrollBar.X = Pos.AnchorEnd ();
         VerticalScrollBar.Y = HEADER_HEIGHT; // Header
     }

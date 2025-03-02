@@ -412,6 +412,11 @@ public static partial class Application // Run (Begin, Run, End, Stop)
     /// <param name="forceDraw">If <see langword="true"/> the entire View hierarchy will be redrawn. The default is <see langword="false"/> and should only be overriden for testing.</param>
     public static void LayoutAndDraw (bool forceDraw = false)
     {
+        ApplicationImpl.Instance.LayoutAndDraw (forceDraw);
+    }
+
+    internal static void LayoutAndDrawImpl (bool forceDraw = false)
+    {
         bool neededLayout = View.Layout (TopLevels.Reverse (), Screen.Size);
 
         if (ClearScreenNextIteration)

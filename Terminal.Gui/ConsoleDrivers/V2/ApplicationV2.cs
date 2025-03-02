@@ -234,4 +234,12 @@ public class ApplicationV2 : ApplicationImpl
 
     /// <inheritdoc/>
     public override bool RemoveTimeout (object token) { return _timedEvents.RemoveTimeout (token); }
+
+    /// <inheritdoc />
+    public override void LayoutAndDraw (bool forceDraw)
+    {
+        // No more ad-hoc drawing, you must wait for iteration to do it
+        Application.Top?.SetNeedsDraw();
+        Application.Top?.SetNeedsLayout ();
+    }
 }

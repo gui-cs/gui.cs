@@ -130,8 +130,7 @@ public class MainLoop<T> : IMainLoop<T>
             {
                 Logging.Redraws.Add (1);
 
-                // TODO: Test only
-                Application.LayoutAndDraw (true);
+                Application.LayoutAndDrawImpl (true);
 
                 Out.Write (OutputBuffer);
 

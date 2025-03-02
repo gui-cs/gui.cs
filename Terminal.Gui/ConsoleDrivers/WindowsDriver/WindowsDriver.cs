@@ -252,7 +252,7 @@ internal class WindowsDriver : ConsoleDriver
         else
         {
             var sb = new StringBuilder ();
-            sb.Append (EscSeqUtils.CSI_SetCursorPosition (position.Y + 1, position.X + 1));
+            EscSeqUtils.CSI_AppendCursorPosition (sb, position.Y + 1, position.X + 1);
             WinConsole?.WriteANSI (sb.ToString ());
         }
 
