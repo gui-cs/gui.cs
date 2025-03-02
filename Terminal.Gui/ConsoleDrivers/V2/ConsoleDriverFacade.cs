@@ -231,14 +231,14 @@ internal class ConsoleDriverFacade<T> : IConsoleDriver, IConsoleDriverFacade
 
         if (InputProcessor is WindowsInputProcessor)
         {
-            type = "(win)";
+            type = "win";
         }
         else if (InputProcessor is NetInputProcessor)
         {
-            type = "(net)";
+            type = "net";
         }
 
-        return GetType ().Name.TrimEnd ('`', '1') + type;
+        return "v2" + type;
     }
 
     /// <summary>Tests if the specified rune is supported by the driver.</summary>

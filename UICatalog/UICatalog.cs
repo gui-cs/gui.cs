@@ -147,8 +147,10 @@ public class UICatalogApp
         // If no driver is provided, the default driver is used.
         Option<string> driverOption = new Option<string> ("--driver", "The IConsoleDriver to use.").FromAmong (
              Application.GetDriverTypes ()
-                        .Select (d => d!.Name)
-                        .ToArray ()
+                            .Where (d=>!typeof (IConsoleDriverFacade).IsAssignableFrom (d))
+                            .Select (d => d!.Name)
+                            .Union (["v2","v2win","v2net"])
+                            .ToArray ()
             );
         driverOption.AddAlias ("-d");
         driverOption.AddAlias ("--d");
