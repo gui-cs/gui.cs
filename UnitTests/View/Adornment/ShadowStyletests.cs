@@ -1,5 +1,4 @@
-﻿using Terminal.Gui.ViewMouseTests;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
@@ -10,7 +9,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
     {
         var view = new View ();
         Assert.Equal (ShadowStyle.None, view.ShadowStyle);
-        Assert.Equal (ShadowStyle.None, view.Margin.ShadowStyle);
+        Assert.Equal (ShadowStyle.None, view.Margin!.ShadowStyle);
         view.Dispose ();
     }
 
@@ -24,7 +23,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
 
         view.ShadowStyle = style;
         Assert.Equal (style, view.ShadowStyle);
-        Assert.Equal (style, view.Margin.ShadowStyle);
+        Assert.Equal (style, view.Margin!.ShadowStyle);
         view.Dispose ();
     }
 
@@ -53,7 +52,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
         superView.BeginInit ();
         superView.EndInit ();
 
-        Thickness origThickness = view.Margin.Thickness;
+        Thickness origThickness = view.Margin!.Thickness;
         view.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed, Position = new (0, 0) });
         Assert.Equal (new (expectedLeft, expectedTop, expectedRight, expectedBottom), view.Margin.Thickness);
 
@@ -130,7 +129,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
             new (fg.GetDarkerColor (), bg.GetDarkerColor ())
         };
 
-        var superView = new Toplevel ()
+        var superView = new Toplevel
         {
             Height = 3,
             Width = 3,
@@ -158,10 +157,10 @@ public class ShadowStyleTests (ITestOutputHelper output)
     [InlineData (ShadowStyle.None, 3)]
     [InlineData (ShadowStyle.Opaque, 4)]
     [InlineData (ShadowStyle.Transparent, 4)]
-    public void Style_Changes_Magin_Thickness (ShadowStyle style, int expected)
+    public void Style_Changes_Margin_Thickness (ShadowStyle style, int expected)
     {
         var view = new View ();
-        view.Margin.Thickness = new (3);
+        view.Margin!.Thickness = new (3);
         view.ShadowStyle = style;
         Assert.Equal (new (3, 3, expected, expected), view.Margin.Thickness);
 
@@ -201,11 +200,11 @@ public class ShadowStyleTests (ITestOutputHelper output)
     {
         ((FakeDriver)Application.Driver!).SetBufferSize (5, 5);
 
-        var superView = new Toplevel()
+        var superView = new Toplevel
         {
             Width = 4,
             Height = 4,
-            Text = "!@#$".Repeat (4)
+            Text = "!@#$".Repeat (4)!
         };
         superView.TextFormatter.WordWrap = true;
 
