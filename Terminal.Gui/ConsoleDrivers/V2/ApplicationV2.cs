@@ -77,6 +77,8 @@ public class ApplicationV2 : ApplicationImpl
 
         Application.OnInitializedChanged (this, new (true));
         Application.SubscribeDriverEvents ();
+
+        SynchronizationContext.SetSynchronizationContext (new MainLoopSyncContext ());
     }
 
     private void CreateDriver (string? driverName)
