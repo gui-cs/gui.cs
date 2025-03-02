@@ -90,7 +90,7 @@ public partial class ToplevelTests ()
 
         // The available height is lower than the Application.Top height minus
         // the menu bar and status bar, then the top can go beyond the bottom
-//        Assert.Equal (2, ny);
+        //        Assert.Equal (2, ny);
         //Assert.NotNull (sb);
 
         menuBar = top.MenuBar;
@@ -104,7 +104,7 @@ public partial class ToplevelTests ()
 
         // The available height is lower than the Application.Top height minus
         // the status bar, then the top can go beyond the bottom
-//        Assert.Equal (2, ny);
+        //        Assert.Equal (2, ny);
         //Assert.NotNull (sb);
 
         //statusBar = top.StatusBar;
@@ -215,162 +215,6 @@ public partial class ToplevelTests ()
         Assert.True (menuBar.WasDisposed);
         //Assert.True (statusBar.WasDisposed);
 #endif
-    }
-
-    [Fact (Skip = "#2491 - Test is broken until #2491 is more mature.")]
-    [AutoInitShutdown]
-    public void KeyBindings_Command ()
-    {
-        var isRunning = false;
-
-        var win1 = new Window { Id = "win1", Width = Dim.Percent (50), Height = Dim.Fill () };
-        var lblTf1W1 = new Label { Id = "lblTf1W1", Text = "Enter text in TextField on Win1:" };
-
-        var tf1W1 = new TextField
-        {
-            Id = "tf1W1", X = Pos.Right (lblTf1W1) + 1, Width = Dim.Fill (), Text = "Text1 on Win1"
-        };
-
-        var lblTvW1 = new Label
-        {
-            Id = "lblTvW1", Y = Pos.Bottom (lblTf1W1) + 1, Text = "Enter text in TextView on Win1:"
-        };
-
-        var tvW1 = new TextView
-        {
-            Id = "tvW1",
-            X = Pos.Left (tf1W1),
-            Width = Dim.Fill (),
-            Height = 2,
-            Text = "First line Win1\nSecond line Win1"
-        };
-
-        var lblTf2W1 = new Label
-        {
-            Id = "lblTf2W1", Y = Pos.Bottom (lblTvW1) + 1, Text = "Enter text in TextField on Win1:"
-        };
-        var tf2W1 = new TextField { Id = "tf2W1", X = Pos.Left (tf1W1), Width = Dim.Fill (), Text = "Text2 on Win1" };
-        win1.Add (lblTf1W1, tf1W1, lblTvW1, tvW1, lblTf2W1, tf2W1);
-
-        var win2 = new Window
-        {
-            Id = "win2", X = Pos.Right (win1) + 1, Width = Dim.Percent (50), Height = Dim.Fill ()
-        };
-        var lblTf1W2 = new Label { Id = "lblTf1W2", Text = "Enter text in TextField on Win2:" };
-
-        var tf1W2 = new TextField
-        {
-            Id = "tf1W2", X = Pos.Right (lblTf1W2) + 1, Width = Dim.Fill (), Text = "Text1 on Win2"
-        };
-
-        var lblTvW2 = new Label
-        {
-            Id = "lblTvW2", Y = Pos.Bottom (lblTf1W2) + 1, Text = "Enter text in TextView on Win2:"
-        };
-
-        var tvW2 = new TextView
-        {
-            Id = "tvW2",
-            X = Pos.Left (tf1W2),
-            Width = Dim.Fill (),
-            Height = 2,
-            Text = "First line Win1\nSecond line Win2"
-        };
-
-        var lblTf2W2 = new Label
-        {
-            Id = "lblTf2W2", Y = Pos.Bottom (lblTvW2) + 1, Text = "Enter text in TextField on Win2:"
-        };
-        var tf2W2 = new TextField { Id = "tf2W2", X = Pos.Left (tf1W2), Width = Dim.Fill (), Text = "Text2 on Win2" };
-        win2.Add (lblTf1W2, tf1W2, lblTvW2, tvW2, lblTf2W2, tf2W2);
-
-        Toplevel top = new ();
-        top.Add (win1, win2);
-        top.Loaded += (s, e) => isRunning = true;
-        top.Closing += (s, e) => isRunning = false;
-        Application.Begin (top);
-        top.Running = true;
-
-        Assert.Equal (new (0, 0, 40, 25), win1.Frame);
-        Assert.Equal (new (41, 0, 40, 25), win2.Frame);
-        Assert.Equal (win1, top.Focused);
-        Assert.Equal (tf1W1, top.MostFocused);
-
-        Assert.True (isRunning);
-        Assert.True (Application.RaiseKeyDownEvent (Application.QuitKey));
-        Assert.False (isRunning);
-        Assert.True (Application.RaiseKeyDownEvent (Key.Z.WithCtrl));
-
-        Assert.True (Application.RaiseKeyDownEvent (Key.F5)); // refresh
-
-        Assert.True (Application.RaiseKeyDownEvent (Key.Tab));
-        Assert.Equal (win1, top.Focused);
-        Assert.Equal (tvW1, top.MostFocused);
-        Assert.True (Application.RaiseKeyDownEvent (Key.Tab));
-        Assert.Equal ($"\tFirst line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
-        Assert.True (Application.RaiseKeyDownEvent (Key.Tab.WithShift));
-        Assert.Equal ($"First line Win1{Environment.NewLine}Second line Win1", tvW1.Text);
-
-        var prevMostFocusedSubview = top.MostFocused;
-
-        Assert.True (Application.RaiseKeyDownEvent (Key.F6)); // move to next TabGroup (win2)
-        Assert.Equal (win2, top.Focused);
-
-        Assert.True (Application.RaiseKeyDownEvent (Key.F6.WithShift)); // move to prev TabGroup (win1)
-        Assert.Equal (win1, top.Focused);
-        Assert.Equal (tf2W1, top.MostFocused);  // BUGBUG: Should be prevMostFocusedSubview - We need to cache the last focused view in the TabGroup somehow
-
-        prevMostFocusedSubview.SetFocus ();
-
-        Assert.Equal (tvW1, top.MostFocused);
-
-        tf2W1.SetFocus ();
-        Assert.True (Application.RaiseKeyDownEvent (Key.Tab)); // tf2W1 is last subview in win1 - tabbing should take us to first subview of win1
-        Assert.Equal (win1, top.Focused);
-        Assert.Equal (tf1W1, top.MostFocused);
-        Assert.True (Application.RaiseKeyDownEvent (Key.CursorRight)); // move char to right in tf1W1. We're at last char so nav to next view
-        Assert.Equal (win1, top.Focused);
-        Assert.Equal (tvW1, top.MostFocused);
-        Assert.True (Application.RaiseKeyDownEvent (Key.CursorDown)); // move down to next view (tvW1)
-        Assert.Equal (win1, top.Focused);
-        Assert.Equal (tvW1, top.MostFocused);
-#if UNIX_KEY_BINDINGS
-        Assert.True (Application.OnKeyDown (new (Key.I.WithCtrl)));
-        Assert.Equal (win1, top.GetFocused ());
-        Assert.Equal (tf2W1, top.MostFocused);
-#endif
-        Assert.True (Application.RaiseKeyDownEvent (Key.Tab.WithShift)); // Ignored. TextView eats shift-tab by default
-        Assert.Equal (win1, top.Focused);
-        Assert.Equal (tvW1, top.MostFocused);
-        tvW1.AllowsTab = false;
-        Assert.True (Application.RaiseKeyDownEvent (Key.Tab.WithShift));
-        Assert.Equal (win1, top.Focused);
-        Assert.Equal (tf1W1, top.MostFocused);
-        Assert.True (Application.RaiseKeyDownEvent (Key.CursorLeft));
-        Assert.Equal (win1, top.Focused);
-        Assert.Equal (tf2W1, top.MostFocused);
-        Assert.True (Application.RaiseKeyDownEvent (Key.CursorUp));
-        Assert.Equal (win1, top.Focused);
-        Assert.Equal (tvW1, top.MostFocused);
-
-        // nav to win2
-        Assert.True (Application.RaiseKeyDownEvent (Key.F6));
-        Assert.Equal (win2, top.Focused);
-        Assert.Equal (tf1W2, top.MostFocused);
-        Assert.True (Application.RaiseKeyDownEvent (Key.F6.WithShift));
-        Assert.Equal (win1, top.Focused);
-        Assert.Equal (tf2W1, top.MostFocused);
-        Assert.True (Application.RaiseKeyDownEvent (Application.NextTabGroupKey));
-        Assert.Equal (win2, top.Focused);
-        Assert.Equal (tf1W2, top.MostFocused);
-        Assert.True (Application.RaiseKeyDownEvent (Application.PrevTabGroupKey));
-        Assert.Equal (win1, top.Focused);
-        Assert.Equal (tf2W1, top.MostFocused);
-        Assert.True (Application.RaiseKeyDownEvent (Key.CursorUp));
-        Assert.Equal (win1, top.Focused);
-        Assert.Equal (tvW1, top.MostFocused);
-
-        top.Dispose ();
     }
 
     [Fact]
