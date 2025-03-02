@@ -3,12 +3,20 @@ name: Run StressTests
 on:
   schedule:
     - cron: '0 0 * * *' # Runs every day at midnight UTC
-
+  push:
+    branches: [ v2_release, v2_develop ]
+    paths-ignore:
+      - '**.md'
+  pull_request:
+    branches: [ v2_release, v2_develop ]
+    paths-ignore:
+      - '**.md'
+      
 jobs:
   run_stress_tests:
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
 
@@ -33,7 +41,7 @@ jobs:
         run: |
           end=$((SECONDS+3600))
           while [ $SECONDS -lt $end ]; do
-            dotnet test StressTests --no-build --verbosity normal
+            dotnet test StressTests --no-build --verbosity normal --diag:logs/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=true
           done
 
       - name: Upload Test Logs
@@ -44,3 +52,4 @@ jobs:
           path: |
             logs/
             StressTests/TestResults/
+

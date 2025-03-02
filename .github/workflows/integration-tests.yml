@@ -1,4 +1,4 @@
-name: Build & Run Unit Tests
+name: Build & Run Integration Tests
 
 on:
   push:
@@ -50,40 +50,18 @@ jobs:
       shell: bash
       run: echo "{VSTEST_DUMP_PATH}={logs/${{ runner.os }}/}" >> $GITHUB_ENV
 
-    - name: Run UnitTests
+    - name: Run IntegrationTests
       run: |
-       dotnet test UnitTests --verbosity normal --collect:"XPlat Code Coverage" --settings UnitTests/coverlet.runsettings --diag:logs/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=true
+       dotnet test IntegrationTests --verbosity normal --diag:logs/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=true
      
-       # mv -v UnitTests/TestResults/*/*.* TestResults/UnitTests/
+       # mv -v IntegrationTests/TestResults/*/*.* TestResults/IntegrationTests/
 
     - name: Upload Test Logs
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: test-logs-${{ runner.os }}
+        name: integration-test-logs-${{ runner.os }}
         path: |
           logs/    
-          TestResults/UnitTests/
-  
+          TestResults/IntegrationTests/
 
-  build_release:
-    # Ensure that RELEASE builds are not broken
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.x
-        dotnet-quality: 'ga'
-
-    - name: Build Release Terminal.Gui
-      run: dotnet build Terminal.Gui/Terminal.Gui.csproj --configuration Release
-
-    - name: Pack Release Terminal.Gui
-      run: dotnet pack Terminal.Gui/Terminal.Gui.csproj --configuration Release --output ./local_packages
-
-    - name: Build Release Solution
-      run: dotnet build --configuration Release
