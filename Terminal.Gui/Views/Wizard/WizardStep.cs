@@ -125,7 +125,7 @@ public class WizardStep : View
     {
         _contentView.Add (view);
 
-        if (view.CanFocus)
+        if (view!.CanFocus)
         {
             CanFocus = true;
         }

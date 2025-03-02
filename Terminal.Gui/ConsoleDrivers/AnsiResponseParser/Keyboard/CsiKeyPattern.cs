@@ -52,6 +52,11 @@ public class CsiKeyPattern : AnsiKeyboardParserPattern
         _pattern = new (@$"^\u001b\[(1;(\d+))?([{terms}]|\d+~)$");
     }
 
+    /// <summary>
+    ///     Called by the base class to determine the key that matches the input.
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
     protected override Key? GetKeyImpl (string input)
     {
         Match match = _pattern.Match (input);

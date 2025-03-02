@@ -19,10 +19,7 @@ public class RegionScenario : Scenario
     private Point? _dragStart;
     private bool _isDragging;
 
-
-    public Rune? _previewFillRune = Glyphs.Stipple;
-
-    public Rune? _fillRune = Glyphs.Dot;
+    private readonly Rune? _previewFillRune = Glyphs.Stipple;
 
     private RegionDrawStyles _drawStyle;
     private RegionOp _regionOp;
@@ -34,25 +31,22 @@ public class RegionScenario : Scenario
         Window app = new ()
         {
             Title = GetQuitKeyAndName (),
-            TabStop = TabBehavior.TabGroup,
-
+            TabStop = TabBehavior.TabGroup
         };
-        app.Padding.Thickness = new (1);
+        app.Padding!.Thickness = new (1);
 
         var tools = new ToolsView { Title = "Tools", X = Pos.AnchorEnd (), Y = 2 };
 
-        tools.CurrentAttribute = app.ColorScheme.HotNormal;
+        tools.CurrentAttribute = app.ColorScheme!.HotNormal;
 
         tools.SetStyle += b =>
                           {
                               _drawStyle = (RegionDrawStyles)b;
-                              app.SetNeedsDraw();
+                              app.SetNeedsDraw ();
                           };
 
-        tools.RegionOpChanged += (s, e) =>
-                                {
-                                    _regionOp = e;
-                                };
+        tools.RegionOpChanged += (s, e) => { _regionOp = e; };
+
         //tools.AddLayer += () => canvas.AddLayer ();
 
         app.Add (tools);
@@ -87,7 +81,7 @@ public class RegionScenario : Scenario
                                       _dragStart = null;
                                   }
 
-                                  app.SetNeedsDraw (); 
+                                  app.SetNeedsDraw ();
                               }
                           };
 
@@ -120,12 +114,17 @@ public class RegionScenario : Scenario
                                   if (_isDragging && _dragStart.HasValue)
                                   {
                                       Point currentMousePos = Application.GetLastMousePosition ()!.Value;
-                                      var previewRect = GetRectFromPoints (_dragStart.Value, currentMousePos);
+                                      Rectangle previewRect = GetRectFromPoints (_dragStart.Value, currentMousePos);
                                       var previewRegion = new Region (previewRect);
 
                                       previewRegion.FillRectangles (tools.CurrentAttribute!.Value, (Rune)' ');
 
-                                      previewRegion.DrawBoundaries (app.LineCanvas, LineStyle.Dashed, new (tools.CurrentAttribute!.Value.Foreground.GetHighlightColor(), tools.CurrentAttribute!.Value.Background));
+                                      previewRegion.DrawBoundaries (
+                                                                    app.LineCanvas,
+                                                                    LineStyle.Dashed,
+                                                                    new (
+                                                                         tools.CurrentAttribute!.Value.Foreground.GetHighlightColor (),
+                                                                         tools.CurrentAttribute!.Value.Background));
                                   }
                               };
 
@@ -138,7 +137,7 @@ public class RegionScenario : Scenario
 
     private void AddRectangleFromPoints (Point start, Point end, RegionOp op)
     {
-        var rect = GetRectFromPoints (start, end);
+        Rectangle rect = GetRectFromPoints (start, end);
         var region = new Region (rect);
         _region.Combine (region, op); // Or RegionOp.MinimalUnion if you want minimal rectangles
     }
@@ -154,7 +153,7 @@ public class RegionScenario : Scenario
         int width = Math.Max (1, right - left + 1);
         int height = Math.Max (1, bottom - top + 1);
 
-        return new Rectangle (left, top, width, height);
+        return new (left, top, width, height);
     }
 }
 
@@ -165,15 +164,14 @@ public enum RegionDrawStyles
     InnerBoundaries = 1,
 
     OuterBoundary = 2
-
 }
 
 public class ToolsView : Window
 {
     //private Button _addLayerBtn;
     private readonly AttributeView _attributeView = new ();
-    private RadioGroup _stylePicker;
-    private RegionOpSelector _regionOpSelector;
+    private RadioGroup? _stylePicker;
+    private RegionOpSelector? _regionOpSelector;
 
     public Attribute? CurrentAttribute
     {
@@ -187,7 +185,6 @@ public class ToolsView : Window
         Border!.Thickness = new (1, 2, 1, 1);
         Height = Dim.Auto ();
         Width = Dim.Auto ();
-
     }
 
     //public event Action AddLayer;
@@ -200,11 +197,11 @@ public class ToolsView : Window
 
         _stylePicker = new ()
         {
-            Width=Dim.Fill(),
-            X = 0, Y = Pos.Bottom (_attributeView) + 1, RadioLabels = Enum.GetNames<RegionDrawStyles> ().Select (n => n = "_" + n).ToArray()
+            Width = Dim.Fill (),
+            X = 0, Y = Pos.Bottom (_attributeView) + 1, RadioLabels = Enum.GetNames<RegionDrawStyles> ().Select (n => n = "_" + n).ToArray ()
         };
         _stylePicker.BorderStyle = LineStyle.Single;
-        _stylePicker.Border.Thickness = new (0, 1, 0, 0);
+        _stylePicker.Border!.Thickness = new (0, 1, 0, 0);
         _stylePicker.Title = "Draw Style";
 
         _stylePicker.SelectedItemChanged += (s, a) => { SetStyle?.Invoke ((LineStyle)a.SelectedItem); };
@@ -221,7 +218,7 @@ public class ToolsView : Window
         //_addLayerBtn = new () { Text = "New Layer", X = Pos.Center (), Y = Pos.Bottom (_stylePicker) };
 
         //_addLayerBtn.Accepting += (s, a) => AddLayer?.Invoke ();
-        Add (_attributeView, _stylePicker, _regionOpSelector);//, _addLayerBtn);
+        Add (_attributeView, _stylePicker, _regionOpSelector); //, _addLayerBtn);
     }
 
     public event EventHandler<Attribute?>? AttributeChanged;
@@ -231,14 +228,15 @@ public class ToolsView : Window
 
 public class RegionOpSelector : View
 {
-    private RadioGroup _radioGroup;
+    private readonly RadioGroup _radioGroup;
+
     public RegionOpSelector ()
     {
         Width = Dim.Auto ();
         Height = Dim.Auto ();
 
         BorderStyle = LineStyle.Single;
-        Border.Thickness = new (0, 1, 0, 0);
+        Border!.Thickness = new (0, 1, 0, 0);
         Title = "RegionOp";
 
         _radioGroup = new ()
@@ -250,14 +248,14 @@ public class RegionOpSelector : View
         _radioGroup.SelectedItemChanged += (s, a) => { SelectedItemChanged?.Invoke (this, (RegionOp)a.SelectedItem); };
         Add (_radioGroup);
     }
+
     public event EventHandler<RegionOp>? SelectedItemChanged;
 
     public RegionOp SelectedItem
     {
         get => (RegionOp)_radioGroup.SelectedItem;
-        set => _radioGroup.SelectedItem = (int) value;
+        set => _radioGroup.SelectedItem = (int)value;
     }
-
 }
 
 public class AttributeView : View
@@ -289,11 +287,11 @@ public class AttributeView : View
 
     public AttributeView ()
     {
-        Width = Dim.Fill();
+        Width = Dim.Fill ();
         Height = 4;
 
         BorderStyle = LineStyle.Single;
-        Border.Thickness = new (0, 1, 0, 0);
+        Border!.Thickness = new (0, 1, 0, 0);
         Title = "Attribute";
     }
 
@@ -366,8 +364,8 @@ public class AttributeView : View
             {
                 ClickedInBackground ();
             }
-
         }
+
         mouseEvent.Handled = true;
 
         return mouseEvent.Handled;
