@@ -195,6 +195,8 @@ public class ViewCommandTests
         // Button A (IsDefault) should NOT have been accepted because B canceled
         Assert.Equal (1, A_AcceptedCount);
         Assert.Equal (2, B_AcceptedCount);
+
+        Application.ResetState (true);
     }
 
     // See: https://github.com/gui-cs/Terminal.Gui/issues/3905
