@@ -45,6 +45,7 @@ public class GlyphTests
 
         // clean up
         Locations = ConfigLocations.All;
+        Settings = null;
     }
 
 }
