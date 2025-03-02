@@ -298,7 +298,7 @@ public class ApplicationV2Tests
         bool result = false;
 
         b.Accepting +=
-            async (s,e) =>
+            (_,_) =>
             {
 
                 Task.Run (() =>
