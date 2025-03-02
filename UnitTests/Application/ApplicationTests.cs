@@ -907,53 +907,6 @@ public class ApplicationTests
     }
 
     // TODO: All Toplevel layout tests should be moved to ToplevelTests.cs
-    [Fact (Skip = "#2491 - Changing focus should cause NeedsDraw = true, so bogus test?")]
-    public void Run_Toplevel_With_Modal_View_Does_Not_Refresh_If_Not_Dirty ()
-    {
-        Init ();
-        var count = 0;
-
-        // Don't use Dialog here as it has more layout logic. Use Window instead.
-        Dialog d = null;
-        Toplevel top = new ();
-        top.DrawingContent += (s, a) => count++;
-        int iteration = -1;
-
-        Application.Iteration += (s, a) =>
-                                 {
-                                     iteration++;
-
-                                     if (iteration == 0)
-                                     {
-                                         // TODO: Don't use Dialog here as it has more layout logic. Use Window instead.
-                                         d = new ();
-                                         d.DrawingContent += (s, a) => count++;
-                                         Application.Run (d);
-                                     }
-                                     else if (iteration < 3)
-                                     {
-                                         Application.RaiseMouseEvent (new () { Flags = MouseFlags.ReportMousePosition });
-                                         Assert.False (top.NeedsDraw);
-                                         Assert.False (top.SubViewNeedsDraw);
-                                         Assert.False (top.NeedsLayout);
-                                         Assert.False (d.NeedsDraw);
-                                         Assert.False (d.SubViewNeedsDraw);
-                                         Assert.False (d.NeedsLayout);
-                                     }
-                                     else
-                                     {
-                                         Application.RequestStop ();
-                                     }
-                                 };
-        Application.Run (top);
-        top.Dispose ();
-        Application.Shutdown ();
-
-        // 1 - First top load, 1 - Dialog load, 1 - Dialog unload, Total - 3.
-        Assert.Equal (3, count);
-    }
-
-    // TODO: All Toplevel layout tests should be moved to ToplevelTests.cs
     [Fact]
     public void Run_A_Modal_Toplevel_Refresh_Background_On_Moving ()
     {
