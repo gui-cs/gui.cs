@@ -905,39 +905,4 @@ public class ScrollBarTests (ITestOutputHelper output)
         Application.ResetState (true);
     }
     #endregion Mouse
-
-
-
-    [Fact (Skip = "Disabled - Will put this feature in View")]
-    [AutoInitShutdown]
-    public void KeepContentInAllViewport_True_False ()
-    {
-        var view = new View { Width = Dim.Fill (), Height = Dim.Fill () };
-        view.Padding.Thickness = new (0, 0, 2, 0);
-        view.SetContentSize (new (view.Viewport.Width, 30));
-        var scrollBar = new ScrollBar { Width = 2, Height = Dim.Fill (), ScrollableContentSize = view.GetContentSize ().Height };
-        scrollBar.SliderPositionChanged += (_, e) => view.Viewport = view.Viewport with { Y = e.CurrentValue };
-        view.Padding.Add (scrollBar);
-        var top = new Toplevel ();
-        top.Add (view);
-        Application.Begin (top);
-
-        //Assert.False (scrollBar.KeepContentInAllViewport);
-        //scrollBar.KeepContentInAllViewport = true;
-        Assert.Equal (80, view.Padding.Viewport.Width);
-        Assert.Equal (25, view.Padding.Viewport.Height);
-        Assert.Equal (2, scrollBar.Viewport.Width);
-        Assert.Equal (25, scrollBar.Viewport.Height);
-        Assert.Equal (30, scrollBar.ScrollableContentSize);
-
-        //scrollBar.KeepContentInAllViewport = false;
-        scrollBar.Position = 50;
-        Assert.Equal (scrollBar.GetSliderPosition (), scrollBar.ScrollableContentSize - 1);
-        Assert.Equal (scrollBar.GetSliderPosition (), view.Viewport.Y);
-        Assert.Equal (29, scrollBar.GetSliderPosition ());
-        Assert.Equal (29, view.Viewport.Y);
-
-        top.Dispose ();
-    }
-
 }
