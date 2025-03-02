@@ -8,7 +8,6 @@ namespace Terminal.Gui.ApplicationTests;
 /// <summary>Tests MainLoop using the FakeMainLoop.</summary>
 public class MainLoopTests
 {
-    private static readonly ManualResetEventSlim _wakeUp = new (false);
     private static Button btn;
     private static string cancel;
     private static string clickMe;
@@ -620,36 +619,6 @@ public class MainLoopTests
                        );
     }
 
-    [Theory]
-    [InlineData (typeof (FakeDriver))]
-    //[InlineData (typeof (NetDriver))] // BUGBUG: NetDriver never exits in this test
-
-    //[InlineData (typeof (ANSIDriver))]
-    //[InlineData (typeof (WindowsDriver))] // BUGBUG: NetDriver never exits in this test
-    //[InlineData (typeof (CursesDriver))] // BUGBUG: CursesDriver never exits in this test
-    public async Task InvokeLeakTest (Type driverType)
-    {
-        Application.Init (driverName: driverType.Name);
-        Random r = new ();
-        TextField tf = new ();
-        var top = new Toplevel ();
-        top.Add (tf);
-
-        const int numPasses = 2;
-        const int numIncrements = 500;
-        const int pollMs = 2500;
-
-        Task task = Task.Run (() => RunTest (r, tf, numPasses, numIncrements, pollMs));
-
-        // blocks here until the RequestStop is processed at the end of the test
-        Application.Run (top);
-
-        await task; // Propagate exception if any occurred
-
-        Assert.Equal (numIncrements * numPasses, tbCounter);
-        top.Dispose ();
-        Application.Shutdown ();
-    }
 
     [Theory]
     [MemberData (nameof (TestAddIdle))]
@@ -779,29 +748,6 @@ public class MainLoopTests
         Assert.Equal (10, functionCalled);
     }
 
-    private static void Launch (Random r, TextField tf, int target)
-    {
-        Task.Run (
-                  () =>
-                  {
-                      Thread.Sleep (r.Next (2, 4));
-
-                      Application.Invoke (
-                                          () =>
-                                          {
-                                              tf.Text = $"index{r.Next ()}";
-                                              Interlocked.Increment (ref tbCounter);
-
-                                              if (target == tbCounter)
-                                              {
-                                                  // On last increment wake up the check
-                                                  _wakeUp.Set ();
-                                              }
-                                          }
-                                         );
-                  }
-                 );
-    }
 
     private static async void RunAsyncTest (object sender, EventArgs e)
     {
@@ -860,40 +806,6 @@ public class MainLoopTests
                                 btn.SetNeedsDraw ();
                             }
                            );
-    }
-
-    private static void RunTest (Random r, TextField tf, int numPasses, int numIncrements, int pollMs)
-    {
-        for (var j = 0; j < numPasses; j++)
-        {
-            _wakeUp.Reset ();
-
-            for (var i = 0; i < numIncrements; i++)
-            {
-                Launch (r, tf, (j + 1) * numIncrements);
-            }
-
-            while (tbCounter != (j + 1) * numIncrements) // Wait for tbCounter to reach expected value
-            {
-                int tbNow = tbCounter;
-                _wakeUp.Wait (pollMs);
-
-                if (tbCounter == tbNow)
-                {
-                    // No change after wait: Idle handlers added via Application.Invoke have gone missing
-                    Application.Invoke (() => Application.RequestStop ());
-
-                    throw new TimeoutException (
-                                                $"Timeout: Increment lost. tbCounter ({tbCounter}) didn't "
-                                                + $"change after waiting {pollMs} ms. Failed to reach {(j + 1) * numIncrements} on pass {j + 1}"
-                                               );
-                }
-            }
-
-            ;
-        }
-
-        Application.Invoke (() => Application.RequestStop ());
     }
 
     private static void SetReadyToRun ()

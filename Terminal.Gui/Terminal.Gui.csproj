@@ -80,6 +80,8 @@
   <!-- =================================================================== -->
   <ItemGroup>
     <InternalsVisibleTo Include="UnitTests" />
+    <InternalsVisibleTo Include="StressTests" />
+    <InternalsVisibleTo Include="IntegrationTests" />
     <InternalsVisibleTo Include="TerminalGuiDesigner" />
     <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
   </ItemGroup>

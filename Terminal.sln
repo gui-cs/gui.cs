@@ -50,6 +50,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NativeAot", "NativeAot\Nati
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks", "Benchmarks\Benchmarks.csproj", "{242FBD3E-2EC6-4274-BD40-8E62AF9327B2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StressTests", "StressTests\StressTests.csproj", "{9ED9E644-8739-477D-9D38-590BEC2E31CD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -92,6 +94,10 @@ Global
 		{242FBD3E-2EC6-4274-BD40-8E62AF9327B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{242FBD3E-2EC6-4274-BD40-8E62AF9327B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{242FBD3E-2EC6-4274-BD40-8E62AF9327B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9ED9E644-8739-477D-9D38-590BEC2E31CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9ED9E644-8739-477D-9D38-590BEC2E31CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9ED9E644-8739-477D-9D38-590BEC2E31CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9ED9E644-8739-477D-9D38-590BEC2E31CD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
