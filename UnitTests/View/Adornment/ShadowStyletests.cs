@@ -154,7 +154,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
         Application.ResetState (true);
     }
 
-    [Theory (Skip = "#3761 Broke - Need to figure out transparent margin.")]
+    [Theory]
     [InlineData (ShadowStyle.None, 3)]
     [InlineData (ShadowStyle.Opaque, 4)]
     [InlineData (ShadowStyle.Transparent, 4)]
@@ -171,7 +171,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
     }
 
     // Visual tests
-    [Theory (Skip = "#3761 Broke - Need to figure out transparent margin.")]
+    [Theory]
     [InlineData (
                     ShadowStyle.None,
                     """
@@ -199,7 +199,9 @@ public class ShadowStyleTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void Visual_Test (ShadowStyle style, string expected)
     {
-        var superView = new View
+        ((FakeDriver)Application.Driver!).SetBufferSize (5, 5);
+
+        var superView = new Toplevel()
         {
             Width = 4,
             Height = 4,
@@ -215,11 +217,11 @@ public class ShadowStyleTests (ITestOutputHelper output)
         };
         view.ShadowStyle = style;
         superView.Add (view);
-        superView.BeginInit ();
-        superView.EndInit ();
-        superView.Draw ();
+        Application.TopLevels.Push (superView);
+        Application.LayoutAndDraw (true);
 
         TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         view.Dispose ();
+        Application.ResetState (true);
     }
 }
