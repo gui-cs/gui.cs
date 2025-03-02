@@ -140,7 +140,7 @@ public class ScenarioTests : TestsAllViews
     /// <summary>
     ///     <para>This runs through all Scenarios defined in UI Catalog, calling Init, Setup, and Run and measuring the perf of each.</para>
     /// </summary>
-    [Theory (Skip = "Cause of #3930?")]
+    [Theory]
     [MemberData (nameof (AllScenarioTypes))]
     public void All_Scenarios_Benchmark (Type scenarioType)
     {
