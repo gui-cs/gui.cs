@@ -230,7 +230,7 @@ public class ScrollBarTests (ITestOutputHelper output)
 
     #region Position
     [Fact]
-    public void Position_Event_Cancelables ()
+    public void Position_Event_Cancels ()
     {
         var changingCount = 0;
         var changedCount = 0;
