@@ -21,20 +21,6 @@ public partial class ColorTests
         Assert.Equal (expectedArgb, color.Argb);
     }
 
-    [Fact (Skip = "Relies on old ColorName mapping")]
-    public void Color_ColorName_Get_ReturnsClosestColorName ()
-    {
-        // Arrange
-        var color = new Color (128, 64, 40); // Custom RGB color, closest to Yellow
-        var expectedColorName = ColorName16.Yellow;
-
-        // Act
-        ColorName16 colorName = color.GetClosestNamedColor16 ();
-
-        // Assert
-        Assert.Equal (expectedColorName, colorName);
-    }
-
     [Fact]
     public void Color_IsClosestToNamedColor_ReturnsExpectedValue ()
     {
@@ -46,7 +32,7 @@ public partial class ColorTests
 
         Assert.True (color2.IsClosestToNamedColor16 (ColorName16.Red));
     }
-    
+
     [Theory]
     [CombinatorialData]
     public void Rgba_Returns_Expected_Value (
@@ -70,13 +56,13 @@ public static partial class ColorTestsTheoryDataGenerators
     public static TheoryData<Color, ColorName16> FindClosestColor_ReturnsClosestColor ()
     {
         TheoryData<Color, ColorName16> data = [];
-        data.Add (new Color (0, 0), ColorName16.Black);
-        data.Add (new Color (255, 255, 255), ColorName16.White);
-        data.Add (new Color (5, 100, 255), ColorName16.BrightBlue);
-        data.Add (new Color (0, 255), ColorName16.BrightGreen);
-        data.Add (new Color (255, 70, 8), ColorName16.BrightRed);
-        data.Add (new Color (0, 128, 128), ColorName16.Cyan);
-        data.Add (new Color (128, 64, 32), ColorName16.Yellow);
+        data.Add (new (0, 0), ColorName16.Black);
+        data.Add (new (255, 255, 255), ColorName16.White);
+        data.Add (new (5, 100, 255), ColorName16.BrightBlue);
+        data.Add (new (0, 255), ColorName16.BrightGreen);
+        data.Add (new (255, 70, 8), ColorName16.BrightRed);
+        data.Add (new (0, 128, 128), ColorName16.Cyan);
+        data.Add (new (128, 64, 32), ColorName16.Yellow);
 
         return data;
     }
