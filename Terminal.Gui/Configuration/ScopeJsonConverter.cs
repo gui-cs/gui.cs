@@ -91,7 +91,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                         scope! [propertyName].PropertyValue =
                             JsonSerializer.Deserialize (ref reader, propertyType!, SerializerContext);
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
                        // Logging.Trace ($"scopeT Read: {ex}");
                     }

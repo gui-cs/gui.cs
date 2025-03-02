@@ -167,6 +167,8 @@ public static partial class Application // Initialization (Init/Shutdown)
         InitializedChanged?.Invoke (null, new (init));
     }
 
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
     internal static void InitializeConfigurationManagement ()
     {
         // Start the process of configuration management.

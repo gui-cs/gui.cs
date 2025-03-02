@@ -63,7 +63,7 @@ public static partial class Application
             {
                 Rune rune = contents [r, c].Rune;
 
-                if (rune.DecodeSurrogatePair (out char [] sp))
+                if (rune.DecodeSurrogatePair (out char []? sp))
                 {
                     sb.Append (sp);
                 }
