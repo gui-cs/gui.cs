@@ -1,4 +1,4 @@
-name: Build & Test Terminal.Gui with .NET Core
+name: Build & Run Unit Tests
 
 on:
   push:
@@ -61,11 +61,11 @@ jobs:
       shell: bash
       run: echo "{VSTEST_DUMP_PATH}={logs/${{ runner.os }}/}" >> $GITHUB_ENV
 
-    - name: Test
+    - name: Run UnitTests
       run: |
-       dotnet test --verbosity normal --collect:"XPlat Code Coverage" --settings UnitTests/coverlet.runsettings --diag:logs/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always 
+       dotnet test UnitTests --verbosity normal --collect:"XPlat Code Coverage" --settings UnitTests/coverlet.runsettings --diag:logs/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always 
      
-       # mv -v UnitTests/TestResults/*/*.* UnitTests/TestResults/
+       # mv -v UnitTests/TestResults/*/*.* TestResults/UnitTests/
 
     - name: Upload Test Logs
       if: always()
@@ -74,7 +74,7 @@ jobs:
         name: test-logs-${{ runner.os }}
         path: |
           logs/    
-          UnitTests/TestResults/
+          TestResults/UnitTests/
   
 
   build_release:
@@ -98,22 +98,3 @@ jobs:
 
     - name: Build Release Solution
       run: dotnet build --configuration Release
-
-
-    # Note: this step is currently not writing to the gist for some reason
-    # - name: Create Test Coverage Badge
-    #   uses: simon-k/dotnet-code-coverage-badge@v1.0.0
-    #   id: create_coverage_badge
-    #   with:
-    #     label: Unit Test Coverage
-    #     color: brightgreen
-    #     path: UnitTests/TestResults/coverage.opencover.xml
-    #     gist-filename: code-coverage.json
-    #     # https://gist.github.com/migueldeicaza/90ef67a684cb71db1817921a970f8d27
-    #     gist-id: 90ef67a684cb71db1817921a970f8d27
-    #     gist-auth-token: ${{ secrets.GIST_AUTH_TOKEN }}   
-
-    # - name: Print Code Coverage
-    #   run: |
-    #     echo "Code coverage percentage: ${{steps.create_coverage_badge.outputs.percentage}}%"
-    #     echo "Badge data: ${{steps.create_coverage_badge.outputs.badge}}"
