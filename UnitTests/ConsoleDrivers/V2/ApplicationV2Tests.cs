@@ -284,4 +284,67 @@ public class ApplicationV2Tests
         Logging.Logger = beforeLogger;
     }
 
+    [Fact]
+    public void Test_Open_CallsContinueWithOnUIThread ()
+    {
+        var orig = ApplicationImpl.Instance;
+
+        var v2 = NewApplicationV2 ();
+        ApplicationImpl.ChangeInstance (v2);
+
+        v2.Init ();
+        var b = new Button ();
+
+        bool result = false;
+
+        b.Accepting +=
+            async (s,e) =>
+            {
+
+                Task.Run (() =>
+                          {
+                              Task.Delay (300).Wait ();
+                          }).ContinueWith (
+                                           (t, _) =>
+                                           {
+                                               // no longer loading
+                                               Application.Invoke (() =>
+                                                                   {
+                                                                       result = true;
+                                                                       Application.RequestStop ();
+                                                                   });
+                                           },
+                                           TaskScheduler.FromCurrentSynchronizationContext ());
+            };
+
+        v2.AddTimeout (TimeSpan.FromMilliseconds (150),
+                                          ()=>
+                                          {
+                                              // Run asynchronous logic inside Task.Run
+                                              if (Application.Top != null)
+                                              {
+                                                  b.NewKeyDownEvent (Key.Enter);
+                                                  b.NewKeyUpEvent (Key.Enter);
+
+                                                  return false;
+                                              }
+
+                                              return true;
+                                          });
+
+        Assert.Null (Application.Top);
+
+        var w = new Window ();
+        w.Add (b);
+
+        // Blocks until the timeout call is hit
+        v2.Run (w);
+
+        Assert.Null (Application.Top);
+        v2.Shutdown ();
+
+        ApplicationImpl.ChangeInstance (orig);
+
+        Assert.True (result);
+    }
 }
