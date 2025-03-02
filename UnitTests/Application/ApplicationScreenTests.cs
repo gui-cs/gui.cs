@@ -27,12 +27,13 @@ public class ApplicationScreenTests (ITestOutputHelper output)
     {
         // Arrange
         Application.Init (new FakeDriver ());
-        Application.Top = new Toplevel ();
+        Application.Top = new ();
         Application.TopLevels.Push (Application.Top);
 
-        int clearedContentsRaised = 0;
+        var clearedContentsRaised = 0;
 
-        Application.Driver!.ClearedContents += (e, a) => clearedContentsRaised++;
+
+        Application.Driver!.ClearedContents += OnClearedContents;
 
         // Act
         Application.LayoutAndDraw ();
@@ -64,9 +65,13 @@ public class ApplicationScreenTests (ITestOutputHelper output)
         // Cleanup
         Application.Top.Dispose ();
         Application.Top = null;
+        Application.Driver!.ClearedContents -= OnClearedContents;
         Application.Shutdown ();
         Application.ResetState (true);
 
+        return;
+
+        void OnClearedContents (object e, EventArgs a) { clearedContentsRaised++; }
     }
 
     [Fact]
@@ -80,7 +85,7 @@ public class ApplicationScreenTests (ITestOutputHelper output)
         Assert.Equal (new (0, 0, 25, 25), Application.Screen);
 
         // Act
-        (((FakeDriver)Application.Driver)!).SetBufferSize (120, 30);
+        ((FakeDriver)Application.Driver)!.SetBufferSize (120, 30);
 
         // Assert
         Assert.Equal (new (0, 0, 120, 30), Application.Screen);
