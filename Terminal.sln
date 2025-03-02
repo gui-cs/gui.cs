@@ -31,9 +31,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub", "GitHub", "{13BB2C46-B324-4B9C-92EB-CE6184D4736E}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\api-docs.yml = .github\workflows\api-docs.yml
-		.github\workflows\dotnet-core.yml = .github\workflows\dotnet-core.yml
 		GitVersion.yml = GitVersion.yml
 		.github\workflows\publish.yml = .github\workflows\publish.yml
+		stress-tests.yml = stress-tests.yml
+		.github\workflows\unit-and-integration-tests.yml = .github\workflows\unit-and-integration-tests.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{C7A51224-5E0F-4986-AB37-A6BF89966C12}"
