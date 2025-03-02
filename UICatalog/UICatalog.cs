@@ -1302,14 +1302,14 @@ public class UICatalogApp
         {
             List<MenuItem []> menuItems = new ()
             {
-                CreateLoggingFlagsMenuItems ()
+                CreateLoggingFlagsMenuItems ()!
             };
 
             return menuItems;
         }
 
         [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-        private MenuItem [] CreateLoggingFlagsMenuItems ()
+        private MenuItem? [] CreateLoggingFlagsMenuItems ()
         {
             string [] logLevelMenuStrings = Enum.GetNames<LogLevel> ().Select (n => n = "_" + n).ToArray ();
             LogLevel [] logLevels = Enum.GetValues<LogLevel> ();
