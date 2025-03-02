@@ -60,3 +60,5 @@ demo.*
 *.dotCover
 
 logs/
+
+log.*

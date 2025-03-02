@@ -10,7 +10,7 @@ iterationCount=1
 while true; do
     echo "Starting iteration $iterationCount..."
 
-    dotnet test --no-build --diag:log.txt
+    dotnet test --no-build --diag:TestResults/log.txt
 
     if [ $? -ne 0 ]; then
         echo "Test run failed on iteration $iterationCount. Exiting."
