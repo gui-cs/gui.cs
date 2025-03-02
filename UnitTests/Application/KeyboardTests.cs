@@ -20,119 +20,6 @@ public class KeyboardTests
 
     private object _timeoutLock;
 
-    [Fact (Skip = "No longer valid test.")]
-    [AutoInitShutdown]
-    public void EnsuresTopOnFront_CanFocus_False_By_Keyboard ()
-    {
-        Toplevel top = new ();
-
-        var win = new Window
-        {
-            Title = "win",
-            X = 0,
-            Y = 0,
-            Width = 20,
-            Height = 10
-        };
-        var tf = new TextField { Width = 10 };
-        win.Add (tf);
-
-        var win2 = new Window
-        {
-            Title = "win2",
-            X = 22,
-            Y = 0,
-            Width = 20,
-            Height = 10
-        };
-        var tf2 = new TextField { Width = 10 };
-        win2.Add (tf2);
-        top.Add (win, win2);
-
-        Application.Begin (top);
-
-        Assert.True (win.CanFocus);
-        Assert.True (win.HasFocus);
-        Assert.True (win2.CanFocus);
-        Assert.False (win2.HasFocus);
-        Assert.Equal ("win", ((Window)top.Subviews [^1]).Title);
-
-        win.CanFocus = false;
-        Assert.False (win.CanFocus);
-        Assert.False (win.HasFocus);
-        Assert.True (win2.CanFocus);
-        Assert.True (win2.HasFocus);
-        Assert.Equal ("win2", ((Window)top.Subviews [^1]).Title);
-
-        Application.RaiseKeyDownEvent (Key.F6);
-        Assert.True (win2.CanFocus);
-        Assert.False (win.HasFocus);
-        Assert.True (win2.CanFocus);
-        Assert.True (win2.HasFocus);
-        Assert.Equal ("win2", ((Window)top.Subviews [^1]).Title);
-
-        Application.RaiseKeyDownEvent (Key.F6);
-        Assert.False (win.CanFocus);
-        Assert.False (win.HasFocus);
-        Assert.True (win2.CanFocus);
-        Assert.True (win2.HasFocus);
-        Assert.Equal ("win2", ((Window)top.Subviews [^1]).Title);
-        top.Dispose ();
-    }
-
-    [Fact (Skip = "No longer valid test.")]
-    [AutoInitShutdown]
-    public void EnsuresTopOnFront_CanFocus_True_By_Keyboard ()
-    {
-        Toplevel top = new ();
-
-        var win = new Window
-        {
-            Title = "win",
-            X = 0,
-            Y = 0,
-            Width = 20,
-            Height = 10
-        };
-        var tf = new TextField { Width = 10 };
-        win.Add (tf);
-
-        var win2 = new Window
-        {
-            Title = "win2",
-            X = 22,
-            Y = 0,
-            Width = 20,
-            Height = 10
-        };
-        var tf2 = new TextField { Width = 10 };
-        win2.Add (tf2);
-        top.Add (win, win2);
-
-        Application.Begin (top);
-
-        Assert.True (win.CanFocus);
-        Assert.True (win.HasFocus);
-        Assert.True (win2.CanFocus);
-        Assert.False (win2.HasFocus);
-        Assert.Equal ("win", ((Window)top.Subviews [^1]).Title);
-
-        Application.RaiseKeyDownEvent (Key.F6);
-        Assert.True (win.CanFocus);
-        Assert.False (win.HasFocus);
-        Assert.True (win2.CanFocus);
-        Assert.True (win2.HasFocus);
-        Assert.Equal ("win2", ((Window)top.Subviews [^1]).Title);
-
-        Application.RaiseKeyDownEvent (Key.F6);
-        Assert.True (win.CanFocus);
-        Assert.True (win.HasFocus);
-        Assert.True (win2.CanFocus);
-        Assert.False (win2.HasFocus);
-        Assert.Equal ("win", ((Window)top.Subviews [^1]).Title);
-        top.Dispose ();
-    }
-
     [Fact]
     [AutoInitShutdown]
     public void KeyBindings_Add_Adds ()
@@ -145,7 +32,7 @@ public class KeyboardTests
         Assert.True (Application.KeyBindings.TryGet (Key.B, out binding));
         Assert.Null (binding.Target);
     }
-            
+
     [Fact]
     [AutoInitShutdown]
     public void KeyBindings_Remove_Removes ()
@@ -161,7 +48,7 @@ public class KeyboardTests
     [Fact]
     public void KeyBindings_OnKeyDown ()
     {
-        Application.Top = new Toplevel ();
+        Application.Top = new ();
         var view = new ScopedKeyBindingView ();
         var keyWasHandled = false;
         view.KeyDownNotHandled += (s, e) => keyWasHandled = true;
