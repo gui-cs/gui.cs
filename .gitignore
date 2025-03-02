@@ -60,3 +60,11 @@ demo.*
 *.dotCover
 
 logs/
+
+BenchmarkDotNet.Artifacts/
+
+*.log
+
+*.log.*
+
+
