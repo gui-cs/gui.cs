@@ -1,4 +1,5 @@
-﻿using Xunit.Abstractions;
+﻿using Terminal.Gui.ViewMouseTests;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
@@ -88,7 +89,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
         Assert.Equal (new (expectedLeft, expectedTop, expectedRight, expectedBottom), view.Margin.Thickness);
     }
 
-    [Theory (Skip = "#3761 Broke - Need to figure out transparent margin.")]
+    [Theory]
     [InlineData (
                     ShadowStyle.None,
                     """
@@ -113,6 +114,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
     [SetupFakeDriver]
     public void ShadowView_Colors (ShadowStyle style, string expectedAttrs)
     {
+        ((FakeDriver)Application.Driver!).SetBufferSize (5, 5);
         Color fg = Color.Red;
         Color bg = Color.Green;
 
@@ -128,7 +130,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
             new (fg.GetDarkerColor (), bg.GetDarkerColor ())
         };
 
-        var superView = new View
+        var superView = new Toplevel ()
         {
             Height = 3,
             Width = 3,
@@ -141,14 +143,15 @@ public class ShadowStyleTests (ITestOutputHelper output)
         {
             Width = Dim.Auto (),
             Height = Dim.Auto (),
-            Text = " ",
+            Text = "*",
             ShadowStyle = style,
             ColorScheme = new (Attribute.Default)
         };
         superView.Add (view);
-        superView.Layout ();
-        superView.Draw ();
+        Application.TopLevels.Push (superView);
+        Application.LayoutAndDraw (true);
         TestHelpers.AssertDriverAttributesAre (expectedAttrs, output, Application.Driver, attributes);
+        Application.ResetState (true);
     }
 
     [Theory (Skip = "#3761 Broke - Need to figure out transparent margin.")]
@@ -215,7 +218,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
         superView.BeginInit ();
         superView.EndInit ();
         superView.Draw ();
-        
+
         TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
         view.Dispose ();
     }
