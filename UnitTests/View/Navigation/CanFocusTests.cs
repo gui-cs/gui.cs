@@ -361,25 +361,4 @@ public class CanFocusTests () : TestsAllViews
         Application.Top.Dispose ();
         Application.ResetState ();
     }
-
-    [Fact (Skip = "Causes crash on Ubuntu in Github Action. Bogus test anyway.")]
-    public void WindowDispose_CanFocusProblem ()
-    {
-        // Arrange
-        Application.Init ();
-        using var top = new Toplevel ();
-        using var view = new View { X = 0, Y = 1, Text = nameof (WindowDispose_CanFocusProblem) };
-        using var window = new Window ();
-        top.Add (window);
-        window.Add (view);
-
-        // Act
-        RunState rs = Application.Begin (top);
-        Application.End (rs);
-        top.Dispose ();
-        Application.Shutdown ();
-
-        // Assert does Not throw NullReferenceException
-        top.SetFocus ();
-    }
 }
