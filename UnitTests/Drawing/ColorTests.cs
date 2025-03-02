@@ -46,19 +46,7 @@ public partial class ColorTests
 
         Assert.True (color2.IsClosestToNamedColor16 (ColorName16.Red));
     }
-
-    [Theory (Skip = "Test data is now bogus")]
-    [MemberData (
-                    nameof (ColorTestsTheoryDataGenerators.FindClosestColor_ReturnsClosestColor),
-                    MemberType = typeof (ColorTestsTheoryDataGenerators)
-                )]
-    public void FindClosestColor_ReturnsClosestColor (Color inputColor, ColorName16 expectedColorName)
-    {
-        ColorName16 actualColorName = Color.GetClosestNamedColor16 (inputColor);
-
-        Assert.Equal (expectedColorName, actualColorName);
-    }
-
+    
     [Theory]
     [CombinatorialData]
     public void Rgba_Returns_Expected_Value (

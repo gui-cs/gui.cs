@@ -59,24 +59,6 @@ public partial class ColorTests
         Assert.Equal (constructedColor.Argb, parsedColor.Argb);
     }
 
-    [Theory (Skip = "Doesn't utilize W3ColorNames")]
-    [CombinatorialData]
-    public void ToString_WithInvariantCultureAndNullString_IsSameAsParameterless (
-        [CombinatorialValues (0, 64, 128, 255)] byte r,
-        [CombinatorialValues (0, 64, 128, 255)] byte g,
-        [CombinatorialValues (0, 64, 128, 255)] byte b
-    )
-    {
-        var expected = $"#{r:X2}{g:X2}{b:X2}";
-        Color testColor = new (r, g, b);
-
-        var testStringWithExplicitInvariantCulture = testColor.ToString (null, CultureInfo.InvariantCulture);
-        Assert.Equal (expected, testStringWithExplicitInvariantCulture);
-
-        var parameterlessToStringValue = testColor.ToString ();
-        Assert.Equal (parameterlessToStringValue, testStringWithExplicitInvariantCulture);
-    }
-
     [Theory]
     [MemberData (
                     nameof (ColorTestsTheoryDataGenerators.TryParse_string_Returns_False_For_Invalid_Inputs),

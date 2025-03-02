@@ -57,20 +57,7 @@ public partial class ColorTests
 
         Assert.Equal (rgba.GetHashCode (), color.GetHashCode ());
     }
-
-    [Theory (Skip = "Relies on old ColorName mapping")]
-    [Trait ("Category", "Operators")]
-    [MemberData (
-                    nameof (ColorTestsTheoryDataGenerators.ExplicitOperator_FromColorName_RoundTripsCorrectly),
-                    MemberType = typeof (ColorTestsTheoryDataGenerators)
-                )]
-    public void ImplicitOperator_FromColorName_ReturnsCorrectColorValue (ColorName16 cname, Color expectedColor)
-    {
-        Color color = cname;
-
-        Assert.Equal (expectedColor, color);
-    }
-
+    
     [Theory]
     [CombinatorialData]
     [Trait ("Category", "Operators")]

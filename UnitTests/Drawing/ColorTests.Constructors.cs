@@ -66,28 +66,6 @@ public partial class ColorTests
                         );
     }
 
-    [Theory (Skip = "Relies on old ColorName mapping")]
-    [MemberData (
-                    nameof (ColorTestsTheoryDataGenerators.Constructor_WithColorName_AllChannelsCorrect),
-                    MemberType = typeof (ColorTestsTheoryDataGenerators)
-                )]
-    public void Constructor_WithColorName_AllChannelsCorrect (
-        ColorName16 cname,
-        ValueTuple<byte, byte, byte> expectedColorValues
-    )
-    {
-        var color = new Color (cname);
-
-        (byte r, byte g, byte b) = expectedColorValues;
-
-        Assert.Multiple (
-                         () => Assert.Equal (r, color.R),
-                         () => Assert.Equal (g, color.G),
-                         () => Assert.Equal (b, color.B),
-                         () => Assert.Equal (byte.MaxValue, color.A)
-                        );
-    }
-
     [Theory]
     [CombinatorialData]
     public void Constructor_WithInt32_AllValuesCorrect (
