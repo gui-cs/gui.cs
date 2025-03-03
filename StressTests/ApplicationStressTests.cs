@@ -11,10 +11,11 @@ public class ApplicationStressTests : TestsAllViews
     [InlineData (typeof (FakeDriver))]
     [InlineData (typeof (NetDriver), Skip = "System.IO.IOException: The handle is invalid")]
     //[InlineData (typeof (ANSIDriver))]
-    [InlineData (typeof (WindowsDriver), Skip = "Increment lost. tbCounter (25500) didn't change after waiting 100 ms. Failed to reach 500 on pass 1")]
+    [InlineData (typeof (WindowsDriver))]
     [InlineData (typeof (CursesDriver), Skip = "Unable to load DLL 'libc' or one of its dependencies: The specified module could not be found. (0x8007007E)")]
     public async Task InvokeLeakTest (Type driverType)
     {
+
         Application.Init (driverName: driverType.Name);
         Random r = new ();
         TextField tf = new ();
@@ -24,6 +25,7 @@ public class ApplicationStressTests : TestsAllViews
         const int NUM_PASSES = 50;
         const int NUM_INCREMENTS = 500;
         const int POLL_MS = 100;
+        _tbCounter = 0;
 
         Task task = Task.Run (() => RunTest (r, tf, NUM_PASSES, NUM_INCREMENTS, POLL_MS));
 
@@ -63,7 +65,7 @@ public class ApplicationStressTests : TestsAllViews
                     Application.Invoke (() => Application.RequestStop ());
 
                     throw new TimeoutException (
-                                                $"Timeout: Increment lost. tbCounter ({_tbCounter}) didn't "
+                                                $"Timeout: Increment lost. _tbCounter ({_tbCounter}) didn't "
                                                 + $"change after waiting {pollMs} ms. Failed to reach {(j + 1) * numIncrements} on pass {j + 1}"
                                                );
                 }
