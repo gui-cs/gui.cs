@@ -45,7 +45,7 @@ jobs:
 
     - name: Set VSTEST_DUMP_PATH
       shell: bash
-      run: echo "{VSTEST_DUMP_PATH}={logs/TestsParallelizable/${{ runner.os }}/}" >> $GITHUB_ENV
+      run: echo "{VSTEST_DUMP_PATH}={logs/UnitTests/${{ runner.os }}/}" >> $GITHUB_ENV
 
     - name: Run UnitTests
       run: |
@@ -57,7 +57,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: test-logs-${{ runner.os }}
+        name: non_parallel_unittests-logs-${{ runner.os }}
         path: |
           logs/UnitTests    
           TestResults/UnitTests/
@@ -108,7 +108,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: test-logs-${{ runner.os }}
+        name: parallel_unittests-logs-${{ runner.os }}
         path: |
           logs/UnitTestsParallelizable/
           TestResults/UnitTestsParallelizable/
