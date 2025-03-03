@@ -10,10 +10,15 @@ iterationCount=1
 while true; do
     echo "Starting iteration $iterationCount..."
 
-    dotnet test UnitTests --no-build --diag:TestResults/log.txt -- xunit.stopOnFail=true
-
+    dotnet test Tests/UnitTests --no-build --diag:TestResults/UnitTests.log -- xunit.stopOnFail=true
     if [ $? -ne 0 ]; then
-        echo "Test run failed on iteration $iterationCount. Exiting."
+        echo "UnitTests run failed on iteration $iterationCount. Exiting."
+        exit 1
+    fi
+
+    dotnet test Tests/UnitTestsParallelizable --no-build --diag:TestResults/UnitTestsParallelizable.log -- xunit.stopOnFail=true
+    if [ $? -ne 0 ]; then
+        echo "UnitTestsParallelizable run failed on iteration $iterationCount. Exiting."
         exit 1
     fi
 
