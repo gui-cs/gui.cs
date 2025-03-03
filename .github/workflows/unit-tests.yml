@@ -45,7 +45,7 @@ jobs:
 
     - name: Set VSTEST_DUMP_PATH
       shell: bash
-      run: echo "{VSTEST_DUMP_PATH}={logs/${{ runner.os }}/}" >> $GITHUB_ENV
+      run: echo "{VSTEST_DUMP_PATH}={logs/TestsParallelizable/${{ runner.os }}/}" >> $GITHUB_ENV
 
     - name: Run UnitTests
       run: |
@@ -96,7 +96,7 @@ jobs:
 
     - name: Set VSTEST_DUMP_PATH
       shell: bash
-      run: echo "{VSTEST_DUMP_PATH}={logs/${{ runner.os }}/}" >> $GITHUB_ENV
+      run: echo "{VSTEST_DUMP_PATH}={logs/UnitTestsParallelizable/${{ runner.os }}/}" >> $GITHUB_ENV
 
     - name: Run UnitTests
       run: |
