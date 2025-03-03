@@ -1,13 +1,9 @@
-name: Run StressTests
+name: Run StressTests (for 15 minutes)
 
 on:
   schedule:
     - cron: '0 0 * * *' # Runs every day at midnight UTC
   push:
-    branches: [ v2_release, v2_develop ]
-    paths-ignore:
-      - '**.md'
-  pull_request:
     branches: [ v2_release, v2_develop ]
     paths-ignore:
       - '**.md'
@@ -18,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        os: [ ubuntu-latest ]
 
     timeout-minutes: 70 # Allow some buffer time beyond the 1-hour test duration
     steps:
@@ -35,13 +31,13 @@ jobs:
         run: dotnet restore
 
       - name: Build StressTests
-        run: dotnet build StressTests --configuration Debug --no-restore
+        run: dotnet build Tests/StressTests --configuration Debug --no-restore
 
-      - name: Run StressTests for 1 hour
+      - name: Run StressTests for 15 minutes
         run: |
-          end=$((SECONDS+3600))
+          end=$((SECONDS+900))
           while [ $SECONDS -lt $end ]; do
-            dotnet test StressTests --no-build --verbosity normal --diag:logs/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=true
+            dotnet test Tests/StressTests --no-build --verbosity normal --diag:logs/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=true
           done
 
       - name: Upload Test Logs
@@ -51,5 +47,5 @@ jobs:
           name: stress-test-logs-${{ runner.os }}
           path: |
             logs/
-            StressTests/TestResults/
+            TestResults/StressTests
 

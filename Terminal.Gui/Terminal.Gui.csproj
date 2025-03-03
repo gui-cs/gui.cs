@@ -20,14 +20,16 @@
   <!-- .NET Build Settings -->
   <!-- =================================================================== -->
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <LangVersion>12</LangVersion>
+      <!--Note - These three SHOULD be picked up from Directory.Build.props, but they are not. Not sure why. -->
+		<TargetFramework>net8.0</TargetFramework>
+	    <LangVersion>12</LangVersion>
+		<ImplicitUsings>enable</ImplicitUsings>
+      <!-- -->
     <RootNamespace>$(AssemblyName)</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DefineTrace>true</DefineTrace>
     <DebugType>portable</DebugType>
     <DefineConstants>$(DefineConstants);CONTRACTS_FULL;CODE_ANALYSIS</DefineConstants>
-    <ImplicitUsings>enable</ImplicitUsings>
     <NoLogo>true</NoLogo>
     <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
     <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
@@ -53,17 +55,17 @@
   <!-- Dependencies -->
   <!-- =================================================================== -->
   <ItemGroup>
-    <PackageReference Include="ColorHelper" Version="[1.8.1,2)" />
-    <PackageReference Include="JetBrains.Annotations" Version="[2024.2.0,)" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis" Version="[4.10,5)" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="[4.10,5)" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="[4.10,5)" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="ColorHelper" />
+    <PackageReference Include="JetBrains.Annotations" />
+    <PackageReference Include="Microsoft.CodeAnalysis" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
+    <PackageReference Include="Microsoft.Extensions.Logging" />
+    <PackageReference Include="System.IO.Abstractions" />
+    <PackageReference Include="System.Text.Json" />
+    <PackageReference Include="Wcwidth" />
     <!-- Enable Nuget Source Link for github -->
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="[8,9)" PrivateAssets="all" />
-    <PackageReference Include="System.IO.Abstractions" Version="[21.0.22,22)" />
-    <PackageReference Include="System.Text.Json" Version="[8.0.5,9)" />
-    <PackageReference Include="Wcwidth" Version="[2,3)" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" />
   </ItemGroup>
   <!-- =================================================================== -->
   <!-- Global Usings and Type Aliases -->
@@ -80,6 +82,7 @@
   <!-- =================================================================== -->
   <ItemGroup>
     <InternalsVisibleTo Include="UnitTests" />
+    <InternalsVisibleTo Include="UnitTests.Parallelizable" />
     <InternalsVisibleTo Include="StressTests" />
     <InternalsVisibleTo Include="IntegrationTests" />
     <InternalsVisibleTo Include="TerminalGuiDesigner" />
