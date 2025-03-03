@@ -8,7 +8,7 @@ public class LocalPackagesTests
     public LocalPackagesTests ()
     {
         // Define the local_packages path relative to the solution directory
-        _localPackagesPath = Path.Combine (Directory.GetCurrentDirectory (), "..", "..", "..", "..", "local_packages");
+        _localPackagesPath = Path.Combine (Directory.GetCurrentDirectory (), "..", "..", "..", "..", "..", "local_packages");
     }
 
     [Fact]

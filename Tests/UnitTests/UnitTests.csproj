@@ -44,8 +44,8 @@
 		</PackageReference>
 	</ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\Terminal.Gui\Terminal.Gui.csproj" />
-		<ProjectReference Include="..\UICatalog\UICatalog.csproj" />
+		<ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj" />
+		<ProjectReference Include="..\..\UICatalog\UICatalog.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Update="xunit.runner.json">
