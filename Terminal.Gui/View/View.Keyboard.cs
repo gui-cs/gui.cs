@@ -319,28 +319,30 @@ public partial class View // Keyboard APIs
 
         bool RaiseKeyDown (Key k)
         {
-            // Before (fire the cancellable event)
-            if (OnKeyDown (k) || k.Handled)
+            // First fire event
+            KeyDown?.Invoke (this, k);
+
+            if (k.Handled)
             {
                 return true;
             }
 
-            // fire event
-            KeyDown?.Invoke (this, k);
-
-            return k.Handled;
+            // After (fire the cancellable event)
+            return OnKeyDown (k);
         }
 
         bool RaiseKeyDownNotHandled (Key k)
         {
-            if (OnKeyDownNotHandled (k) || k.Handled)
+            // First fire event
+            KeyDownNotHandled?.Invoke (this, k);
+
+            if (k.Handled)
             {
                 return true;
             }
 
-            KeyDownNotHandled?.Invoke (this, k);
-
-            return false;
+            // After (fire the cancellable event)
+            return OnKeyDownNotHandled (k);
         }
     }
 
@@ -453,16 +455,16 @@ public partial class View // Keyboard APIs
 
         bool RaiseKeyUp (Key k)
         {
-            // Before (fire the cancellable event)
-            if (OnKeyUp (k) || k.Handled)
+            // First fire event
+            KeyUp?.Invoke (this, k);
+
+            if (k.Handled)
             {
                 return true;
             }
 
-            // fire event
-            KeyUp?.Invoke (this, k);
-
-            return k.Handled;
+            // After (fire the cancellable event)
+            return OnKeyUp (k);
         }
     }
 

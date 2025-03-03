@@ -102,7 +102,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
                             Assert.Equal (alt, e.IsAlt);
                             Assert.Equal (control, e.IsCtrl);
                             Assert.False (keyDown);
-                            Assert.True (view.OnKeyDownCalled);
+                            Assert.False (view.OnKeyDownCalled);
                             keyDown = true;
                         };
         view.KeyDownNotHandled += (s, e) => { keyDownNotHandled = true; };
@@ -114,7 +114,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
                           Assert.Equal (alt, e.IsAlt);
                           Assert.Equal (control, e.IsCtrl);
                           Assert.False (keyUp);
-                          Assert.True (view.OnKeyUpCalled);
+                          Assert.False (view.OnKeyUpCalled);
                           keyUp = true;
                       };
 
@@ -147,6 +147,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
     {
         var keyDown = false;
         var keyDownNotHandled = false;
+        var keyHandled = false;
 
         var view = new OnNewKeyTestView ();
         Assert.True (view.CanFocus);
@@ -156,8 +157,8 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
                         {
                             Assert.Equal (KeyCode.A, e.KeyCode);
                             Assert.False (keyDown);
-                            Assert.True (view.OnKeyDownCalled);
-                            e.Handled = true;
+                            Assert.False (view.OnKeyDownCalled);
+                            e.Handled = keyHandled;
                             keyDown = true;
                         };
 
@@ -167,15 +168,29 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
                                    Assert.Equal (KeyCode.A, e.KeyCode);
                                    Assert.False (keyDownNotHandled);
                                    Assert.False (view.OnProcessKeyDownCalled);
-                                   e.Handled = true;
+                                   e.Handled = keyHandled;
                                    keyDownNotHandled = true;
                                };
 
         view.NewKeyDownEvent (Key.A);
         Assert.True (keyDown);
-        Assert.False (keyDownNotHandled);
+        Assert.True (keyDownNotHandled);
 
         Assert.True (view.OnKeyDownCalled);
+        Assert.True (view.OnProcessKeyDownCalled);
+
+        keyDown = false;
+        keyDownNotHandled = false;
+        keyHandled = true;
+        view.CancelVirtualMethods = true;
+        view.OnKeyDownCalled = false;
+        view.OnProcessKeyDownCalled = false;
+
+        view.NewKeyDownEvent (Key.A);
+        Assert.True (keyDown);
+        Assert.False (keyDownNotHandled);
+
+        Assert.False (view.OnKeyDownCalled);
         Assert.False (view.OnProcessKeyDownCalled);
     }
 
@@ -223,7 +238,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
                         {
                             Assert.Equal (KeyCode.A, e.KeyCode);
                             Assert.False (keyDown);
-                            Assert.True (view.OnKeyDownCalled);
+                            Assert.False (view.OnKeyDownCalled);
                             e.Handled = false;
                             keyDown = true;
                         };
@@ -232,7 +247,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
                                {
                                    Assert.Equal (KeyCode.A, e.KeyCode);
                                    Assert.False (keyDownNotHandled);
-                                   Assert.True (view.OnProcessKeyDownCalled);
+                                   Assert.False (view.OnProcessKeyDownCalled);
                                    e.Handled = true;
                                    keyDownNotHandled = true;
                                };
@@ -242,13 +257,14 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
         Assert.True (keyDownNotHandled);
 
         Assert.True (view.OnKeyDownCalled);
-        Assert.True (view.OnProcessKeyDownCalled);
+        Assert.False (view.OnProcessKeyDownCalled);
     }
 
     [Fact]
     public void NewKeyUpEvent_KeyUp_Handled_True_Stops_Processing ()
     {
         var keyUp = false;
+        var keyHandled = false;
 
         var view = new OnNewKeyTestView ();
         Assert.True (view.CanFocus);
@@ -259,7 +275,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
                           Assert.Equal (KeyCode.A, e.KeyCode);
                           Assert.False (keyUp);
                           Assert.False (view.OnProcessKeyDownCalled);
-                          e.Handled = true;
+                          e.Handled = keyHandled;
                           keyUp = true;
                       };
 
@@ -267,6 +283,18 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
         Assert.True (keyUp);
 
         Assert.True (view.OnKeyUpCalled);
+        Assert.False (view.OnKeyDownCalled);
+        Assert.False (view.OnProcessKeyDownCalled);
+
+        keyUp = false;
+        keyHandled = true;
+        view.CancelVirtualMethods = true;
+        view.OnKeyUpCalled = false;
+
+        view.NewKeyUpEvent (Key.A);
+        Assert.True (keyUp);
+
+        Assert.False (view.OnKeyUpCalled);
         Assert.False (view.OnKeyDownCalled);
         Assert.False (view.OnProcessKeyDownCalled);
     }
