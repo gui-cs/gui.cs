@@ -7,10 +7,6 @@ on:
     branches: [ v2_release, v2_develop ]
     paths-ignore:
       - '**.md'
-  pull_request:
-    branches: [ v2_release, v2_develop ]
-    paths-ignore:
-      - '**.md'
       
 jobs:
   run_stress_tests:
