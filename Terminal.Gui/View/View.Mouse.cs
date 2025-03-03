@@ -335,14 +335,16 @@ public partial class View // Mouse APIs
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
     public bool RaiseMouseEvent (MouseEventArgs mouseEvent)
     {
-        if (OnMouseEvent (mouseEvent) || mouseEvent.Handled)
+        // First fire event
+        MouseEvent?.Invoke (this, mouseEvent);
+
+        if (mouseEvent.Handled)
         {
             return true;
         }
 
-        MouseEvent?.Invoke (this, mouseEvent);
-
-        return mouseEvent.Handled;
+        // After (fire the cancellable event)
+        return OnMouseEvent (mouseEvent);
     }
 
     /// <summary>Called when a mouse event occurs within the view's <see cref="Viewport"/>.</summary>
