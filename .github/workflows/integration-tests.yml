@@ -45,9 +45,9 @@ jobs:
 
     - name: Run IntegrationTests
       run: |
-       dotnet test IntegrationTests --no-build --verbosity normal --diag:logs/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=true
+       dotnet test Tests/IntegrationTests --no-build --verbosity normal --diag:logs/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=true
      
-       # mv -v IntegrationTests/TestResults/*/*.* TestResults/IntegrationTests/
+       # mv -v Tests/IntegrationTests/TestResults/*/*.* TestResults/IntegrationTests/
 
     - name: Upload Test Logs
       if: always()

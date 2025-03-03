@@ -54,7 +54,7 @@ jobs:
       run: |
        dotnet test Tests/UnitTests --no-build --verbosity normal --collect:"XPlat Code Coverage" --settings Tests/UnitTests/coverlet.runsettings --diag:logs/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=true
      
-       # mv -v UnitTests/TestResults/*/*.* TestResults/UnitTests/
+       # mv -v Tests/UnitTests/TestResults/*/*.* TestResults/UnitTests/
 
     - name: Upload Test Logs
       if: always()
