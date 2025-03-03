@@ -52,11 +52,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NativeAot", "NativeAot\Nati
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks", "Benchmarks\Benchmarks.csproj", "{242FBD3E-2EC6-4274-BD40-8E62AF9327B2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "D:\s\gui-cs\Terminal.Gui\Tests\UnitTests\UnitTests.csproj", "{038B09F5-EF3A-F21E-7C10-A6551866ECE2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "Tests\UnitTests\UnitTests.csproj", "{038B09F5-EF3A-F21E-7C10-A6551866ECE2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationTests", "D:\s\gui-cs\Terminal.Gui\Tests\IntegrationTests\IntegrationTests.csproj", "{F74EC349-B988-FCFA-A1E5-967F70FB75B5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationTests", "Tests\IntegrationTests\IntegrationTests.csproj", "{F74EC349-B988-FCFA-A1E5-967F70FB75B5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StressTests", "D:\s\gui-cs\Terminal.Gui\Tests\StressTests\StressTests.csproj", "{96ACE8BA-2E07-7537-FBF2-E8176CCB8080}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StressTests", "Tests\StressTests\StressTests.csproj", "{96ACE8BA-2E07-7537-FBF2-E8176CCB8080}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
