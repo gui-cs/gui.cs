@@ -1,9 +1,16 @@
 using Terminal.Gui;
+using Xunit.Abstractions;
 
 namespace StressTests;
 
 public class ApplicationStressTests : TestsAllViews
 {
+    public ApplicationStressTests (ITestOutputHelper output)
+    {
+        ConsoleDriver.RunningUnitTests = true;
+        ConfigurationManager.Locations = ConfigLocations.Default;
+    }
+
     private static volatile int _tbCounter;
     private static readonly ManualResetEventSlim _wakeUp = new (false);
 
