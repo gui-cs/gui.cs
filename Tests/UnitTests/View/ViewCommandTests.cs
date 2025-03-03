@@ -167,7 +167,8 @@ public class ViewCommandTests
 
         w.LayoutSubviews ();
 
-        Application.Begin (w);
+        Application.Top = w;
+        Application.TopLevels.Push(w);
         Assert.Same (Application.Top, w);
 
         // Click button 2
@@ -237,9 +238,12 @@ public class ViewCommandTests
 
         w.Add (btn);
 
-        w.LayoutSubviews ();
 
-        Application.Begin (w);
+        Application.Top = w;
+        Application.TopLevels.Push (w);
+        Assert.Same (Application.Top, w);
+
+        w.LayoutSubviews ();
 
         // Click button just like a driver would
         var btnFrame = btn.FrameToScreen ();
@@ -266,6 +270,8 @@ public class ViewCommandTests
 
         Assert.Equal (1, btnAcceptedCount);
         Assert.Equal (2, wAcceptedCount);
+
+        Application.ResetState (true);
     }
 
     #endregion OnAccept/Accept tests
