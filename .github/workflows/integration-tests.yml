@@ -23,8 +23,6 @@ jobs:
     timeout-minutes: 10
     steps:
 
-# Build (Debug)
-
     - name: Checkout code
       uses: actions/checkout@v4
 
@@ -38,13 +36,8 @@ jobs:
       run: |
         dotnet restore
 
-    - name: Build Debug
-      run: dotnet build --configuration Debug --no-restore
-
-# Test
-    # Note: The --blame and VSTEST_DUMP_PATH stuff is needed to diagnose the test runner crashing on ubuntu/mac
-    # See https://github.com/microsoft/vstest/issues/2952 for why the --blame stuff below is needed.
-    # Without it, the test runner crashes on ubuntu (but not Windows or mac)
+    - name: Build IntegrationTests
+      run: dotnet build Tests/IntegrationTests --configuration Debug --no-restore
 
     - name: Set VSTEST_DUMP_PATH
       shell: bash
@@ -52,7 +45,7 @@ jobs:
 
     - name: Run IntegrationTests
       run: |
-       dotnet test IntegrationTests --verbosity normal --diag:logs/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=true
+       dotnet test IntegrationTests --no-build --verbosity normal --diag:logs/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=true
      
        # mv -v IntegrationTests/TestResults/*/*.* TestResults/IntegrationTests/
 

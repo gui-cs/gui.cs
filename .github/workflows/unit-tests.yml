@@ -38,7 +38,7 @@ jobs:
       run: |
         dotnet restore
 
-    - name: Build Debug
+    - name: Build Solution Debug
       run: dotnet build --configuration Debug --no-restore
 
 # Test
@@ -52,7 +52,7 @@ jobs:
 
     - name: Run UnitTests
       run: |
-       dotnet test UnitTests --verbosity normal --collect:"XPlat Code Coverage" --settings UnitTests/coverlet.runsettings --diag:logs/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=true
+       dotnet test Tests/UnitTests --no-build --verbosity normal --collect:"XPlat Code Coverage" --settings Tests/UnitTests/coverlet.runsettings --diag:logs/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=true
      
        # mv -v UnitTests/TestResults/*/*.* TestResults/UnitTests/
 
