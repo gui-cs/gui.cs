@@ -4,8 +4,6 @@ namespace Terminal.Gui.InputTests;
 
 public class ResponderTests
 {
-   
-
     [Fact]
     public void KeyPressed_Handled_True_Cancels_KeyPress ()
     {
