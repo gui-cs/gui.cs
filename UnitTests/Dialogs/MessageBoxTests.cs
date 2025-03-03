@@ -502,5 +502,19 @@ public class MessageBoxTests
         Application.Run (top);
         top.Dispose ();
     }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void Button_IsDefault_True_Return_His_Index_On_Accepting ()
+    {
+        Application.Init ();
+
+        Application.Iteration += (_, _) => Assert.True (Application.RaiseKeyDownEvent (Key.Enter));
+        var res = MessageBox.Query ("hey", "IsDefault", "Yes", "No");
+
+        Assert.Equal (0, res);
+
+        Application.Shutdown ();
+    }
 }
 
