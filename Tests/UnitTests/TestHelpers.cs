@@ -1,13 +1,14 @@
 ﻿using System.Diagnostics;
+using System.Drawing;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using Terminal.Gui;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 using static Terminal.Gui.ConfigurationManager;
-
-namespace Terminal.Gui;
+using Attribute = Terminal.Gui.Attribute;
 
 /// <summary>
 ///     This class enables test functions annotated with the [AutoInitShutdown] attribute to
