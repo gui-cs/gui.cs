@@ -507,7 +507,15 @@ public partial class View : IDisposable, ISupportInitializeNotification
 #if DEBUG_IDISPOSABLE
         WasDisposed = true;
 
-        foreach (View instance in Instances.Where (x => x.WasDisposed).ToList ())
+        foreach (View? instance in Instances.Where (x =>
+                                                   {
+                                                       if (x is { })
+                                                       {
+                                                           return x.WasDisposed;
+                                                       }
+
+                                                       return false;
+                                                   }).ToList ())
         {
             Instances.Remove (instance);
         }
