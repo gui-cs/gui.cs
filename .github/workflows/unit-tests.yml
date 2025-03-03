@@ -11,7 +11,7 @@ on:
       - '**.md'
       
 jobs:
-  build_and_test_debug:
+  build_and_test_debug_non_parallel:
 
     runs-on: ${{ matrix.os }}
     strategy:
@@ -22,8 +22,6 @@ jobs:
 
     timeout-minutes: 10
     steps:
-
-# Build (Debug)
 
     - name: Checkout code
       uses: actions/checkout@v4
@@ -64,6 +62,58 @@ jobs:
         path: |
           logs/    
           TestResults/UnitTests/
+  
+  build_and_test_debug_parallel:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      # Turn off fail-fast to let all runners run even if there are errors
+      fail-fast: true
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+
+    timeout-minutes: 10
+    steps:
+
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.x
+        dotnet-quality: 'ga'
+
+    - name: Install dependencies
+      run: |
+        dotnet restore
+
+    - name: Build Solution Debug
+      run: dotnet build --configuration Debug --no-restore
+
+# Test
+    # Note: The --blame and VSTEST_DUMP_PATH stuff is needed to diagnose the test runner crashing on ubuntu/mac
+    # See https://github.com/microsoft/vstest/issues/2952 for why the --blame stuff below is needed.
+    # Without it, the test runner crashes on ubuntu (but not Windows or mac)
+
+    - name: Set VSTEST_DUMP_PATH
+      shell: bash
+      run: echo "{VSTEST_DUMP_PATH}={logs/${{ runner.os }}/}" >> $GITHUB_ENV
+
+    - name: Run UnitTests
+      run: |
+       dotnet test Tests/UnitTestsParallelizable --no-build --verbosity normal --collect:"XPlat Code Coverage" --settings Tests/UnitTestsParallelizable/coverlet.runsettings --diag:logs/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=true
+     
+       # mv -v Tests/UnitTests/TestResults/*/*.* TestResults/UnitTests/
+
+    - name: Upload Test Logs
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-logs-${{ runner.os }}
+        path: |
+          logs/    
+          TestResults/UnitTestsParallelizable/
   
 
   build_release:

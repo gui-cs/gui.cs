@@ -5,6 +5,7 @@
       "Terminal.Gui\\Terminal.Gui.csproj",
       "UICatalog\\UICatalog.csproj",
       "Tests\\UnitTests\\UnitTests.csproj",
+      "Tests\\UnitTestsParallelizable\\UnitTests.Parallelizable.csproj",
       "Tests\\IntegrationTests\\IntegrationTests.csproj",
       "Tests\\StressTests\\StressTests.csproj"
     ]

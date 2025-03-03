@@ -82,6 +82,7 @@
   <!-- =================================================================== -->
   <ItemGroup>
     <InternalsVisibleTo Include="UnitTests" />
+    <InternalsVisibleTo Include="UnitTests.Parallelizable" />
     <InternalsVisibleTo Include="StressTests" />
     <InternalsVisibleTo Include="IntegrationTests" />
     <InternalsVisibleTo Include="TerminalGuiDesigner" />
