@@ -2,6 +2,8 @@ using System.Collections;
 using System.Data;
 using System.Globalization;
 using System.Reflection;
+using UnitTests;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -83,7 +85,7 @@ public class TableViewTests (ITestOutputHelper output)
 │Hello│  │f        │
 ";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         var color = new Attribute (Color.Magenta, Color.BrightBlue);
 
@@ -115,7 +117,7 @@ public class TableViewTests (ITestOutputHelper output)
 00000000000000000000
 01111101101111111110
 ";
-        TestHelpers.AssertDriverAttributesAre (expected, output, Application.Driver, tv.ColorScheme.Normal, color);
+        DriverAssert.AssertDriverAttributesAre (expected, output, Application.Driver, tv.ColorScheme.Normal, color);
         top.Dispose ();
     }
 
@@ -452,7 +454,7 @@ public class TableViewTests (ITestOutputHelper output)
 │1│2                    │
 ";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         // get a style for the long column
         ColumnStyle style = tableView.Style.GetOrCreateColumnStyle (2);
@@ -470,7 +472,7 @@ public class TableViewTests (ITestOutputHelper output)
 │1│2│aaaaaaaaaaaaaaaaaaa│
 │1│2│aaa                │
 ";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         // revert the style change
         style.MaxWidth = TableView.DefaultMaxCellWidth;
@@ -489,7 +491,7 @@ public class TableViewTests (ITestOutputHelper output)
 │1│2│aaaaaaaaaaaaa...   │
 │1│2│aaa                │
 ";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         // revert style change
         style.RepresentationGetter = null;
@@ -516,7 +518,7 @@ public class TableViewTests (ITestOutputHelper output)
 │1│2│aaaaaaaaaaaaaaaaaaa│
 │1│2│aaa                │
 ";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         // Now test making the width too small for the MinAcceptableWidth
         // the Column won't fit so should not be rendered
@@ -534,7 +536,7 @@ public class TableViewTests (ITestOutputHelper output)
 │1│2    │
 
 ";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         // setting width to 10 leaves just enough space for the column to
         // meet MinAcceptableWidth of 5.  Column width includes terminator line
@@ -549,7 +551,7 @@ public class TableViewTests (ITestOutputHelper output)
 │1│2│aaaa│
 │1│2│aaa │
 ";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         tableView.Viewport = new (0, 0, 25, 5);
 
@@ -570,7 +572,7 @@ public class TableViewTests (ITestOutputHelper output)
 │1  │2  │aaaaaaaaaa│    │
 │1  │2  │aaa       │    │
 ";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         // MaxCellWidth limits MinCellWidth
         tableView.MaxCellWidth = 5;
@@ -586,7 +588,7 @@ public class TableViewTests (ITestOutputHelper output)
 │1    │2    │aaaaa│     │
 │1    │2    │aaa  │     │
 ";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         top.Dispose ();
         Application.Shutdown ();
@@ -716,7 +718,7 @@ public class TableViewTests (ITestOutputHelper output)
 ├─┼─┼─►
 │1│2│3│";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         // Scroll right
         tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorRight });
@@ -732,7 +734,7 @@ public class TableViewTests (ITestOutputHelper output)
 ◄─┼─┼─►
 │2│3│4│";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         // Scroll right twice more (to end of columns)
         tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorRight });
@@ -747,7 +749,7 @@ public class TableViewTests (ITestOutputHelper output)
 ◄─┼─┼─┤
 │4│5│6│";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -793,7 +795,7 @@ public class TableViewTests (ITestOutputHelper output)
 │A│B│C│
 │1│2│3│";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         // Scroll right
         tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorRight });
@@ -812,7 +814,7 @@ public class TableViewTests (ITestOutputHelper output)
 │B│C│D│
 │2│3│4│";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
     }
 
     [Fact]
@@ -853,7 +855,7 @@ public class TableViewTests (ITestOutputHelper output)
 │A│B│C│
 │1│2│3│";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         // Scroll right
         tableView.NewKeyDownEvent (new () { KeyCode = KeyCode.CursorRight });
@@ -871,7 +873,7 @@ public class TableViewTests (ITestOutputHelper output)
 │D│E│F│
 │4│5│6│";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
     }
 
@@ -959,7 +961,7 @@ public class TableViewTests (ITestOutputHelper output)
  1 2 3
 ───────";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
     }
 
     [Fact]
@@ -989,7 +991,7 @@ public class TableViewTests (ITestOutputHelper output)
 │1│2│3│
 └─┴─┴─┘";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
     }
 
     [Fact]
@@ -1076,7 +1078,7 @@ public class TableViewTests (ITestOutputHelper output)
 ├─┼─┤
 │1│2│
 ";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         var expectedColors = @"
 00000
@@ -1085,7 +1087,7 @@ public class TableViewTests (ITestOutputHelper output)
 01020
 ";
 
-        TestHelpers.AssertDriverAttributesAre (
+        DriverAssert.AssertDriverAttributesAre (
                                                expectedColors,
                                                output,
                                                Application.Driver,
@@ -1110,7 +1112,7 @@ public class TableViewTests (ITestOutputHelper output)
 ├─┼─┤
 │1│5│
 ";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         expectedColors = @"
 00000
@@ -1122,7 +1124,7 @@ public class TableViewTests (ITestOutputHelper output)
         // now we only see 2 colors used (the selected cell color and Normal
         // cellHighlight should no longer be used because the delegate returned null
         // (now that the cell value is 5 - which does not match the conditional)
-        TestHelpers.AssertDriverAttributesAre (
+        DriverAssert.AssertDriverAttributesAre (
                                                expectedColors,
                                                output,
                                                Application.Driver,
@@ -1172,7 +1174,7 @@ public class TableViewTests (ITestOutputHelper output)
 ├─┼─┤
 │1│2│
 ";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         var expectedColors = @"
 00000
@@ -1181,7 +1183,7 @@ public class TableViewTests (ITestOutputHelper output)
 21222
 ";
 
-        TestHelpers.AssertDriverAttributesAre (
+        DriverAssert.AssertDriverAttributesAre (
                                                expectedColors,
                                                output,
                                                Application.Driver,
@@ -1205,7 +1207,7 @@ public class TableViewTests (ITestOutputHelper output)
 ├─┼─┤
 │1│5│
 ";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         expectedColors = @"
 00000
@@ -1217,7 +1219,7 @@ public class TableViewTests (ITestOutputHelper output)
         // now we only see 2 colors used (the selected cell color and Normal
         // rowHighlight should no longer be used because the delegate returned null
         // (now that the cell value is 5 - which does not match the conditional)
-        TestHelpers.AssertDriverAttributesAre (
+        DriverAssert.AssertDriverAttributesAre (
                                                expectedColors,
                                                output,
                                                Application.Driver,
@@ -1254,7 +1256,7 @@ public class TableViewTests (ITestOutputHelper output)
 ├─┼─┤
 │1│2│
 ";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         var expectedColors = @"
 00000
@@ -1263,7 +1265,7 @@ public class TableViewTests (ITestOutputHelper output)
 01000
 ";
 
-        TestHelpers.AssertDriverAttributesAre (
+        DriverAssert.AssertDriverAttributesAre (
                                                expectedColors,
                                                output,
                                                Application.Driver,
@@ -1297,7 +1299,7 @@ public class TableViewTests (ITestOutputHelper output)
 ├─┼─┤
 │1│2│
 ";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         var expectedColors = @"
 00000
@@ -1309,7 +1311,7 @@ public class TableViewTests (ITestOutputHelper output)
         var invertFocus = new Attribute (tv.ColorScheme.Focus.Background, tv.ColorScheme.Focus.Foreground);
         var invertHotNormal = new Attribute (tv.ColorScheme.HotNormal.Background, tv.ColorScheme.HotNormal.Foreground);
 
-        TestHelpers.AssertDriverAttributesAre (
+        DriverAssert.AssertDriverAttributesAre (
                                                expectedColors,
                                                output,
                                                Application.Driver,
@@ -1336,7 +1338,7 @@ public class TableViewTests (ITestOutputHelper output)
 ├─┼─┼────┤
 │1│2│    │
 ";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
     }
 
@@ -1360,7 +1362,7 @@ public class TableViewTests (ITestOutputHelper output)
 ├─┼─┤
 │1│2│
 ";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
     }
 
     [Fact]
@@ -1380,7 +1382,7 @@ public class TableViewTests (ITestOutputHelper output)
 ├─┼──────┤
 │1│2     │
 ";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
     }
 
     [Fact]
@@ -1404,7 +1406,7 @@ public class TableViewTests (ITestOutputHelper output)
 ├─┼─►
 │1│2│
 ";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
     }
 
     [Fact]
@@ -1423,7 +1425,7 @@ public class TableViewTests (ITestOutputHelper output)
         var expected = @"
 │1│2│
 ";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
     }
 
     [Fact]
@@ -1443,7 +1445,7 @@ public class TableViewTests (ITestOutputHelper output)
 ┌─┬─┐
 │1│2│
 ";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
     }
 
     [Fact]
@@ -1466,7 +1468,7 @@ public class TableViewTests (ITestOutputHelper output)
 ├─┼─►
 │1│2│
 ";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
     }
 
     [Fact]
@@ -1592,7 +1594,7 @@ public class TableViewTests (ITestOutputHelper output)
 │trap │p                                         │
 │zoo  │o                                         │";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         Assert.Equal (0, tv.SelectedRow);
 
@@ -1672,7 +1674,7 @@ public class TableViewTests (ITestOutputHelper output)
 │1│2│3│
 │1│2│3│";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         // ---------------- X=0 -----------------------
         // click is before first cell
@@ -1750,7 +1752,7 @@ public class TableViewTests (ITestOutputHelper output)
 │1│2│3│
 │1│2│3│";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
         int? col;
 
         // ---------------- X=0 -----------------------
@@ -1862,13 +1864,13 @@ public class TableViewTests (ITestOutputHelper output)
 ";
 
         tableView.Draw ();
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         // expect behavior to match when Table is null
         tableView.Table = null;
 
         tableView.Draw ();
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
     }
 
     [InlineData (true)]
@@ -1916,7 +1918,7 @@ public class TableViewTests (ITestOutputHelper output)
 ├─┼─┼─►
 │2│3│4│";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
     }
 
     [InlineData (true)]
@@ -1968,7 +1970,7 @@ public class TableViewTests (ITestOutputHelper output)
 ◄─┼─┼─►
 │2│3│4│";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         // but if E and F are invisible so we shouldn't show right
         tableView.Style.GetOrCreateColumnStyle (4).Visible = false;
@@ -1983,7 +1985,7 @@ public class TableViewTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tableView.Draw ();
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         // now also A is invisible so we cannot scroll in either direction
         tableView.Style.GetOrCreateColumnStyle (0).Visible = false;
@@ -1997,7 +1999,7 @@ public class TableViewTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tableView.Draw ();
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
     }
 
     [Fact]
@@ -2020,7 +2022,7 @@ public class TableViewTests (ITestOutputHelper output)
 ├─┼─┼─►
 │1│2│3│";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         // but if DEF are invisible we shouldn't be showing the indicator
         tableView.Style.GetOrCreateColumnStyle (3).Visible = false;
@@ -2035,7 +2037,7 @@ public class TableViewTests (ITestOutputHelper output)
         tableView.SetNeedsDraw ();
         View.SetClipToScreen ();
         tableView.Draw ();
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
     }
 
     [Fact]
@@ -2115,7 +2117,7 @@ public class TableViewTests (ITestOutputHelper output)
 │A│C│D│
 │1│3│4│";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
     }
 
     [Fact]
@@ -2239,7 +2241,7 @@ public class TableViewTests (ITestOutputHelper output)
 │Int32 │System   │System.ValueType               │
 │Single│System   │System.ValueType               │";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
     }
 
     [Fact]
@@ -2276,7 +2278,7 @@ public class TableViewTests (ITestOutputHelper output)
 │1│2│3│
 └─┴─┴─┘";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         Attribute normal = tv.ColorScheme.Normal;
         tv.ColorScheme = new (tv.ColorScheme) { Focus = new (Color.Magenta, Color.White) };
@@ -2295,7 +2297,7 @@ public class TableViewTests (ITestOutputHelper output)
 0101010
 0000000";
 
-        TestHelpers.AssertDriverAttributesAre (expected, output, Application.Driver, normal, focus);
+        DriverAssert.AssertDriverAttributesAre (expected, output, Application.Driver, normal, focus);
     }
 
     [Fact]
@@ -2330,7 +2332,7 @@ A B C
 1 2 3
 1 2 3";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         Attribute normal = tv.ColorScheme.Normal;
         tv.ColorScheme = new (tv.ColorScheme) { Focus = new (Color.Magenta, Color.White) };
@@ -2348,7 +2350,7 @@ A B C
 000000
 111111";
 
-        TestHelpers.AssertDriverAttributesAre (expected, output, Application.Driver, normal, focus);
+        DriverAssert.AssertDriverAttributesAre (expected, output, Application.Driver, normal, focus);
     }
 
     [Fact]
@@ -2384,7 +2386,7 @@ A B C
 │1│2│3│
 └─┴─┴─┘";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         Attribute normal = tv.ColorScheme.Normal;
         tv.ColorScheme = new (tv.ColorScheme) { Focus = new (Color.Magenta, Color.White) };
@@ -2404,7 +2406,7 @@ A B C
 0111110
 0000000";
 
-        TestHelpers.AssertDriverAttributesAre (expected, output, Application.Driver, normal, focus);
+        DriverAssert.AssertDriverAttributesAre (expected, output, Application.Driver, normal, focus);
     }
 
     [Theory]
@@ -2488,7 +2490,7 @@ A B C
             }
         }
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
     }
 
     [InlineData (true)]
@@ -2599,7 +2601,7 @@ A B C
 │☐│Tibbles│Cat          │
 │☐│Ripper │Dog          │";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
 #pragma warning disable xUnit2029
         Assert.Empty (pets.Where (p => p.IsPicked));
@@ -2621,7 +2623,7 @@ A B C
 │☐│Tibbles│Cat          │
 │☐│Ripper │Dog          │";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         tv.NewKeyDownEvent (Key.CursorDown);
         tv.NewKeyDownEvent (Key.Space);
@@ -2641,7 +2643,7 @@ A B C
 │☑│Tibbles│Cat          │
 │☐│Ripper │Dog          │";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         tv.NewKeyDownEvent (Key.CursorUp);
         tv.NewKeyDownEvent (Key.Space);
@@ -2661,7 +2663,7 @@ A B C
 │☑│Tibbles│Cat          │
 │☐│Ripper │Dog          │";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
     }
 
     [Fact]
@@ -2695,7 +2697,7 @@ A B C
         tv.NewKeyDownEvent (Key.Space);
 
         // Because at least 1 of the rows is not yet ticked we toggle them all to ticked
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
         Assert.Contains (0, wrapper.CheckedRows);
         Assert.Contains (1, wrapper.CheckedRows);
         Assert.Contains (2, wrapper.CheckedRows);
@@ -2712,7 +2714,7 @@ A B C
 │☑│1│2│
 │☑│1│2│";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         // Untoggle the top 2
         tv.NewKeyDownEvent (Key.Space);
@@ -2727,7 +2729,7 @@ A B C
 │☐│1│2│
 │☐│1│2│
 │☑│1│2│";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
         Assert.Single (wrapper.CheckedRows, 2);
     }
 
@@ -2757,7 +2759,7 @@ A B C
 │☑│1│2│
 │☑│1│2│";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
         Assert.Contains (0, wrapper.CheckedRows);
         Assert.Contains (1, wrapper.CheckedRows);
         Assert.Contains (2, wrapper.CheckedRows);
@@ -2777,7 +2779,7 @@ A B C
 │☐│1│2│
 │☐│1│2│";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         Assert.Empty (wrapper.CheckedRows);
     }
@@ -2819,7 +2821,7 @@ A B C
 │☑│Tibbles│Cat          │
 │☑│Ripper │Dog          │";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         tv.NewKeyDownEvent (Key.Space);
 
@@ -2840,7 +2842,7 @@ A B C
 │☐│Ripper │Dog          │
 ";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
     }
 
     [Fact]
@@ -2865,7 +2867,7 @@ A B C
 │☐│1│2│
 │☐│1│2│";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         Assert.Empty (wrapper.CheckedRows);
 
@@ -2885,7 +2887,7 @@ A B C
 │☐│1│2│
 │☐│1│2│";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         tv.NewKeyDownEvent (Key.CursorDown);
         tv.NewKeyDownEvent (Key.Space);
@@ -2905,7 +2907,7 @@ A B C
 │☑│1│2│
 │☐│1│2│";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         // untoggle top one
         tv.NewKeyDownEvent (Key.CursorUp);
@@ -2924,7 +2926,7 @@ A B C
 │☑│1│2│
 │☐│1│2│";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
     }
 
     [Fact]
@@ -2958,7 +2960,7 @@ A B C
 │○│Ripper │Dog          │
 ";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
 #pragma warning disable xUnit2029
         Assert.Empty (pets.Where (p => p.IsPicked));
@@ -2980,7 +2982,7 @@ A B C
 │○│Tibbles│Cat          │
 │○│Ripper │Dog          │";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         tv.NewKeyDownEvent (Key.CursorDown);
         tv.NewKeyDownEvent (Key.Space);
@@ -3001,7 +3003,7 @@ A B C
 │◉│Tibbles│Cat          │
 │○│Ripper │Dog          │";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         tv.NewKeyDownEvent (Key.CursorUp);
         tv.NewKeyDownEvent (Key.Space);
@@ -3022,7 +3024,7 @@ A B C
 │○│Tibbles│Cat          │
 │○│Ripper │Dog          │";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
     }
 
     [Fact]

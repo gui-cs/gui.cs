@@ -2,6 +2,8 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using UnitTests;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -60,7 +62,7 @@ public class ListViewTests (ITestOutputHelper output)
 
         Assert.Equal (-1, lv.SelectedItem);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────┐
 │Line0     │
@@ -81,7 +83,7 @@ public class ListViewTests (ITestOutputHelper output)
         Application.RunIteration (ref rs);
         Assert.Equal (-1, lv.SelectedItem);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────┐
 │Line10    │
@@ -102,7 +104,7 @@ public class ListViewTests (ITestOutputHelper output)
         Application.RunIteration (ref rs);
         Assert.Equal (0, lv.SelectedItem);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────┐
 │Line0     │
@@ -123,7 +125,7 @@ public class ListViewTests (ITestOutputHelper output)
         Application.RunIteration (ref rs);
         Assert.Equal (19, lv.SelectedItem);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────┐
 │Line10    │
@@ -144,7 +146,7 @@ public class ListViewTests (ITestOutputHelper output)
         Application.RunIteration (ref rs);
         Assert.Equal (19, lv.SelectedItem);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────┐
 │Line0     │
@@ -165,7 +167,7 @@ public class ListViewTests (ITestOutputHelper output)
         Application.RunIteration (ref rs);
         Assert.Equal (19, lv.SelectedItem);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────┐
 │Line10    │
@@ -186,7 +188,7 @@ public class ListViewTests (ITestOutputHelper output)
         Application.RunIteration (ref rs);
         Assert.Equal (19, lv.SelectedItem);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────┐
 │Line0     │
@@ -207,7 +209,7 @@ public class ListViewTests (ITestOutputHelper output)
         Application.RunIteration (ref rs);
         Assert.Equal (19, lv.SelectedItem);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────┐
 │Line10    │
@@ -228,7 +230,7 @@ public class ListViewTests (ITestOutputHelper output)
         Application.RunIteration (ref rs);
         Assert.Equal (0, lv.SelectedItem);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────┐
 │Line0     │
@@ -249,7 +251,7 @@ public class ListViewTests (ITestOutputHelper output)
         Application.RunIteration (ref rs);
         Assert.Equal (0, lv.SelectedItem);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────┐
 │Line19    │
@@ -270,7 +272,7 @@ public class ListViewTests (ITestOutputHelper output)
         Application.RunIteration (ref rs);
         Assert.Equal (0, lv.SelectedItem);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────┐
 │Line0     │
@@ -306,7 +308,7 @@ public class ListViewTests (ITestOutputHelper output)
         Application.Begin (top);
         Application.LayoutAndDraw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 Item 0
 Item 1
@@ -320,7 +322,7 @@ Item 4",
         lv.SelectedItem = 6;
         Application.LayoutAndDraw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 Item 2
 Item 3
@@ -729,7 +731,7 @@ Item 6",
         Assert.Equal (-1, lv.SelectedItem);
         Assert.Equal ("", lv.Text);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌─────┐
 │One  │
@@ -799,7 +801,7 @@ Item 6",
         Application.Begin (top);
         Application.LayoutAndDraw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
  Item 0
  Item 1
@@ -812,7 +814,7 @@ Item 6",
         lv.TopItem = 1;
         Application.LayoutAndDraw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
  tem 1
  tem 2

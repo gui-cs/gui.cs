@@ -68,22 +68,22 @@ public class AddRuneTests
 
         //		var s = "a\u0301\u0300\u0306";
 
-        //		TestHelpers.AssertDriverContentsWithFrameAre (@"
+        //		DriverAsserts.AssertDriverContentsWithFrameAre (@"
         //ắ", output);
 
         //		tf.Text = "\u1eaf";
         //		Application.Refresh ();
-        //		TestHelpers.AssertDriverContentsWithFrameAre (@"
+        //		DriverAsserts.AssertDriverContentsWithFrameAre (@"
         //ắ", output);
 
         //		tf.Text = "\u0103\u0301";
         //		Application.Refresh ();
-        //		TestHelpers.AssertDriverContentsWithFrameAre (@"
+        //		DriverAsserts.AssertDriverContentsWithFrameAre (@"
         //ắ", output);
 
         //		tf.Text = "\u0061\u0306\u0301";
         //		Application.Refresh ();
-        //		TestHelpers.AssertDriverContentsWithFrameAre (@"
+        //		DriverAsserts.AssertDriverContentsWithFrameAre (@"
         //ắ", output);
         driver.End ();
     }

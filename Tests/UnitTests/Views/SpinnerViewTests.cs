@@ -1,4 +1,6 @@
-﻿using Xunit.Abstractions;
+﻿using UnitTests;
+using UnitTests;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
@@ -56,14 +58,14 @@ public class SpinnerViewTests
         view.Draw ();
 
         var expected = "|";
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         view.AdvanceAnimation ();
         View.SetClipToScreen ();
         view.Draw ();
 
         expected = "/";
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Application.Top.Dispose ();
     }
 
@@ -75,19 +77,19 @@ public class SpinnerViewTests
         view.Draw ();
 
         var expected = @"\";
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         view.AdvanceAnimation ();
         view.Draw ();
 
         expected = @"\";
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         view.AdvanceAnimation ();
         view.Draw ();
 
         expected = @"\";
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         // BUGBUG: Disabled due to xunit error
         //Task.Delay (400).Wait ();
@@ -96,7 +98,7 @@ public class SpinnerViewTests
         //view.Draw ();
 
         //expected = "|";
-        //TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        //DriverAsserts.AssertDriverContentsWithFrameAre (expected, output);
         Application.Top.Dispose ();
     }
 

@@ -1,5 +1,7 @@
 #nullable enable
 using System.Text;
+using UnitTests;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
@@ -42,7 +44,7 @@ public class TransparentTests (ITestOutputHelper _output)
         super.Layout ();
         super.Draw ();
 
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (
+        _ = DriverAssert.AssertDriverContentsWithFrameAre (
                                                         @"
 ░░░░░░░░░░░░░░░░░░░░
 ░┌─────────────┐░░░░
@@ -96,7 +98,7 @@ public class TransparentTests (ITestOutputHelper _output)
         super.Layout ();
         super.Draw ();
 
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (
+        _ = DriverAssert.AssertDriverContentsWithFrameAre (
                                                           @"
 ░░░░░░░░░░░░░░░░░░░░
 ░┌─────────────┐░░░░

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Reflection;
 using Terminal.Gui;
 using UICatalog;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace StressTests;

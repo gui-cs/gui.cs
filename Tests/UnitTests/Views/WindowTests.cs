@@ -1,3 +1,5 @@
+using UnitTests;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -55,7 +57,7 @@ public class WindowTests
         Application.Begin (top);
         ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────────────┐
 │ File  Edit       │
@@ -72,7 +74,7 @@ public class WindowTests
 
         ((FakeDriver)Application.Driver!).SetBufferSize (40, 20);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -99,7 +101,7 @@ public class WindowTests
 
         ((FakeDriver)Application.Driver!).SetBufferSize (20, 10);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────────────┐
 │ File  Edit       │

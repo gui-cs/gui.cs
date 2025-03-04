@@ -1,5 +1,7 @@
 ﻿using System.Text;
+using UnitTests;
 using Terminal.Gui.ViewMouseTests;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -705,7 +707,7 @@ public class MultiBarSeriesTests
  │  MM  MM  MM
  ┼──┬M──┬M──┬M──────
    heytherebob  ";
-        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, _output);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1123,7 +1125,7 @@ public class TextAnnotationTests
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1149,7 +1151,7 @@ public class TextAnnotationTests
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output);
 
         // user scrolls up one unit of graph space
         gv.ScrollOffset = new PointF (0, 1f);
@@ -1169,7 +1171,7 @@ public class TextAnnotationTests
 1┼┬┬┬┬┬┬┬┬
  0    5";
 
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1203,7 +1205,7 @@ public class TextAnnotationTests
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1233,7 +1235,7 @@ public class TextAnnotationTests
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1259,7 +1261,7 @@ public class TextAnnotationTests
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output);
 
         // user scrolls up one unit of graph space
         gv.ScrollOffset = new PointF (0, 1f);
@@ -1278,7 +1280,7 @@ public class TextAnnotationTests
 1┼┬┬┬┬┬┬┬┬
  0    5";
 
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output);
 
         // user scrolls up one unit of graph space
         gv.ScrollOffset = new PointF (0, 1f);
@@ -1297,7 +1299,7 @@ public class TextAnnotationTests
 1┼┬┬┬┬┬┬┬┬
  0    5";
 
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1349,7 +1351,7 @@ public class LegendTests
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1378,7 +1380,7 @@ public class LegendTests
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1409,7 +1411,7 @@ public class PathAnnotationTests
          
          
           ";
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1434,7 +1436,7 @@ public class PathAnnotationTests
          
          
           ";
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1467,7 +1469,7 @@ public class PathAnnotationTests
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1500,7 +1502,7 @@ public class PathAnnotationTests
 0┼┬┬┬┬┬┬┬┬
  0    5";
 
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1548,7 +1550,7 @@ public class PathAnnotationTests
             mount.Draw ();
 
             // should have the initial text
-            TestHelpers.AssertDriverContentsAre ("ff", null);
+            DriverAssert.AssertDriverContentsAre ("ff", null);
 
             // change the text and redraw
             view.Text = "ff1234";
@@ -1557,7 +1559,7 @@ public class PathAnnotationTests
             mount.Draw ();
 
             // should have the new text rendered
-            TestHelpers.AssertDriverContentsAre ("ff1234", null);
+            DriverAssert.AssertDriverContentsAre ("ff1234", null);
         }
         finally
         {
@@ -1599,7 +1601,7 @@ public class PathAnnotationTests
    0    5
          
           ";
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();
@@ -1636,7 +1638,7 @@ public class PathAnnotationTests
  0    5   
           
           ";
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output);
 
         // Shutdown must be called to safely clean up Application if Init has been called
         Application.Shutdown ();

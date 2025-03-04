@@ -1,4 +1,6 @@
-﻿using Xunit.Abstractions;
+﻿using UnitTests;
+using UnitTests;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
@@ -149,7 +151,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
         superView.Add (view);
         Application.TopLevels.Push (superView);
         Application.LayoutAndDraw (true);
-        TestHelpers.AssertDriverAttributesAre (expectedAttrs, output, Application.Driver, attributes);
+        DriverAssert.AssertDriverAttributesAre (expectedAttrs, output, Application.Driver, attributes);
         Application.ResetState (true);
     }
 
@@ -219,7 +221,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
         Application.TopLevels.Push (superView);
         Application.LayoutAndDraw (true);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         view.Dispose ();
         Application.ResetState (true);
     }

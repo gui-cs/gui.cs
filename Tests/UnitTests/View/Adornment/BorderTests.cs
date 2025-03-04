@@ -1,4 +1,6 @@
-﻿using Xunit.Abstractions;
+﻿using UnitTests;
+using UnitTests;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
@@ -33,8 +35,8 @@ public class BorderTests (ITestOutputHelper output)
         superView.Draw ();
 
         var expected = @"─┤A├─";
-        TestHelpers.AssertDriverContentsAre (expected, output);
-        TestHelpers.AssertDriverAttributesAre ("00000", output, null, view.ColorScheme.Normal);
+        DriverAssert.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverAttributesAre ("00000", output, null, view.ColorScheme.Normal);
 
         view.CanFocus = true;
         view.SetFocus ();
@@ -43,7 +45,7 @@ public class BorderTests (ITestOutputHelper output)
         Assert.Equal (view.GetFocusColor (), view.Border.GetFocusColor ());
         Assert.Equal (view.ColorScheme.Focus.Foreground, view.Border.GetFocusColor ().Foreground);
         Assert.Equal (view.ColorScheme.Normal.Foreground, view.Border.GetNormalColor ().Foreground);
-        TestHelpers.AssertDriverAttributesAre ("00100", output, null, view.ColorScheme.Normal, view.GetFocusColor ());
+        DriverAssert.AssertDriverAttributesAre ("00100", output, null, view.ColorScheme.Normal, view.GetFocusColor ());
     }
 
     [Fact]
@@ -68,8 +70,8 @@ public class BorderTests (ITestOutputHelper output)
         view.Draw ();
 
         var expected = @"─┤A├─";
-        TestHelpers.AssertDriverContentsAre (expected, output);
-        TestHelpers.AssertDriverAttributesAre ("00000", output, null, view.ColorScheme.Normal);
+        DriverAssert.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverAttributesAre ("00000", output, null, view.ColorScheme.Normal);
     }
 
     [Theory]
@@ -201,7 +203,7 @@ public class BorderTests (ITestOutputHelper output)
                 break;
         }
 
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Application.End (rs);
         win.Dispose ();
     }
@@ -334,7 +336,7 @@ public class BorderTests (ITestOutputHelper output)
                 break;
         }
 
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Application.End (rs);
         win.Dispose ();
     }
@@ -468,7 +470,7 @@ public class BorderTests (ITestOutputHelper output)
                 break;
         }
 
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Application.End (rs);
         win.Dispose ();
     }
@@ -523,7 +525,7 @@ public class BorderTests (ITestOutputHelper output)
                 break;
         }
 
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Application.End (rs);
         win.Dispose ();
     }
@@ -637,7 +639,7 @@ public class BorderTests (ITestOutputHelper output)
                 break;
         }
 
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         win.Dispose ();
     }
 
@@ -742,7 +744,7 @@ public class BorderTests (ITestOutputHelper output)
 ║└─┘║
 ╚═══╝";
 
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Application.End (rs);
         top.Dispose ();
     }
@@ -769,7 +771,7 @@ public class BorderTests (ITestOutputHelper output)
 ║└──────┘║
 ╚════════╝";
 
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Application.End (rs);
         top.Dispose ();
     }
@@ -791,7 +793,7 @@ public class BorderTests (ITestOutputHelper output)
 │ │
 └─┘";
 
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         win.Dispose ();
     }
 
@@ -874,7 +876,7 @@ public class BorderTests (ITestOutputHelper output)
         superView.EndInit ();
         superView.Draw ();
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
     }
 
 
@@ -940,6 +942,6 @@ public class BorderTests (ITestOutputHelper output)
         superView.EndInit ();
         superView.Draw ();
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
     }
 }

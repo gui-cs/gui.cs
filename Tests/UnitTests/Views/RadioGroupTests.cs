@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel;
+using UnitTests;
+using UnitTests;
 using Xunit.Abstractions;
 
 // ReSharper disable AccessToModifiedClosure
@@ -549,7 +551,7 @@ public class RadioGroupTests (ITestOutputHelper output)
 └────────────────────────────┘
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 30, 5), pos);
 
         rg.Orientation = Orientation.Horizontal;
@@ -570,7 +572,7 @@ public class RadioGroupTests (ITestOutputHelper output)
 └────────────────────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 30, 5), pos);
 
         rg.HorizontalSpace = 4;
@@ -591,7 +593,7 @@ public class RadioGroupTests (ITestOutputHelper output)
 └────────────────────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 30, 5), pos);
         top.Dispose ();
     }

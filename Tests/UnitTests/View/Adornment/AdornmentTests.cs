@@ -1,4 +1,6 @@
-﻿using Xunit.Abstractions;
+﻿using UnitTests;
+using UnitTests;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
@@ -527,7 +529,7 @@ public class AdornmentTests (ITestOutputHelper output)
 
         view.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ╭────╮
 │View│
@@ -545,7 +547,7 @@ public class AdornmentTests (ITestOutputHelper output)
         Assert.Equal (6, view.Width);
         Assert.Equal (3, view.Height);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ╭────╮
 │View│
@@ -565,7 +567,7 @@ public class AdornmentTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         view.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ╭────╮
 │View│

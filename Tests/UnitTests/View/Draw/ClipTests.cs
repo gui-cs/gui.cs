@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Text;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
@@ -82,86 +83,86 @@ public class ClipTests (ITestOutputHelper _output)
 
         superView.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
  ┌─┐
  │X│
  └─┘",
-                                                      _output);
+                                                       _output);
 
         Rectangle toFill = new (x, y, width, height);
         View.SetClipToScreen ();
         view.FillRect (toFill);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
  ┌─┐
  │ │
  └─┘",
-                                                      _output);
+                                                       _output);
 
         // Now try to clear beyond Viewport (invalid; clipping should prevent)
         superView.SetNeedsDraw ();
         superView.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
  ┌─┐
  │X│
  └─┘",
-                                                      _output);
+                                                       _output);
         toFill = new (-width, -height, width, height);
         view.FillRect (toFill);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
  ┌─┐
  │X│
  └─┘",
-                                                      _output);
+                                                       _output);
 
         // Now try to clear beyond Viewport (valid)
         superView.SetNeedsDraw ();
         superView.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
  ┌─┐
  │X│
  └─┘",
-                                                      _output);
+                                                       _output);
         toFill = new (-1, -1, width + 1, height + 1);
 
         View.SetClipToScreen ();
         view.FillRect (toFill);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
  ┌─┐
  │ │
  └─┘",
-                                                      _output);
+                                                       _output);
 
         // Now clear too much size
         superView.SetNeedsDraw ();
         superView.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
  ┌─┐
  │X│
  └─┘",
-                                                      _output);
+                                                       _output);
         toFill = new (0, 0, width * 2, height * 2);
         View.SetClipToScreen ();
         view.FillRect (toFill);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
-                                                      @"
+        DriverAssert.AssertDriverContentsWithFrameAre (
+                                                       @"
  ┌─┐
  │ │
  └─┘",
-                                                      _output);
+                                                       _output);
     }
 
     // TODO: Simplify this test to just use AddRune directly
@@ -200,7 +201,7 @@ public class ClipTests (ITestOutputHelper _output)
                              │これは広いルーンラインです。
                              """;
 
-        TestHelpers.AssertDriverContentsWithFrameAre (expectedOutput, _output);
+        DriverAssert.AssertDriverContentsWithFrameAre (expectedOutput, _output);
 
         var view = new View
         {
@@ -228,7 +229,7 @@ public class ClipTests (ITestOutputHelper _output)
                          │�│0123456789│�ンラインです。
                          """;
 
-        TestHelpers.AssertDriverContentsWithFrameAre (expectedOutput, _output);
+        DriverAssert.AssertDriverContentsWithFrameAre (expectedOutput, _output);
     }
 
     // TODO: Add more AddRune tests to cover all the cases where wide runes are clipped

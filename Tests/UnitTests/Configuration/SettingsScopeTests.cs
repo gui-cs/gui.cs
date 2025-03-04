@@ -1,4 +1,5 @@
-﻿using static Terminal.Gui.ConfigurationManager;
+﻿using UnitTests;
+using static Terminal.Gui.ConfigurationManager;
 
 namespace Terminal.Gui.ConfigurationTests;
 

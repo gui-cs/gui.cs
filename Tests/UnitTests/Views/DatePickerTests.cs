@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using UnitTests;
 
 namespace Terminal.Gui.ViewsTests;
 

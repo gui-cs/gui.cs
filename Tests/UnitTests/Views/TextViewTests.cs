@@ -2,6 +2,8 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using Xunit.Abstractions;
+using UnitTests;
+using UnitTests;
 
 namespace Terminal.Gui.ViewsTests;
 
@@ -727,7 +729,7 @@ public class TextViewTests
         Assert.False (tv.WordWrap);
         Assert.Equal (Point.Empty, tv.CursorPosition);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 This is the first line. 
 This is the second line.
@@ -741,7 +743,7 @@ This is the second line.
         Application.RunIteration (ref rs);
         Assert.Equal (new Point (2, 0), tv.CursorPosition);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 Ths is the first line.  
 This is the second line.
@@ -755,7 +757,7 @@ This is the second line.
         Application.RunIteration (ref rs);
         Assert.Equal (new Point (22, 0), tv.CursorPosition);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 Ths is the first line.This is the second line.
 ",
@@ -766,7 +768,7 @@ Ths is the first line.This is the second line.
         Application.RunIteration (ref rs);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 Ths is the first line.  
 This is the second line.
@@ -801,7 +803,7 @@ This is the second line.
         Assert.True (tv.WordWrap);
         Assert.Equal (Point.Empty, tv.CursorPosition);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 This is the first line. 
 This is the second line.
@@ -815,7 +817,7 @@ This is the second line.
         Application.RunIteration (ref rs);
         Assert.Equal (new Point (2, 0), tv.CursorPosition);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 Ths is the first line.  
 This is the second line.
@@ -829,7 +831,7 @@ This is the second line.
         Application.RunIteration (ref rs);
         Assert.Equal (new Point (22, 0), tv.CursorPosition);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 Ths is the first line.This is the second line.
 ",
@@ -840,7 +842,7 @@ Ths is the first line.This is the second line.
         Application.RunIteration (ref rs);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 Ths is the first line.  
 This is the second line.
@@ -875,7 +877,7 @@ This is the second line.
         Assert.False (tv.WordWrap);
         Assert.Equal (Point.Empty, tv.CursorPosition);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 This is the first line. 
 This is the second line.
@@ -889,7 +891,7 @@ This is the second line.
         Application.RunIteration (ref rs);
         Assert.Equal (new Point (2, 0), tv.CursorPosition);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 Ths is the first line.  
 This is the second line.
@@ -903,7 +905,7 @@ This is the second line.
         Application.RunIteration (ref rs);
         Assert.Equal (new Point (22, 0), tv.CursorPosition);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 Ths is the first line.This is the second line.
 ",
@@ -914,7 +916,7 @@ Ths is the first line.This is the second line.
         Application.RunIteration (ref rs);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 Ths is the first line.  
 This is the second line.
@@ -948,7 +950,7 @@ This is the second line.
         Assert.True (tv.WordWrap);
         Assert.Equal (Point.Empty, tv.CursorPosition);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 This is the first line. 
 This is the second line.
@@ -962,7 +964,7 @@ This is the second line.
         Application.RunIteration (ref rs);
         Assert.Equal (new Point (2, 0), tv.CursorPosition);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 Ths is the first line.  
 This is the second line.
@@ -976,7 +978,7 @@ This is the second line.
         Application.RunIteration (ref rs);
         Assert.Equal (new Point (22, 0), tv.CursorPosition);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 Ths is the first line.This is the second line.
 ",
@@ -987,7 +989,7 @@ Ths is the first line.This is the second line.
         Application.RunIteration (ref rs);
         Assert.Equal (new Point (0, 1), tv.CursorPosition);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 Ths is the first line.  
 This is the second line.
@@ -6366,7 +6368,7 @@ This is the second line.
         };
 
         //                                             TAB to jump between text fields.
-        TestHelpers.AssertDriverAttributesAre ("0000000", _output, Application.Driver, attributes);
+        DriverAssert.AssertDriverAttributesAre ("0000000", _output, Application.Driver, attributes);
         Assert.Empty (_textView.SelectedCellsList);
 
         _textView.NewKeyDownEvent (Key.CursorRight.WithCtrl.WithShift);
@@ -6375,7 +6377,7 @@ This is the second line.
         Assert.Equal (new Point (4, 0), _textView.CursorPosition);
 
         //                                             TAB to jump between text fields.
-        TestHelpers.AssertDriverAttributesAre ("1111000", _output, Application.Driver, attributes);
+        DriverAssert.AssertDriverAttributesAre ("1111000", _output, Application.Driver, attributes);
         Assert.Equal ("TAB ", Cell.ToString (_textView.SelectedCellsList [^1]));
         top.Dispose ();
     }
@@ -6743,7 +6745,7 @@ This is the second line.
         Assert.Equal ("\tTAB to jump between text fields.", _textView.Text);
         Application.LayoutAndDraw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 TAB to jump between text field",
                                                       _output
@@ -6752,7 +6754,7 @@ TAB to jump between text field",
         _textView.TabWidth = 4;
         Application.LayoutAndDraw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
     TAB to jump between text f",
                                                       _output
@@ -6763,7 +6765,7 @@ TAB to jump between text field",
         Assert.True (_textView.NeedsDraw);
         Application.LayoutAndDraw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 TAB to jump between text field",
                                                       _output
@@ -6830,7 +6832,7 @@ TAB to jump between text field",
         Application.LayoutAndDraw ();
 
         //this passes
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (
                                                                  @"
 ┌─────────────┐
 │             │
@@ -6858,7 +6860,7 @@ TAB to jump between text field",
         tv.InsertText ("\r\naaa\r\nbbb");
         Application.LayoutAndDraw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌─────────────┐
 │             │
@@ -6908,7 +6910,7 @@ TAB to jump between text field",
         Application.LayoutAndDraw ();
 
         //this passes
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (
                                                                  @"
 ┌─────────────┐
 │             │
@@ -6936,7 +6938,7 @@ TAB to jump between text field",
         tv.InsertText ("\naaa\nbbb");
         Application.LayoutAndDraw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌─────────────┐
 │             │
@@ -7009,7 +7011,7 @@ TAB to jump between text field",
         Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (Point.Empty, cp);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 This is the first line. 
 This is the second line.
@@ -7023,7 +7025,7 @@ This is the second line.
         Assert.Equal (new Point (12, 0), tv.CursorPosition);
         Assert.Equal (new Point (12, 0), cp);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 This is the first line. 
 This is the second line.
@@ -7037,7 +7039,7 @@ This is the second line.
         Assert.Equal (new Point (4, 2), tv.CursorPosition);
         Assert.Equal (new Point (12, 0), cp);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 This 
 is   
@@ -7060,7 +7062,7 @@ line.
         Assert.Equal (new Point (0, 3), tv.CursorPosition);
         Assert.Equal (new Point (12, 0), cp);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 This 
 is   
@@ -7083,7 +7085,7 @@ line.
         Assert.Equal (new Point (1, 3), tv.CursorPosition);
         Assert.Equal (new Point (13, 0), cp);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 This 
 is   
@@ -7106,7 +7108,7 @@ line.
         Assert.Equal (new Point (0, 3), tv.CursorPosition);
         Assert.Equal (new Point (13, 0), cp);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 This 
 is   
@@ -8181,7 +8183,7 @@ line.
         Assert.Equal (Point.Empty, tv.CursorPosition);
         Assert.Equal (0, tv.LeftColumn);
 
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"
 aaaa
 ",
@@ -8193,7 +8195,7 @@ aaaa
         Application.LayoutAndDraw ();
         Assert.Equal (0, tv.LeftColumn);
 
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"
 aaa
 ",
@@ -8204,7 +8206,7 @@ aaa
         Application.LayoutAndDraw ();
         Assert.Equal (0, tv.LeftColumn);
 
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"
 aa
 ",
@@ -8215,7 +8217,7 @@ aa
         Application.LayoutAndDraw ();
         Assert.Equal (0, tv.LeftColumn);
 
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"
 a
 ",
@@ -8226,7 +8228,7 @@ a
         Application.LayoutAndDraw ();
         Assert.Equal (0, tv.LeftColumn);
 
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"
 
 ",
@@ -8237,7 +8239,7 @@ a
         Application.LayoutAndDraw ();
         Assert.Equal (0, tv.LeftColumn);
 
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"
 
 ",
@@ -8260,7 +8262,7 @@ a
 
         Assert.True (_textView.WordWrap);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 Line 1.
 Line 2.",
@@ -8272,13 +8274,13 @@ Line 2.",
 
         Assert.True (_textView.NewKeyDownEvent (new Key (del)));
         Application.LayoutAndDraw ();
-        TestHelpers.AssertDriverContentsWithFrameAre ("Line 2.", _output);
+        DriverAssert.AssertDriverContentsWithFrameAre ("Line 2.", _output);
 
         Assert.True (_textView.NewKeyDownEvent (Key.H.WithShift));
         Assert.NotEqual (Rectangle.Empty, _textView._needsDrawRect);
         Application.LayoutAndDraw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 H      
 Line 2.",
@@ -8335,7 +8337,7 @@ Line 2.",
         top.Layout ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 This is  
 the first
@@ -8355,7 +8357,7 @@ line.
         View.SetClipToScreen ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 This is   
 the first 
@@ -8441,7 +8443,7 @@ line.
         top.Layout ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 This is
 the    
@@ -8860,7 +8862,7 @@ line.
         tv.EndInit ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre ("\u241b", _output);
+        DriverAssert.AssertDriverContentsWithFrameAre ("\u241b", _output);
 
         tv.Dispose ();
     }
@@ -8916,7 +8918,7 @@ line.
         Application.Begin (top);
         Application.LayoutAndDraw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 This is the first line. 
 This is the second line.",
@@ -8928,7 +8930,7 @@ This is the second line.",
         tv.WordWrap = true;
         Application.LayoutAndDraw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 This is
 the    
@@ -8978,7 +8980,7 @@ Base
 Dialog  
 Menu    
 Error   ";
-        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output);
 
         Attribute [] attributes =
         {
@@ -9007,12 +9009,12 @@ Error   ";
 2222225555
 3333555555
 4444455555";
-        TestHelpers.AssertDriverAttributesAre (expectedColor, _output, Application.Driver, attributes);
+        DriverAssert.AssertDriverAttributesAre (expectedColor, _output, Application.Driver, attributes);
 
         tv.WordWrap = true;
         Application.LayoutAndDraw ();
-        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
-        TestHelpers.AssertDriverAttributesAre (expectedColor, _output, Application.Driver, attributes);
+        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output);
+        DriverAssert.AssertDriverAttributesAre (expectedColor, _output, Application.Driver, attributes);
 
         tv.CursorPosition = new (6, 2);
         tv.SelectionStartColumn = 0;
@@ -9032,7 +9034,7 @@ Menu
 ErTopLevel
 Base      
 Dialogror ";
-        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output);
 
         expectedColor = @"
 0000000055
@@ -9042,7 +9044,7 @@ Dialogror ";
 4400000000
 1111555555
 2222224445";
-        TestHelpers.AssertDriverAttributesAre (expectedColor, _output, Application.Driver, attributes);
+        DriverAssert.AssertDriverAttributesAre (expectedColor, _output, Application.Driver, attributes);
 
         tv.Undo ();
         tv.CursorPosition = new (0, 3);
@@ -9068,7 +9070,7 @@ ErTopLevel
 Base      
 Dialog    
 ror       ";
-        TestHelpers.AssertDriverContentsWithFrameAre (expectedText, _output);
+        DriverAssert.AssertDriverContentsWithFrameAre (expectedText, _output);
 
         expectedColor = @"
 0000000055
@@ -9079,7 +9081,7 @@ ror       ";
 1111555555
 2222225555
 4445555555";
-        TestHelpers.AssertDriverAttributesAre (expectedColor, _output, Application.Driver, attributes);
+        DriverAssert.AssertDriverAttributesAre (expectedColor, _output, Application.Driver, attributes);
 
         Application.End (rs);
         top.Dispose ();

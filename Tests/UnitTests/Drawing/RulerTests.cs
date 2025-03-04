@@ -1,4 +1,6 @@
-﻿using Xunit.Abstractions;
+﻿using UnitTests;
+using UnitTests;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.DrawingTests;
 
@@ -33,7 +35,7 @@ public class RulerTests
 
         var r = new Ruler ();
         r.Draw (Point.Empty);
-        TestHelpers.AssertDriverContentsWithFrameAre (@"", _output);
+        DriverAssert.AssertDriverContentsWithFrameAre (@"", _output);
     }
 
     [Fact]
@@ -48,7 +50,7 @@ public class RulerTests
         r.Length = len;
         r.Draw (Point.Empty);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 |123456789|1234",
                                                       _output
@@ -57,7 +59,7 @@ public class RulerTests
         // Postive offset
         r.Draw (new (1, 1));
 
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                                       @"
 |123456789|1234
  |123456789|1234
@@ -68,7 +70,7 @@ public class RulerTests
         // Negative offset
         r.Draw (new (-1, 3));
 
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"
 |123456789|1234
  |123456789|1234
@@ -89,7 +91,7 @@ public class RulerTests
         r.Length = len;
         r.Draw (Point.Empty);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 -
 1
@@ -111,7 +113,7 @@ public class RulerTests
 
         r.Draw (new (1, 1));
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 - 
 1-
@@ -135,7 +137,7 @@ public class RulerTests
         // Negative offset
         r.Draw (new (2, -1));
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 - 1
 1-2

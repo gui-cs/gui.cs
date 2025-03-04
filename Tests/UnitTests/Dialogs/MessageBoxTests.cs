@@ -1,5 +1,7 @@
 ﻿using System.Text;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using UnitTests;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.DialogTests;
@@ -221,7 +223,7 @@ public class MessageBoxTests
                                      {
                                          Application.LayoutAndDraw ();
 
-                                         TestHelpers.AssertDriverContentsWithFrameAre (
+                                         DriverAssert.AssertDriverContentsWithFrameAre (
                                                                                        @"
  ╔════════════════╗
  ║ ff ff ff ff ff ║
@@ -238,7 +240,7 @@ public class MessageBoxTests
                                      {
                                          Application.LayoutAndDraw ();
 
-                                         TestHelpers.AssertDriverContentsWithFrameAre (
+                                         DriverAssert.AssertDriverContentsWithFrameAre (
                                                                                        @"
  ╔════════════════╗
  ║ffffffffffffffff║
@@ -293,7 +295,7 @@ public class MessageBoxTests
                                      {
                                          Application.LayoutAndDraw ();
 
-                                         TestHelpers.AssertDriverContentsWithFrameAre (
+                                         DriverAssert.AssertDriverContentsWithFrameAre (
                                                                                        @"
   ╔══════════════╗
   ║ff ff ff ff ff║
@@ -313,7 +315,7 @@ public class MessageBoxTests
                                      {
                                          Application.LayoutAndDraw ();
 
-                                         TestHelpers.AssertDriverContentsWithFrameAre (
+                                         DriverAssert.AssertDriverContentsWithFrameAre (
                                                                                        @$"
  ╔════════════════╗
  ║ffffffffffffffff║
@@ -491,7 +493,7 @@ public class MessageBoxTests
                                                                └────────────────────────────────────────────────────────────────────┘
                                                                """;
 
-                                         TestHelpers.AssertDriverContentsAre (expectedText, _output);
+                                         DriverAssert.AssertDriverContentsAre (expectedText, _output);
 
                                          Application.RequestStop ();
                                      }

@@ -1,4 +1,6 @@
 ﻿using System.Text;
+using UnitTests;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -43,7 +45,7 @@ public class TreeTableSourceTests : IDisposable
 │├+Lost Highway│Exciting night road    │
 │└+Route 66    │Great race course      │";
 
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output);
 
         Assert.Equal (2, tv.Table.Rows);
 
@@ -67,7 +69,7 @@ public class TreeTableSourceTests : IDisposable
 │└+Route 66       │Great race course   │
 ";
 
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output);
 
         // when pressing left we should collapse the top route again
         tv.NewKeyDownEvent (Key.CursorLeft);
@@ -83,7 +85,7 @@ public class TreeTableSourceTests : IDisposable
 │└+Route 66    │Great race course      │
 ";
 
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output);
     }
 
     [Fact]
@@ -106,7 +108,7 @@ public class TreeTableSourceTests : IDisposable
 │├+Lost Highway│Exciting night road    │
 │└+Route 66    │Great race course      │";
 
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output);
 
         Assert.Equal (2, tv.Table.Rows);
 
@@ -129,15 +131,15 @@ public class TreeTableSourceTests : IDisposable
 │└+Route 66       │Great race course   │
 ";
 
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output);
 
         // Clicking to the right/left of the expand/collapse does nothing
         tv.NewMouseEvent (new MouseEventArgs { Position = new (3, 2), Flags = MouseFlags.Button1Clicked });
         tv.Draw ();
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output);
         tv.NewMouseEvent (new MouseEventArgs { Position = new (1, 2), Flags = MouseFlags.Button1Clicked });
         tv.Draw ();
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output);
 
         // Clicking on the + again should collapse
         tv.NewMouseEvent (new MouseEventArgs { Position = new (2, 2), Flags = MouseFlags.Button1Clicked });
@@ -151,7 +153,7 @@ public class TreeTableSourceTests : IDisposable
 │├+Lost Highway│Exciting night road    │
 │└+Route 66    │Great race course      │";
 
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output);
     }
 
     [Fact]
@@ -177,7 +179,7 @@ public class TreeTableSourceTests : IDisposable
 │☐│└+Route 66    │Great race course    │
 ";
 
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output);
 
         Assert.Equal (2, tv.Table.Rows);
 
@@ -208,7 +210,7 @@ public class TreeTableSourceTests : IDisposable
 │☐│└+Route 66       │Great race course │
 ";
 
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output);
 
         tv.NewKeyDownEvent (Key.CursorDown);
         tv.NewKeyDownEvent (Key.Space);
@@ -226,7 +228,7 @@ public class TreeTableSourceTests : IDisposable
 │☐│└+Route 66       │Great race course │
 ";
 
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output);
 
         IDescribedThing [] selectedObjects = checkSource.CheckedRows.Select (treeSource.GetObjectOnRow).ToArray ();
         IDescribedThing selected = Assert.Single (selectedObjects);

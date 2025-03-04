@@ -1,4 +1,6 @@
 ﻿using System.Globalization;
+using UnitTests;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -103,7 +105,7 @@ public class TabViewTests (ITestOutputHelper output)
         View tabRow = tv.Subviews [0];
         Assert.Equal ("TabRow", tabRow.GetType ().Name);
 
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"
 ╭────┬────╮
 │Tab1│Tab2│
@@ -186,7 +188,7 @@ public class TabViewTests (ITestOutputHelper output)
         View tabRow = tv.Subviews [0];
         Assert.Equal ("TabRow", tabRow.GetType ().Name);
 
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"
 ╭────╮
 │Tab1│
@@ -223,7 +225,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tab2, newChanged);
         Assert.Equal (tab2, tv.SelectedTab);
 
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"
 ╭────╮
 │Tab2│
@@ -243,7 +245,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tab1, newChanged);
         Assert.Equal (tab1, tv.SelectedTab);
 
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"
 ╭────╮
 │Tab1│
@@ -274,7 +276,7 @@ public class TabViewTests (ITestOutputHelper output)
         View tabRow = tv.Subviews [0];
         Assert.Equal ("TabRow", tabRow.GetType ().Name);
 
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"
 ┌───────┐
 │╭────╮ │
@@ -313,7 +315,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tab2, newChanged);
         Assert.Equal (tab2, tv.SelectedTab);
 
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"
 ┌───────┐
 │╭────╮ │
@@ -335,7 +337,7 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tab1, newChanged);
         Assert.Equal (tab1, tv.SelectedTab);
 
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"
 ┌───────┐
 │╭────╮ │
@@ -595,7 +597,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ││ 
 │╰►
@@ -619,7 +621,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 │T│ 
 │ ╰►
@@ -649,7 +651,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 │12│13│   
 │  ╰──┴──╮
@@ -666,7 +668,7 @@ public class TabViewTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 │12│13│   
 ├──╯  ╰──╮
@@ -685,7 +687,7 @@ public class TabViewTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 │1234567│ 
 │       ╰►
@@ -701,7 +703,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.Layout ();
         View.SetClipToScreen ();
         tv.Draw ();
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 │13│      
 ◄  ╰─────╮
@@ -718,7 +720,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.Layout ();
         View.SetClipToScreen ();
         tv.Draw ();
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 │abcdefg│ 
 ◄       ╰╮
@@ -742,7 +744,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌─┐
 │h│
@@ -766,7 +768,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──┐
 │hi│
@@ -795,7 +797,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.Layout ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌────────┐
 │hi      │
@@ -812,7 +814,7 @@ public class TabViewTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌────────┐
 │hi2     │
@@ -832,7 +834,7 @@ public class TabViewTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌────────┐
 │hi      │
@@ -849,7 +851,7 @@ public class TabViewTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌────────┐
 │hi2     │
@@ -867,7 +869,7 @@ public class TabViewTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌────────┐
 │hi2     │
@@ -889,7 +891,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ╭╮ 
 ││ 
@@ -912,7 +914,7 @@ public class TabViewTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ╭─╮ 
 │T│ 
@@ -938,7 +940,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.Layout ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ╭──┬──╮   
 │12│13│   
@@ -954,7 +956,7 @@ public class TabViewTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ╭──┬──╮   
 │12│13│   
@@ -974,7 +976,7 @@ public class TabViewTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ╭───────╮ 
 │1234567│ 
@@ -991,7 +993,7 @@ public class TabViewTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ╭──╮      
 │13│      
@@ -1009,7 +1011,7 @@ public class TabViewTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ╭───────╮ 
 │abcdefg│ 
@@ -1035,7 +1037,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.Layout ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ╭────╮              
 │Tab0│              
@@ -1051,7 +1053,7 @@ public class TabViewTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ╭──────────────╮    
 │Les Misérables│    
@@ -1075,7 +1077,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌─┐
 │h│
@@ -1099,7 +1101,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──┐
 │hi│
@@ -1128,7 +1130,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.Layout ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌────────┐
 │hi      │
@@ -1146,7 +1148,7 @@ public class TabViewTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌────────┐
 │hi      │
@@ -1163,7 +1165,7 @@ public class TabViewTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌────────┐
 │hi2     │
@@ -1181,7 +1183,7 @@ public class TabViewTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌────────┐
 │hi2     │
@@ -1209,7 +1211,7 @@ public class TabViewTests (ITestOutputHelper output)
         tv.Layout ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────────────┐
 │hi                │
@@ -1225,7 +1227,7 @@ public class TabViewTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────────────┐
 │hi2               │
@@ -1322,7 +1324,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         Assert.Equal (tab1, tv.SelectedTab);
 
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"
 ╭────┬────┬────╮
 │Tab1│Tab2│Tab3│
@@ -1339,7 +1341,7 @@ public class TabViewTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ╭────┬────┬────╮    
 │Tab1│Tab2│Tab3│    
@@ -1356,7 +1358,7 @@ public class TabViewTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ╭────┬────┬────╮    
 │Tab1│Tab2│Tab3│    
@@ -1389,7 +1391,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         Assert.Equal (tab1, tv.SelectedTab);
 
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"
 ┌──────────────────┐
 │hi                │
@@ -1406,7 +1408,7 @@ public class TabViewTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────────────┐
 │hi2               │
@@ -1423,7 +1425,7 @@ public class TabViewTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────────────┐
 │hi3               │

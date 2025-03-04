@@ -256,7 +256,7 @@ public class ConsoleDriverTests
     //└──────────────────┘
     //";
 
-    //					var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+    //					var pos = DriverAsserts.AssertDriverContentsWithFrameAre (expected, output);
     //					Assert.Equal (new (0, 0, 20, 8), pos);
 
     //					Assert.True (dlg.ProcessKey (new (Key.Tab)));
@@ -273,7 +273,7 @@ public class ConsoleDriverTests
     //└──────────────────┘
     //";
 
-    //					pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+    //					pos = DriverAsserts.AssertDriverContentsWithFrameAre (expected, output);
     //					Assert.Equal (new (0, 0, 20, 8), pos);
 
     //					win.RequestStop ();

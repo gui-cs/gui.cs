@@ -1,4 +1,6 @@
-﻿using Xunit.Abstractions;
+﻿using UnitTests;
+using UnitTests;
+using Xunit.Abstractions;
 using static Unix.Terminal.Delegates;
 
 namespace Terminal.Gui.ViewsTests;
@@ -802,7 +804,7 @@ public class ScrollBarTests (ITestOutputHelper output)
         super.Layout ();
         super.Draw ();
 
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
     }
     #endregion Draw
 

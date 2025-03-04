@@ -1,3 +1,5 @@
+using UnitTests;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.TextTests;
@@ -14,7 +16,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         Application.Driver?.SendKeys ('f', ConsoleKey.F, false, false, false);
         tf.Draw ();
         tf.PositionCursor ();
-        TestHelpers.AssertDriverContentsAre ("fish", output);
+        DriverAssert.AssertDriverContentsAre ("fish", output);
         Assert.Equal ("f", tf.Text);
 
         // When cancelling autocomplete
@@ -23,7 +25,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         // Suggestion should disappear
         View.SetClipToScreen ();
         tf.Draw ();
-        TestHelpers.AssertDriverContentsAre ("f", output);
+        DriverAssert.AssertDriverContentsAre ("f", output);
         Assert.Equal ("f", tf.Text);
 
         // Still has focus though
@@ -46,7 +48,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tf.Draw ();
         tf.PositionCursor ();
-        TestHelpers.AssertDriverContentsAre ("fish", output);
+        DriverAssert.AssertDriverContentsAre ("fish", output);
         Assert.Equal ("f", tf.Text);
 
         // When cancelling autocomplete
@@ -55,7 +57,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         // Suggestion should disappear
         View.SetClipToScreen ();
         tf.Draw ();
-        TestHelpers.AssertDriverContentsAre ("f", output);
+        DriverAssert.AssertDriverContentsAre ("f", output);
         Assert.Equal ("f", tf.Text);
 
         // Should reappear when you press next letter
@@ -63,7 +65,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         tf.PositionCursor ();
         View.SetClipToScreen ();
         tf.Draw ();
-        TestHelpers.AssertDriverContentsAre ("fish", output);
+        DriverAssert.AssertDriverContentsAre ("fish", output);
         Assert.Equal ("fi", tf.Text);
         Application.Top.Dispose ();
     }
@@ -81,7 +83,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tf.Draw ();
         tf.PositionCursor ();
-        TestHelpers.AssertDriverContentsAre ("fish", output);
+        DriverAssert.AssertDriverContentsAre ("fish", output);
         Assert.Equal ("f", tf.Text);
 
         // When cycling autocomplete
@@ -90,7 +92,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tf.Draw ();
         tf.PositionCursor ();
-        TestHelpers.AssertDriverContentsAre ("friend", output);
+        DriverAssert.AssertDriverContentsAre ("friend", output);
         Assert.Equal ("f", tf.Text);
 
         // Should be able to cycle in circles endlessly
@@ -98,7 +100,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tf.Draw ();
         tf.PositionCursor ();
-        TestHelpers.AssertDriverContentsAre ("fish", output);
+        DriverAssert.AssertDriverContentsAre ("fish", output);
         Assert.Equal ("f", tf.Text);
         Application.Top.Dispose ();
     }
@@ -114,7 +116,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tf.Draw ();
         tf.PositionCursor ();
-        TestHelpers.AssertDriverContentsAre ("fish", output);
+        DriverAssert.AssertDriverContentsAre ("fish", output);
         Assert.Equal ("f", tf.Text);
 
         // add a space then go back 1
@@ -123,7 +125,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
 
         View.SetClipToScreen ();
         tf.Draw ();
-        TestHelpers.AssertDriverContentsAre ("f", output);
+        DriverAssert.AssertDriverContentsAre ("f", output);
         Assert.Equal ("f ", tf.Text);
         Application.Top.Dispose ();
     }
@@ -139,14 +141,14 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tf.Draw ();
         tf.PositionCursor ();
-        TestHelpers.AssertDriverContentsAre ("fish", output);
+        DriverAssert.AssertDriverContentsAre ("fish", output);
         Assert.Equal ("f", tf.Text);
 
         // x is typed and suggestion should disappear
         Application.Driver?.SendKeys ('x', ConsoleKey.X, false, false, false);
         View.SetClipToScreen ();
         tf.Draw ();
-        TestHelpers.AssertDriverContentsAre ("fx", output);
+        DriverAssert.AssertDriverContentsAre ("fx", output);
         Assert.Equal ("fx", tf.Text);
         Application.Top.Dispose ();
     }
@@ -164,7 +166,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tf.Draw ();
         tf.PositionCursor ();
-        TestHelpers.AssertDriverContentsAre ("", output);
+        DriverAssert.AssertDriverContentsAre ("", output);
         tf.NewKeyDownEvent (Key.M);
         tf.NewKeyDownEvent (Key.Y);
         tf.NewKeyDownEvent (Key.Space);
@@ -175,14 +177,14 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tf.Draw ();
         tf.PositionCursor ();
-        TestHelpers.AssertDriverContentsAre ("my fISH", output);
+        DriverAssert.AssertDriverContentsAre ("my fISH", output);
         Assert.Equal ("my f", tf.Text);
 
         // When tab completing the case of the whole suggestion should be applied
         Application.Driver?.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
         View.SetClipToScreen ();
         tf.Draw ();
-        TestHelpers.AssertDriverContentsAre ("my FISH", output);
+        DriverAssert.AssertDriverContentsAre ("my FISH", output);
         Assert.Equal ("my FISH", tf.Text);
         Application.Top.Dispose ();
     }
@@ -200,21 +202,21 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tf.Draw ();
         tf.PositionCursor ();
-        TestHelpers.AssertDriverContentsAre ("", output);
+        DriverAssert.AssertDriverContentsAre ("", output);
 
         tf.NewKeyDownEvent (new Key ('f'));
 
         View.SetClipToScreen ();
         tf.Draw ();
         tf.PositionCursor ();
-        TestHelpers.AssertDriverContentsAre ("fish", output);
+        DriverAssert.AssertDriverContentsAre ("fish", output);
         Assert.Equal ("f", tf.Text);
 
         Application.Driver?.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
 
         View.SetClipToScreen ();
         tf.Draw ();
-        TestHelpers.AssertDriverContentsAre ("fish", output);
+        DriverAssert.AssertDriverContentsAre ("fish", output);
         Assert.Equal ("fish", tf.Text);
 
         // Tab should autcomplete but not move focus
@@ -240,7 +242,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         View.SetClipToScreen ();
         tf.Draw ();
         tf.PositionCursor ();
-        TestHelpers.AssertDriverContentsAre (expectRender, output);
+        DriverAssert.AssertDriverContentsAre (expectRender, output);
         Assert.Equal ("f", tf.Text);
         Application.Top.Dispose ();
     }
@@ -271,7 +273,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
 
         tf.Draw ();
         tf.PositionCursor ();
-        TestHelpers.AssertDriverContentsAre ("", output);
+        DriverAssert.AssertDriverContentsAre ("", output);
 
         return tf;
     }
