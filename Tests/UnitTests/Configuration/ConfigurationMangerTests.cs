@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 using System.Text.Json;
+using UnitTests;
 using Xunit.Abstractions;
 using static Terminal.Gui.ConfigurationManager;
 #pragma warning disable IDE1006

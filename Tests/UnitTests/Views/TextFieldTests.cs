@@ -1,6 +1,8 @@
 ﻿using System.Globalization;
 using System.Reflection;
 using System.Text;
+using UnitTests;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -17,7 +19,7 @@ public class TextFieldTests (ITestOutputHelper output)
         tf.Layout ();
         tf.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ắ",
                                                       output
@@ -27,7 +29,7 @@ public class TextFieldTests (ITestOutputHelper output)
         tf.Layout ();
         tf.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ắ",
                                                       output
@@ -37,7 +39,7 @@ public class TextFieldTests (ITestOutputHelper output)
         tf.Layout ();
         tf.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ắ",
                                                       output
@@ -47,7 +49,7 @@ public class TextFieldTests (ITestOutputHelper output)
         tf.Layout ();
         tf.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ắ",
                                                       output
@@ -170,7 +172,7 @@ public class TextFieldTests (ITestOutputHelper output)
         Assert.False (tf.HasFocus);
 
         tf.Draw ();
-        TestHelpers.AssertDriverContentsAre (expectedRender, output);
+        DriverAssert.AssertDriverContentsAre (expectedRender, output);
         Application.Top.Dispose ();
     }
 
@@ -190,7 +192,7 @@ public class TextFieldTests (ITestOutputHelper output)
         Assert.False (tf.HasFocus);
 
         tf.Draw ();
-        TestHelpers.AssertDriverContentsAre ("Misérables", output);
+        DriverAssert.AssertDriverContentsAre ("Misérables", output);
         Application.Top.Dispose ();
     }
 
@@ -203,7 +205,7 @@ public class TextFieldTests (ITestOutputHelper output)
         TextField tf = GetTextFieldsInView ();
 
         tf.Draw ();
-        TestHelpers.AssertDriverContentsAre ("", output);
+        DriverAssert.AssertDriverContentsAre ("", output);
 
         tf.Caption = "Enter txt";
         Application.Driver?.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
@@ -212,13 +214,13 @@ public class TextFieldTests (ITestOutputHelper output)
         Assert.False (tf.HasFocus);
         View.SetClipToScreen ();
         tf.Draw ();
-        TestHelpers.AssertDriverContentsAre ("Enter txt", output);
+        DriverAssert.AssertDriverContentsAre ("Enter txt", output);
 
         // but disapear when text is added
         tf.Text = content;
         View.SetClipToScreen ();
         tf.Draw ();
-        TestHelpers.AssertDriverContentsAre (content, output);
+        DriverAssert.AssertDriverContentsAre (content, output);
         Application.Top.Dispose ();
     }
 
@@ -229,21 +231,21 @@ public class TextFieldTests (ITestOutputHelper output)
         TextField tf = GetTextFieldsInView ();
 
         tf.Draw ();
-        TestHelpers.AssertDriverContentsAre ("", output);
+        DriverAssert.AssertDriverContentsAre ("", output);
 
         // Caption has no effect when focused
         tf.Caption = "Enter txt";
         Assert.True (tf.HasFocus);
         View.SetClipToScreen ();
         tf.Draw ();
-        TestHelpers.AssertDriverContentsAre ("", output);
+        DriverAssert.AssertDriverContentsAre ("", output);
 
         Application.Driver?.SendKeys ('\t', ConsoleKey.Tab, false, false, false);
 
         Assert.False (tf.HasFocus);
         View.SetClipToScreen ();
         tf.Draw ();
-        TestHelpers.AssertDriverContentsAre ("Enter txt", output);
+        DriverAssert.AssertDriverContentsAre ("Enter txt", output);
         Application.Top.Dispose ();
     }
 
@@ -1082,7 +1084,7 @@ public class TextFieldTests (ITestOutputHelper output)
         };
 
         //                                             TAB to jump between text fields.
-        TestHelpers.AssertDriverAttributesAre ("0000000", output, Application.Driver, attributes);
+        DriverAssert.AssertDriverAttributesAre ("0000000", output, Application.Driver, attributes);
 
         // Cursor is at the end
         Assert.Equal (32, _textField.CursorPosition);
@@ -1093,7 +1095,7 @@ public class TextFieldTests (ITestOutputHelper output)
         Assert.Equal (4, _textField.CursorPosition);
 
         //                                             TAB to jump between text fields.
-        TestHelpers.AssertDriverAttributesAre ("1111000", output, Application.Driver, attributes);
+        DriverAssert.AssertDriverAttributesAre ("1111000", output, Application.Driver, attributes);
         top.Dispose ();
     }
 
@@ -1980,7 +1982,7 @@ public class TextFieldTests (ITestOutputHelper output)
         tf.SetRelativeLayout (new (100, 100));
         tf.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 Les Misérables",
                                                       output
@@ -1989,7 +1991,7 @@ Les Misérables",
         tf.Text = "Les Mise" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "rables";
         tf.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 Les Misérables",
                                                       output
@@ -2000,7 +2002,7 @@ Les Misérables",
         View.SetClipToScreen ();
         tf.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 Les Miśerables",
                                                       output
@@ -2173,7 +2175,7 @@ Les Miśerables",
         tf.EndInit ();
         tf.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre ("\u241b", output);
+        DriverAssert.AssertDriverContentsWithFrameAre ("\u241b", output);
 
         tf.Dispose ();
     }

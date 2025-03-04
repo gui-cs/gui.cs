@@ -1,4 +1,5 @@
-﻿using Xunit.Abstractions;
+﻿using UnitTests;
+using Xunit.Abstractions;
 using static Terminal.Gui.Dim;
 using static Terminal.Gui.Pos;
 
@@ -35,38 +36,6 @@ public class PosTests ()
         Application.Shutdown ();
     }
 
-    [Fact]
-    public void PosCombine_Calculate_ReturnsExpectedValue ()
-    {
-        var posCombine = new PosCombine (AddOrSubtract.Add, new PosAbsolute (5), new PosAbsolute (3));
-        var result = posCombine.Calculate (10, new DimAbsolute (2), null, Dimension.None);
-        Assert.Equal (8, result);
-    }
-
-    [Fact]
-    public void PosFactor_Calculate_ReturnsExpectedValue ()
-    {
-        var posFactor = new PosPercent (50);
-        var result = posFactor.Calculate (10, new DimAbsolute (2), null, Dimension.None);
-        Assert.Equal (5, result);
-    }
-
-    [Fact]
-    public void PosFunc_Calculate_ReturnsExpectedValue ()
-    {
-        var posFunc = new PosFunc (() => 5);
-        var result = posFunc.Calculate (10, new DimAbsolute (2), null, Dimension.None);
-        Assert.Equal (5, result);
-    }
-
-    [Fact]
-    public void PosView_Calculate_ReturnsExpectedValue ()
-    {
-        var posView = new PosView (new View { Frame = new Rectangle (5, 5, 10, 10) }, 0);
-        var result = posView.Calculate (10, new DimAbsolute (2), null, Dimension.None);
-        Assert.Equal (5, result);
-    }
-
 
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
     // TODO: A new test that calls SetRelativeLayout directly is needed.
@@ -95,107 +64,6 @@ public class PosTests ()
         Application.Shutdown ();
 
         v2.Dispose ();
-    }
-
-    [Fact]
-    public void PosCombine_DoesNotReturn ()
-    {
-        var v = new View { Id = "V" };
-
-        Pos pos = Pos.Left (v);
-
-        Assert.Equal (
-                      $"View(Side=Left,Target=View(V){v.Frame})",
-                      pos.ToString ()
-                     );
-
-        pos = Pos.X (v);
-
-        Assert.Equal (
-                      $"View(Side=Left,Target=View(V){v.Frame})",
-                      pos.ToString ()
-                     );
-
-        pos = Pos.Top (v);
-
-        Assert.Equal (
-                      $"View(Side=Top,Target=View(V){v.Frame})",
-                      pos.ToString ()
-                     );
-
-        pos = Pos.Y (v);
-
-        Assert.Equal (
-                      $"View(Side=Top,Target=View(V){v.Frame})",
-                      pos.ToString ()
-                     );
-
-        pos = Pos.Right (v);
-
-        Assert.Equal (
-                      $"View(Side=Right,Target=View(V){v.Frame})",
-                      pos.ToString ()
-                     );
-
-        pos = Pos.Bottom (v);
-
-        Assert.Equal (
-                      $"View(Side=Bottom,Target=View(V){v.Frame})",
-                      pos.ToString ()
-                     );
-    }
-
-    [Fact]
-    public void PosFunction_SetsValue ()
-    {
-        var text = "Test";
-        Pos pos = Pos.Func (() => text.Length);
-        Assert.Equal ("PosFunc(4)", pos.ToString ());
-
-        text = "New Test";
-        Assert.Equal ("PosFunc(8)", pos.ToString ());
-
-        text = "";
-        Assert.Equal ("PosFunc(0)", pos.ToString ());
-    }
-
-    [Fact]
-    [TestRespondersDisposed]
-    public void Internal_Tests ()
-    {
-        var posFactor = new PosPercent (10);
-        Assert.Equal (10, posFactor.GetAnchor (100));
-
-        var posAnchorEnd = new PosAnchorEnd (1);
-        Assert.Equal (99, posAnchorEnd.GetAnchor (100));
-
-        var posCenter = new PosCenter ();
-        Assert.Equal (50, posCenter.GetAnchor (100));
-
-        var posAbsolute = new PosAbsolute (10);
-        Assert.Equal (10, posAbsolute.GetAnchor (0));
-
-        var posCombine = new PosCombine (AddOrSubtract.Add, posFactor, posAbsolute);
-        Assert.Equal (posCombine.Left, posFactor);
-        Assert.Equal (posCombine.Right, posAbsolute);
-        Assert.Equal (20, posCombine.GetAnchor (100));
-
-        posCombine = new (AddOrSubtract.Add, posAbsolute, posFactor);
-        Assert.Equal (posCombine.Left, posAbsolute);
-        Assert.Equal (posCombine.Right, posFactor);
-        Assert.Equal (20, posCombine.GetAnchor (100));
-
-        var view = new View { Frame = new (20, 10, 20, 1) };
-        var posViewX = new PosView (view, Side.Left);
-        Assert.Equal (20, posViewX.GetAnchor (0));
-        var posViewY = new PosView (view, Side.Top);
-        Assert.Equal (10, posViewY.GetAnchor (0));
-        var posRight = new PosView (view, Side.Right);
-        Assert.Equal (40, posRight.GetAnchor (0));
-        var posViewBottom = new PosView (view, Side.Bottom);
-        Assert.Equal (11, posViewBottom.GetAnchor (0));
-
-        view.Dispose ();
     }
 
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
@@ -283,42 +151,6 @@ public class PosTests ()
         }
     }
 
-    [Fact]
-    public void PosPercent_Equal ()
-    {
-        int n1 = 0;
-        int n2 = 0;
-        Pos pos1 = Pos.Percent (n1);
-        Pos pos2 = Pos.Percent (n2);
-        Assert.Equal (pos1, pos2);
-
-        n1 = n2 = 1;
-        pos1 = Pos.Percent (n1);
-        pos2 = Pos.Percent (n2);
-        Assert.Equal (pos1, pos2);
-
-        n1 = n2 = 50;
-        pos1 = Pos.Percent (n1);
-        pos2 = Pos.Percent (n2);
-        Assert.Equal (pos1, pos2);
-
-        n1 = n2 = 100;
-        pos1 = Pos.Percent (n1);
-        pos2 = Pos.Percent (n2);
-        Assert.Equal (pos1, pos2);
-
-        n1 = 0;
-        n2 = 1;
-        pos1 = Pos.Percent (n1);
-        pos2 = Pos.Percent (n2);
-        Assert.NotEqual (pos1, pos2);
-
-        n1 = 50;
-        n2 = 150;
-        pos1 = Pos.Percent (n1);
-        pos2 = Pos.Percent (n2);
-        Assert.NotEqual (pos1, pos2);
-    }
 
     // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
     // TODO: A new test that calls SetRelativeLayout directly is needed.

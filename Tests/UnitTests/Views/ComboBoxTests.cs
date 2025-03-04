@@ -1,4 +1,6 @@
 ﻿using System.Collections.ObjectModel;
+using UnitTests;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -529,7 +531,7 @@ public class ComboBoxTests (ITestOutputHelper output)
 
         cb.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
      ▼
 One   
@@ -550,7 +552,7 @@ Three ",
             cb.Subviews [1].GetNormalColor ()
         };
 
-        TestHelpers.AssertDriverAttributesAre (
+        DriverAssert.AssertDriverAttributesAre (
                                                @"
 000000
 222222
@@ -569,7 +571,7 @@ Three ",
         View.SetClipToScreen ();
         cb.Draw ();
 
-        TestHelpers.AssertDriverAttributesAre (
+        DriverAssert.AssertDriverAttributesAre (
                                                @"
 000000
 222222
@@ -588,7 +590,7 @@ Three ",
         View.SetClipToScreen ();
         cb.Draw ();
 
-        TestHelpers.AssertDriverAttributesAre (
+        DriverAssert.AssertDriverAttributesAre (
                                                @"
 000000
 222222
@@ -613,7 +615,7 @@ Three ",
         View.SetClipToScreen ();
         cb.Draw ();
 
-        TestHelpers.AssertDriverAttributesAre (
+        DriverAssert.AssertDriverAttributesAre (
                                                @"
 000000
 222222
@@ -632,7 +634,7 @@ Three ",
         View.SetClipToScreen ();
         cb.Draw ();
 
-        TestHelpers.AssertDriverAttributesAre (
+        DriverAssert.AssertDriverAttributesAre (
                                                @"
 000000
 222222
@@ -651,7 +653,7 @@ Three ",
         View.SetClipToScreen ();
         cb.Draw ();
 
-        TestHelpers.AssertDriverAttributesAre (
+        DriverAssert.AssertDriverAttributesAre (
                                                @"
 000000
 000002
@@ -915,7 +917,7 @@ Three ",
         Assert.Equal ("One", cb.Text);
 
         cb.Draw ();
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 One      ▼
 One       
@@ -930,7 +932,7 @@ One
 
         View.SetClipToScreen ();
         cb.Draw ();
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 Two      ▼
 Two       
@@ -945,7 +947,7 @@ Two
 
         View.SetClipToScreen ();
         cb.Draw ();
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 Three    ▼
 Three     

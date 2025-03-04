@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
+using UnitTests;
+using UnitTests;
 using Xunit.Abstractions;
 using static Unix.Terminal.Delegates;
 
@@ -1005,6 +1007,6 @@ public class ScrollSliderTests (ITestOutputHelper output)
         super.Layout ();
         super.Draw ();
 
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
     }
 }

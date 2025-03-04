@@ -1,5 +1,7 @@
 // Alias Console to MockConsole so we don't accidentally use Console
 
+using UnitTests;
+
 namespace Terminal.Gui.ApplicationTests;
 
 public class SyncrhonizationContextTests

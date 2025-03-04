@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Reflection;
 using System.Text;
+using UnitTests;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -77,7 +79,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
     {
         foreach (ConstructorInfo ctor in type.GetConstructors ())
         {
-            View view = TestHelpers.CreateViewFromType (type, ctor);
+            View view = ViewTestHelpers.CreateViewFromType (type, ctor);
 
             if (view != null)
             {

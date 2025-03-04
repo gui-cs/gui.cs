@@ -1,4 +1,6 @@
 ﻿using System.Globalization;
+using UnitTests;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -133,7 +135,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         ((FakeDriver)Application.Driver!).SetBufferSize (20, 15);
 
         Assert.Equal (new Rectangle (0, 0, 20, 15), View.GetClip ()!.GetBounds ());
-        TestHelpers.AssertDriverContentsWithFrameAre ("", output);
+        DriverAssert.AssertDriverContentsWithFrameAre ("", output);
 
         var top = new Toplevel { X = 2, Y = 2, Width = 15, Height = 4 };
         top.Add (new TextField { X = Pos.Center (), Width = 10, Text = "Test" });
@@ -143,7 +145,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.Equal (new Rectangle (2, 2, 15, 4), top.Frame);
         Assert.Equal (top, Application.Top);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
     Test",
                                                       output
@@ -153,7 +155,7 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         Application.RunIteration (ref rs);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
     Test            
 ┌───────────────────
@@ -184,7 +186,7 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         Assert.Equal (new Rectangle (0, 0, 20, 15), win.Frame);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────────────┐
 │                  │
@@ -212,7 +214,7 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         Assert.Equal (new Rectangle (2, 2, 15, 4), testWindow.Frame);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────────────┐
 │                  │
@@ -236,7 +238,7 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         Application.RunIteration (ref rsDialog);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────────────┐
 │                  │
@@ -268,7 +270,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         ((FakeDriver)Application.Driver!).SetBufferSize (20, 15);
 
         Assert.Equal (new Rectangle (0, 0, 20, 15), View.GetClip ()!.GetBounds ());
-        TestHelpers.AssertDriverContentsWithFrameAre ("", output);
+        DriverAssert.AssertDriverContentsWithFrameAre ("", output);
 
         // Don't use Dialog here as it has more layout logic. Use Window instead.
         var dialog = new Window { X = 2, Y = 2, Width = 15, Height = 4 };
@@ -279,7 +281,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.Equal (new Rectangle (2, 2, 15, 4), dialog.Frame);
         Assert.Equal (dialog, Application.Top);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
   ┌─────────────┐
   │ Test        │
@@ -293,7 +295,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         var firstIteration = false;
         Application.RunIteration (ref rs, firstIteration);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
   ┌─────────────┐   
   │ Test        │   
@@ -344,7 +346,7 @@ public class ContextMenuTests (ITestOutputHelper output)
 └──────┘
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new Rectangle (0, 1, 8, 4), pos);
 
         cm.ForceMinimumPosToZero = false;
@@ -358,7 +360,7 @@ public class ContextMenuTests (ITestOutputHelper output)
 ──────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new Rectangle (1, 0, 7, 3), pos);
         top.Dispose ();
     }
@@ -451,7 +453,7 @@ public class ContextMenuTests (ITestOutputHelper output)
           └──────┘
 ";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         menuItems = new MenuBarItem (
                                      [
@@ -472,7 +474,7 @@ public class ContextMenuTests (ITestOutputHelper output)
           └─────────┘
 ";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
         top.Dispose ();
     }
 
@@ -516,7 +518,7 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         Assert.Equal (new Point (-1, -2), cm.Position);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌────────┐
 │ One    │
@@ -539,7 +541,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Application.RunIteration (ref rs);
         Assert.Equal (new Point (-1, -2), cm.Position);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌────────┐             
 │ One    │             
@@ -564,7 +566,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Application.RunIteration (ref rs);
         Assert.Equal (new Point (41, -2), cm.Position);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
                               ┌────────┐
                               │ One    │
@@ -587,7 +589,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Application.RunIteration (ref rs);
         Assert.Equal (new Point (41, -2), cm.Position);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
                               ┌────────┐
                               │ One    │
@@ -611,7 +613,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Application.RunIteration (ref rs);
         Assert.Equal (new Point (41, 9), cm.Position);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
                               ┌────────┐
                               │ One    │
@@ -634,7 +636,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Application.RunIteration (ref rs);
         Assert.Equal (new Point (41, 9), cm.Position);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
                               ┌────────┐
                  ┌───────────┐│ One    │
@@ -655,7 +657,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Application.RunIteration (ref rs);
         Assert.Equal (new Point (41, 22), cm.Position);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
                               ┌────────┐
                               │ One    │
@@ -678,7 +680,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Application.RunIteration (ref rs);
         Assert.Equal (new Point (41, 22), cm.Position);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
                  ┌───────────┐          
                  │ SubMenu1  │┌────────┐
@@ -699,7 +701,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Application.RunIteration (ref rs);
         Assert.Equal (new Point (19, 10), cm.Position);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
         ┌────────┐
         │ One    │
@@ -722,7 +724,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Application.RunIteration (ref rs);
         Assert.Equal (new Point (19, 10), cm.Position);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌───────────┐────┐
 │ SubMenu1  │    │
@@ -809,7 +811,7 @@ public class ContextMenuTests (ITestOutputHelper output)
           └──────┘
 ";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         cm.Position = new Point (5, 10);
 
@@ -823,7 +825,7 @@ public class ContextMenuTests (ITestOutputHelper output)
      └──────┘
 ";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
         top.Dispose ();
     }
 
@@ -942,7 +944,7 @@ public class ContextMenuTests (ITestOutputHelper output)
 │ One  │
 │ Two  │";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new Rectangle (0, 0, 8, 3), pos);
 
         cm.Hide ();
@@ -981,7 +983,7 @@ public class ContextMenuTests (ITestOutputHelper output)
 │ Two
 └────";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new Rectangle (0, 1, 5, 4), pos);
 
         cm.Hide ();
@@ -1032,7 +1034,7 @@ public class ContextMenuTests (ITestOutputHelper output)
           └──────┘
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new Rectangle (10, 5, 18, 5), pos);
 
         cm.Hide ();
@@ -1056,7 +1058,7 @@ public class ContextMenuTests (ITestOutputHelper output)
      └──────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new Rectangle (5, 10, 13, 7), pos);
 
         cm.Hide ();
@@ -1094,7 +1096,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                                         └──────┘
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new Rectangle (72, 21, 80, 4), pos);
 
         cm.Hide ();
@@ -1145,7 +1147,7 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                                       View    
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new Rectangle (70, 20, 78, 5), pos);
 
         cm.Hide ();
@@ -1179,7 +1181,7 @@ public class ContextMenuTests (ITestOutputHelper output)
           └──────┘
 ";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         cm.Hide ();
         Assert.False (ContextMenu.IsShow);
@@ -1188,7 +1190,7 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         expected = "";
 
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
         top.Dispose ();
     }
 
@@ -1226,7 +1228,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top!.Subviews [0].Frame);
         Application.LayoutAndDraw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
      ┌────────┐
      │ One    │
@@ -1244,7 +1246,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
         Assert.Equal (new Rectangle (5, 11, 15, 6), Application.Top.Subviews [1].Frame);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
      ┌─────────────┐
      │◄    Two     │
@@ -1261,7 +1263,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Application.RunIteration (ref rs, firstIteration);
         Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
      ┌────────┐
      │ One    │
@@ -1319,7 +1321,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
         Application.LayoutAndDraw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
      ┌────────┐
      │ One    │
@@ -1335,7 +1337,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Application.RunIteration (ref rs, firstIteration);
         Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
      ┌────────┐               
      │ One    │               
@@ -1352,7 +1354,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Application.RunIteration (ref rs, firstIteration);
         Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
      ┌────────┐                 
      │ One    │                 
@@ -1370,7 +1372,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Application.RunIteration (ref rs, firstIteration);
         Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.Subviews [0].Frame);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
      ┌────────┐               
      │ One    │               

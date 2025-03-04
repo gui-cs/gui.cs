@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui.ViewsTests;
+﻿using UnitTests;
+
+namespace Terminal.Gui.ViewsTests;
 
 public partial class ToplevelTests ()
 {
@@ -637,7 +639,7 @@ public partial class ToplevelTests ()
         Application.LayoutAndDraw ();
         Assert.Equal (new (0, 0, 19, 2), top.Frame);
         Assert.Equal (new (19, 2, 20, 3), window.Frame);
-        //TestHelpers.AssertDriverContentsWithFrameAre (@"", output);
+        //DriverAsserts.AssertDriverContentsWithFrameAre (@"", output);
 
         Application.End (rsWindow);
         Application.End (rsTop);

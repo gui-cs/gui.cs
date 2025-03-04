@@ -1,4 +1,6 @@
-﻿using Xunit.Abstractions;
+﻿using UnitTests;
+using UnitTests;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
@@ -25,13 +27,13 @@ public class PaddingTests (ITestOutputHelper output)
         view.EndInit ();
         view.Draw ();
 
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"
 PPP
 P P
 PPP",
                                              output
                                             );
-        TestHelpers.AssertDriverAttributesAre ("0", output, null, view.GetNormalColor ());
+        DriverAssert.AssertDriverAttributesAre ("0", output, null, view.GetNormalColor ());
     }
 }

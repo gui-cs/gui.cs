@@ -1,4 +1,5 @@
-﻿using Xunit.Abstractions;
+﻿using UnitTests;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.DialogTests;
 
@@ -467,7 +468,7 @@ public class WizardTests ()
         Application.RunIteration (ref runstate, firstIteration);
 
         // TODO: Disabled until Dim.Auto is used in Dialog
-        //TestHelpers.AssertDriverContentsWithFrameAre (
+        //DriverAsserts.AssertDriverContentsWithFrameAre (
         //                                              $"{topRow}\n{row2}\n{row3}\n{row4}\n{separatorRow}\n{buttonRow}\n{bottomRow}",
         //                                              _output
         //                                             );
@@ -715,7 +716,7 @@ public class WizardTests ()
         RunState runstate = Application.Begin (wizard);
 
         // TODO: Disabled until Dim.Auto is used in Dialog
-        //TestHelpers.AssertDriverContentsWithFrameAre (
+        //DriverAsserts.AssertDriverContentsWithFrameAre (
         //                                              $"{topRow}\n{row2}\n{row3}\n{separatorRow}\n{buttonRow}\n{bottomRow}",
         //                                              _output
         //                                             );

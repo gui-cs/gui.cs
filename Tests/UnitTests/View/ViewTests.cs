@@ -1,5 +1,7 @@
 using System.ComponentModel;
 using System.Text;
+using UnitTests;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
@@ -338,7 +340,7 @@ public class ViewTests (ITestOutputHelper output)
 111
 ───────────
 222";
-        TestHelpers.AssertDriverContentsAre (looksLike, output);
+        DriverAssert.AssertDriverContentsAre (looksLike, output);
         v.Dispose ();
         top.Dispose ();
         bottom.Dispose ();
@@ -444,7 +446,7 @@ public class ViewTests (ITestOutputHelper output)
         Assert.True (view.Visible);
         ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌────────────────────────────┐
 │Testing visibility.         │
@@ -460,7 +462,7 @@ public class ViewTests (ITestOutputHelper output)
         var firstIteration = false;
         Application.RunIteration (ref rs, firstIteration);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌────────────────────────────┐
 │                            │

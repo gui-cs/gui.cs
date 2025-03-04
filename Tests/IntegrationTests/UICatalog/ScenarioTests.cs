@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Reflection;
 using Terminal.Gui;
+using UnitTests;
 using UICatalog;
 using Xunit.Abstractions;
 
@@ -184,7 +185,7 @@ public class ScenarioTests : TestsAllViews
 
         var top = new Toplevel ();
 
-        _viewClasses = TestHelpers.GetAllViewClasses ().ToDictionary (t => t.Name);
+        _viewClasses = ViewTestHelpers.GetAllViewClasses ().ToDictionary (t => t.Name);
 
         _leftPane = new ()
         {

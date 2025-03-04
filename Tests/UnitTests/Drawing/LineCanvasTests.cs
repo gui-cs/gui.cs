@@ -1,4 +1,6 @@
 ﻿using System.Text;
+using UnitTests;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.DrawingTests;
@@ -294,7 +296,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
         lc.AddLine (new (x1, y1), len1, o1, s1);
         lc.AddLine (new (x2, y2), len2, o2, s2);
 
-        TestHelpers.AssertEqual (_output, expected, lc.ToString ());
+        OutputAssert.AssertEqual (_output, expected, lc.ToString ());
         v.Dispose ();
     }
 
@@ -502,7 +504,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
         lc.AddLine (new (x + width, y), height, Orientation.Vertical, LineStyle.Double);
         Assert.Equal (new (x, y, 4, 2), lc.Bounds);
 
-        TestHelpers.AssertEqual (
+        OutputAssert.AssertEqual (
                                  _output,
                                  @"
 ╔╡╞╗
@@ -552,7 +554,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
         lc.AddLine (new (x + width, y), height, Orientation.Vertical, LineStyle.Double);
         Assert.Equal (new (x, y, 4, 2), lc.Bounds);
 
-        TestHelpers.AssertEqual (
+        OutputAssert.AssertEqual (
                                  _output,
                                  @"
 ╔╡╞╗
@@ -596,7 +598,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
 
         // Add a line at 5, 5 that's has length of 1
         canvas.AddLine (new (x, y), 1, orientation, LineStyle.Single);
-        TestHelpers.AssertEqual (_output, $"{expected}", $"{canvas}");
+        OutputAssert.AssertEqual (_output, $"{expected}", $"{canvas}");
     }
 
     // X is offset by 2
@@ -653,7 +655,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
         canvas.AddLine (new (x, y), length, orientation, LineStyle.Single);
 
         var result = canvas.ToString ();
-        TestHelpers.AssertEqual (_output, expected, result);
+        OutputAssert.AssertEqual (_output, expected, result);
     }
 
     [Fact]
@@ -680,7 +682,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
 
         // Add a line at 0, 0 that's has length of 0
         lc.AddLine (Point.Empty, 0, orientation, LineStyle.Single);
-        TestHelpers.AssertEqual (_output, expected, $"{lc}");
+        OutputAssert.AssertEqual (_output, expected, $"{lc}");
     }
 
     [InlineData (Orientation.Horizontal, "┼")]
@@ -701,7 +703,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
 
         // Add a line at 0, 0 that's has length of 0
         lc.AddLine (Point.Empty, 0, orientation, LineStyle.Single);
-        TestHelpers.AssertEqual (_output, expected, $"{lc}");
+        OutputAssert.AssertEqual (_output, expected, $"{lc}");
     }
 
     [InlineData (Orientation.Horizontal, "╥")]
@@ -724,7 +726,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
 
         // Add a line at 0, 0 that's has length of 0
         lc.AddLine (Point.Empty, 0, orientation, LineStyle.Single);
-        TestHelpers.AssertEqual (_output, expected, $"{lc}");
+        OutputAssert.AssertEqual (_output, expected, $"{lc}");
     }
 
     [Fact]
@@ -740,7 +742,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
             @"
 ┌─
 │ ";
-        TestHelpers.AssertEqual (_output, looksLike, $"{Environment.NewLine}{canvas}");
+        OutputAssert.AssertEqual (_output, looksLike, $"{Environment.NewLine}{canvas}");
     }
 
     [Fact]
@@ -767,7 +769,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
 ┣━━━━╋━━━┫
 ┃    ┃   ┃
 ┗━━━━┻━━━┛";
-        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, _output);
         v.Dispose ();
     }
 
@@ -798,7 +800,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
 │    │   │
 ┕━━━━┷━━━┙
 ";
-        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, _output);
         v.Dispose ();
     }
 
@@ -830,7 +832,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
 ┖────┸───┚
 
 ";
-        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, _output);
         v.Dispose ();
     }
 
@@ -848,7 +850,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
             @"
 ┌─
 │ ";
-        TestHelpers.AssertEqual (_output, looksLike, $"{Environment.NewLine}{canvas}");
+        OutputAssert.AssertEqual (_output, looksLike, $"{Environment.NewLine}{canvas}");
     }
 
     [Fact]
@@ -877,7 +879,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
         Dictionary<Point, Rune> map = canvas.GetMap ();
         Assert.Equal (2, map.Count);
 
-        TestHelpers.AssertEqual (
+        OutputAssert.AssertEqual (
                                  _output,
                                  @"
 ─ 
@@ -891,7 +893,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
     public void ToString_Empty ()
     {
         var lc = new LineCanvas ();
-        TestHelpers.AssertEqual (_output, string.Empty, lc.ToString ());
+        OutputAssert.AssertEqual (_output, string.Empty, lc.ToString ());
     }
 
     //                  012
@@ -910,7 +912,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
     {
         var lc = new LineCanvas ();
         lc.AddLine (new (x, y), 3, Orientation.Horizontal, LineStyle.Double);
-        TestHelpers.AssertEqual (_output, expected, $"{lc}");
+        OutputAssert.AssertEqual (_output, expected, $"{lc}");
     }
 
     [InlineData (0, 0, 0, 0, "═══")]
@@ -935,7 +937,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
         lc.AddLine (new (x1, y1), 3, Orientation.Horizontal, LineStyle.Double);
         lc.AddLine (new (x2, y2), 3, Orientation.Horizontal, LineStyle.Double);
 
-        TestHelpers.AssertEqual (_output, expected, $"{lc}");
+        OutputAssert.AssertEqual (_output, expected, $"{lc}");
     }
 
     //		[Fact, SetupFakeDriver]
@@ -995,7 +997,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
 
         v.Draw ();
 
-        TestHelpers.AssertDriverContentsAre (expected, _output);
+        DriverAssert.AssertDriverContentsAre (expected, _output);
         v.Dispose ();
     }
 
@@ -1014,7 +1016,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
             @"    
 ┌─
 │";
-        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, _output);
         v.Dispose ();
     }
 
@@ -1037,7 +1039,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
 ──
 │
 │";
-        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, _output);
         v.Dispose ();
     }
 
@@ -1055,7 +1057,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
         var looksLike =
             @"    
 ──";
-        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, _output);
         v.Dispose ();
     }
 
@@ -1071,7 +1073,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
         var looksLike =
             @" 
 ══";
-        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, _output);
         v.Dispose ();
     }
 
@@ -1090,7 +1092,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
             @"    
 │
 │";
-        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, _output);
         v.Dispose ();
     }
 
@@ -1107,7 +1109,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
             @"    
 ║
 ║";
-        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, _output);
         v.Dispose ();
     }
 
@@ -1135,7 +1137,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
 ╠════╬═══╣
 ║    ║   ║
 ╚════╩═══╝";
-        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, _output);
         v.Dispose ();
     }
 
@@ -1166,7 +1168,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
 │    │   │
 ╘════╧═══╛
 ";
-        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, _output);
         v.Dispose ();
     }
 
@@ -1203,7 +1205,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
 ├────┼───┤
 │    │   │
 ╰────┴───╯";
-        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, _output);
         v.Dispose ();
     }
 
@@ -1235,7 +1237,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
 ╙────╨───╜
 
 ";
-        TestHelpers.AssertDriverContentsAre (looksLike, _output);
+        DriverAssert.AssertDriverContentsAre (looksLike, _output);
         v.Dispose ();
     }
 
@@ -1262,7 +1264,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
 ├────┼───┤
 │    │   │
 └────┴───┘";
-        TestHelpers.AssertEqual (_output, looksLike, $"{Environment.NewLine}{canvas}");
+        OutputAssert.AssertEqual (_output, looksLike, $"{Environment.NewLine}{canvas}");
     }
 
     [Fact]
@@ -1300,7 +1302,7 @@ public class LineCanvasTests (ITestOutputHelper _output)
         var looksLike = @"
 ╔╡╞══╗
 ║    ║";
-        TestHelpers.AssertEqual (_output, looksLike, $"{Environment.NewLine}{lc}");
+        OutputAssert.AssertEqual (_output, looksLike, $"{Environment.NewLine}{lc}");
     }
 
     [Fact]

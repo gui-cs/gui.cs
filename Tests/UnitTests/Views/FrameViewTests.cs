@@ -1,4 +1,6 @@
-﻿using Xunit.Abstractions;
+﻿using UnitTests;
+using UnitTests;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
@@ -45,14 +47,14 @@ public class FrameViewTests (ITestOutputHelper output)
         top.Add (fv);
         Application.Begin (top);
         Assert.Equal (new (0, 0, 0, 0), fv.Frame);
-        TestHelpers.AssertDriverContentsWithFrameAre (@"", output);
+        DriverAssert.AssertDriverContentsWithFrameAre (@"", output);
 
         fv.Height = 5;
         fv.Width = 5;
         Assert.Equal (new (0, 0, 5, 5), fv.Frame);
         Application.LayoutAndDraw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌───┐
 │   │
@@ -67,7 +69,7 @@ public class FrameViewTests (ITestOutputHelper output)
         Assert.Equal (new (1, 2, 5, 5), fv.Frame);
         Application.LayoutAndDraw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
  ┌───┐
  │   │
@@ -82,7 +84,7 @@ public class FrameViewTests (ITestOutputHelper output)
         Assert.Equal (new (-1, -2, 5, 5), fv.Frame);
         Application.LayoutAndDraw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
    │
    │
@@ -95,7 +97,7 @@ public class FrameViewTests (ITestOutputHelper output)
         Assert.Equal (new (7, 8, 5, 5), fv.Frame);
         Application.LayoutAndDraw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
        ┌──
        │  ",

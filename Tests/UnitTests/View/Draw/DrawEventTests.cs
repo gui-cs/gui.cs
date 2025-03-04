@@ -1,5 +1,6 @@
 #nullable enable
 using System.Text;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
@@ -9,7 +10,6 @@ public class DrawEventTests (ITestOutputHelper _output)
 {
 
     [Fact]
-    [AutoInitShutdown]
     public void DrawContentComplete_Event_Is_Always_Called ()
     {
         var viewCalled = false;

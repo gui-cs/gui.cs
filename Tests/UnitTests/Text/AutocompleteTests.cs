@@ -1,4 +1,6 @@
 ﻿using System.Text.RegularExpressions;
+using UnitTests;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.TextTests;
@@ -29,7 +31,7 @@ public class AutocompleteTests (ITestOutputHelper output)
 
             if (i < 4 || i > 5)
             {
-                TestHelpers.AssertDriverContentsWithFrameAre (
+                DriverAssert.AssertDriverContentsWithFrameAre (
                                                               @"
 This a long line and against TextView.",
                                                               output
@@ -37,7 +39,7 @@ This a long line and against TextView.",
             }
             else
             {
-                TestHelpers.AssertDriverContentsWithFrameAre (
+                DriverAssert.AssertDriverContentsWithFrameAre (
                                                               @"
 This a long line and against TextView.
      and                              
@@ -55,7 +57,7 @@ This a long line and against TextView.
         top.SetNeedsDraw ();
         Application.RunIteration (ref rs);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 This a long line and against TextView.
      and                              
@@ -67,7 +69,7 @@ This a long line and against TextView.
         top.SetNeedsDraw ();
         Application.RunIteration (ref rs);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 This ag long line and against TextView.
      against                           ",
@@ -78,7 +80,7 @@ This ag long line and against TextView.
         top.SetNeedsDraw ();
         Application.RunIteration (ref rs);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 This ag long line and against TextView.
      against                           ",
@@ -89,7 +91,7 @@ This ag long line and against TextView.
         top.SetNeedsDraw ();
         Application.RunIteration (ref rs);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 This ag long line and against TextView.
      against                           ",
@@ -100,7 +102,7 @@ This ag long line and against TextView.
         top.SetNeedsDraw ();
         Application.RunIteration (ref rs);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 This ag long line and against TextView.",
                                                       output
@@ -112,7 +114,7 @@ This ag long line and against TextView.",
             top.SetNeedsDraw ();
             Application.RunIteration (ref rs);
 
-            TestHelpers.AssertDriverContentsWithFrameAre (
+            DriverAssert.AssertDriverContentsWithFrameAre (
                                                           @"
 This ag long line and against TextView.
      against                           ",
@@ -124,7 +126,7 @@ This ag long line and against TextView.
         top.SetNeedsDraw ();
         Application.RunIteration (ref rs);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 This a long line and against TextView.
      and                              
@@ -136,7 +138,7 @@ This a long line and against TextView.
         top.SetNeedsDraw ();
         Application.RunIteration (ref rs);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 This an long line and against TextView.
      and                               ",
@@ -147,7 +149,7 @@ This an long line and against TextView.
         top.SetNeedsDraw ();
         Application.RunIteration (ref rs);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 This an long line and against TextView.",
                                                       output

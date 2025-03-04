@@ -1,4 +1,6 @@
 ﻿using JetBrains.Annotations;
+using UnitTests;
+
 // ReSharper disable HeuristicUnreachableCode
 
 namespace Terminal.Gui.InputTests;

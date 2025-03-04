@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using UnitTests;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -113,7 +115,7 @@ public class LabelTests (ITestOutputHelper output)
 └────────────────────────────┘
 ";
 
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         label.Text = "Say Hello 你 changed";
 
@@ -127,7 +129,7 @@ public class LabelTests (ITestOutputHelper output)
 └────────────────────────────┘
 ";
 
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         top.Dispose ();
     }
 
@@ -153,7 +155,7 @@ public class LabelTests (ITestOutputHelper output)
 └────────────────────────────┘
 ";
 
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         label.Text = "Say Hello 你 changed";
 
@@ -167,7 +169,7 @@ public class LabelTests (ITestOutputHelper output)
 └────────────────────────────┘
 ";
 
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         top.Dispose ();
     }
 
@@ -209,7 +211,7 @@ public class LabelTests (ITestOutputHelper output)
 
         tf2.Draw (new (new (0, 2), tfSize), label.GetNormalColor (), label.ColorScheme.HotNormal);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 This label needs to be cleared before rewritten.                       
 This TextFormatter (tf1) without fill will not be cleared on rewritten.
@@ -232,7 +234,7 @@ This TextFormatter (tf2) with fill will be cleared on rewritten.       ",
         tf2.Text = "This TextFormatter (tf2) is rewritten.";
         tf2.Draw (new (new (0, 2), tfSize), label.GetNormalColor (), label.ColorScheme.HotNormal);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 This label is rewritten.                                               
 This TextFormatter (tf1) is rewritten.will not be cleared on rewritten.
@@ -258,7 +260,7 @@ This TextFormatter (tf2) is rewritten.                                 ",
 Demo Simple Rune
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 16, 1), pos);
         top.Dispose ();
     }
@@ -294,7 +296,7 @@ n
 e
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 1, 16), pos);
         top.Dispose ();
     }
@@ -319,7 +321,7 @@ e
 ズ
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 2, 7), pos);
         top.Dispose ();
     }
@@ -406,7 +408,7 @@ e
 │                            │
 └────────────────────────────┘
 ";
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 30, 5), pos);
         top.Dispose ();
     }
@@ -439,7 +441,7 @@ e
 └────────────────────────────┘
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 30, 5), pos);
         top.Dispose ();
     }
@@ -458,7 +460,7 @@ e
 
         label.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌┤Te├┐
 │Test│
@@ -484,7 +486,7 @@ e
         Assert.Equal (new (0, 0, 4, 1), label.Viewport);
         Application.Begin (top);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 │Test│
 └────┘",
@@ -507,7 +509,7 @@ e
         Assert.Equal (new (0, 0, 4, 1), label.Viewport);
         Application.Begin (top);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 │Test│
 └────┘",
@@ -881,7 +883,7 @@ e
 "
             ;
 
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Application.End (rs);
         top.Dispose ();
     }
@@ -928,7 +930,7 @@ e
 └──────────────────────────────────────┘
 ";
 
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Application.End (rs);
         top.Dispose ();
     }
@@ -982,7 +984,7 @@ e
                              if (k.KeyCode == KeyCode.Enter)
                              {
                                  ((FakeDriver)Application.Driver!).SetBufferSize (22, count + 4);
-                                 Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expecteds [count], output);
+                                 Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expecteds [count], output);
                                  Assert.Equal (new (0, 0, 22, count + 4), pos);
 
                                  if (count > 0)
@@ -1076,7 +1078,7 @@ e
 └────────┘
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 10, 4), pos);
 
         text = "0123456789";
@@ -1105,7 +1107,7 @@ e
 └────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 10, 4), pos);
     }
 
@@ -1133,7 +1135,7 @@ e
                              if (k.KeyCode == KeyCode.Enter)
                              {
                                  ((FakeDriver)Application.Driver!).SetBufferSize (22, count + 4);
-                                 Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expecteds [count], output);
+                                 Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expecteds [count], output);
                                  Assert.Equal (new (0, 0, 22, count + 4), pos);
 
                                  if (count < 20)
@@ -1223,7 +1225,7 @@ e
 └────────┘
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 10, 4), pos);
 
         text = "0123456789";
@@ -1244,7 +1246,7 @@ e
 └────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 10, 4), pos);
         top.Dispose ();
     }
@@ -1282,7 +1284,7 @@ e
 └────────┘
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 10, 4), pos);
 
         text = "0123456789";
@@ -1302,7 +1304,7 @@ e
 └────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 10, 4), pos);
         top.Dispose ();
     }

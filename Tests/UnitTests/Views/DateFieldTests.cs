@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Runtime.InteropServices;
+using UnitTests;
 
 namespace Terminal.Gui.ViewsTests;
 

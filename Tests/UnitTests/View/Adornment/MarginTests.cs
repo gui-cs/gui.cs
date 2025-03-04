@@ -1,4 +1,6 @@
-﻿using Xunit.Abstractions;
+﻿using UnitTests;
+using UnitTests;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
@@ -30,14 +32,14 @@ public class MarginTests (ITestOutputHelper output)
         Application.Top.EndInit ();
         Application.LayoutAndDraw();
 
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"
 MMM
 M M
 MMM",
                                              output
                                             );
-        TestHelpers.AssertDriverAttributesAre ("0", output, null, Application.Top.GetNormalColor ());
+        DriverAssert.AssertDriverAttributesAre ("0", output, null, Application.Top.GetNormalColor ());
 
         Application.ResetState (true);
     }

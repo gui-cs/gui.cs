@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using UnitTests;
 using Xunit.Abstractions;
 using static Terminal.Gui.ConfigurationManager;
 

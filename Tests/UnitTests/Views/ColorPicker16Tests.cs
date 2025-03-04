@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui.ViewsTests;
+﻿using UnitTests;
+
+namespace Terminal.Gui.ViewsTests;
 
 public class ColorPicker16Tests
 {

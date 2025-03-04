@@ -1,5 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using System.Text;
+using UnitTests;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
@@ -9,32 +11,6 @@ namespace Terminal.Gui.ViewTests;
 /// </summary>
 public class TextTests (ITestOutputHelper output)
 {
-    // TextFormatter.Size should be empty unless DimAuto is set or ContentSize is set
-    [Theory]
-    [InlineData ("", 0, 0)]
-    [InlineData (" ", 0, 0)]
-    [InlineData ("01234", 0, 0)]
-    public void TextFormatter_Size_Default (string text, int expectedW, int expectedH)
-    {
-        var view = new View ();
-        view.Text = text;
-        view.Layout ();
-        Assert.Equal (new (expectedW, expectedH), view.TextFormatter.ConstrainToSize);
-    }
-
-    // TextFormatter.Size should track ContentSize (without DimAuto)
-    [Theory]
-    [InlineData ("", 1, 1)]
-    [InlineData (" ", 1, 1)]
-    [InlineData ("01234", 1, 1)]
-    public void TextFormatter_Size_Tracks_ContentSize (string text, int expectedW, int expectedH)
-    {
-        var view = new View ();
-        view.SetContentSize (new (1, 1));
-        view.Text = text;
-        view.Layout ();
-        Assert.Equal (new (expectedW, expectedH), view.TextFormatter.ConstrainToSize);
-    }
 
     [Fact]
     [SetupFakeDriver]
@@ -59,7 +35,7 @@ HelloX
 Y     
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         label.Width = 10;
         label.Height = 2;
@@ -76,7 +52,7 @@ Hello     X
 Y          
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
     }
 
     [Fact]
@@ -109,7 +85,7 @@ o
 Y 
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         label.Width = 2;
         label.Height = 10;
@@ -132,7 +108,7 @@ Y
 "
             ;
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Application.End (rs);
         top.Dispose ();
     }
@@ -181,7 +157,7 @@ Y
 └─────────────┘
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         view.Text = "Hello World";
         view.Width = 11;
@@ -211,7 +187,7 @@ Y
 └─────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         view.Width = Dim.Auto ();
         view.Height = Dim.Auto ();
@@ -239,7 +215,7 @@ Y
 └─────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         view.TextDirection = TextDirection.TopBottom_LeftRight;
         Application.RunIteration (ref rs);
@@ -264,7 +240,7 @@ Y
 └─────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         // Setting to false causes Width and Height to be set to the current ContentSize
         view.Width = 1;
@@ -283,7 +259,7 @@ Y
         view.SetNeedsDraw ();
         view.Draw ();
         expected = @" HelloWorlds";
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         Application.RunIteration (ref rs);
 
@@ -308,7 +284,7 @@ Y
 └─────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         view.PreserveTrailingSpaces = true;
         Application.RunIteration (ref rs);
@@ -333,7 +309,7 @@ Y
 └─────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         view.PreserveTrailingSpaces = false;
         Rectangle f = view.Frame;
@@ -362,7 +338,7 @@ Y
 └─────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         view.Width = Dim.Auto ();
         view.Height = Dim.Auto ();
@@ -389,7 +365,7 @@ Y
 └─────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Application.End (rs);
         top.Dispose ();
     }
@@ -437,7 +413,7 @@ Y
 └──┘
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 4, 10), pos);
 
         text = "0123456789";
@@ -464,7 +440,7 @@ Y
 └──┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 4, 10), pos);
         top.Dispose ();
     }
@@ -501,7 +477,7 @@ i
 e 
 w ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
     }
 
     [Fact]
@@ -567,7 +543,7 @@ w ";
 └──────────────────┘
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         verticalView.Text = $"最初の行{Environment.NewLine}二行目";
         Application.RunIteration (ref rs);
@@ -596,7 +572,7 @@ w ";
 └──────────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Application.End (rs);
         top.Dispose ();
     }
@@ -660,7 +636,7 @@ w ";
 └────────────────────┘
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         verticalView.Text = "最初の行二行目";
         Application.RunIteration (ref rs);
@@ -693,7 +669,7 @@ w ";
 └────────────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Application.End (rs);
         top.Dispose ();
     }
@@ -858,7 +834,7 @@ w ";
 ";
         }
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, width + 2, 6), pos);
         top.Dispose ();
     }
@@ -1016,166 +992,11 @@ w ";
 ";
         }
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 9, height + 2), pos);
         top.Dispose ();
     }
 
-    // Test that View.PreserveTrailingSpaces removes trailing spaces
-    [Fact]
-    public void PreserveTrailingSpaces_Removes_Trailing_Spaces ()
-    {
-        var view = new View { Text = "Hello World " };
-        Assert.Equal ("Hello World ", view.TextFormatter.Text);
-
-        view.TextFormatter.WordWrap = true;
-        view.TextFormatter.ConstrainToSize = new (5, 3);
-
-        view.PreserveTrailingSpaces = false;
-        Assert.Equal ($"Hello{Environment.NewLine}World", view.TextFormatter.Format ());
-
-        view.PreserveTrailingSpaces = true;
-        Assert.Equal ($"Hello{Environment.NewLine} {Environment.NewLine}World", view.TextFormatter.Format ());
-    }
-
-    // View.PreserveTrailingSpaces Gets or sets whether trailing spaces at the end of word-wrapped lines are preserved
-    // or not when <see cref="TextFormatter.WordWrap"/> is enabled.
-    // If <see langword="true"/> trailing spaces at the end of wrapped lines will be removed when
-    // <see cref = "Text" / > is formatted for display.The default is <see langword = "false" / >.
-    [Fact]
-    public void PreserveTrailingSpaces_Set_Get ()
-    {
-        var view = new View { Text = "Hello World" };
-
-        Assert.False (view.PreserveTrailingSpaces);
-
-        view.PreserveTrailingSpaces = true;
-        Assert.True (view.PreserveTrailingSpaces);
-    }
-
-    // Setting TextFormatter DOES NOT update Text
-    [Fact]
-    public void SettingTextFormatterDoesNotUpdateText ()
-    {
-        var view = new View ();
-        view.TextFormatter.Text = "Hello World";
-
-        Assert.True (string.IsNullOrEmpty (view.Text));
-    }
-
-    // Setting Text updates TextFormatter
-    [Fact]
-    public void SettingTextUpdatesTextFormatter ()
-    {
-        var view = new View { Text = "Hello World" };
-
-        Assert.Equal ("Hello World", view.Text);
-        Assert.Equal ("Hello World", view.TextFormatter.Text);
-    }
-
-    // Setting Text does NOT set the HotKey
-    [Fact]
-    public void Text_Does_Not_Set_HotKey ()
-    {
-        var view = new View { HotKeySpecifier = (Rune)'_', Text = "_Hello World" };
-
-        Assert.NotEqual (Key.H, view.HotKey);
-    }
-
-    // Test that TextFormatter is init only
-    [Fact]
-    public void TextFormatterIsInitOnly ()
-    {
-        var view = new View ();
-
-        // Use reflection to ensure the TextFormatter property is `init` only
-        Assert.Contains (
-                         typeof (IsExternalInit),
-                         typeof (View).GetMethod ("set_TextFormatter")
-                                      .ReturnParameter.GetRequiredCustomModifiers ());
-    }
-
-    // Test that the Text property is set correctly.
-    [Fact]
-    public void TextProperty ()
-    {
-        var view = new View { Text = "Hello World" };
-
-        Assert.Equal ("Hello World", view.Text);
-    }
-
-    // Test view.UpdateTextFormatterText overridden in a subclass updates TextFormatter.Text
-    [Fact]
-    public void UpdateTextFormatterText_Overridden ()
-    {
-        var view = new TestView { Text = "Hello World" };
-
-        Assert.Equal ("Hello World", view.Text);
-        Assert.Equal (">Hello World<", view.TextFormatter.Text);
-    }
-
-    private class TestView : View
-    {
-        protected override void UpdateTextFormatterText () { TextFormatter.Text = $">{Text}<"; }
-    }
-
-    [Fact]
-    public void TextDirection_Horizontal_Dims_Correct ()
-    {
-        // Initializes a view with a vertical direction
-        var view = new View
-        {
-            Text = "01234",
-            TextDirection = TextDirection.LeftRight_TopBottom,
-            Width = Dim.Auto (DimAutoStyle.Text),
-            Height = Dim.Auto (DimAutoStyle.Text)
-        };
-        Assert.True (view.NeedsLayout);
-        view.Layout ();
-        Assert.Equal (new (0, 0, 5, 1), view.Frame);
-        Assert.Equal (new (0, 0, 5, 1), view.Viewport);
-
-        view.BeginInit ();
-        view.EndInit ();
-        Assert.Equal (new (0, 0, 5, 1), view.Frame);
-        Assert.Equal (new (0, 0, 5, 1), view.Viewport);
-    }
-
-    // BUGBUG: this is a temporary test that helped identify #3469 - It needs to be expanded upon (and renamed)
-    [Fact]
-    public void TextDirection_Horizontal_Dims_Correct_WidthAbsolute ()
-    {
-        var view = new View
-        {
-            Text = "01234",
-            TextDirection = TextDirection.LeftRight_TopBottom,
-            TextAlignment = Alignment.Center,
-            Width = 10,
-            Height = Dim.Auto (DimAutoStyle.Text)
-        };
-        view.BeginInit ();
-        view.EndInit ();
-        Assert.Equal (new (0, 0, 10, 1), view.Frame);
-        Assert.Equal (new (0, 0, 10, 1), view.Viewport);
-
-        Assert.Equal (new (10, 1), view.TextFormatter.ConstrainToSize);
-    }
-
-    [Fact]
-    public void TextDirection_Vertical_Dims_Correct ()
-    {
-        // Initializes a view with a vertical direction
-        var view = new View
-        {
-            TextDirection = TextDirection.TopBottom_LeftRight,
-            Text = "01234",
-            Width = Dim.Auto (DimAutoStyle.Text),
-            Height = Dim.Auto (DimAutoStyle.Text)
-        };
-        view.Layout ();
-        Assert.Equal (new (0, 0, 1, 5), view.Frame);
-        Assert.Equal (new (0, 0, 1, 5), view.Viewport);
-    }
 
     [Fact]
     [SetupFakeDriver]
@@ -1248,7 +1069,7 @@ w ";
 └──────────────────────────────┘
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         verticalView.Text = $"最初の行{Environment.NewLine}二行目";
         Assert.True (verticalView.TextFormatter.NeedsFormat);
@@ -1297,7 +1118,7 @@ w ";
 └──────────────────────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
     }
 
     [Fact]
@@ -1312,6 +1133,6 @@ w ";
         view.EndInit ();
         view.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (text, output);
+        DriverAssert.AssertDriverContentsWithFrameAre (text, output);
     }
 }

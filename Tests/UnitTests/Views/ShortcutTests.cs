@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using UnitTests;
 
 namespace Terminal.Gui.ViewsTests;
 

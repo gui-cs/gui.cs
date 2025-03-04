@@ -1,4 +1,6 @@
 using System.ComponentModel;
+using UnitTests;
+using UnitTests;
 using Xunit.Abstractions;
 // ReSharper disable AccessToModifiedClosure
 
@@ -364,7 +366,7 @@ public class CheckBoxTests (ITestOutputHelper output)
 └────────────────────────────┘
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 30, 5), pos);
 
         checkBox.CheckedState = CheckState.Checked;
@@ -378,7 +380,7 @@ public class CheckBoxTests (ITestOutputHelper output)
 └────────────────────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 30, 5), pos);
         top.Dispose ();
     }
@@ -426,7 +428,7 @@ public class CheckBoxTests (ITestOutputHelper output)
 └────────────────────────────┘
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 30, 6), pos);
 
         checkBox1.CheckedState = CheckState.Checked;
@@ -449,7 +451,7 @@ public class CheckBoxTests (ITestOutputHelper output)
 └────────────────────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 30, 6), pos);
         top.Dispose ();
     }
@@ -485,7 +487,7 @@ public class CheckBoxTests (ITestOutputHelper output)
 └────────────────────────────┘
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 30, 5), pos);
 
         checkBox.CheckedState = CheckState.Checked;
@@ -499,7 +501,7 @@ public class CheckBoxTests (ITestOutputHelper output)
 └────────────────────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 30, 5), pos);
         top.Dispose ();
     }
@@ -536,7 +538,7 @@ public class CheckBoxTests (ITestOutputHelper output)
 └────────────────────────────┘
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 30, 5), pos);
 
         checkBox.CheckedState = CheckState.Checked;
@@ -550,7 +552,7 @@ public class CheckBoxTests (ITestOutputHelper output)
 └────────────────────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 30, 5), pos);
         top.Dispose ();
     }

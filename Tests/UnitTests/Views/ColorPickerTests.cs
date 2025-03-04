@@ -1,4 +1,5 @@
 ﻿using System.Reflection.Emit;
+using UnitTests;
 using Xunit.Abstractions;
 using Color = Terminal.Gui.Color;
 

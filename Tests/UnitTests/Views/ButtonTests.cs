@@ -1,4 +1,6 @@
 using System.ComponentModel;
+using UnitTests;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -181,7 +183,7 @@ public class ButtonTests (ITestOutputHelper output)
         var expected = @$"
 {Glyphs.LeftBracket}  {Glyphs.RightBracket}
 ";
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         btn.Dispose ();
 
         btn = new () { Text = "_Test", IsDefault = true };
@@ -238,7 +240,7 @@ public class ButtonTests (ITestOutputHelper output)
         expected = @$"
  {Glyphs.LeftBracket}{Glyphs.LeftDefaultIndicator} abc {Glyphs.RightDefaultIndicator}{Glyphs.RightBracket}
 ";
-        TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         Assert.Equal (new (0, 0, 9, 1), btn.Viewport);
         Assert.Equal (new (1, 2, 9, 1), btn.Frame);
@@ -588,7 +590,7 @@ public class ButtonTests (ITestOutputHelper output)
 └────────────────────────────┘
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 30, 5), pos);
         top.Dispose ();
     }

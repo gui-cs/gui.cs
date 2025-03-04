@@ -1,4 +1,5 @@
 using Terminal.Gui;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace StressTests;

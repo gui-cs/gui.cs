@@ -1,5 +1,7 @@
 ﻿#nullable enable
 using Moq;
+using UnitTests;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
@@ -117,7 +119,7 @@ public class ClearViewportTests (ITestOutputHelper _output)
 
         superView.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
  ┌─┐
  │X│
@@ -127,7 +129,7 @@ public class ClearViewportTests (ITestOutputHelper _output)
         // On Draw exit the view is excluded from the clip, so this will do nothing.
         view.ClearViewport ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
  ┌─┐
  │X│
@@ -138,7 +140,7 @@ public class ClearViewportTests (ITestOutputHelper _output)
 
         view.ClearViewport ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
  ┌─┐
  │ │
@@ -167,7 +169,7 @@ public class ClearViewportTests (ITestOutputHelper _output)
 
         superView.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
  ┌─┐
  │X│
@@ -176,7 +178,7 @@ public class ClearViewportTests (ITestOutputHelper _output)
         View.SetClipToScreen ();
         view.ClearViewport ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
  ┌─┐
  │ │
@@ -226,7 +228,7 @@ public class ClearViewportTests (ITestOutputHelper _output)
 "
             ;
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new (0, 0, 20, 10), pos);
 
         view.FillRect (view.Viewport);
@@ -245,7 +247,7 @@ public class ClearViewportTests (ITestOutputHelper _output)
 "
             ;
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, _output);
         top.Dispose ();
     }
 
@@ -291,7 +293,7 @@ public class ClearViewportTests (ITestOutputHelper _output)
 "
             ;
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, _output);
         Assert.Equal (new (0, 0, 20, 10), pos);
 
         view.FillRect (view.Viewport);
@@ -309,7 +311,7 @@ public class ClearViewportTests (ITestOutputHelper _output)
 └──────────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, _output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, _output);
 
         top.Dispose ();
     }
@@ -350,7 +352,7 @@ public class ClearViewportTests (ITestOutputHelper _output)
             Assert.Equal (new (0, 0, 20, 1), v.Frame);
         }
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 cccccccccccccccccccc",
                                                       _output
@@ -365,7 +367,7 @@ cccccccccccccccccccc",
 
         if (label)
         {
-            TestHelpers.AssertDriverAttributesAre (
+            DriverAssert.AssertDriverAttributesAre (
                                                    @"
 111111111111111111110
 111111111111111111110",
@@ -376,7 +378,7 @@ cccccccccccccccccccc",
         }
         else
         {
-            TestHelpers.AssertDriverAttributesAre (
+            DriverAssert.AssertDriverAttributesAre (
                                                    @"
 222222222222222222220
 111111111111111111110",
@@ -395,7 +397,7 @@ cccccccccccccccccccc",
             Assert.True (v.HasFocus);
             Application.LayoutAndDraw ();
 
-            TestHelpers.AssertDriverAttributesAre (
+            DriverAssert.AssertDriverAttributesAre (
                                                    @"
 222222222222222222220
 111111111111111111110",

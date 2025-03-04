@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Text;
+using UnitTests;
+using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -714,7 +716,7 @@ public class TreeViewTests
         tv.Draw ();
 
         // Nothing expanded
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"└+1
 ",
                                              _output
@@ -725,7 +727,7 @@ public class TreeViewTests
         tv.Draw ();
 
         // Normal drawing of the tree view
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"    
 └-1
   └-2
@@ -753,7 +755,7 @@ public class TreeViewTests
         tv.Draw ();
 
         // Nothing expanded
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"└+1
 ",
                                              _output
@@ -765,7 +767,7 @@ public class TreeViewTests
         tv.Draw ();
 
         // Normal drawing of the tree view
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"    
 └-1
   └-2
@@ -793,7 +795,7 @@ public class TreeViewTests
         tv.Draw ();
 
         // Normal drawing of the tree view
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"    
 └-1
   └-2
@@ -827,7 +829,7 @@ public class TreeViewTests
         tv.LayoutSubviews ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"├-normal
 │ ├─pink
 │ └─normal
@@ -847,7 +849,7 @@ public class TreeViewTests
 
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"├+normal
 └─pink
 ",
@@ -883,7 +885,7 @@ public class TreeViewTests
         View.SetClipToScreen ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"├-normal
 │ ├─pink
 │ └─normal
@@ -903,7 +905,7 @@ public class TreeViewTests
         View.SetClipToScreen ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"├+normal
 └─pink
 ",
@@ -921,7 +923,7 @@ public class TreeViewTests
         View.SetClipToScreen ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"└─pink
 ",
                                              _output
@@ -959,7 +961,7 @@ public class TreeViewTests
         tv.Draw ();
 
         // Normal drawing of the tree view
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"
 ├-root one
 │ ├─leaf 1
@@ -1034,7 +1036,7 @@ public class TreeViewTests
         tv.Draw ();
 
         // Normal drawing of the tree view
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"
 ├-root one
 FFFFFFFFFF
@@ -1074,7 +1076,7 @@ FFFFFFFFFF
         tv.Draw ();
 
         // Normal drawing of the tree view
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"
 ─leaf 1
 ─leaf 2
@@ -1130,7 +1132,7 @@ oot two
         tv.Draw ();
 
         // Normal drawing of the tree view
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"
 ├-root one
 │ ├─leaf 1
@@ -1148,7 +1150,7 @@ oot two
         tv.Draw ();
 
         // Normal drawing of the tree view
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"",
                                              _output
                                             );
@@ -1158,7 +1160,7 @@ oot two
         View.SetClipToScreen ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"
 ├-root one
 │ ├─leaf 1
@@ -1173,7 +1175,7 @@ oot two
         View.SetClipToScreen ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"
 ├-root one
 │ ├─leaf 1
@@ -1187,7 +1189,7 @@ oot two
         View.SetClipToScreen ();
         tv.Draw ();
 
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"
 ├-root one
 │ ├─leaf 1
@@ -1223,7 +1225,7 @@ oot two
         var hotpink = new Attribute (Color.BrightMagenta, Color.Black);
 
         // Normal drawing of the tree view
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"
 ├-normal
 │ ├─pink
@@ -1234,7 +1236,7 @@ oot two
                                             );
 
         // Should all be the same color
-        TestHelpers.AssertDriverAttributesAre (
+        DriverAssert.AssertDriverAttributesAre (
                                                @"
 0000000000
 0000000000
@@ -1260,7 +1262,7 @@ oot two
         tv.Draw ();
 
         // Same text
-        TestHelpers.AssertDriverContentsAre (
+        DriverAssert.AssertDriverContentsAre (
                                              @"
 ├-normal
 │ ├─pink
@@ -1272,7 +1274,7 @@ oot two
 
         // but now the item (only not lines) appear
         // in pink when they are the word "pink"
-        TestHelpers.AssertDriverAttributesAre (
+        DriverAssert.AssertDriverAttributesAre (
                                                @"
 00000000
 00001111

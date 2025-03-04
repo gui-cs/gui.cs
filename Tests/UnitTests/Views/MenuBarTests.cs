@@ -1,4 +1,6 @@
-﻿using Xunit.Abstractions;
+﻿using UnitTests;
+using UnitTests;
+using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
@@ -103,7 +105,7 @@ public class MenuBarTests (ITestOutputHelper output)
                     );
         Application.LayoutAndDraw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @$"
  Nullable Checked       
 ┌──────────────────────┐
@@ -378,7 +380,7 @@ public class MenuBarTests (ITestOutputHelper output)
             menu.ColorScheme.Disabled
         };
 
-        TestHelpers.AssertDriverAttributesAre (
+        DriverAssert.AssertDriverAttributesAre (
                                                @"
 00000000000000",
                                                output,
@@ -393,7 +395,7 @@ public class MenuBarTests (ITestOutputHelper output)
                     );
         top.Draw ();
 
-        TestHelpers.AssertDriverAttributesAre (
+        DriverAssert.AssertDriverAttributesAre (
                                                @"
 11111100000000
 00000000000000
@@ -416,7 +418,7 @@ public class MenuBarTests (ITestOutputHelper output)
         top.Subviews [1].Layout();
         top.Subviews [1].Draw ();
 
-        TestHelpers.AssertDriverAttributesAre (
+        DriverAssert.AssertDriverAttributesAre (
                                                @"
 11111100000000
 00000000000000
@@ -438,7 +440,7 @@ public class MenuBarTests (ITestOutputHelper output)
                     );
         top.Subviews [1].Draw ();
 
-        TestHelpers.AssertDriverAttributesAre (
+        DriverAssert.AssertDriverAttributesAre (
                                                @"
 11111100000000
 00000000000000
@@ -473,7 +475,7 @@ public class MenuBarTests (ITestOutputHelper output)
 
         Assert.Equal (new (0, 0, 40, 15), win.Frame);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────────────────────────────────┐
 │                                      │
@@ -575,7 +577,7 @@ public class MenuBarTests (ITestOutputHelper output)
 
         Assert.Equal (new (2, 2, 15, 4), dialog.Frame);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────────────────────────────────┐
 │                                      │
@@ -599,7 +601,7 @@ public class MenuBarTests (ITestOutputHelper output)
         menu.OpenMenu ();
         Application.RunIteration (ref rsDialog);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────────────────────────────────┐
 │                                      │
@@ -627,7 +629,7 @@ public class MenuBarTests (ITestOutputHelper output)
         Application.RunIteration (ref rsDialog, firstIteration);
         Assert.Equal (items [0], menu.Menus [0].Title);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────────────────────────────────┐
 │                                      │
@@ -661,7 +663,7 @@ public class MenuBarTests (ITestOutputHelper output)
         menu.OpenMenu ();
         Application.RunIteration (ref rsDialog);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────────────┐
 │                  │
@@ -700,7 +702,7 @@ public class MenuBarTests (ITestOutputHelper output)
         Button.DefaultShadow = ShadowStyle.None;
 
         Assert.Equal (new (0, 0, 40, 15), View.GetClip ()!.GetBounds());
-        TestHelpers.AssertDriverContentsWithFrameAre (@"", output);
+        DriverAssert.AssertDriverContentsWithFrameAre (@"", output);
 
         List<string> items = new ()
         {
@@ -784,7 +786,7 @@ public class MenuBarTests (ITestOutputHelper output)
 
         Assert.Equal (new (2, 2, 15, 4), dialog.Frame);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
   ┌─────────────┐
   │  File       │
@@ -797,7 +799,7 @@ public class MenuBarTests (ITestOutputHelper output)
         menu.OpenMenu ();
         Application.RunIteration (ref rs);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
   ┌─────────────┐                       
   │  File       │                       
@@ -819,7 +821,7 @@ public class MenuBarTests (ITestOutputHelper output)
         Application.RunIteration (ref rs);
         Assert.Equal (items [0], menu.Menus [0].Title);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
   ┌─────────────┐
   │  New        │
@@ -842,7 +844,7 @@ public class MenuBarTests (ITestOutputHelper output)
         menu.OpenMenu ();
         Application.RunIteration (ref rs);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
   ┌─────────────┐   
   │  Delete     │   
@@ -890,7 +892,7 @@ public class MenuBarTests (ITestOutputHelper output)
 ──────┘
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 7, 4), pos);
 
         menu.CloseAllMenus ();
@@ -904,7 +906,7 @@ public class MenuBarTests (ITestOutputHelper output)
 ──────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 7, 3), pos);
 
         menu.CloseAllMenus ();
@@ -920,7 +922,7 @@ public class MenuBarTests (ITestOutputHelper output)
 └──────
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 1, 7, 4), pos);
 
         menu.CloseAllMenus ();
@@ -935,7 +937,7 @@ public class MenuBarTests (ITestOutputHelper output)
 │ Two  
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 7, 3), pos);
         top.Dispose ();
     }
@@ -968,7 +970,7 @@ ne
 wo
 ";
 
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         menu.CloseAllMenus ();
         menu.Frame = new (-2, -2, menu.Frame.Width, menu.Frame.Height);
@@ -979,7 +981,7 @@ wo
 wo
 ";
 
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         menu.CloseAllMenus ();
         menu.Frame = new (0, 0, menu.Frame.Width, menu.Frame.Height);
@@ -992,7 +994,7 @@ wo
  Tw
 ";
 
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         menu.CloseAllMenus ();
         menu.Frame = new (0, 0, menu.Frame.Width, menu.Frame.Height);
@@ -1004,7 +1006,7 @@ wo
  On
 ";
 
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         top.Dispose ();
     }
 
@@ -1034,7 +1036,7 @@ wo
 └──────┘
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 1, 8, 4), pos);
         top.Dispose ();
     }
@@ -1064,7 +1066,7 @@ wo
  Two
 ";
 
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         top.Dispose ();
     }
 
@@ -1112,7 +1114,7 @@ wo
  File  Edit
 ";
 
-        var pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        var pos = DriverAsserts.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 11, 1), pos);
 
         Assert.True (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.N)));
@@ -1140,7 +1142,7 @@ wo
  File  Edit
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAsserts.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 11, 1), pos);
 
         Assert.True (Application.Top.ProcessKeyDown (new KeyEventArgs (Key.CursorRight)));
@@ -1214,7 +1216,7 @@ wo
         Assert.True (menu.NewKeyDownEvent (Key.F.WithAlt));
         Assert.True (menu.IsMenuOpen);
         Application.Top.Draw ();
-        TestHelpers.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), output);
+        DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), output);
 
         Assert.True (Application.Top.Subviews [1].NewKeyDownEvent (Key.N));
         Application.MainLoop.RunIteration ();
@@ -1223,7 +1225,7 @@ wo
         Assert.True (menu.NewKeyDownEvent (Key.E.WithAlt));
         Assert.True (menu.IsMenuOpen);
         Application.Top.Draw ();
-        TestHelpers.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (1), output);
+        DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (1), output);
 
         Assert.True (Application.Top.Subviews [1].NewKeyDownEvent (Key.C));
         Application.MainLoop.RunIteration ();
@@ -1482,7 +1484,7 @@ wo
         menu.OpenMenu ();
         Application.LayoutAndDraw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
  File                         
 ┌────────────────────────────┐
@@ -1530,7 +1532,7 @@ wo
         menu.OpenMenu ();
         Application.LayoutAndDraw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
  File                       
  Open   Open a file  Ctrl+O 
@@ -1592,13 +1594,13 @@ wo
         Assert.True (menu.IsMenuOpen);
         top.Draw ();
 
-        TestHelpers.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), output);
+        DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), output);
 
         Assert.True (menu.NewMouseEvent (new () { Position = new (1, 0), Flags = MouseFlags.Button1Pressed, View = menu }));
         Assert.False (menu.IsMenuOpen);
         View.SetClipToScreen ();
         top.Draw ();
-        TestHelpers.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
+        DriverAssert.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
         top.Dispose ();
     }
 
@@ -1632,7 +1634,7 @@ wo
         Application.Begin (top);
         ((FakeDriver)Application.Driver!).SetBufferSize (40, 8);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -1648,7 +1650,7 @@ wo
         Assert.True (win.NewKeyDownEvent (menu.Key));
         top.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -1664,7 +1666,7 @@ wo
         Assert.True (menu.NewKeyDownEvent (Key.CursorRight));
         Application.LayoutAndDraw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -1680,7 +1682,7 @@ wo
         Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorRight));
         top.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -1697,7 +1699,7 @@ wo
         View.SetClipToScreen ();
         top.Draw ();
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -1744,7 +1746,7 @@ wo
                                  {
                                      ((FakeDriver)Application.Driver!).SetBufferSize (40, 8);
 
-                                     TestHelpers.AssertDriverContentsWithFrameAre (
+                                     DriverAssert.AssertDriverContentsWithFrameAre (
                                                                                    @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -1760,7 +1762,7 @@ wo
                                      Assert.True (win.NewKeyDownEvent (menu.Key));
                                      top.Draw ();
 
-                                     TestHelpers.AssertDriverContentsWithFrameAre (
+                                     DriverAssert.AssertDriverContentsWithFrameAre (
                                                                                    @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -1776,7 +1778,7 @@ wo
                                      Assert.True (menu.NewKeyDownEvent (Key.CursorRight));
                                      Application.LayoutAndDraw ();
 
-                                     TestHelpers.AssertDriverContentsWithFrameAre (
+                                     DriverAssert.AssertDriverContentsWithFrameAre (
                                                                                    @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -1792,7 +1794,7 @@ wo
                                      Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorRight));
                                      top.Draw ();
 
-                                     TestHelpers.AssertDriverContentsWithFrameAre (
+                                     DriverAssert.AssertDriverContentsWithFrameAre (
                                                                                    @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -1809,7 +1811,7 @@ wo
                                      View.SetClipToScreen ();
                                      top.Draw ();
 
-                                     TestHelpers.AssertDriverContentsWithFrameAre (
+                                     DriverAssert.AssertDriverContentsWithFrameAre (
                                                                                    @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -1858,7 +1860,7 @@ wo
         RunState rs = Application.Begin (win);
         Application.RunIteration (ref rs);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -1874,7 +1876,7 @@ wo
         Assert.True (win.NewKeyDownEvent (menu.Key));
         Application.RunIteration (ref rs);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -1890,7 +1892,7 @@ wo
         Assert.True (menu.NewKeyDownEvent (Key.CursorRight));
         Application.RunIteration (ref rs);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -1906,7 +1908,7 @@ wo
         Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorRight));
         Application.RunIteration (ref rs);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -1922,7 +1924,7 @@ wo
         Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorRight));
         Application.RunIteration (ref rs);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -1948,7 +1950,7 @@ wo
                                      Toplevel top = Application.Top;
                                      Application.LayoutAndDraw();
 
-                                     TestHelpers.AssertDriverContentsWithFrameAre (
+                                     DriverAssert.AssertDriverContentsWithFrameAre (
                                                                                    @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -1964,7 +1966,7 @@ wo
                                      Assert.True (top.NewKeyDownEvent (Key.F9));
                                      top.Draw ();
 
-                                     TestHelpers.AssertDriverContentsWithFrameAre (
+                                     DriverAssert.AssertDriverContentsWithFrameAre (
                                                                                    @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -1980,7 +1982,7 @@ wo
                                      Assert.True (top.Subviews [0].NewKeyDownEvent (Key.CursorRight));
                                      Application.LayoutAndDraw ();
 
-                                     TestHelpers.AssertDriverContentsWithFrameAre (
+                                     DriverAssert.AssertDriverContentsWithFrameAre (
                                                                                    @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -1998,7 +2000,7 @@ wo
                                                  );
                                      top.Draw ();
 
-                                     TestHelpers.AssertDriverContentsWithFrameAre (
+                                     DriverAssert.AssertDriverContentsWithFrameAre (
                                                                                    @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -2017,7 +2019,7 @@ wo
                                      View.SetClipToScreen ();
                                      top.Draw ();
 
-                                     TestHelpers.AssertDriverContentsWithFrameAre (
+                                     DriverAssert.AssertDriverContentsWithFrameAre (
                                                                                    @"
 ┌──────────────────────────────────────┐
 │ File  Edit                           │
@@ -2084,21 +2086,21 @@ wo
         Assert.True (menu.NewKeyDownEvent (menu.Key));
         Assert.True (menu.IsMenuOpen);
         top.Draw ();
-        TestHelpers.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), output);
+        DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), output);
 
         // Open second
         Assert.True (Application.Top.Subviews [1].NewKeyDownEvent (Key.CursorRight));
         Assert.True (menu.IsMenuOpen);
         View.SetClipToScreen ();
         top.Draw ();
-        TestHelpers.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (1), output);
+        DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (1), output);
 
         // Close menu
         Assert.True (menu.NewKeyDownEvent (menu.Key));
         Assert.False (menu.IsMenuOpen);
         View.SetClipToScreen ();
         top.Draw ();
-        TestHelpers.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
+        DriverAssert.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
 
         top.Remove (menu);
 
@@ -2132,21 +2134,21 @@ wo
         Assert.True (menu.IsMenuOpen);
         View.SetClipToScreen ();
         top.Draw ();
-        TestHelpers.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), output);
+        DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), output);
 
         // Open second
         Assert.True (top.Subviews [1].NewKeyDownEvent (Key.CursorRight));
         Assert.True (menu.IsMenuOpen);
         View.SetClipToScreen ();
         Application.Top.Draw ();
-        TestHelpers.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (1), output);
+        DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (1), output);
 
         // Close menu
         Assert.True (menu.NewKeyDownEvent (menu.Key));
         Assert.False (menu.IsMenuOpen);
         View.SetClipToScreen ();
         top.Draw ();
-        TestHelpers.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
+        DriverAssert.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
         top.Dispose ();
     }
 
@@ -2215,7 +2217,7 @@ wo
 
         View.SetClipToScreen ();
         top.Draw ();
-        TestHelpers.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
+        DriverAssert.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
 
         for (var i = 0; i < expectedMenu.Menus.Length; i++)
         {
@@ -2223,7 +2225,7 @@ wo
             Assert.True (menu.IsMenuOpen);
             View.SetClipToScreen ();
             top.Draw ();
-            TestHelpers.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (i), output);
+            DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (i), output);
         }
 
         top.Dispose ();
@@ -2474,7 +2476,7 @@ Edit
 │ Copy   Copies the selection. │
 └──────────────────────────────┘
 ";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         cancelClosing = true;
         Assert.True (menu.NewKeyDownEvent (menu.Key));
@@ -2489,7 +2491,7 @@ Edit
 │ Copy   Copies the selection. │
 └──────────────────────────────┘
 ";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         cancelClosing = false;
         Assert.True (menu.NewKeyDownEvent (menu.Key));
@@ -2501,7 +2503,7 @@ Edit
         expected = @"
 Edit
 ";
-        TestHelpers.AssertDriverContentsAre (expected, output);
+        DriverAssert.AssertDriverContentsAre (expected, output);
 
         void New () { miAction = "New"; }
 
@@ -2650,7 +2652,7 @@ Edit
         Assert.True (menu.IsMenuOpen);
         Assert.False (tf.HasFocus);
         top.Draw ();
-        TestHelpers.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), output);
+        DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), output);
 
         // Right - Edit has no sub menu; this tests that no sub menu shows
         Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorRight));
@@ -2661,7 +2663,7 @@ Edit
         Assert.Null (menu._openSubMenu);
         View.SetClipToScreen ();
         top.Draw ();
-        TestHelpers.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (1), output);
+        DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (1), output);
 
         // Right - Format
         Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorRight));
@@ -2669,7 +2671,7 @@ Edit
         Assert.False (tf.HasFocus);
         View.SetClipToScreen ();
         top.Draw ();
-        TestHelpers.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (2), output);
+        DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (2), output);
 
         // Left - Edit
         Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorLeft));
@@ -2677,21 +2679,21 @@ Edit
         Assert.False (tf.HasFocus);
         View.SetClipToScreen ();
         top.Draw ();
-        TestHelpers.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (1), output);
+        DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (1), output);
 
         Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorLeft));
         Assert.True (menu.IsMenuOpen);
         Assert.False (tf.HasFocus);
         View.SetClipToScreen ();
         top.Draw ();
-        TestHelpers.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), output);
+        DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), output);
 
         Assert.True (Application.RaiseKeyDownEvent (menu.Key));
         Assert.False (menu.IsMenuOpen);
         Assert.True (tf.HasFocus);
         View.SetClipToScreen ();
         top.Draw ();
-        TestHelpers.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
+        DriverAssert.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
         top.Dispose ();
     }
 
@@ -2751,7 +2753,7 @@ Edit
         Assert.True (menu.IsMenuOpen);
         Assert.False (tf.HasFocus);
         top.Draw ();
-        TestHelpers.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), output);
+        DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), output);
 
         Assert.True (
                      menu.NewMouseEvent (
@@ -2762,7 +2764,7 @@ Edit
         Assert.False (tf.HasFocus);
         View.SetClipToScreen ();
         top.Draw ();
-        TestHelpers.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (1), output);
+        DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (1), output);
 
         Assert.True (
                      menu.NewMouseEvent (
@@ -2773,7 +2775,7 @@ Edit
         Assert.False (tf.HasFocus);
         View.SetClipToScreen ();
         top.Draw ();
-        TestHelpers.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (2), output);
+        DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (2), output);
 
         Assert.True (
                      menu.NewMouseEvent (
@@ -2784,7 +2786,7 @@ Edit
         Assert.False (tf.HasFocus);
         View.SetClipToScreen ();
         top.Draw ();
-        TestHelpers.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
+        DriverAssert.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
 
         Assert.True (
                      menu.NewMouseEvent (
@@ -2795,14 +2797,14 @@ Edit
         Assert.False (tf.HasFocus);
         View.SetClipToScreen ();
         top.Draw ();
-        TestHelpers.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), output);
+        DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), output);
 
         Assert.True (menu.NewMouseEvent (new () { Position = new (8, 0), Flags = MouseFlags.Button1Pressed, View = menu }));
         Assert.False (menu.IsMenuOpen);
         Assert.True (tf.HasFocus);
         View.SetClipToScreen ();
         top.Draw ();
-        TestHelpers.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
+        DriverAssert.AssertDriverContentsAre (expectedMenu.ClosedMenuText, output);
         top.Dispose ();
     }
 
@@ -2892,7 +2894,7 @@ Edit
         var firstIteration = false;
         Application.RunIteration (ref rs, firstIteration);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
  File                         
 ┌────────────────────────────┐
@@ -2905,7 +2907,7 @@ Edit
         firstIteration = false;
         Application.RunIteration (ref rs, firstIteration);
 
-        TestHelpers.AssertDriverContentsWithFrameAre (
+        DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
  File",
                                                       output
@@ -3063,7 +3065,7 @@ Edit
  Numbers
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         Assert.True (menu.NewKeyDownEvent (menu.Key));
         top.Draw ();
@@ -3077,7 +3079,7 @@ Edit
 └────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         Assert.True (Application.Top.Subviews [1].NewKeyDownEvent (Key.CursorDown));
         top.Draw ();
@@ -3092,7 +3094,7 @@ Edit
           └─────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         Assert.True (Application.Top.Subviews [2].NewKeyDownEvent (Key.CursorLeft));
         top.Draw ();
@@ -3106,7 +3108,7 @@ Edit
 └────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         Assert.True (Application.Top.Subviews [1].NewKeyDownEvent (Key.Esc));
         top.Draw ();
@@ -3115,7 +3117,7 @@ Edit
  Numbers
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         top.Dispose ();
     }
 
@@ -3167,7 +3169,7 @@ Edit
  Numbers
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 8, 1), pos);
 
         menu.NewMouseEvent (
@@ -3184,7 +3186,7 @@ Edit
 └────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 10, 6), pos);
 
         menu.NewMouseEvent (
@@ -3205,7 +3207,7 @@ Edit
           └─────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 25, 7), pos);
 
         Assert.False (
@@ -3227,7 +3229,7 @@ Edit
 └────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 10, 6), pos);
 
         menu.NewMouseEvent (
@@ -3239,7 +3241,7 @@ Edit
  Numbers
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 8, 1), pos);
         top.Dispose ();
     }
@@ -3297,7 +3299,7 @@ Edit
  Two   ►
  Three  ";
 
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorDown));
         menu.Draw ();
@@ -3310,7 +3312,7 @@ Edit
  Two   ► Sub-Menu 1
  Three   Sub-Menu 2";
 
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
     }
 
     [Fact (Skip = "#3798 Broke. Will fix in #2975")]
@@ -3363,7 +3365,7 @@ Edit
  Numbers
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 8, 1), pos);
 
         Assert.True (menu.NewKeyDownEvent (menu.Key));
@@ -3378,7 +3380,7 @@ Edit
 └────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 10, 6), pos);
 
         Assert.True (Application.Top.Subviews [1].NewKeyDownEvent (Key.CursorDown));
@@ -3395,7 +3397,7 @@ Edit
 └─────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 15, 7), pos);
 
         Assert.True (Application.Top.Subviews [2].NewKeyDownEvent (Key.Enter));
@@ -3410,7 +3412,7 @@ Edit
 └────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 10, 6), pos);
 
         Assert.True (Application.Top.Subviews [1].NewKeyDownEvent (Key.Esc));
@@ -3420,7 +3422,7 @@ Edit
  Numbers
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 8, 1), pos);
         top.Dispose ();
     }
@@ -3475,7 +3477,7 @@ Edit
  Numbers
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 8, 1), pos);
 
         Assert.True (menu.NewMouseEvent (new () { Position = new (1, 0), Flags = MouseFlags.Button1Pressed, View = menu }));
@@ -3490,7 +3492,7 @@ Edit
 └────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 10, 6), pos);
 
         Assert.False (menu.NewMouseEvent (new () { Position = new (1, 2), Flags = MouseFlags.Button1Clicked, View = Application.Top.Subviews [1] }));
@@ -3506,7 +3508,7 @@ Edit
 └─────────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 15, 7), pos);
 
         menu.NewMouseEvent (new () { Position = new (1, 1), Flags = MouseFlags.Button1Clicked, View = Application.Top.Subviews [2] });
@@ -3521,7 +3523,7 @@ Edit
 └────────┘
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 10, 6), pos);
 
         Assert.False (menu.NewMouseEvent (new () { Position = new (70, 2), Flags = MouseFlags.Button1Clicked, View = Application.Top }));
@@ -3531,7 +3533,7 @@ Edit
  Numbers
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 8, 1), pos);
         top.Dispose ();
     }
@@ -3589,7 +3591,7 @@ Edit
  Two   ►
  Three  ";
 
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
         Assert.True (menu._openMenu.NewKeyDownEvent (Key.CursorDown));
         Assert.True (menu._openMenu.NewKeyDownEvent (Key.Enter));
@@ -3604,7 +3606,7 @@ Edit
  Sub-Menu 1  
  Sub-Menu 2  ";
 
-        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        _ = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
     }
 
     [Fact (Skip = "#3798 Broke. Will fix in #2975")]
@@ -3658,7 +3660,7 @@ Edit
  Numbers
 ";
 
-        Rectangle pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 8, 1), pos);
 
         Assert.True (
@@ -3675,7 +3677,7 @@ Edit
  Three  
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 8, 4), pos);
 
         menu.NewMouseEvent (
@@ -3691,7 +3693,7 @@ Edit
  Sub-Menu 2  
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 13, 5), pos);
 
         menu.NewMouseEvent (
@@ -3706,7 +3708,7 @@ Edit
  Three  
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 8, 4), pos);
 
         menu.NewMouseEvent (
@@ -3718,7 +3720,7 @@ Edit
  Numbers
 ";
 
-        pos = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+        pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 8, 1), pos);
         top.Dispose ();
     }

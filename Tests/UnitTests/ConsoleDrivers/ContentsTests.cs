@@ -1,4 +1,6 @@
 ﻿using System.Text;
+using UnitTests;
+using UnitTests;
 using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
@@ -28,7 +30,7 @@ public class ContentsTests
         driver.Init ();
         var expected = "\u0301!";
         driver.AddStr ("\u0301!"); // acute accent + exclamation mark
-        TestHelpers.AssertDriverContentsAre (expected, output, driver);
+        DriverAssert.AssertDriverContentsAre (expected, output, driver);
 
         driver.End ();
     }
@@ -50,7 +52,7 @@ public class ContentsTests
         var expected = "é";
 
         driver.AddStr (combined);
-        TestHelpers.AssertDriverContentsAre (expected, output, driver);
+        DriverAssert.AssertDriverContentsAre (expected, output, driver);
 
         // 3 char combine
         // a + ogonek + acute = <U+0061, U+0328, U+0301> ( ą́ )
@@ -60,7 +62,7 @@ public class ContentsTests
 
         driver.Move (0, 0);
         driver.AddStr (combined);
-        TestHelpers.AssertDriverContentsAre (expected, output, driver);
+        DriverAssert.AssertDriverContentsAre (expected, output, driver);
 
         // e + ogonek + acute = <U+0061, U+0328, U+0301> ( ę́́ )
         combined = "e" + ogonek + acuteaccent;
@@ -68,7 +70,7 @@ public class ContentsTests
 
         driver.Move (0, 0);
         driver.AddStr (combined);
-        TestHelpers.AssertDriverContentsAre (expected, output, driver);
+        DriverAssert.AssertDriverContentsAre (expected, output, driver);
 
         // i + ogonek + acute = <U+0061, U+0328, U+0301> ( į́́́ )
         combined = "i" + ogonek + acuteaccent;
@@ -76,7 +78,7 @@ public class ContentsTests
 
         driver.Move (0, 0);
         driver.AddStr (combined);
-        TestHelpers.AssertDriverContentsAre (expected, output, driver);
+        DriverAssert.AssertDriverContentsAre (expected, output, driver);
 
         // u + ogonek + acute = <U+0061, U+0328, U+0301> ( ų́́́́ )
         combined = "u" + ogonek + acuteaccent;
@@ -84,7 +86,7 @@ public class ContentsTests
 
         driver.Move (0, 0);
         driver.AddStr (combined);
-        TestHelpers.AssertDriverContentsAre (expected, output, driver);
+        DriverAssert.AssertDriverContentsAre (expected, output, driver);
 
         driver.End ();
     }
