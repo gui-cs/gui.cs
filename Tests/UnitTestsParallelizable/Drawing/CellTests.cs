@@ -3,7 +3,7 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.DrawingTests;
 
-public class CellTests (ITestOutputHelper output)
+public class CellTests ()
 {
     [Fact]
     public void Constructor_Defaults ()

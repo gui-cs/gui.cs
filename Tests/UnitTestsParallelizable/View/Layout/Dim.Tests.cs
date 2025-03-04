@@ -217,12 +217,6 @@ public class DimTests
         dim1 = Width (view1);
         dim2 = Width (view2);
         Assert.NotEqual (dim1, dim2);
-#if DEBUG_IDISPOSABLE
-
-        // HACK: Force clean up of Responders to avoid having to Dispose all the Views created above.
-        View.Instances.Clear ();
-        Assert.Empty (View.Instances);
-#endif
     }
 
     [Fact]
