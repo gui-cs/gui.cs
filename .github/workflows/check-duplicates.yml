@@ -11,4 +11,4 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Run Duplicate Test Check
-      run: powershell -File ./Scripts/FindDuplicateTestMethodsInSameFileName.ps1 -solutionPath "$PWD"
+      run: pwsh -File ./Scripts/FindDuplicateTestMethodsInSameFileName.ps1 -solutionPath "$PWD"
