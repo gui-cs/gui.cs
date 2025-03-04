@@ -378,8 +378,8 @@ public class TabViewTests (ITestOutputHelper output)
         Assert.Equal (tv.MostFocused, top.Focused.MostFocused);
         Assert.Equal (tv.SelectedTab.View, top.Focused.MostFocused);
 
-        // Press the cursor up key to focus the selected tab
-        Assert.True (Application.RaiseKeyDownEvent (Key.CursorUp));
+        // Press F6 key to focus the selected tab
+        Assert.True (Application.RaiseKeyDownEvent (Key.F6));
         Application.LayoutAndDraw ();
 
         // Is the selected tab focused
@@ -584,12 +584,12 @@ public class TabViewTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void ShowTopLine_False_TabsOnBottom_False_TestTabView_Width3 ()
+    public void ShowInitialLine_False_TabsSide_Top_TestTabView_Width3 ()
     {
         TabView tv = GetTabView (out _, out _);
         tv.Width = 3;
         tv.Height = 5;
-        tv.Style = new () { ShowTopLine = false };
+        tv.Style = new () { ShowInitialLine = false };
         tv.ApplyStyleChanges ();
         tv.Layout ();
 
@@ -608,12 +608,12 @@ public class TabViewTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void ShowTopLine_False_TabsOnBottom_False_TestTabView_Width4 ()
+    public void ShowInitialLine_False_TabsSide_Top_TestTabView_Width4 ()
     {
         TabView tv = GetTabView (out _, out _);
         tv.Width = 4;
         tv.Height = 5;
-        tv.Style = new () { ShowTopLine = false };
+        tv.Style = new () { ShowInitialLine = false };
         tv.ApplyStyleChanges ();
         tv.Layout ();
 
@@ -632,12 +632,12 @@ public class TabViewTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void ShowTopLine_False_TabsOnBottom_False_TestThinTabView_WithLongNames ()
+    public void ShowInitialLine_False_TabsSide_Top_TestThinTabView_WithLongNames ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
         tv.Width = 10;
         tv.Height = 5;
-        tv.Style = new () { ShowTopLine = false };
+        tv.Style = new () { ShowInitialLine = false };
         tv.ApplyStyleChanges ();
 
         // Test two tab names that fit
@@ -731,12 +731,12 @@ public class TabViewTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void ShowTopLine_False_TabsOnBottom_True_TestTabView_Width3 ()
+    public void ShowInitialLine_False_TabsSide_Bottom_TestTabView_Width3 ()
     {
         TabView tv = GetTabView (out _, out _);
         tv.Width = 3;
         tv.Height = 5;
-        tv.Style = new () { ShowTopLine = false, TabsOnBottom = true };
+        tv.Style = new () { ShowInitialLine = false, TabsSide = TabSide.Bottom };
         tv.ApplyStyleChanges ();
         tv.Layout ();
 
@@ -755,12 +755,12 @@ public class TabViewTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void ShowTopLine_False_TabsOnBottom_True_TestTabView_Width4 ()
+    public void ShowInitialLine_False_TabsSide_Bottom_TestTabView_Width4 ()
     {
         TabView tv = GetTabView (out _, out _);
         tv.Width = 4;
         tv.Height = 5;
-        tv.Style = new () { ShowTopLine = false, TabsOnBottom = true };
+        tv.Style = new () { ShowInitialLine = false, TabsSide = TabSide.Bottom };
         tv.ApplyStyleChanges ();
         tv.Layout ();
 
@@ -779,12 +779,12 @@ public class TabViewTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void ShowTopLine_False_TabsOnBottom_True_TestThinTabView_WithLongNames ()
+    public void ShowInitialLine_False_TabsSide_Bottom_TestThinTabView_WithLongNames ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
         tv.Width = 10;
         tv.Height = 5;
-        tv.Style = new () { ShowTopLine = false, TabsOnBottom = true };
+        tv.Style = new () { ShowInitialLine = false, TabsSide = TabSide.Bottom };
         tv.ApplyStyleChanges ();
         tv.Layout ();
 
@@ -880,7 +880,7 @@ public class TabViewTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void ShowTopLine_True_TabsOnBottom_False_TestTabView_Width3 ()
+    public void ShowInitialLine_True_TabsSide_Top_TestTabView_Width3 ()
     {
         TabView tv = GetTabView (out _, out _);
         tv.Width = 3;
@@ -902,7 +902,7 @@ public class TabViewTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void ShowTopLine_True_TabsOnBottom_False_TestTabView_Width4 ()
+    public void ShowInitialLine_True_TabsSide_Top_TestTabView_Width4 ()
     {
         TabView tv = GetTabView (out _, out _);
         tv.Width = 4;
@@ -925,7 +925,7 @@ public class TabViewTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void ShowTopLine_True_TabsOnBottom_False_TestThinTabView_WithLongNames ()
+    public void ShowInitialLine_True_TabsSide_Top_TestThinTabView_WithLongNames ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
         tv.Width = 10;
@@ -1022,7 +1022,7 @@ public class TabViewTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void ShowTopLine_True_TabsOnBottom_False_With_Unicode ()
+    public void ShowInitialLine_True_TabsSide_Top_With_Unicode ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
         tv.Width = 20;
@@ -1064,12 +1064,12 @@ public class TabViewTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void ShowTopLine_True_TabsOnBottom_True_TestTabView_Width3 ()
+    public void ShowInitialLine_True_TabsSide_Bottom_TestTabView_Width3 ()
     {
         TabView tv = GetTabView (out _, out _);
         tv.Width = 3;
         tv.Height = 5;
-        tv.Style = new () { TabsOnBottom = true };
+        tv.Style = new () { TabsSide = TabSide.Bottom };
         tv.ApplyStyleChanges ();
         tv.Layout ();
 
@@ -1088,12 +1088,12 @@ public class TabViewTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void ShowTopLine_True_TabsOnBottom_True_TestTabView_Width4 ()
+    public void ShowInitialLine_True_TabsSide_Bottom_TestTabView_Width4 ()
     {
         TabView tv = GetTabView (out _, out _);
         tv.Width = 4;
         tv.Height = 5;
-        tv.Style = new () { TabsOnBottom = true };
+        tv.Style = new () { TabsSide = TabSide.Bottom };
         tv.ApplyStyleChanges ();
         tv.Layout ();
 
@@ -1112,12 +1112,12 @@ public class TabViewTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void ShowTopLine_True_TabsOnBottom_True_TestThinTabView_WithLongNames ()
+    public void ShowInitialLine_True_TabsSide_Bottom_TestThinTabView_WithLongNames ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
         tv.Width = 10;
         tv.Height = 5;
-        tv.Style = new () { TabsOnBottom = true };
+        tv.Style = new () { TabsSide = TabSide.Bottom };
         tv.ApplyStyleChanges ();
         tv.Layout ();
 
@@ -1194,12 +1194,12 @@ public class TabViewTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void ShowTopLine_True_TabsOnBottom_True_With_Unicode ()
+    public void ShowInitialLine_True_TabsSide_Bottom_With_Unicode ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
         tv.Width = 20;
         tv.Height = 5;
-        tv.Style = new () { TabsOnBottom = true };
+        tv.Style = new () { TabsSide = TabSide.Bottom };
         tv.ApplyStyleChanges ();
 
         tab1.DisplayText = "Tab0";
@@ -1232,6 +1232,1084 @@ public class TabViewTests (ITestOutputHelper output)
 ◄              ╭───╯
 │Les Misérables│    
 ╰──────────────╯    ",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void ShowInitialLine_True_TabsSide_Left_TestTabView_Height3 ()
+    {
+        TabView tv = GetTabView (out _, out _);
+        tv.Width = 5;
+        tv.Height = 3;
+        tv.Style = new () { TabsSide = TabSide.Left };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+╭───┐
+│T h│
+╰─▼─┘",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void ShowInitialLine_True_TabsSide_Left_TestTabView_Height4 ()
+    {
+        TabView tv = GetTabView (out _, out _);
+        tv.Width = 5;
+        tv.Height = 4;
+        tv.Style = new () { TabsSide = TabSide.Left };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+╭───┐
+│T h│
+╰─╮ │
+  ▼─┘",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void ShowInitialLine_True_TabsSide_Left_TestTabView_Height5_One_Tab ()
+    {
+        TabView tv = GetTabView (out _, out Tab tab2);
+        tv.RemoveTab (tab2);
+        tv.Width = 5;
+        tv.Height = 5;
+        tv.Style = new () { TabsSide = TabSide.Left };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+╭───┐
+│T h│
+╰─╮ │
+  │ │
+  ╰─┘",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void ShowInitialLine_True_TabsSide_Left_TestTabView_Height6_Two_Tab ()
+    {
+        TabView tv = GetTabView (out _, out Tab tab2);
+        tv.Width = 5;
+        tv.Height = 6;
+        tv.Style = new () { TabsSide = TabSide.Left };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+╭───┐
+│T h│
+├─╮ │
+│T│ │
+╰─┤ │
+  ╰─┘",
+                                                      output
+                                                     );
+
+        tv.SelectedTab = tab2;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+╭─┬─┐
+│T│h│
+├─╯ │
+│T  │
+╰─╮ │
+  ╰─┘",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void ShowInitialLine_True_TabsSide_Left_TestTabView_Height7_Two_Tab ()
+    {
+        TabView tv = GetTabView (out _, out Tab tab2);
+        tv.Width = 5;
+        tv.Height = 7;
+        tv.Style = new () { TabsSide = TabSide.Left };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+╭───┐
+│T h│
+├─╮ │
+│T│ │
+╰─┤ │
+  │ │
+  ╰─┘",
+                                                      output
+                                                     );
+
+        tv.SelectedTab = tab2;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+╭─┬─┐
+│T│h│
+├─╯ │
+│T  │
+╰─╮ │
+  │ │
+  ╰─┘",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void ShowInitialLine_True_TabsSide_Left_TestThinTabView_WithLongNames ()
+    {
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
+        tv.Width = 10;
+        tv.Height = 5;
+        tv.Style = new () { TabsSide = TabSide.Left };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+
+        // Test two tab names that fit
+        tab1.DisplayText = "12";
+        tab2.DisplayText = "13";
+
+        tv.Layout ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+╭────────┐
+│12 hi   │
+├──╮     │
+│13│     │
+╰──┴─────┘",
+                                                      output
+                                                     );
+
+        // Test first tab name too long
+        tab1.DisplayText = "12345678910";
+        tab2.DisplayText = "13";
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+╭────────┐
+│123456 h│
+├──────╮ │
+│13    │ │
+╰──────┴─┘",
+                                                      output
+                                                     );
+
+        //switch to tab2
+        tv.SelectedTab = tab2;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+╭──────┬─┐
+│123456│h│
+├──────╯ │
+│13      │
+╰────────┘",
+                                                      output
+                                                     );
+
+        // now make both tabs too long
+        tab1.DisplayText = "12345678910";
+        tab2.DisplayText = "abcdefghijklmnopq";
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+╭──────┬─┐
+│123456│h│
+├──────╯ │
+│abcdef  │
+╰────────┘",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void ShowInitialLine_True_TabsSide_Left_With_Unicode ()
+    {
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
+        tv.Width = 20;
+        tv.Height = 5;
+        tv.Style = new () { TabsSide = TabSide.Left };
+        tv.ApplyStyleChanges ();
+
+        tab1.DisplayText = "Tab0";
+
+        tab2.DisplayText = "Les Mise" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "rables";
+
+        tv.Layout ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+╭──────────────────┐
+│Tab0           hi │
+├──────────────╮   │
+│Les Misérables│   │
+╰──────────────┴───┘",
+                                                      output
+                                                     );
+
+        tv.SelectedTab = tab2;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+╭──────────────┬───┐
+│Tab0          │hi2│
+├──────────────╯   │
+│Les Misérables    │
+╰──────────────────┘",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void ShowInitialLine_False_TabsSide_Left_TestTabView_Height3 ()
+    {
+        TabView tv = GetTabView (out _, out _);
+        tv.Width = 5;
+        tv.Height = 3;
+        tv.Style = new () { ShowInitialLine = false, TabsSide = TabSide.Left };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+────┐
+Ta h│
+──▼─┘",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void ShowInitialLine_False_TabsSide_Left_TestTabView_Height4 ()
+    {
+        TabView tv = GetTabView (out _, out _);
+        tv.Width = 5;
+        tv.Height = 4;
+        tv.Style = new () { ShowInitialLine = false, TabsSide = TabSide.Left };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+────┐
+Ta h│
+──╮ │
+  ▼─┘",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void ShowInitialLine_False_TabsSide_Left_TestTabView_Height5_One_Tab ()
+    {
+        TabView tv = GetTabView (out _, out Tab tab2);
+        tv.RemoveTab (tab2);
+        tv.Width = 5;
+        tv.Height = 5;
+        tv.Style = new () { TabsSide = TabSide.Left, ShowInitialLine = false };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+────┐
+Ta h│
+──╮ │
+  │ │
+  ╰─┘",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void ShowInitialLine_False_TabsSide_Left_TestTabView_Height6_Two_Tab ()
+    {
+        TabView tv = GetTabView (out _, out Tab tab2);
+        tv.Width = 5;
+        tv.Height = 6;
+        tv.Style = new () { TabsSide = TabSide.Left, ShowInitialLine = false };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+────┐
+Ta h│
+──╮ │
+Ta│ │
+──┤ │
+  ╰─┘",
+                                                      output
+                                                     );
+
+        tv.SelectedTab = tab2;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+──┬─┐
+Ta│h│
+──╯ │
+Ta  │
+──╮ │
+  ╰─┘",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void ShowInitialLine_False_TabsSide_Left_TestTabView_Height7_Two_Tab ()
+    {
+        TabView tv = GetTabView (out _, out Tab tab2);
+        tv.Width = 5;
+        tv.Height = 7;
+        tv.Style = new () { TabsSide = TabSide.Left, ShowInitialLine = false };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+────┐
+Ta h│
+──╮ │
+Ta│ │
+──┤ │
+  │ │
+  ╰─┘",
+                                                      output
+                                                     );
+
+        tv.SelectedTab = tab2;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+──┬─┐
+Ta│h│
+──╯ │
+Ta  │
+──╮ │
+  │ │
+  ╰─┘",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void ShowInitialLine_False_TabsSide_Left_TestThinTabView_WithLongNames ()
+    {
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
+        tv.Width = 10;
+        tv.Height = 5;
+        tv.Style = new () { ShowInitialLine = false, TabsSide = TabSide.Left };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+
+        // Test two tab names that fit
+        tab1.DisplayText = "12";
+        tab2.DisplayText = "13";
+
+        tv.Layout ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+─────────┐
+12 hi    │
+──╮      │
+13│      │
+──┴──────┘",
+                                                      output
+                                                     );
+
+        tv.SelectedTab = tab2;
+        Assert.Equal (tab2, tv.Subviews.First (v => v.Id.Contains ("tabRow")).MostFocused);
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+──┬──────┐
+12│hi2   │
+──╯      │
+13       │
+─────────┘",
+                                                      output
+                                                     );
+
+        tv.SelectedTab = tab1;
+
+        // Test first tab name too long
+        tab1.DisplayText = "12345678910";
+        tab2.DisplayText = "13";
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+─────────┐
+1234567 h│
+───────╮ │
+13     │ │
+───────┴─┘",
+                                                      output
+                                                     );
+
+        //switch to tab2
+        tv.SelectedTab = tab2;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+───────┬─┐
+1234567│h│
+───────╯ │
+13       │
+─────────┘",
+                                                      output
+                                                     );
+
+        // now make both tabs too long
+        tab1.DisplayText = "12345678910";
+        tab2.DisplayText = "abcdefghijklmnopq";
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+───────┬─┐
+1234567│h│
+───────╯ │
+abcdefg  │
+─────────┘",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void ShowInitialLine_True_TabsSide_Right_TestTabView_Height3 ()
+    {
+        TabView tv = GetTabView (out _, out _);
+        tv.Width = 5;
+        tv.Height = 3;
+        tv.Style = new () { TabsSide = TabSide.Right };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌───╮
+│h T│
+└─▼─╯",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void ShowInitialLine_True_TabsSide_Right_TestTabView_Height4 ()
+    {
+        TabView tv = GetTabView (out _, out _);
+        tv.Width = 5;
+        tv.Height = 4;
+        tv.Style = new () { TabsSide = TabSide.Right };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌───╮
+│h T│
+│ ╭─╯
+└─▼  ",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void ShowInitialLine_True_TabsSide_Right_TestTabView_Height5_One_Tab ()
+    {
+        TabView tv = GetTabView (out _, out Tab tab2);
+        tv.RemoveTab (tab2);
+        tv.Width = 5;
+        tv.Height = 5;
+        tv.Style = new () { TabsSide = TabSide.Right };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌───╮
+│h T│
+│ ╭─╯
+│ │  
+└─╯  ",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void ShowInitialLine_True_TabsSide_Right_TestTabView_Height6_Two_Tab ()
+    {
+        TabView tv = GetTabView (out _, out Tab tab2);
+        tv.Width = 5;
+        tv.Height = 6;
+        tv.Style = new () { TabsSide = TabSide.Right };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌───╮
+│h T│
+│ ╭─┤
+│ │T│
+│ ├─╯
+└─╯  ",
+                                                      output
+                                                     );
+
+        tv.SelectedTab = tab2;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌─┬─╮
+│h│T│
+│ ╰─┤
+│  T│
+│ ╭─╯
+└─╯  ",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void ShowInitialLine_True_TabsSide_Right_TestTabView_Height7_Two_Tab ()
+    {
+        TabView tv = GetTabView (out _, out Tab tab2);
+        tv.Width = 5;
+        tv.Height = 7;
+        tv.Style = new () { TabsSide = TabSide.Right };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌───╮
+│h T│
+│ ╭─┤
+│ │T│
+│ ├─╯
+│ │  
+└─╯  ",
+                                                      output
+                                                     );
+
+        tv.SelectedTab = tab2;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌─┬─╮
+│h│T│
+│ ╰─┤
+│  T│
+│ ╭─╯
+│ │  
+└─╯  ",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void ShowInitialLine_True_TabsSide_Right_TestThinTabView_WithLongNames ()
+    {
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
+        tv.Width = 10;
+        tv.Height = 5;
+        tv.Style = new () { TabsSide = TabSide.Right };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+
+        // Test two tab names that fit
+        tab1.DisplayText = "12";
+        tab2.DisplayText = "13";
+
+        tv.Layout ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌────────╮
+│hi    12│
+│     ╭──┤
+│     │13│
+└─────┴──╯",
+                                                      output
+                                                     );
+
+        // Test first tab name too long
+        tab1.DisplayText = "12345678910";
+        tab2.DisplayText = "13";
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌────────╮
+│h 123456│
+│ ╭──────┤
+│ │13    │
+└─┴──────╯",
+                                                      output
+                                                     );
+
+        //switch to tab2
+        tv.SelectedTab = tab2;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌─┬──────╮
+│h│123456│
+│ ╰──────┤
+│  13    │
+└────────╯",
+                                                      output
+                                                     );
+
+        // now make both tabs too long
+        tab1.DisplayText = "12345678910";
+        tab2.DisplayText = "abcdefghijklmnopq";
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌─┬──────╮
+│h│123456│
+│ ╰──────┤
+│  abcdef│
+└────────╯",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void ShowInitialLine_True_TabsSide_Right_With_Unicode ()
+    {
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
+        tv.Width = 20;
+        tv.Height = 5;
+        tv.Style = new () { TabsSide = TabSide.Right };
+        tv.ApplyStyleChanges ();
+
+        tab1.DisplayText = "Tab0";
+
+        tab2.DisplayText = "Les Mise" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "rables";
+
+        tv.Layout ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌──────────────────╮
+│hi  Tab0          │
+│   ╭──────────────┤
+│   │Les Misérables│
+└───┴──────────────╯",
+                                                      output
+                                                     );
+
+        tv.SelectedTab = tab2;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌───┬──────────────╮
+│hi2│Tab0          │
+│   ╰──────────────┤
+│    Les Misérables│
+└──────────────────╯",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void ShowInitialLine_False_TabsSide_Right_TestTabView_Height3 ()
+    {
+        TabView tv = GetTabView (out _, out _);
+        tv.Width = 5;
+        tv.Height = 3;
+        tv.Style = new () { ShowInitialLine = false, TabsSide = TabSide.Right };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌────
+│h Ta
+└─▼──",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void ShowInitialLine_False_TabsSide_Right_TestTabView_Height4 ()
+    {
+        TabView tv = GetTabView (out _, out _);
+        tv.Width = 5;
+        tv.Height = 4;
+        tv.Style = new () { ShowInitialLine = false, TabsSide = TabSide.Right };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌────
+│h Ta
+│ ╭──
+└─▼  ",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void ShowInitialLine_False_TabsSide_Right_TestTabView_Height5_One_Tab ()
+    {
+        TabView tv = GetTabView (out _, out Tab tab2);
+        tv.RemoveTab (tab2);
+        tv.Width = 5;
+        tv.Height = 5;
+        tv.Style = new () { TabsSide = TabSide.Right, ShowInitialLine = false };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌────
+│h Ta
+│ ╭──
+│ │  
+└─╯  ",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void ShowInitialLine_False_TabsSide_Right_TestTabView_Height6_Two_Tab ()
+    {
+        TabView tv = GetTabView (out _, out Tab tab2);
+        tv.Width = 5;
+        tv.Height = 6;
+        tv.Style = new () { TabsSide = TabSide.Right, ShowInitialLine = false };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌────
+│h Ta
+│ ╭──
+│ │Ta
+│ ├──
+└─╯  ",
+                                                      output
+                                                     );
+
+        tv.SelectedTab = tab2;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌─┬──
+│h│Ta
+│ ╰──
+│  Ta
+│ ╭──
+└─╯  ",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void ShowInitialLine_False_TabsSide_Right_TestTabView_Height7_Two_Tab ()
+    {
+        TabView tv = GetTabView (out _, out Tab tab2);
+        tv.Width = 5;
+        tv.Height = 7;
+        tv.Style = new () { TabsSide = TabSide.Right, ShowInitialLine = false };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌────
+│h Ta
+│ ╭──
+│ │Ta
+│ ├──
+│ │  
+└─╯  ",
+                                                      output
+                                                     );
+
+        tv.SelectedTab = tab2;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌─┬──
+│h│Ta
+│ ╰──
+│  Ta
+│ ╭──
+│ │  
+└─╯  ",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void ShowInitialLine_False_TabsSide_Right_TestThinTabView_WithLongNames ()
+    {
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
+        tv.Width = 10;
+        tv.Height = 5;
+        tv.Style = new () { ShowInitialLine = false, TabsSide = TabSide.Right };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+
+        // Test two tab names that fit
+        tab1.DisplayText = "12";
+        tab2.DisplayText = "13";
+
+        tv.Layout ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌─────────
+│hi     12
+│      ╭──
+│      │13
+└──────┴──",
+                                                      output
+                                                     );
+
+        tv.SelectedTab = tab2;
+        Assert.Equal (tab2, tv.Subviews.First (v => v.Id.Contains ("tabRow")).MostFocused);
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌──────┬──
+│hi2   │12
+│      ╰──
+│       13
+└─────────",
+                                                      output
+                                                     );
+
+        tv.SelectedTab = tab1;
+
+        // Test first tab name too long
+        tab1.DisplayText = "12345678910";
+        tab2.DisplayText = "13";
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌─────────
+│h 1234567
+│ ╭───────
+│ │13     
+└─┴───────",
+                                                      output
+                                                     );
+
+        //switch to tab2
+        tv.SelectedTab = tab2;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌─┬───────
+│h│1234567
+│ ╰───────
+│  13     
+└─────────",
+                                                      output
+                                                     );
+
+        // now make both tabs too long
+        tab1.DisplayText = "12345678910";
+        tab2.DisplayText = "abcdefghijklmnopq";
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌─┬───────
+│h│1234567
+│ ╰───────
+│  abcdefg
+└─────────",
                                                       output
                                                      );
     }
@@ -1305,7 +2383,7 @@ public class TabViewTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void Add_Three_TabsOnTop_ChangesTab ()
+    public void Add_Three_TabsSide_Top_ShowInitialLine_True_ChangesTab ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
         Tab tab3;
@@ -1370,7 +2448,73 @@ public class TabViewTests (ITestOutputHelper output)
 
     [Fact]
     [SetupFakeDriver]
-    public void Add_Three_TabsOnBottom_ChangesTab ()
+    public void Add_Three_TabsSide_Top_ShowInitialLine_False_ChangesTab ()
+    {
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
+        Tab tab3;
+
+        tv.AddTab (
+                   tab3 = new () { Id = "tab3", DisplayText = "Tab3", View = new TextView { Id = "tab3.TextView", Width = 3, Height = 1, Text = "hi3" } },
+                   false);
+        tv.Width = 20;
+        tv.Height = 5;
+        tv.Style = new () { ShowInitialLine = false };
+        tv.ApplyStyleChanges ();
+
+        tv.Layout ();
+        tv.Draw ();
+
+        Assert.Equal (tab1, tv.SelectedTab);
+
+        TestHelpers.AssertDriverContentsAre (
+                                             @"
+│Tab1│Tab2│Tab3│
+│    ╰────┴────┴───╮
+│hi                │
+│                  │
+└──────────────────┘
+",
+                                             output
+                                            );
+
+        tv.SelectedTab = tab2;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+│Tab1│Tab2│Tab3│    
+├────╯    ╰────┴───╮
+│hi2               │
+│                  │
+└──────────────────┘
+",
+                                                      output
+                                                     );
+
+        tv.SelectedTab = tab3;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+│Tab1│Tab2│Tab3│    
+├────┴────╯    ╰───╮
+│hi3               │
+│                  │
+└──────────────────┘
+",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void Add_Three_TabsSide_Bottom_ShowInitialLine_True_ChangesTab ()
     {
         TabView tv = GetTabView (out Tab tab1, out Tab tab2);
         Tab tab3;
@@ -1381,7 +2525,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         tv.Width = 20;
         tv.Height = 5;
-        tv.Style = new () { TabsOnBottom = true };
+        tv.Style = new () { TabsSide = TabSide.Bottom };
         tv.ApplyStyleChanges ();
 
         tv.Layout ();
@@ -1436,6 +2580,656 @@ public class TabViewTests (ITestOutputHelper output)
     }
 
     [Fact]
+    [SetupFakeDriver]
+    public void Add_Three_TabsSide_Bottom_ShowInitialLine_False_ChangesTab ()
+    {
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
+        Tab tab3;
+
+        tv.AddTab (
+                   tab3 = new () { Id = "tab3", DisplayText = "Tab3", View = new TextView { Id = "tab3.TextView", Width = 3, Height = 1, Text = "hi3" } },
+                   false);
+
+        tv.Width = 20;
+        tv.Height = 5;
+        tv.Style = new () { TabsSide = TabSide.Bottom, ShowInitialLine = false };
+        tv.ApplyStyleChanges ();
+
+        tv.Layout ();
+        tv.Draw ();
+
+        Assert.Equal (tab1, tv.SelectedTab);
+
+        TestHelpers.AssertDriverContentsAre (
+                                             @"
+┌──────────────────┐
+│hi                │
+│                  │
+│    ╭────┬────┬───╯
+│Tab1│Tab2│Tab3│
+",
+                                             output
+                                            );
+
+        tv.SelectedTab = tab2;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌──────────────────┐
+│hi2               │
+│                  │
+├────╮    ╭────┬───╯
+│Tab1│Tab2│Tab3│    
+",
+                                                      output
+                                                     );
+
+        tv.SelectedTab = tab3;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌──────────────────┐
+│hi3               │
+│                  │
+├────┬────╮    ╭───╯
+│Tab1│Tab2│Tab3│    
+",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void Add_Three_TabsSide_Left_ShowInitialLine_True_ChangesTab_Height5 ()
+    {
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
+        Tab tab3;
+
+        tv.AddTab (
+                   tab3 = new () { Id = "tab3", DisplayText = "Tab3", View = new TextView { Id = "tab3.TextView", Width = 3, Height = 1, Text = "hi3" } },
+                   false);
+
+        tv.Width = 20;
+        tv.Height = 5;
+        tv.Style = new () { TabsSide = TabSide.Left };
+        tv.ApplyStyleChanges ();
+
+        tv.Layout ();
+        tv.Draw ();
+
+        Assert.Equal (tab1, tv.SelectedTab);
+
+        TestHelpers.AssertDriverContentsAre (
+                                             @"
+╭──────────────────┐
+│Tab1 hi           │
+├────╮             │
+│Tab2│             │
+╰────▼─────────────┘
+",
+                                             output
+                                            );
+
+        tv.SelectedTab = tab2;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+╭────┬─────────────┐
+│Tab1│hi2          │
+├────╯             │
+│Tab2              │
+╰────▼─────────────┘
+",
+                                                      output
+                                                     );
+
+        tv.SelectedTab = tab3;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+╭────▲─────────────┐
+│Tab3 hi3          │
+╰────╮             │
+     │             │
+     ╰─────────────┘
+",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void Add_Three_TabsSide_Left_ShowInitialLine_False_ChangesTab_Height5 ()
+    {
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
+        Tab tab3;
+
+        tv.AddTab (
+                   tab3 = new () { Id = "tab3", DisplayText = "Tab3", View = new TextView { Id = "tab3.TextView", Width = 3, Height = 1, Text = "hi3" } },
+                   false);
+
+        tv.Width = 20;
+        tv.Height = 5;
+        tv.Style = new () { TabsSide = TabSide.Left, ShowInitialLine = false };
+        tv.ApplyStyleChanges ();
+
+        tv.Layout ();
+        tv.Draw ();
+
+        Assert.Equal (tab1, tv.SelectedTab);
+
+        TestHelpers.AssertDriverContentsAre (
+                                             @"
+───────────────────┐
+Tab1 hi            │
+────╮              │
+Tab2│              │
+────▼──────────────┘
+",
+                                             output
+                                            );
+
+        tv.SelectedTab = tab2;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+────┬──────────────┐
+Tab1│hi2           │
+────╯              │
+Tab2               │
+────▼──────────────┘
+",
+                                                      output
+                                                     );
+
+        tv.SelectedTab = tab3;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+────▲──────────────┐
+Tab3 hi3           │
+────╮              │
+    │              │
+    ╰──────────────┘
+",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void Add_Three_TabsSide_Left_ShowInitialLine_True_ChangesTab_Height9 ()
+    {
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
+        Tab tab3;
+
+        tv.AddTab (
+                   tab3 = new () { Id = "tab3", DisplayText = "Tab3", View = new TextView { Id = "tab3.TextView", Width = 3, Height = 1, Text = "hi3" } },
+                   false);
+
+        tv.Width = 20;
+        tv.Height = 9;
+        tv.Style = new () { TabsSide = TabSide.Left };
+        tv.ApplyStyleChanges ();
+
+        tv.Layout ();
+        tv.Draw ();
+
+        Assert.Equal (tab1, tv.SelectedTab);
+
+        TestHelpers.AssertDriverContentsAre (
+                                             @"
+╭──────────────────┐
+│Tab1 hi           │
+├────╮             │
+│Tab2│             │
+├────┤             │
+│Tab3│             │
+╰────┤             │
+     │             │
+     ╰─────────────┘",
+                                             output
+                                            );
+
+        tv.SelectedTab = tab2;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+╭────┬─────────────┐
+│Tab1│hi2          │
+├────╯             │
+│Tab2              │
+├────╮             │
+│Tab3│             │
+╰────┤             │
+     │             │
+     ╰─────────────┘
+",
+                                                      output
+                                                     );
+
+        tv.SelectedTab = tab3;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+╭────┬─────────────┐
+│Tab1│hi3          │
+├────┤             │
+│Tab2│             │
+├────╯             │
+│Tab3              │
+╰────╮             │
+     │             │
+     ╰─────────────┘
+",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void Add_Three_TabsSide_Left_ShowInitialLine_False_ChangesTab_Height9 ()
+    {
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
+        Tab tab3;
+
+        tv.AddTab (
+                   tab3 = new () { Id = "tab3", DisplayText = "Tab3", View = new TextView { Id = "tab3.TextView", Width = 3, Height = 1, Text = "hi3" } },
+                   false);
+
+        tv.Width = 20;
+        tv.Height = 9;
+        tv.Style = new () { TabsSide = TabSide.Left, ShowInitialLine = false };
+        tv.ApplyStyleChanges ();
+
+        tv.Layout ();
+        tv.Draw ();
+
+        Assert.Equal (tab1, tv.SelectedTab);
+
+        TestHelpers.AssertDriverContentsAre (
+                                             @"
+───────────────────┐
+Tab1 hi            │
+────╮              │
+Tab2│              │
+────┤              │
+Tab3│              │
+────┤              │
+    │              │
+    ╰──────────────┘
+",
+                                             output
+                                            );
+
+        tv.SelectedTab = tab2;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+────┬──────────────┐
+Tab1│hi2           │
+────╯              │
+Tab2               │
+────╮              │
+Tab3│              │
+────┤              │
+    │              │
+    ╰──────────────┘
+",
+                                                      output
+                                                     );
+
+        tv.SelectedTab = tab3;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+────┬──────────────┐
+Tab1│hi3           │
+────┤              │
+Tab2│              │
+────╯              │
+Tab3               │
+────╮              │
+    │              │
+    ╰──────────────┘
+",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void Add_Three_TabsSide_Right_ShowInitialLine_True_ChangesTab_Height5 ()
+    {
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
+        Tab tab3;
+
+        tv.AddTab (
+                   tab3 = new () { Id = "tab3", DisplayText = "Tab3", View = new TextView { Id = "tab3.TextView", Width = 3, Height = 1, Text = "hi3" } },
+                   false);
+
+        tv.Width = 20;
+        tv.Height = 5;
+        tv.Style = new () { TabsSide = TabSide.Right };
+        tv.ApplyStyleChanges ();
+
+        tv.Layout ();
+        tv.Draw ();
+
+        Assert.Equal (tab1, tv.SelectedTab);
+
+        TestHelpers.AssertDriverContentsAre (
+                                             @"
+┌──────────────────╮
+│hi            Tab1│
+│             ╭────┤
+│             │Tab2│
+└─────────────▼────╯
+",
+                                             output
+                                            );
+
+        tv.SelectedTab = tab2;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌─────────────┬────╮
+│hi2          │Tab1│
+│             ╰────┤
+│              Tab2│
+└─────────────▼────╯
+",
+                                                      output
+                                                     );
+
+        tv.SelectedTab = tab3;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌─────────────▲────╮
+│hi3           Tab3│
+│             ╭────╯
+│             │     
+└─────────────╯     
+",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void Add_Three_TabsSide_Right_ShowInitialLine_False_ChangesTab_Height5 ()
+    {
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
+        Tab tab3;
+
+        tv.AddTab (
+                   tab3 = new () { Id = "tab3", DisplayText = "Tab3", View = new TextView { Id = "tab3.TextView", Width = 3, Height = 1, Text = "hi3" } },
+                   false);
+
+        tv.Width = 20;
+        tv.Height = 5;
+        tv.Style = new () { TabsSide = TabSide.Right, ShowInitialLine = false };
+        tv.ApplyStyleChanges ();
+
+        tv.Layout ();
+        tv.Draw ();
+
+        Assert.Equal (tab1, tv.SelectedTab);
+
+        TestHelpers.AssertDriverContentsAre (
+                                             @"
+┌───────────────────
+│hi             Tab1
+│              ╭────
+│              │Tab2
+└──────────────▼────
+",
+                                             output
+                                            );
+
+        tv.SelectedTab = tab2;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌──────────────┬────
+│hi2           │Tab1
+│              ╰────
+│               Tab2
+└──────────────▼────
+",
+                                                      output
+                                                     );
+
+        tv.SelectedTab = tab3;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌──────────────▲────
+│hi3            Tab3
+│              ╭────
+│              │    
+└──────────────╯    
+",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void Add_Three_TabsSide_Right_ShowInitialLine_True_ChangesTab_Height9 ()
+    {
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
+        Tab tab3;
+
+        tv.AddTab (
+                   tab3 = new () { Id = "tab3", DisplayText = "Tab3", View = new TextView { Id = "tab3.TextView", Width = 3, Height = 1, Text = "hi3" } },
+                   false);
+
+        tv.Width = 20;
+        tv.Height = 9;
+        tv.Style = new () { TabsSide = TabSide.Right };
+        tv.ApplyStyleChanges ();
+
+        tv.Layout ();
+        tv.Draw ();
+
+        Assert.Equal (tab1, tv.SelectedTab);
+
+        TestHelpers.AssertDriverContentsAre (
+                                             @"
+┌──────────────────╮
+│hi            Tab1│
+│             ╭────┤
+│             │Tab2│
+│             ├────┤
+│             │Tab3│
+│             ├────╯
+│             │
+└─────────────╯
+",
+                                             output
+                                            );
+
+        tv.SelectedTab = tab2;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌─────────────┬────╮
+│hi2          │Tab1│
+│             ╰────┤
+│              Tab2│
+│             ╭────┤
+│             │Tab3│
+│             ├────╯
+│             │     
+└─────────────╯     
+",
+                                                      output
+                                                     );
+
+        tv.SelectedTab = tab3;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌─────────────┬────╮
+│hi3          │Tab1│
+│             ├────┤
+│             │Tab2│
+│             ╰────┤
+│              Tab3│
+│             ╭────╯
+│             │     
+└─────────────╯     
+",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void Add_Three_TabsSide_Right_ShowInitialLine_False_ChangesTab_Height9 ()
+    {
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
+        Tab tab3;
+
+        tv.AddTab (
+                   tab3 = new () { Id = "tab3", DisplayText = "Tab3", View = new TextView { Id = "tab3.TextView", Width = 3, Height = 1, Text = "hi3" } },
+                   false);
+
+        tv.Width = 20;
+        tv.Height = 9;
+        tv.Style = new () { TabsSide = TabSide.Right, ShowInitialLine = false };
+        tv.ApplyStyleChanges ();
+
+        tv.Layout ();
+        tv.Draw ();
+
+        Assert.Equal (tab1, tv.SelectedTab);
+
+        TestHelpers.AssertDriverContentsAre (
+                                             @"
+┌───────────────────
+│hi             Tab1
+│              ╭────
+│              │Tab2
+│              ├────
+│              │Tab3
+│              ├────
+│              │
+└──────────────╯
+",
+                                             output
+                                            );
+
+        tv.SelectedTab = tab2;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌──────────────┬────
+│hi2           │Tab1
+│              ╰────
+│               Tab2
+│              ╭────
+│              │Tab3
+│              ├────
+│              │    
+└──────────────╯    
+",
+                                                      output
+                                                     );
+
+        tv.SelectedTab = tab3;
+
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌──────────────┬────
+│hi3           │Tab1
+│              ├────
+│              │Tab2
+│              ╰────
+│               Tab3
+│              ╭────
+│              │    
+└──────────────╯    
+",
+                                                      output
+                                                     );
+    }
+
+    [Fact]
     [AutoInitShutdown]
     public void Tab_Get_Focus_By_Press_F6 ()
     {
@@ -1482,6 +3276,451 @@ public class TabViewTests (ITestOutputHelper output)
         Application.RaiseMouseEvent (new () { Position = new (1, 1), Flags = MouseFlags.WheeledLeft });
         Assert.True (tab1.HasFocus);
         top.Dispose ();
+    }
+
+    [Fact]
+    [SetupFakeDriver]
+    public void Tabs_Alignments ()
+    {
+        TabView tv = GetTabView (out Tab tab1, out Tab tab2);
+        tv.Width = 20;
+        tv.Height = 5;
+
+        tab1.DisplayText = "Tab 1";
+        tab2.DisplayText = "Long Text";
+
+        tv.Layout ();
+        tv.Draw ();
+
+        string top = @"
+╭─────┬─────────╮   
+│Tab 1│Long Text│   
+│     ╰─────────┴──╮
+│hi                │
+└──────────────────┘
+";
+
+        TestHelpers.AssertDriverContentsWithFrameAre (top, output);
+
+        tv.Style = new () { TabsSide = TabSide.Bottom };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        string bottom = @"
+┌──────────────────┐
+│hi                │
+│     ╭─────────┬──╯
+│Tab 1│Long Text│   
+╰─────┴─────────╯   
+";
+
+        TestHelpers.AssertDriverContentsWithFrameAre (bottom, output);
+
+        tv.Style = new () { TabsSide = TabSide.Left };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+╭──────────────────┐
+│Tab 1     hi      │
+├─────────╮        │
+│Long Text│        │
+╰─────────┴────────┘
+",
+                                                      output
+                                                     );
+
+        tv.Style = new () { TabsSide = TabSide.Right };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌──────────────────╮
+│hi       Tab 1    │
+│        ╭─────────┤
+│        │Long Text│
+└────────┴─────────╯
+",
+                                                      output
+                                                     );
+
+        Assert.Equal (Alignment.Start, tv.Style.TabsTextAlignment);
+
+        tv.Style = new () { TabsSide = TabSide.Top, TabsTextAlignment = Alignment.End };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (top, output);
+
+        tv.Style = new () { TabsSide = TabSide.Bottom, TabsTextAlignment = Alignment.End };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (bottom, output);
+
+        tv.Style = new () { TabsSide = TabSide.Left, TabsTextAlignment = Alignment.End };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+╭──────────────────┐
+│    Tab 1 hi      │
+├─────────╮        │
+│Long Text│        │
+╰─────────┴────────┘
+",
+                                                      output
+                                                     );
+
+        tv.Style = new () { TabsSide = TabSide.Right, TabsTextAlignment = Alignment.End };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌──────────────────╮
+│hi           Tab 1│
+│        ╭─────────┤
+│        │Long Text│
+└────────┴─────────╯
+",
+                                                      output
+                                                     );
+
+        tv.Style = new () { TabsSide = TabSide.Top, TabsTextAlignment = Alignment.Center };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (top, output);
+
+        tv.Style = new () { TabsSide = TabSide.Bottom, TabsTextAlignment = Alignment.Center };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (bottom, output);
+
+        tv.Style = new () { TabsSide = TabSide.Left, TabsTextAlignment = Alignment.Center };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+╭──────────────────┐
+│  Tab 1   hi      │
+├─────────╮        │
+│Long Text│        │
+╰─────────┴────────┘
+",
+                                                      output
+                                                     );
+
+        tv.Style = new () { TabsSide = TabSide.Right, TabsTextAlignment = Alignment.Center };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌──────────────────╮
+│hi         Tab 1  │
+│        ╭─────────┤
+│        │Long Text│
+└────────┴─────────╯
+",
+                                                      output
+                                                     );
+
+        tv.Style = new () { TabsSide = TabSide.Top, TabsTextAlignment = Alignment.Fill };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (top, output);
+
+        tv.Style = new () { TabsSide = TabSide.Bottom, TabsTextAlignment = Alignment.Fill };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (bottom, output);
+
+        tv.Style = new () { TabsSide = TabSide.Left, TabsTextAlignment = Alignment.Fill };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+╭──────────────────┐
+│Tab     1 hi      │
+├─────────╮        │
+│Long Text│        │
+╰─────────┴────────┘
+",
+                                                      output
+                                                     );
+
+        tv.Style = new () { TabsSide = TabSide.Right, TabsTextAlignment = Alignment.Fill };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌──────────────────╮
+│hi       Tab     1│
+│        ╭─────────┤
+│        │Long Text│
+└────────┴─────────╯
+",
+                                                      output
+                                                     );
+
+        tv.Style = new () { TabsSide = TabSide.Top, ShowInitialLine = false, TabsTextAlignment = Alignment.Start };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        top = @"
+│Tab 1│Long Text│   
+│     ╰─────────┴──╮
+│hi                │
+│                  │
+└──────────────────┘
+";
+
+        TestHelpers.AssertDriverContentsWithFrameAre (top, output);
+
+        // ShowInitialLine false
+
+        tv.Style = new () { TabsSide = TabSide.Bottom, ShowInitialLine = false, TabsTextAlignment = Alignment.Start };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        bottom = @"
+┌──────────────────┐
+│hi                │
+│                  │
+│     ╭─────────┬──╯
+│Tab 1│Long Text│   
+";
+
+        TestHelpers.AssertDriverContentsWithFrameAre (bottom, output);
+
+        tv.Style = new () { TabsSide = TabSide.Left, ShowInitialLine = false, TabsTextAlignment = Alignment.Start };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+───────────────────┐
+Tab 1     hi       │
+─────────╮         │
+Long Text│         │
+─────────┴─────────┘
+",
+                                                      output
+                                                     );
+
+        tv.Style = new () { TabsSide = TabSide.Right, ShowInitialLine = false, TabsTextAlignment = Alignment.Start };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌───────────────────
+│hi        Tab 1    
+│         ╭─────────
+│         │Long Text
+└─────────┴─────────
+",
+                                                      output
+                                                     );
+
+        tv.Style = new () { TabsSide = TabSide.Top, ShowInitialLine = false, TabsTextAlignment = Alignment.End };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (top, output);
+
+        tv.Style = new () { TabsSide = TabSide.Bottom, ShowInitialLine = false, TabsTextAlignment = Alignment.End };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (bottom, output);
+
+        tv.Style = new () { TabsSide = TabSide.Left, ShowInitialLine = false, TabsTextAlignment = Alignment.End };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+───────────────────┐
+    Tab 1 hi       │
+─────────╮         │
+Long Text│         │
+─────────┴─────────┘
+",
+                                                      output
+                                                     );
+
+        tv.Style = new () { TabsSide = TabSide.Right, ShowInitialLine = false, TabsTextAlignment = Alignment.End };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌───────────────────
+│hi            Tab 1
+│         ╭─────────
+│         │Long Text
+└─────────┴─────────
+",
+                                                      output
+                                                     );
+
+        tv.Style = new () { TabsSide = TabSide.Top, ShowInitialLine = false, TabsTextAlignment = Alignment.Center };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (top, output);
+
+        tv.Style = new () { TabsSide = TabSide.Bottom, ShowInitialLine = false, TabsTextAlignment = Alignment.Center };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (bottom, output);
+
+        tv.Style = new () { TabsSide = TabSide.Left, ShowInitialLine = false, TabsTextAlignment = Alignment.Center };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+───────────────────┐
+  Tab 1   hi       │
+─────────╮         │
+Long Text│         │
+─────────┴─────────┘
+",
+                                                      output
+                                                     );
+
+        tv.Style = new () { TabsSide = TabSide.Right, ShowInitialLine = false, TabsTextAlignment = Alignment.Center };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌───────────────────
+│hi          Tab 1  
+│         ╭─────────
+│         │Long Text
+└─────────┴─────────
+",
+                                                      output
+                                                     );
+
+        tv.Style = new () { TabsSide = TabSide.Top, ShowInitialLine = false, TabsTextAlignment = Alignment.Fill };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (top, output);
+
+        tv.Style = new () { TabsSide = TabSide.Bottom, ShowInitialLine = false, TabsTextAlignment = Alignment.Fill };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (bottom, output);
+
+        tv.Style = new () { TabsSide = TabSide.Left, ShowInitialLine = false, TabsTextAlignment = Alignment.Fill };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+───────────────────┐
+Tab     1 hi       │
+─────────╮         │
+Long Text│         │
+─────────┴─────────┘
+",
+                                                      output
+                                                     );
+
+        tv.Style = new () { TabsSide = TabSide.Right, ShowInitialLine = false, TabsTextAlignment = Alignment.Fill };
+        tv.ApplyStyleChanges ();
+        tv.Layout ();
+        View.SetClipToScreen ();
+        tv.Draw ();
+
+        TestHelpers.AssertDriverContentsWithFrameAre (
+                                                      @"
+┌───────────────────
+│hi        Tab     1
+│         ╭─────────
+│         │Long Text
+└─────────┴─────────
+",
+                                                      output
+                                                     );
     }
 
     private TabView GetTabView () { return GetTabView (out _, out _); }

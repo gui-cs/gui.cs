@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Terminal.Gui;
 
@@ -12,7 +14,10 @@ public class TabViewExample : Scenario
     private MenuItem _miShowBorder;
     private MenuItem _miShowTabViewBorder;
     private MenuItem _miShowTopLine;
-    private MenuItem _miTabsOnBottom;
+    private MenuItem [] _miTabsSide;
+    private MenuItem _cachedTabsSide;
+    private MenuItem [] _miTabsTextAlignment;
+    private MenuItem _cachedTabsTextAlignment;
     private TabView _tabView;
 
     public override void Main ()
@@ -22,6 +27,9 @@ public class TabViewExample : Scenario
 
         // Setup - Create a top-level application window and configure it.
         Toplevel appWindow = new ();
+
+        _miTabsSide = SetTabsSide ();
+        _miTabsTextAlignment = SetTabsTextAlignment ();
 
         var menu = new MenuBar
         {
@@ -54,17 +62,23 @@ public class TabViewExample : Scenario
                              {
                                  Checked = true, CheckType = MenuItemCheckStyle.Checked
                              },
-                         _miTabsOnBottom =
-                             new ("_Tabs On Bottom", "", SetTabsOnBottom)
-                             {
-                                 Checked = false, CheckType = MenuItemCheckStyle.Checked
-                             },
+                         null,
+                         _miTabsSide [0],
+                         _miTabsSide [1],
+                         _miTabsSide [2],
+                         _miTabsSide [3],
+                         null,
                          _miShowTabViewBorder =
                              new (
                                   "_Show TabView Border",
                                   "",
                                   ShowTabViewBorder
-                                 ) { Checked = true, CheckType = MenuItemCheckStyle.Checked }
+                                 ) { Checked = true, CheckType = MenuItemCheckStyle.Checked },
+                         null,
+                         _miTabsTextAlignment [0],
+                         _miTabsTextAlignment [1],
+                         _miTabsTextAlignment [2],
+                         _miTabsTextAlignment [3]
                      }
                     )
             ]
@@ -241,12 +255,78 @@ public class TabViewExample : Scenario
 
     private void Quit () { Application.RequestStop (); }
 
-    private void SetTabsOnBottom ()
+    private MenuItem [] SetTabsSide ()
     {
-        _miTabsOnBottom.Checked = !_miTabsOnBottom.Checked;
+        List<MenuItem> menuItems = [];
 
-        _tabView.Style.TabsOnBottom = (bool)_miTabsOnBottom.Checked;
-        _tabView.ApplyStyleChanges ();
+        foreach (TabSide side in Enum.GetValues (typeof (TabSide)))
+        {
+            string sideName = Enum.GetName (typeof (TabSide), side);
+            var item = new MenuItem { Title = $"_{sideName}", Data = side };
+            item.CheckType |= MenuItemCheckStyle.Radio;
+
+            item.Action += () =>
+                           {
+                               if (_cachedTabsSide == item)
+                               {
+                                   return;
+                               }
+
+                               _cachedTabsSide.Checked = false;
+                               item.Checked = true;
+                               _cachedTabsSide = item;
+                               _tabView.Style.TabsSide = (TabSide)item.Data;
+                               _tabView.ApplyStyleChanges ();
+                           };
+            item.ShortcutKey = ((Key)sideName! [0].ToString ().ToLower ()).WithCtrl;
+
+            if (sideName == "Top")
+            {
+                item.Checked = true;
+                _cachedTabsSide = item;
+            }
+
+            menuItems.Add (item);
+        }
+
+        return menuItems.ToArray ();
+    }
+
+    private MenuItem [] SetTabsTextAlignment ()
+    {
+        List<MenuItem> menuItems = [];
+
+        foreach (TabSide align in Enum.GetValues (typeof (Alignment)))
+        {
+            string alignName = Enum.GetName (typeof (Alignment), align);
+            var item = new MenuItem { Title = $"_{alignName}", Data = align };
+            item.CheckType |= MenuItemCheckStyle.Radio;
+
+            item.Action += () =>
+                           {
+                               if (_cachedTabsTextAlignment == item)
+                               {
+                                   return;
+                               }
+
+                               _cachedTabsTextAlignment.Checked = false;
+                               item.Checked = true;
+                               _cachedTabsTextAlignment = item;
+                               _tabView.Style.TabsTextAlignment = (Alignment)item.Data;
+                               _tabView.ApplyStyleChanges ();
+                           };
+            item.ShortcutKey = ((Key)alignName! [0].ToString ().ToLower ()).WithCtrl;
+
+            if (alignName == "Start")
+            {
+                item.Checked = true;
+                _cachedTabsTextAlignment = item;
+            }
+
+            menuItems.Add (item);
+        }
+
+        return menuItems.ToArray ();
     }
 
     private void ShowBorder ()
@@ -271,7 +351,7 @@ public class TabViewExample : Scenario
     {
         _miShowTopLine.Checked = !_miShowTopLine.Checked;
 
-        _tabView.Style.ShowTopLine = (bool)_miShowTopLine.Checked;
+        _tabView.Style.ShowInitialLine = (bool)_miShowTopLine.Checked;
         _tabView.ApplyStyleChanges ();
     }
 }

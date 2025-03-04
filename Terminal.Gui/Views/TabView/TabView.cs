@@ -27,8 +27,8 @@ public class TabView : View
     public TabView ()
     {
         CanFocus = true;
-        TabStop = TabBehavior.TabStop; // Because TabView has focusable subviews, it must be a TabGroup
-        _tabsBar = new TabRow (this);
+        TabStop = TabBehavior.TabStop;
+        _tabsBar = new (this);
         _containerView = new ();
         ApplyStyleChanges ();
 
@@ -36,9 +36,53 @@ public class TabView : View
         base.Add (_containerView);
 
         // Things this view knows how to do
-        AddCommand (Command.Left, () => SwitchTabBy (-1));
+        AddCommand (
+                    Command.Left,
+                    () =>
+                    {
+                        if (Style.TabsSide is TabSide.Top or TabSide.Bottom)
+                        {
+                            return SwitchTabBy (-1);
+                        }
 
-        AddCommand (Command.Right, () => SwitchTabBy (1));
+                        return false;
+                    });
+
+        AddCommand (
+                    Command.Right,
+                    () =>
+                    {
+                        if (Style.TabsSide is TabSide.Top or TabSide.Bottom)
+                        {
+                            return SwitchTabBy (1);
+                        }
+
+                        return false;
+                    });
+
+        AddCommand (
+                    Command.Up,
+                    () =>
+                    {
+                        if (Style.TabsSide is TabSide.Left or TabSide.Right)
+                        {
+                            return SwitchTabBy (-1);
+                        }
+
+                        return false;
+                    });
+
+        AddCommand (
+                    Command.Down,
+                    () =>
+                    {
+                        if (Style.TabsSide is TabSide.Left or TabSide.Right)
+                        {
+                            return SwitchTabBy (1);
+                        }
+
+                        return false;
+                    });
 
         AddCommand (
                     Command.LeftStart,
@@ -87,6 +131,8 @@ public class TabView : View
         // Default keybindings for this view
         KeyBindings.Add (Key.CursorLeft, Command.Left);
         KeyBindings.Add (Key.CursorRight, Command.Right);
+        KeyBindings.Add (Key.CursorUp, Command.Up);
+        KeyBindings.Add (Key.CursorDown, Command.Down);
         KeyBindings.Add (Key.Home, Command.LeftStart);
         KeyBindings.Add (Key.End, Command.RightEnd);
         KeyBindings.Add (Key.PageDown, Command.PageDown);
@@ -122,6 +168,7 @@ public class TabView : View
                 if (_selectedTab.View is { })
                 {
                     _selectedTab.View.CanFocusChanged -= ContainerViewCanFocus!;
+
                     // remove old content
                     _containerView.Remove (_selectedTab.View);
                 }
@@ -149,19 +196,14 @@ public class TabView : View
 
                 OnSelectedTabChanged (old!, _selectedTab!);
             }
+
             SetNeedsLayout ();
         }
     }
 
-    private bool TabCanSetFocus ()
-    {
-        return IsInitialized && SelectedTab is { } && (_selectedTabHasFocus || !_containerView.CanFocus);
-    }
+    private bool TabCanSetFocus () { return IsInitialized && SelectedTab is { } && (_selectedTabHasFocus || !_containerView.CanFocus); }
 
-    private void ContainerViewCanFocus (object sender, EventArgs eventArgs)
-    {
-        _containerView.CanFocus = _containerView.Subviews.Count (v => v.CanFocus) > 0;
-    }
+    private void ContainerViewCanFocus (object sender, EventArgs eventArgs) { _containerView.CanFocus = _containerView.Subviews.Count (v => v.CanFocus) > 0; }
 
     private TabStyle _style = new ();
 
@@ -176,6 +218,7 @@ public class TabView : View
             {
                 return;
             }
+
             _style = value;
             SetNeedsLayout ();
         }
@@ -229,60 +272,102 @@ public class TabView : View
     /// </summary>
     public void ApplyStyleChanges ()
     {
+        _tabLocations = CalculateViewport (Viewport);
+
         _containerView.BorderStyle = Style.ShowBorder ? LineStyle.Single : LineStyle.None;
-        _containerView.Width = Dim.Fill ();
 
-        if (Style.TabsOnBottom)
+        switch (Style.TabsSide)
         {
-            // Tabs are along the bottom so just dodge the border
-            if (Style.ShowBorder)
-            {
-                _containerView.Border!.Thickness = new Thickness (1, 1, 1, 0);
-            }
+            case TabSide.Top:
+                // Tabs are along the top
+                if (Style.ShowBorder)
+                {
+                    _containerView.Border!.Thickness = new (1, 0, 1, 1);
+                }
 
-            _containerView.Y = 0;
+                _tabsBar.X = 0;
+                _tabsBar.Y = 0;
+                _tabsBar.Width = Dim.Fill ();
+                _tabsBar.Height = GetTabHeight (true);
 
-            int tabHeight = GetTabHeight (false);
+                _containerView.X = 0;
 
-            // Fill client area leaving space at bottom for tabs
-            _containerView.Height = Dim.Fill (tabHeight);
+                //move content down to make space for tabs
+                _containerView.Y = Pos.Bottom (_tabsBar);
+                _containerView.Width = Dim.Fill ();
+                _containerView.Height = Dim.Fill ();
 
-            _tabsBar.Height = tabHeight;
+                break;
+            case TabSide.Bottom:
+                // Tabs are along the bottom so just dodge the border
+                if (Style.ShowBorder)
+                {
+                    _containerView.Border!.Thickness = new (1, 1, 1, 0);
+                }
 
-            _tabsBar.Y = Pos.Bottom (_containerView);
-        }
-        else
-        {
-            // Tabs are along the top
-            if (Style.ShowBorder)
-            {
-                _containerView.Border!.Thickness = new Thickness (1, 0, 1, 1);
-            }
+                _tabsBar.X = 0;
+                _tabsBar.Width = Dim.Fill ();
+                int tabHeight = GetTabHeight (false);
+                _tabsBar.Height = tabHeight;
 
-            _tabsBar.Y = 0;
+                _containerView.X = 0;
+                _containerView.Y = 0;
+                _containerView.Width = Dim.Fill ();
 
-            int tabHeight = GetTabHeight (true);
+                // Fill client area leaving space at bottom for tabs
+                _containerView.Height = Dim.Fill (tabHeight);
 
-            //move content down to make space for tabs
-            _containerView.Y = Pos.Bottom (_tabsBar);
+                _tabsBar.Y = Pos.Bottom (_containerView);
 
-            // Fill client area leaving space at bottom for border
-            _containerView.Height = Dim.Fill ();
+                break;
+            case TabSide.Left:
+                // Tabs are along the left
+                if (Style.ShowBorder)
+                {
+                    _containerView.Border!.Thickness = new (0, 1, 1, 1);
+                }
 
-            // The top tab should be 2 or 3 rows high and on the top
+                _tabsBar.X = 0;
+                _tabsBar.Y = 0;
+                _tabsBar.Height = Dim.Fill ();
 
-            _tabsBar.Height = tabHeight;
+                //move content right to make space for tabs
+                _containerView.X = Pos.Right (_tabsBar);
+                _containerView.Y = 0;
 
-            // Should be able to just use 0 but switching between top/bottom tabs repeatedly breaks in ValidatePosDim if just using the absolute value 0
+                // Fill client area leaving space at left for tabs
+                _containerView.Width = Dim.Fill ();
+                _containerView.Height = Dim.Fill ();
+
+                break;
+            case TabSide.Right:
+                // Tabs are along the right
+                if (Style.ShowBorder)
+                {
+                    _containerView.Border!.Thickness = new (1, 1, 0, 1);
+                }
+
+                _tabsBar.Y = 0;
+                _tabsBar.Height = Dim.Fill ();
+
+                //move content left to make space for tabs
+                _containerView.X = 0;
+                _containerView.Y = 0;
+
+                _containerView.Height = Dim.Fill ();
+
+                break;
+            default:
+                throw new ArgumentOutOfRangeException ();
         }
 
         SetNeedsLayout ();
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnViewportChanged (DrawEventArgs e)
     {
-        _tabLocations = CalculateViewport (Viewport).ToArray ();
+        _tabLocations = CalculateViewport (Viewport);
 
         base.OnViewportChanged (e);
     }
@@ -296,10 +381,15 @@ public class TabView : View
         }
 
         // if current viewport does not include the selected tab
-        if (!CalculateViewport (Viewport).Any (t => Equals (SelectedTab, t)))
+        if (_tabLocations is null || (_tabLocations is { } && !_tabLocations.Any (t => Equals (SelectedTab, t))))
         {
             // Set scroll offset so the first tab rendered is the
             TabScrollOffset = Math.Max (0, Tabs.IndexOf (SelectedTab));
+            _tabLocations = CalculateViewport (Viewport);
+        }
+        else
+        {
+            RenderTabLine (_tabLocations);
         }
     }
 
@@ -309,7 +399,7 @@ public class TabView : View
     /// <returns>The valid <see cref="TabScrollOffset"/> for the given value.</returns>
     public int EnsureValidScrollOffsets (int value) { return Math.Max (Math.Min (value, Tabs.Count - 1), 0); }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView)
     {
         if (SelectedTab is { HasFocus: false } && !_containerView.CanFocus && focusedView == this)
@@ -388,6 +478,7 @@ public class TabView : View
         if (currentIdx == -1)
         {
             SelectedTab = Tabs.ElementAt (0);
+
             return true;
         }
 
@@ -430,88 +521,207 @@ public class TabView : View
     }
 
     /// <summary>Raises the <see cref="SelectedTabChanged"/> event.</summary>
-    protected virtual void OnSelectedTabChanged (Tab oldTab, Tab newTab)
-    {
-        SelectedTabChanged?.Invoke (this, new TabChangedEventArgs (oldTab, newTab));
-    }
+    protected virtual void OnSelectedTabChanged (Tab oldTab, Tab newTab) { SelectedTabChanged?.Invoke (this, new (oldTab, newTab)); }
 
     /// <summary>Returns which tabs to render at each x location.</summary>
     /// <returns></returns>
-    internal IEnumerable<Tab> CalculateViewport (Rectangle bounds)
+    internal Tab []? CalculateViewport (Rectangle bounds)
     {
         UnSetCurrentTabs ();
 
+        List<Tab> tabs = [];
         var i = 1;
         View? prevTab = null;
 
-        // Starting at the first or scrolled to tab
-        foreach (Tab tab in Tabs.Skip (TabScrollOffset))
+        switch (Style.TabsSide)
         {
-            if (prevTab is { })
-            {
-                tab.X = Pos.Right (prevTab) - 1;
-            }
-            else
-            {
-                tab.X = 0;
-            }
+            case TabSide.Top:
+            case TabSide.Bottom:
+                // Starting at the first or scrolled to tab
+                foreach (Tab tab in Tabs.Skip (TabScrollOffset))
+                {
+                    if (prevTab is { })
+                    {
+                        tab.X = Pos.Right (prevTab) - 1;
+                    }
+                    else
+                    {
+                        tab.X = 0;
+                    }
 
-            tab.Y = 0;
+                    tab.Y = 0;
 
-            // while there is space for the tab
-            int tabTextWidth = tab.DisplayText.EnumerateRunes ().Sum (c => c.GetColumns ());
+                    // while there is space for the tab
+                    int tabTextWidth = tab.DisplayText.EnumerateRunes ().Sum (c => c.GetColumns ());
 
-            // The maximum number of characters to use for the tab name as specified
-            // by the user (MaxTabTextWidth).  But not more than the width of the view
-            // or we won't even be able to render a single tab!
-            long maxWidth = Math.Max (0, Math.Min (bounds.Width - 3, MaxTabTextWidth));
+                    // The maximum number of characters to use for the tab name as specified
+                    // by the user (MaxTabTextWidth).  But not more than the width of the view
+                    // or we won't even be able to render a single tab!
+                    long maxWidth = Math.Max (0, Math.Min (bounds.Width - 3, MaxTabTextWidth));
 
-            tab.Width = 2;
-            tab.Height = Style.ShowTopLine ? 3 : 2;
+                    tab.Width = 2;
+                    tab.Height = Style.ShowInitialLine ? 3 : 2;
 
-            // if tab view is width <= 3 don't render any tabs
-            if (maxWidth == 0)
-            {
-                tab.Visible = true;
-                tab.MouseClick += Tab_MouseClick!;
-                tab.Border!.MouseClick += Tab_MouseClick!;
+                    // if tab view is width <= 3 don't render any tabs
+                    if (maxWidth == 0)
+                    {
+                        tab.Visible = true;
+                        tab.MouseClick += Tab_MouseClick!;
+                        tab.Border!.MouseClick += Tab_MouseClick!;
+                        tab.DisplayTextChanged += Tab_DisplayTextChanged;
 
-                yield return tab;
+                        tabs.Add (tab);
+
+                        break;
+                    }
+
+                    if (tabTextWidth > maxWidth)
+                    {
+                        tab.Text = tab.DisplayText.Substring (0, (int)maxWidth);
+                        tabTextWidth = (int)maxWidth;
+                    }
+                    else
+                    {
+                        tab.Text = tab.DisplayText;
+                    }
+
+                    tab.Width = tabTextWidth + 2;
+                    tab.Height = Style.ShowInitialLine ? 3 : 2;
+
+                    // if there is not enough space for this tab
+                    if (i + tabTextWidth >= bounds.Width)
+                    {
+                        tab.Visible = false;
+
+                        break;
+                    }
+
+                    // there is enough space!
+                    tab.Visible = true;
+                    tab.MouseClick += Tab_MouseClick!;
+                    tab.Border!.MouseClick += Tab_MouseClick!;
+                    tab.DisplayTextChanged += Tab_DisplayTextChanged;
+
+                    tabs.Add (tab);
+
+                    prevTab = tab;
+
+                    i += tabTextWidth + 1;
+                }
 
                 break;
-            }
+            case TabSide.Left:
+            case TabSide.Right:
+                var maxColWidth = 0;
 
-            if (tabTextWidth > maxWidth)
-            {
-                tab.Text = tab.DisplayText.Substring (0, (int)maxWidth);
-                tabTextWidth = (int)maxWidth;
-            }
-            else
-            {
-                tab.Text = tab.DisplayText;
-            }
+                // Starting at the first or scrolled to tab
+                foreach (Tab tab in Tabs.Skip (TabScrollOffset))
+                {
+                    tab.X = 0;
 
-            tab.Width = Math.Max (tabTextWidth + 2, 1);
-            tab.Height = Style.ShowTopLine ? 3 : 2;
+                    if (prevTab is { })
+                    {
+                        tab.Y = Pos.Bottom (prevTab) - 1;
+                    }
+                    else
+                    {
+                        tab.Y = 0;
+                    }
 
-            // if there is not enough space for this tab
-            if (i + tabTextWidth >= bounds.Width)
-            {
-                tab.Visible = false;
+                    // while there is space for the tab
+                    int tabTextWidth = tab.DisplayText.EnumerateRunes ().Sum (c => c.GetColumns ());
+
+                    // The maximum number of characters to use for the tab name as specified
+                    // by the user (MaxTabTextWidth).  But not more than the width of the view
+                    // or we won't even be able to render a single tab!
+                    long maxWidth = Math.Max (0, Math.Min (bounds.Width - (Style.ShowInitialLine ? 2 : 1), MaxTabTextWidth));
+
+                    maxColWidth = GetMaxColWidth (Math.Min (tabTextWidth, (int)maxWidth));
+
+                    // The maximum height to use for the tab. But not more than the height of the view
+                    // or we won't even be able to render a single tab!
+                    int maxHeight = Math.Max (0, Math.Min (bounds.Height - 2, 2));
+
+                    tab.Height = 2;
+                    tab.TextAlignment = Style.TabsTextAlignment;
+
+                    // if tab view is height <= 3 don't render any tabs
+                    if (maxHeight == 0)
+                    {
+                        tab.Width = maxColWidth;
+                        tab.Visible = true;
+                        tab.MouseClick += Tab_MouseClick!;
+                        tab.Border!.MouseClick += Tab_MouseClick!;
+                        tab.DisplayTextChanged += Tab_DisplayTextChanged;
+
+                        tabs.Add (tab);
+
+                        break;
+                    }
+
+                    if (tabTextWidth > maxWidth)
+                    {
+                        tab.Text = tab.DisplayText.Substring (0, (int)maxWidth);
+                        tabTextWidth = (int)maxWidth;
+                    }
+                    else
+                    {
+                        tab.Text = tab.DisplayText;
+                    }
+
+                    maxColWidth = GetMaxColWidth (tabTextWidth);
+                    tab.Height = 3;
+
+                    // if there is not enough space for this tab
+                    if (i + 1 >= bounds.Height)
+                    {
+                        tab.Visible = false;
+
+                        break;
+                    }
+
+                    // there is enough space!
+                    tab.Visible = true;
+                    tab.MouseClick += Tab_MouseClick!;
+                    tab.Border!.MouseClick += Tab_MouseClick!;
+                    tab.DisplayTextChanged += Tab_DisplayTextChanged;
+
+                    tabs.Add (tab);
+
+                    prevTab = tab;
+
+                    i += 2;
+                }
+
+                foreach (Tab t in tabs)
+                {
+                    t.Width = maxColWidth;
+                }
+
+                _tabsBar.Width = maxColWidth;
+
+                if (Style.TabsSide == TabSide.Right)
+                {
+                    _tabsBar.X = Pos.AnchorEnd (maxColWidth);
+                    // Fill client area leaving space at right for tabs
+                    _containerView.Width = Dim.Fill (maxColWidth);
+                }
+
+                int GetMaxColWidth (int textWidth)
+                {
+                    int maxViewportWidth = Math.Max (0, Viewport.Width - (Style.ShowBorder ? 2 : 0));
+
+                    if (Math.Max (textWidth + (Style.ShowInitialLine ? 2 : 1), maxColWidth) > maxViewportWidth)
+                    {
+                        return maxViewportWidth;
+                    }
+
+                    return Math.Max (textWidth + (Style.ShowInitialLine ? 2 : 1), maxColWidth);
+                }
 
                 break;
-            }
-
-            // there is enough space!
-            tab.Visible = true;
-            tab.MouseClick += Tab_MouseClick!;
-            tab.Border!.MouseClick += Tab_MouseClick!;
-
-            yield return tab;
-
-            prevTab = tab;
-
-            i += tabTextWidth + 1;
+            default:
+                throw new ArgumentOutOfRangeException ();
         }
 
         if (TabCanSetFocus ())
@@ -522,41 +732,121 @@ public class TabView : View
         {
             SelectedTab?.View?.SetFocus ();
         }
+
+        RenderTabLine (tabs.Count == 0 ? null : tabs.ToArray ());
+
+        SetNeedsLayout ();
+
+        return tabs.Count == 0 ? null : tabs.ToArray ();
+    }
+
+    private void Tab_DisplayTextChanged (object? sender, EventArgs e) { _tabLocations = CalculateViewport (Viewport); }
+
+    /// <summary>Renders the line with the tab names in it.</summary>
+    private void RenderTabLine (Tab []? tabLocations)
+    {
+        if (tabLocations is null)
+        {
+            return;
+        }
+
+        int topLine = Style.ShowInitialLine ? 1 : 0;
+
+        foreach (Tab toRender in tabLocations)
+        {
+            Tab tab = toRender;
+
+            if (toRender == SelectedTab)
+            {
+                switch (Style.TabsSide)
+                {
+                    case TabSide.Top:
+                        tab.Border!.Thickness = new (1, topLine, 1, 0);
+                        tab.Margin!.Thickness = new (0, 0, 0, 1);
+
+                        break;
+                    case TabSide.Bottom:
+                        tab.Border!.Thickness = new (1, 0, 1, topLine);
+                        tab.Margin!.Thickness = new (0, 1, 0, 0);
+
+                        break;
+                    case TabSide.Left:
+                        tab.Border!.Thickness = new (topLine, 1, 0, 1);
+                        tab.Margin!.Thickness = new (0, 0, 1, 0);
+
+                        break;
+                    case TabSide.Right:
+                        tab.Border!.Thickness = new (0, 1, topLine, 1);
+                        tab.Margin!.Thickness = new (1, 0, 0, 0);
+
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException ();
+                }
+            }
+            else
+            {
+                tab.Margin!.Thickness = new (0, 0, 0, 0);
+
+                switch (Style.TabsSide)
+                {
+                    case TabSide.Top:
+                        tab.Border!.Thickness = new (1, topLine, 1, 1);
+
+                        break;
+                    case TabSide.Bottom:
+                        tab.Border!.Thickness = new (1, 1, 1, topLine);
+
+                        break;
+                    case TabSide.Left:
+                        tab.Border!.Thickness = new (topLine, 1, 1, 1);
+
+                        break;
+                    case TabSide.Right:
+                        tab.Border!.Thickness = new (1, 1, topLine, 1);
+
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException ();
+                }
+            }
+
+            // Ensures updating TextFormatter constrains
+            tab.TextFormatter.ConstrainToWidth = tab.GetContentSize ().Width;
+            tab.TextFormatter.ConstrainToHeight = tab.GetContentSize ().Height;
+        }
     }
 
     /// <summary>
-    ///     Returns the number of rows occupied by rendering the tabs, this depends on <see cref="TabStyle.ShowTopLine"/>
-    ///     and can be 0 (e.g. if <see cref="TabStyle.TabsOnBottom"/> and you ask for <paramref name="top"/>).
+    ///     Returns the number of rows occupied by rendering the tabs, this depends on <see cref="TabStyle.ShowInitialLine"/>
+    ///     and can be 0 (e.g. if <see cref="TabStyle.TabsSide"/> and you ask for <paramref name="top"/>).
     /// </summary>
     /// <param name="top">True to measure the space required at the top of the control, false to measure space at the bottom.</param>
     /// .
     /// <returns></returns>
     private int GetTabHeight (bool top)
     {
-        if (top && Style.TabsOnBottom)
+        if (top && Style.TabsSide == TabSide.Bottom)
         {
             return 0;
         }
 
-        if (!top && !Style.TabsOnBottom)
+        if (!top && Style.TabsSide == TabSide.Top)
         {
             return 0;
         }
 
-        return Style.ShowTopLine ? 3 : 2;
+        return Style.ShowInitialLine ? 3 : 2;
     }
 
-    internal void Tab_MouseClick (object sender, MouseEventArgs e)
-    {
-        e.Handled = _tabsBar.NewMouseEvent (e) == true;
-    }
+    internal void Tab_MouseClick (object sender, MouseEventArgs e) { e.Handled = _tabsBar.NewMouseEvent (e) == true; }
 
     private void UnSetCurrentTabs ()
     {
         if (_tabLocations is null)
         {
             // Ensures unset any visible tab prior to TabScrollOffset
-            for (int i = 0; i < TabScrollOffset; i++)
+            for (var i = 0; i < TabScrollOffset; i++)
             {
                 Tab tab = Tabs.ElementAt (i);
 
@@ -564,6 +854,7 @@ public class TabView : View
                 {
                     tab.MouseClick -= Tab_MouseClick!;
                     tab.Border!.MouseClick -= Tab_MouseClick!;
+                    tab.DisplayTextChanged -= Tab_DisplayTextChanged;
                     tab.Visible = false;
                 }
             }
@@ -574,6 +865,7 @@ public class TabView : View
             {
                 tabToRender.MouseClick -= Tab_MouseClick!;
                 tabToRender.Border!.MouseClick -= Tab_MouseClick!;
+                tabToRender.DisplayTextChanged -= Tab_DisplayTextChanged;
                 tabToRender.Visible = false;
             }
 
@@ -584,6 +876,4 @@ public class TabView : View
     /// <summary>Raises the <see cref="TabClicked"/> event.</summary>
     /// <param name="tabMouseEventArgs"></param>
     internal virtual void OnTabClicked (TabMouseEventArgs tabMouseEventArgs) { TabClicked?.Invoke (this, tabMouseEventArgs); }
-
-
 }
