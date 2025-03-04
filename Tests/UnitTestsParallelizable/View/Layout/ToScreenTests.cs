@@ -1,20 +1,14 @@
-﻿using UnitTests;
-using UnitTests;
-using Xunit.Abstractions;
-using static System.Net.Mime.MediaTypeNames;
+﻿using Xunit.Abstractions;
 
 namespace Terminal.Gui.LayoutTests;
 
 /// <summary>
-/// Test the <see cref="View.FrameToScreen"/> and <see cref="View.ViewportToScreen"/> methods.
-/// DOES NOT TEST Adornment.xxxToScreen methods. Those are in ./Adornment/ToScreenTests.cs
+///     Test the <see cref="View.FrameToScreen"/> and <see cref="View.ViewportToScreen"/> methods.
+///     DOES NOT TEST Adornment.xxxToScreen methods. Those are in ./Adornment/ToScreenTests.cs
 /// </summary>
 /// <param name="output"></param>
-public class ToScreenTests (ITestOutputHelper output)
+public class ToScreenTests ()
 {
-    private readonly ITestOutputHelper _output = output;
-
-
     // Test FrameToScreen
     [Theory]
     [InlineData (0, 0, 0, 0)]
@@ -58,6 +52,7 @@ public class ToScreenTests (ITestOutputHelper output)
         Rectangle actual = view.FrameToScreen ();
         Assert.Equal (expected, actual);
     }
+
     [Theory]
     [InlineData (0, 0)]
     [InlineData (1, 1)]
@@ -73,7 +68,7 @@ public class ToScreenTests (ITestOutputHelper output)
         view.Frame = frame;
 
         // Act
-        var screen = view.FrameToScreen ();
+        Rectangle screen = view.FrameToScreen ();
 
         // Assert
         Assert.Equal (expectedX, screen.X);
@@ -95,7 +90,7 @@ public class ToScreenTests (ITestOutputHelper output)
         view.Frame = frame;
 
         // Act
-        var screen = view.FrameToScreen ();
+        Rectangle screen = view.FrameToScreen ();
 
         // Assert
         Assert.Equal (expectedX, screen.X);
@@ -116,7 +111,7 @@ public class ToScreenTests (ITestOutputHelper output)
         view.BorderStyle = LineStyle.Single;
         view.Frame = frame;
 
-        var subviewOfBorder = new View ()
+        var subviewOfBorder = new View
         {
             X = 1, // screen should be 1
             Y = 0,
@@ -129,7 +124,7 @@ public class ToScreenTests (ITestOutputHelper output)
         view.EndInit ();
 
         // Act
-        var screen = subviewOfBorder.FrameToScreen ();
+        Rectangle screen = subviewOfBorder.FrameToScreen ();
 
         // Assert
         Assert.Equal (expectedX, screen.X);
@@ -150,16 +145,16 @@ public class ToScreenTests (ITestOutputHelper output)
         adornment.Frame = adornmentFrame;
         adornment.Thickness = new (1);
 
-        var subviewOfAdornment = new View ()
+        var subviewOfAdornment = new View
         {
             Id = "subviewOfAdornment",
             X = 1, // screen should be 1
             Y = 0,
             Width = 1,
-            Height = 1,
+            Height = 1
         };
 
-        var subviewOfSubview = new View ()
+        var subviewOfSubview = new View
         {
             Id = "subviewOfSubview",
             X = 2, // screen should be 3 (the subviewOfAdornment location is 1)
@@ -174,7 +169,7 @@ public class ToScreenTests (ITestOutputHelper output)
         adornment.EndInit ();
 
         // Act
-        var screen = subviewOfSubview.FrameToScreen ();
+        Rectangle screen = subviewOfSubview.FrameToScreen ();
 
         // Assert
         Assert.Equal (expectedX, screen.X);
@@ -191,7 +186,7 @@ public class ToScreenTests (ITestOutputHelper output)
         // Arrange
         var frame = new Rectangle (x, 0, 10, 10);
 
-        var superView = new View ()
+        var superView = new View
         {
             X = 0,
             Y = 0,
@@ -206,7 +201,7 @@ public class ToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var screen = view.FrameToScreen ();
+        Rectangle screen = view.FrameToScreen ();
 
         // Assert
         Assert.Equal (expectedX, screen.X);
@@ -223,7 +218,7 @@ public class ToScreenTests (ITestOutputHelper output)
         // Arrange
         var frame = new Rectangle (x, 0, 10, 10);
 
-        var superView = new View ()
+        var superView = new View
         {
             X = 0,
             Y = 0,
@@ -239,7 +234,7 @@ public class ToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var screen = view.FrameToScreen ();
+        Rectangle screen = view.FrameToScreen ();
 
         // Assert
         Assert.Equal (expectedX, screen.X);
@@ -256,7 +251,7 @@ public class ToScreenTests (ITestOutputHelper output)
         // Arrange
         var frame = new Rectangle (x, 0, 10, 10);
 
-        var superSuperView = new View ()
+        var superSuperView = new View
         {
             X = 0,
             Y = 0,
@@ -264,7 +259,7 @@ public class ToScreenTests (ITestOutputHelper output)
             Width = Dim.Fill ()
         };
 
-        var superView = new View ()
+        var superView = new View
         {
             X = 0,
             Y = 0,
@@ -281,7 +276,7 @@ public class ToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var screen = view.FrameToScreen ();
+        Rectangle screen = view.FrameToScreen ();
 
         // Assert
         Assert.Equal (expectedX, screen.X);
@@ -298,7 +293,7 @@ public class ToScreenTests (ITestOutputHelper output)
         // Arrange
         var frame = new Rectangle (x, 0, 10, 10);
 
-        var superSuperView = new View ()
+        var superSuperView = new View
         {
             X = 0,
             Y = 0,
@@ -307,7 +302,7 @@ public class ToScreenTests (ITestOutputHelper output)
         };
         superSuperView.BorderStyle = LineStyle.Single;
 
-        var superView = new View ()
+        var superView = new View
         {
             X = 0,
             Y = 0,
@@ -325,7 +320,7 @@ public class ToScreenTests (ITestOutputHelper output)
         superSuperView.Layout ();
 
         // Act
-        var screen = view.FrameToScreen ();
+        Rectangle screen = view.FrameToScreen ();
 
         // Assert
         Assert.Equal (expectedX, screen.X);
@@ -347,18 +342,16 @@ public class ToScreenTests (ITestOutputHelper output)
         view.SetContentSize (new (20, 20));
 
         Point testPoint = new (0, 0);
-        Assert.Equal (new Point (1, 1), view.ContentToScreen (testPoint));
+        Assert.Equal (new (1, 1), view.ContentToScreen (testPoint));
     }
 
     [Theory]
     [InlineData (0, 0, 1)]
     [InlineData (1, 0, 2)]
     [InlineData (-1, 0, 0)]
-
     [InlineData (0, 1, 2)]
     [InlineData (1, 1, 3)]
     [InlineData (-1, 1, 1)]
-
     [InlineData (0, -1, 0)]
     [InlineData (1, -1, 1)]
     [InlineData (-1, -1, -1)]
@@ -374,7 +367,7 @@ public class ToScreenTests (ITestOutputHelper output)
         view.BorderStyle = LineStyle.Single;
 
         // Act
-        var screen = view.ContentToScreen (new (contentX, 0));
+        Point screen = view.ContentToScreen (new (contentX, 0));
 
         // Assert
         Assert.Equal (expectedX, screen.X);
@@ -385,12 +378,10 @@ public class ToScreenTests (ITestOutputHelper output)
     [InlineData (1, 0, 1)]
     [InlineData (-1, 0, -1)]
     [InlineData (11, 0, 11)]
-
     [InlineData (0, 1, 1)]
     [InlineData (1, 1, 2)]
     [InlineData (-1, 1, 0)]
     [InlineData (11, 1, 12)]
-
     [InlineData (0, -1, -1)]
     [InlineData (1, -1, 0)]
     [InlineData (-1, -1, -2)]
@@ -401,7 +392,7 @@ public class ToScreenTests (ITestOutputHelper output)
         // Arrange
         var frame = new Rectangle (frameX, 0, 10, 10);
 
-        var superView = new View ()
+        var superView = new View
         {
             X = 0,
             Y = 0,
@@ -417,7 +408,7 @@ public class ToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var screen = view.ContentToScreen (new (contentX, 0));
+        Point screen = view.ContentToScreen (new (contentX, 0));
 
         // Assert
         Assert.Equal (expectedX, screen.X);
@@ -572,7 +563,6 @@ public class ToScreenTests (ITestOutputHelper output)
     //    Assert.Equal (expectedX, screen.X);
     //}
 
-
     //[Theory]
     //[InlineData (0, 0, 3)]
     //[InlineData (1, 0, 4)]
@@ -642,12 +632,12 @@ public class ToScreenTests (ITestOutputHelper output)
         };
         view.Layout ();
 
-        Rectangle testRect = new Rectangle (0, 0, 1, 1);
-        Assert.Equal (new Point (0, 0), view.ViewportToScreen (testRect).Location);
-        view.Viewport = view.Viewport with { Location = new Point (1, 1) };
+        var testRect = new Rectangle (0, 0, 1, 1);
+        Assert.Equal (new (0, 0), view.ViewportToScreen (testRect).Location);
+        view.Viewport = view.Viewport with { Location = new (1, 1) };
 
-        Assert.Equal (new Rectangle (1, 1, 10, 10), view.Viewport);
-        Assert.Equal (new Point (0, 0), view.ViewportToScreen (testRect).Location);
+        Assert.Equal (new (1, 1, 10, 10), view.Viewport);
+        Assert.Equal (new (0, 0), view.ViewportToScreen (testRect).Location);
     }
 
     [Theory]
@@ -666,7 +656,7 @@ public class ToScreenTests (ITestOutputHelper output)
         view.Layout ();
 
         // Act
-        var screen = view.ViewportToScreen (new Point (viewportX, 0));
+        Point screen = view.ViewportToScreen (new Point (viewportX, 0));
 
         // Assert
         Assert.Equal (expectedX, screen.X);
@@ -677,12 +667,10 @@ public class ToScreenTests (ITestOutputHelper output)
     [InlineData (1, 0, 2)]
     [InlineData (-1, 0, 0)]
     [InlineData (11, 0, 12)]
-
     [InlineData (0, 1, 2)]
     [InlineData (1, 1, 3)]
     [InlineData (-1, 1, 1)]
     [InlineData (11, 1, 13)]
-
     [InlineData (0, -1, 0)]
     [InlineData (1, -1, 1)]
     [InlineData (-1, -1, -1)]
@@ -698,7 +686,7 @@ public class ToScreenTests (ITestOutputHelper output)
         view.Frame = frame;
 
         // Act
-        var screen = view.ViewportToScreen (new Point (viewportX, 0));
+        Point screen = view.ViewportToScreen (new Point (viewportX, 0));
 
         // Assert
         Assert.Equal (expectedX, screen.X);
@@ -709,12 +697,10 @@ public class ToScreenTests (ITestOutputHelper output)
     [InlineData (1, 0, 1)]
     [InlineData (-1, 0, -1)]
     [InlineData (11, 0, 11)]
-
     [InlineData (0, 1, 1)]
     [InlineData (1, 1, 2)]
     [InlineData (-1, 1, 0)]
     [InlineData (11, 1, 12)]
-
     [InlineData (0, -1, -1)]
     [InlineData (1, -1, 0)]
     [InlineData (-1, -1, -2)]
@@ -725,7 +711,7 @@ public class ToScreenTests (ITestOutputHelper output)
         // Arrange
         var frame = new Rectangle (frameX, 0, 10, 10);
 
-        var superView = new View ()
+        var superView = new View
         {
             X = 0,
             Y = 0,
@@ -740,7 +726,7 @@ public class ToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var screen = view.ViewportToScreen (new Point (viewportX, 0));
+        Point screen = view.ViewportToScreen (new Point (viewportX, 0));
 
         // Assert
         Assert.Equal (expectedX, screen.X);
@@ -751,12 +737,10 @@ public class ToScreenTests (ITestOutputHelper output)
     [InlineData (1, 0, 2)]
     [InlineData (-1, 0, 0)]
     [InlineData (11, 0, 12)]
-
     [InlineData (0, 1, 2)]
     [InlineData (1, 1, 3)]
     [InlineData (-1, 1, 1)]
     [InlineData (11, 1, 13)]
-
     [InlineData (0, -1, 0)]
     [InlineData (1, -1, 1)]
     [InlineData (-1, -1, -1)]
@@ -767,7 +751,7 @@ public class ToScreenTests (ITestOutputHelper output)
         // Arrange
         var frame = new Rectangle (frameX, 0, 10, 10);
 
-        var superView = new View ()
+        var superView = new View
         {
             X = 0,
             Y = 0,
@@ -783,7 +767,7 @@ public class ToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var screen = view.ViewportToScreen (new Point (viewportX, 0));
+        Point screen = view.ViewportToScreen (new Point (viewportX, 0));
 
         // Assert
         Assert.Equal (expectedX, screen.X);
@@ -794,12 +778,10 @@ public class ToScreenTests (ITestOutputHelper output)
     [InlineData (1, 0, 1)]
     [InlineData (-1, 0, -1)]
     [InlineData (11, 0, 11)]
-
     [InlineData (0, 1, 1)]
     [InlineData (1, 1, 2)]
     [InlineData (-1, 1, 0)]
     [InlineData (11, 1, 12)]
-
     [InlineData (0, -1, -1)]
     [InlineData (1, -1, 0)]
     [InlineData (-1, -1, -2)]
@@ -810,7 +792,7 @@ public class ToScreenTests (ITestOutputHelper output)
         // Arrange
         var frame = new Rectangle (frameX, 0, 10, 10);
 
-        var superSuperView = new View ()
+        var superSuperView = new View
         {
             X = 0,
             Y = 0,
@@ -818,7 +800,7 @@ public class ToScreenTests (ITestOutputHelper output)
             Width = Dim.Fill ()
         };
 
-        var superView = new View ()
+        var superView = new View
         {
             X = 0,
             Y = 0,
@@ -835,7 +817,7 @@ public class ToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var screen = view.ViewportToScreen (new Point (viewportX, 0));
+        Point screen = view.ViewportToScreen (new Point (viewportX, 0));
 
         // Assert
         Assert.Equal (expectedX, screen.X);
@@ -846,12 +828,10 @@ public class ToScreenTests (ITestOutputHelper output)
     [InlineData (1, 0, 3)]
     [InlineData (-1, 0, 1)]
     [InlineData (11, 0, 13)]
-
     [InlineData (0, 1, 3)]
     [InlineData (1, 1, 4)]
     [InlineData (-1, 1, 2)]
     [InlineData (11, 1, 14)]
-
     [InlineData (0, -1, 1)]
     [InlineData (1, -1, 2)]
     [InlineData (-1, -1, 0)]
@@ -862,7 +842,7 @@ public class ToScreenTests (ITestOutputHelper output)
         // Arrange
         var frame = new Rectangle (frameX, 0, 10, 10);
 
-        var superSuperView = new View ()
+        var superSuperView = new View
         {
             X = 0,
             Y = 0,
@@ -871,7 +851,7 @@ public class ToScreenTests (ITestOutputHelper output)
         };
         superSuperView.BorderStyle = LineStyle.Single;
 
-        var superView = new View ()
+        var superView = new View
         {
             X = 0,
             Y = 0,
@@ -889,24 +869,21 @@ public class ToScreenTests (ITestOutputHelper output)
         superView.Layout ();
 
         // Act
-        var screen = view.ViewportToScreen (new Point (viewportX, 0));
+        Point screen = view.ViewportToScreen (new Point (viewportX, 0));
 
         // Assert
         Assert.Equal (expectedX, screen.X);
     }
-
 
     [Theory]
     [InlineData (0, 0, 2)]
     [InlineData (1, 0, 3)]
     [InlineData (-1, 0, 1)]
     [InlineData (11, 0, 13)]
-
     [InlineData (0, 1, 3)]
     [InlineData (1, 1, 4)]
     [InlineData (-1, 1, 2)]
     [InlineData (11, 1, 14)]
-
     [InlineData (0, -1, 1)]
     [InlineData (1, -1, 2)]
     [InlineData (-1, -1, 0)]
@@ -917,7 +894,7 @@ public class ToScreenTests (ITestOutputHelper output)
         // Arrange
         var frame = new Rectangle (frameX, 0, 10, 10);
 
-        var superSuperView = new View ()
+        var superSuperView = new View
         {
             X = 0,
             Y = 0,
@@ -926,7 +903,7 @@ public class ToScreenTests (ITestOutputHelper output)
         };
         superSuperView.BorderStyle = LineStyle.Single;
 
-        var superView = new View ()
+        var superView = new View
         {
             X = 0,
             Y = 0,
@@ -946,10 +923,9 @@ public class ToScreenTests (ITestOutputHelper output)
         superView.LayoutSubviews ();
 
         // Act
-        var screen = view.ViewportToScreen (new Point (testX, 0));
+        Point screen = view.ViewportToScreen (new Point (testX, 0));
 
         // Assert
         Assert.Equal (expectedX, screen.X);
     }
-
 }

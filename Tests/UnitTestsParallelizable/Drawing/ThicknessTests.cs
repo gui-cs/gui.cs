@@ -1,11 +1,6 @@
-﻿using System.Text;
-using UnitTests;
-using UnitTests;
-using Xunit.Abstractions;
+﻿namespace Terminal.Gui.DrawingTests;
 
-namespace Terminal.Gui.DrawingTests;
-
-public class ThicknessTests (ITestOutputHelper output)
+public class ThicknessTests
 {
     [Fact]
     public void Constructor_Defaults ()
@@ -26,13 +21,13 @@ public class ThicknessTests (ITestOutputHelper output)
         Assert.Equal (3, t.Right);
         Assert.Equal (4, t.Bottom);
 
-        t = new Thickness (0, 0, 0, 0);
+        t = new (0, 0, 0, 0);
         Assert.Equal (0, t.Left);
         Assert.Equal (0, t.Top);
         Assert.Equal (0, t.Right);
         Assert.Equal (0, t.Bottom);
 
-        t = new Thickness (-1, 0, 0, 0);
+        t = new (-1, 0, 0, 0);
         Assert.Equal (-1, t.Left);
         Assert.Equal (0, t.Top);
         Assert.Equal (0, t.Right);
@@ -106,24 +101,24 @@ public class ThicknessTests (ITestOutputHelper output)
         Assert.Equal (5, inside.Width);
         Assert.Equal (1, inside.Height);
 
-        t = new Thickness (-1, 1, -1, 1);
-        r = new Rectangle (-1, -1, 3, 3);
+        t = new (-1, 1, -1, 1);
+        r = new (-1, -1, 3, 3);
         inside = t.GetInside (r);
         Assert.Equal (-2, inside.X);
         Assert.Equal (0, inside.Y);
         Assert.Equal (5, inside.Width);
         Assert.Equal (1, inside.Height);
 
-        t = new Thickness (-1, 1, -1, 1);
-        r = new Rectangle (1, 1, 3, 3);
+        t = new (-1, 1, -1, 1);
+        r = new (1, 1, 3, 3);
         inside = t.GetInside (r);
         Assert.Equal (0, inside.X);
         Assert.Equal (2, inside.Y);
         Assert.Equal (5, inside.Width);
         Assert.Equal (1, inside.Height);
 
-        t = new Thickness (-2, -1, 0, 1);
-        r = new Rectangle (-1, 0, 50, 60);
+        t = new (-2, -1, 0, 1);
+        r = new (-1, 0, 50, 60);
         inside = t.GetInside (r);
         Assert.Equal (-3, inside.X);
         Assert.Equal (-1, inside.Y);
@@ -142,24 +137,24 @@ public class ThicknessTests (ITestOutputHelper output)
         Assert.Equal (5, inside.Width);
         Assert.Equal (5, inside.Height);
 
-        t = new Thickness (-1, -1, -1, -1);
-        r = new Rectangle (-1, -1, 3, 3);
+        t = new (-1, -1, -1, -1);
+        r = new (-1, -1, 3, 3);
         inside = t.GetInside (r);
         Assert.Equal (-2, inside.X);
         Assert.Equal (-2, inside.Y);
         Assert.Equal (5, inside.Width);
         Assert.Equal (5, inside.Height);
 
-        t = new Thickness (-1, -1, -1, -1);
-        r = new Rectangle (1, 1, 3, 3);
+        t = new (-1, -1, -1, -1);
+        r = new (1, 1, 3, 3);
         inside = t.GetInside (r);
         Assert.Equal (0, inside.X);
         Assert.Equal (0, inside.Y);
         Assert.Equal (5, inside.Width);
         Assert.Equal (5, inside.Height);
 
-        t = new Thickness (-1, -2, -3, -4);
-        r = new Rectangle (-1, 0, 50, 60);
+        t = new (-1, -2, -3, -4);
+        r = new (-1, 0, 50, 60);
         inside = t.GetInside (r);
         Assert.Equal (-2, inside.X);
         Assert.Equal (-2, inside.Y);
@@ -178,24 +173,24 @@ public class ThicknessTests (ITestOutputHelper output)
         Assert.Equal (1, inside.Width);
         Assert.Equal (1, inside.Height);
 
-        t = new Thickness (1, 1, 1, 1);
-        r = new Rectangle (-1, -1, 3, 3);
+        t = new (1, 1, 1, 1);
+        r = new (-1, -1, 3, 3);
         inside = t.GetInside (r);
         Assert.Equal (0, inside.X);
         Assert.Equal (0, inside.Y);
         Assert.Equal (1, inside.Width);
         Assert.Equal (1, inside.Height);
 
-        t = new Thickness (1, 1, 1, 1);
-        r = new Rectangle (1, 1, 3, 3);
+        t = new (1, 1, 1, 1);
+        r = new (1, 1, 3, 3);
         inside = t.GetInside (r);
         Assert.Equal (2, inside.X);
         Assert.Equal (2, inside.Y);
         Assert.Equal (1, inside.Width);
         Assert.Equal (1, inside.Height);
 
-        t = new Thickness (1, 2, 3, 4);
-        r = new Rectangle (-1, 0, 50, 60);
+        t = new (1, 2, 3, 4);
+        r = new (-1, 0, 50, 60);
         inside = t.GetInside (r);
         Assert.Equal (0, inside.X);
         Assert.Equal (2, inside.Y);
@@ -214,72 +209,72 @@ public class ThicknessTests (ITestOutputHelper output)
         Assert.Equal (0, inside.Width);
         Assert.Equal (0, inside.Height);
 
-        t = new Thickness (1, 1, 1, 1);
-        r = new Rectangle (0, 0, 1, 1);
+        t = new (1, 1, 1, 1);
+        r = new (0, 0, 1, 1);
         inside = t.GetInside (r);
         Assert.Equal (1, inside.X);
         Assert.Equal (1, inside.Y);
         Assert.Equal (0, inside.Width);
         Assert.Equal (0, inside.Height);
 
-        t = new Thickness (1, 1, 1, 1);
-        r = new Rectangle (1, 1, 1, 1);
+        t = new (1, 1, 1, 1);
+        r = new (1, 1, 1, 1);
         inside = t.GetInside (r);
         Assert.Equal (2, inside.X);
         Assert.Equal (2, inside.Y);
         Assert.Equal (0, inside.Width);
         Assert.Equal (0, inside.Height);
 
-        t = new Thickness (1, 1, 1, 1);
-        r = new Rectangle (0, 0, 1, 0);
+        t = new (1, 1, 1, 1);
+        r = new (0, 0, 1, 0);
         inside = t.GetInside (r);
         Assert.Equal (1, inside.X);
         Assert.Equal (1, inside.Y);
         Assert.Equal (0, inside.Width);
         Assert.Equal (0, inside.Height);
 
-        t = new Thickness (1, 1, 1, 1);
-        r = new Rectangle (0, 0, 0, 1);
+        t = new (1, 1, 1, 1);
+        r = new (0, 0, 0, 1);
         inside = t.GetInside (r);
         Assert.Equal (1, inside.X);
         Assert.Equal (1, inside.Y);
         Assert.Equal (0, inside.Width);
         Assert.Equal (0, inside.Height);
 
-        t = new Thickness (1, 1, 1, 1);
-        r = new Rectangle (-1, -1, 0, 1);
+        t = new (1, 1, 1, 1);
+        r = new (-1, -1, 0, 1);
         inside = t.GetInside (r);
         Assert.Equal (0, inside.X);
         Assert.Equal (0, inside.Y);
         Assert.Equal (0, inside.Width);
         Assert.Equal (0, inside.Height);
 
-        t = new Thickness (1, 1, 1, 1);
-        r = new Rectangle (0, 0, 2, 2);
+        t = new (1, 1, 1, 1);
+        r = new (0, 0, 2, 2);
         inside = t.GetInside (r);
         Assert.Equal (1, inside.X);
         Assert.Equal (1, inside.Y);
         Assert.Equal (0, inside.Width);
         Assert.Equal (0, inside.Height);
 
-        t = new Thickness (1, 1, 1, 1);
-        r = new Rectangle (-1, -1, 2, 2);
+        t = new (1, 1, 1, 1);
+        r = new (-1, -1, 2, 2);
         inside = t.GetInside (r);
         Assert.Equal (0, inside.X);
         Assert.Equal (0, inside.Y);
         Assert.Equal (0, inside.Width);
         Assert.Equal (0, inside.Height);
 
-        t = new Thickness (1, 1, 1, 1);
-        r = new Rectangle (1, 1, 2, 2);
+        t = new (1, 1, 1, 1);
+        r = new (1, 1, 2, 2);
         inside = t.GetInside (r);
         Assert.Equal (2, inside.X);
         Assert.Equal (2, inside.Y);
         Assert.Equal (0, inside.Width);
         Assert.Equal (0, inside.Height);
 
-        t = new Thickness (1, 2, 3, 4);
-        r = new Rectangle (-1, 0, 4, 6);
+        t = new (1, 2, 3, 4);
+        r = new (-1, 0, 4, 6);
         inside = t.GetInside (r);
         Assert.Equal (0, inside.X);
         Assert.Equal (2, inside.Y);
@@ -298,40 +293,40 @@ public class ThicknessTests (ITestOutputHelper output)
         Assert.Equal (0, inside.Width);
         Assert.Equal (0, inside.Height);
 
-        t = new Thickness (0, 0, 0, 0);
-        r = new Rectangle (0, 0, 1, 1);
+        t = new (0, 0, 0, 0);
+        r = new (0, 0, 1, 1);
         inside = t.GetInside (r);
         Assert.Equal (0, inside.X);
         Assert.Equal (0, inside.Y);
         Assert.Equal (1, inside.Width);
         Assert.Equal (1, inside.Height);
 
-        t = new Thickness (0, 0, 0, 0);
-        r = new Rectangle (1, 1, 1, 1);
+        t = new (0, 0, 0, 0);
+        r = new (1, 1, 1, 1);
         inside = t.GetInside (r);
         Assert.Equal (1, inside.X);
         Assert.Equal (1, inside.Y);
         Assert.Equal (1, inside.Width);
         Assert.Equal (1, inside.Height);
 
-        t = new Thickness (0, 0, 0, 0);
-        r = new Rectangle (0, 0, 1, 0);
+        t = new (0, 0, 0, 0);
+        r = new (0, 0, 1, 0);
         inside = t.GetInside (r);
         Assert.Equal (0, inside.X);
         Assert.Equal (0, inside.Y);
         Assert.Equal (1, inside.Width);
         Assert.Equal (0, inside.Height);
 
-        t = new Thickness (0, 0, 0, 0);
-        r = new Rectangle (0, 0, 0, 1);
+        t = new (0, 0, 0, 0);
+        r = new (0, 0, 0, 1);
         inside = t.GetInside (r);
         Assert.Equal (0, inside.X);
         Assert.Equal (0, inside.Y);
         Assert.Equal (0, inside.Width);
         Assert.Equal (1, inside.Height);
 
-        t = new Thickness (0, 0, 0, 0);
-        r = new Rectangle (-1, -1, 0, 1);
+        t = new (0, 0, 0, 0);
+        r = new (-1, -1, 0, 1);
         inside = t.GetInside (r);
         Assert.Equal (-1, inside.X);
         Assert.Equal (-1, inside.Y);
@@ -345,7 +340,7 @@ public class ThicknessTests (ITestOutputHelper output)
         var t = new Thickness (1, 2, 3, 4);
         Assert.Equal (4, t.Horizontal);
 
-        t = new Thickness (0);
+        t = new (0);
         Assert.Equal (0, t.Horizontal);
     }
 
@@ -479,13 +474,11 @@ public class ThicknessTests (ITestOutputHelper output)
         Assert.Equal (expected, result);
     }
 
-
     [Theory]
     [InlineData (0, 0, 0, 0, 0, 0, false)]
     [InlineData (0, 0, 0, 1, 0, 0, false)]
     [InlineData (0, 0, 1, 0, 0, 0, false)]
     [InlineData (0, 0, 1, 1, 0, 0, true)]
-
     [InlineData (1, 1, 0, 0, 0, 0, false)]
     [InlineData (1, 1, 0, 1, 0, 0, false)]
     [InlineData (1, 1, 1, 0, 0, 0, false)]
@@ -513,7 +506,7 @@ public class ThicknessTests (ITestOutputHelper output)
         var t = new Thickness (1, 2, 3, 4);
         Assert.Equal (6, t.Vertical);
 
-        t = new Thickness (0);
+        t = new (0);
         Assert.Equal (0, t.Vertical);
     }
 
@@ -600,7 +593,6 @@ public class ThicknessTests (ITestOutputHelper output)
                     3,
                     4,
                     5)]
-
     public void AddTest (
         int left,
         int top,
@@ -618,7 +610,7 @@ public class ThicknessTests (ITestOutputHelper output)
     {
         var t = new Thickness (left, top, right, bottom);
         var t2 = new Thickness (left2, top2, right2, bottom2);
-        var result = t.Add (t2);
+        Thickness result = t.Add (t2);
         Assert.Equal (expectedLeft, result.Left);
         Assert.Equal (expectedTop, result.Top);
         Assert.Equal (expectedRight, result.Right);

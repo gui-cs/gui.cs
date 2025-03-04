@@ -1,7 +1,4 @@
-﻿using UnitTests;
-using UnitTests;
-using Xunit.Abstractions;
-using static Terminal.Gui.Dim;
+﻿using Xunit.Abstractions;
 using static Terminal.Gui.Pos;
 
 namespace Terminal.Gui.LayoutTests;
@@ -56,7 +53,6 @@ public class PosCenterTests (ITestOutputHelper output)
         Assert.Equal (expectedX, result);
     }
 
-
     [Fact]
     public void PosCenter_Bigger_Than_SuperView ()
     {
@@ -68,5 +64,4 @@ public class PosCenterTests (ITestOutputHelper output)
         Assert.Equal (-5, view.Frame.Left);
         Assert.Equal (-5, view.Frame.Top);
     }
-
 }
