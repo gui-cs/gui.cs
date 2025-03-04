@@ -4,7 +4,24 @@ param (
 )
 
 # Set the base path for relative paths (current directory when script is run)
-$basePath = Get-Location
+$basePath = Get-Location | Select-Object -ExpandProperty Path
+
+# Function to get relative path (compatible with PowerShell 5.1)
+function Get-RelativePath {
+    param (
+        [string]$basePath,
+        [string]$fullPath
+    )
+    # Ensure paths are absolute and normalized
+    $basePath = [System.IO.Path]::GetFullPath($basePath)
+    $fullPath = [System.IO.Path]::GetFullPath($fullPath)
+    # Calculate relative path using .NET
+    if ($fullPath.StartsWith($basePath)) {
+        $relative = $fullPath.Substring($basePath.Length).TrimStart('\', '/')
+        return $relative
+    }
+    return $fullPath  # Fallback to full path if not relative
+}
 
 # Function to extract method names from a C# file
 function Get-TestMethodNames {
@@ -12,13 +29,12 @@ function Get-TestMethodNames {
     $content = Get-Content -Path $filePath -Raw
     $testMethods = @()
 
-    # Match test attributes and capture method names with flexible spacing/comments
     $methodPattern = '(?s)(\[TestMethod\]|\[Test\]|\[Fact\]|\[Theory\])\s*[\s\S]*?public\s+(?:void|Task)\s+(\w+)\s*\('
     $methods = [regex]::Matches($content, $methodPattern)
 
     foreach ($match in $methods) {
-        $methodName = $match.Groups[2].Value  # Group 2 is the method name
-        if ($methodName) {  # Ensure we only add non-empty method names
+        $methodName = $match.Groups[2].Value
+        if ($methodName) {
             $testMethods += $methodName
         }
     }
@@ -36,15 +52,14 @@ $fileGroups = $testFiles | Group-Object -Property Name
 $duplicates = @{}
 
 foreach ($group in $fileGroups) {
-    if ($group.Count -gt 1) { # Only process files that exist in multiple locations
+    if ($group.Count -gt 1) {
         $fileName = $group.Name
-        $methodMap = @{} # Track methods for this specific filename
+        $methodMap = @{}
 
         foreach ($file in $group.Group) {
             $methods = Get-TestMethodNames -filePath $file.FullName
             foreach ($method in $methods) {
                 if ($methodMap.ContainsKey($method)) {
-                    # Duplicate found for this method in the same filename
                     if (-not $duplicates.ContainsKey($method)) {
                         $duplicates[$method] = @($methodMap[$method])
                     }
@@ -65,12 +80,10 @@ if ($duplicates.Count -eq 0) {
     foreach ($dup in $duplicates.Keys) {
         Write-Host "Method: $dup" -ForegroundColor Cyan
         foreach ($fullPath in $duplicates[$dup]) {
-            $relativePath = Resolve-Path -Path $fullPath -Relative -RelativeBasePath $basePath
+            $relativePath = Get-RelativePath -basePath $basePath -fullPath $fullPath
             Write-Host "  - $relativePath" -ForegroundColor White
         }
     }
-    # Display total number of duplicate methods
     Write-Host "Total number of duplicate methods: $($duplicates.Count)" -ForegroundColor Magenta
-    # Fail the pipeline by setting a non-zero exit code
     exit 1
 }
