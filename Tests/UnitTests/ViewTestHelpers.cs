@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-using System.Reflection;
-using Terminal.Gui;
+﻿using System.Reflection;
 
 namespace UnitTests;
 
@@ -140,5 +138,4 @@ public class ViewTestHelpers
             pTypes.Add (null);
         }
     }
-
 }
