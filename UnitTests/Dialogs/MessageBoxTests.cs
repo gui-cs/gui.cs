@@ -502,5 +502,25 @@ public class MessageBoxTests
         Application.Run (top);
         top.Dispose ();
     }
-}
 
+    [Theory]
+    [SetupFakeDriver]
+    [MemberData (nameof (AcceptingKeys))]
+    public void Button_IsDefault_True_Return_His_Index_On_Accepting (Key key)
+    {
+        Application.Init ();
+
+        Application.Iteration += (_, _) => Assert.True (Application.RaiseKeyDownEvent (key));
+        int res = MessageBox.Query ("hey", "IsDefault", "Yes", "No");
+
+        Assert.Equal (0, res);
+
+        Application.Shutdown ();
+    }
+
+    public static IEnumerable<object []> AcceptingKeys ()
+    {
+        yield return [Key.Enter];
+        yield return [Key.Space];
+    }
+}
