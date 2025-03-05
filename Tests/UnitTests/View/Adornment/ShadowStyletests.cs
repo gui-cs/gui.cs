@@ -1,12 +1,10 @@
 ﻿using UnitTests;
-using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
 public class ShadowStyleTests (ITestOutputHelper output)
 {
-  
     [Theory]
     [InlineData (
                     ShadowStyle.None,

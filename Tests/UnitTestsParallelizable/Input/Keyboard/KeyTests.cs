@@ -289,10 +289,10 @@ public class KeyTests
     [Fact]
     public void NoShift_ShouldReturnCorrectValue ()
     {
-        Key CAD = Key.Delete.WithCtrl.WithAlt;
-        Assert.Equal (KeyCode.Delete | KeyCode.CtrlMask | KeyCode.AltMask, CAD);
+        Key cad = Key.Delete.WithCtrl.WithAlt;
+        Assert.Equal (KeyCode.Delete | KeyCode.CtrlMask | KeyCode.AltMask, cad);
 
-        Assert.Equal (KeyCode.Delete | KeyCode.AltMask, CAD.NoCtrl);
+        Assert.Equal (KeyCode.Delete | KeyCode.AltMask, cad.NoCtrl);
 
         Key a = Key.A.WithCtrl.WithAlt.WithShift;
         Assert.Equal (KeyCode.A, a.NoCtrl.NoShift.NoAlt);
@@ -507,8 +507,8 @@ public class KeyTests
         Key a = Key.A;
         Assert.Equal (KeyCode.A | KeyCode.ShiftMask, a.WithShift);
 
-        Key CAD = Key.Delete.WithCtrl.WithAlt;
-        Assert.Equal (KeyCode.Delete | KeyCode.CtrlMask | KeyCode.AltMask, CAD);
+        Key cad = Key.Delete.WithCtrl.WithAlt;
+        Assert.Equal (KeyCode.Delete | KeyCode.CtrlMask | KeyCode.AltMask, cad);
     }
 
     // Test Equals

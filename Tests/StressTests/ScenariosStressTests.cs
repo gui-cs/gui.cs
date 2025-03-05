@@ -1,6 +1,4 @@
-using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Reflection;
 using Terminal.Gui;
 using UICatalog;
 using UnitTests;
@@ -20,16 +18,13 @@ public class ScenariosStressTests : TestsAllViews
 
     private readonly ITestOutputHelper _output;
 
-    private object _timeoutLock;
-
-    public static IEnumerable<object []> AllScenarioTypes =>
-        typeof (Scenario).Assembly
-                         .GetTypes ()
-                         .Where (type => type.IsClass && !type.IsAbstract && type.IsSubclassOf (typeof (Scenario)))
-                         .Select (type => new object [] { type });
+    private object? _timeoutLock;
 
     /// <summary>
-    ///     <para>This runs through all Scenarios defined in UI Catalog, calling Init, Setup, and Run and measuring the perf of each.</para>
+    ///     <para>
+    ///         This runs through all Scenarios defined in UI Catalog, calling Init, Setup, and Run and measuring the perf of
+    ///         each.
+    ///     </para>
     /// </summary>
     [Theory]
     [MemberData (nameof (AllScenarioTypes))]
@@ -47,23 +42,21 @@ public class ScenariosStressTests : TestsAllViews
 
         uint maxIterations = 1000;
         uint abortTime = 2000;
-        object timeout = null;
-        var initialized = false;
-        var shutdown = false;
+        object? timeout = null;
 
-        int iterationCount = 0;
-        int clearedContentCount = 0;
-        int refreshedCount = 0;
-        int updatedCount = 0;
-        int drawCompleteCount = 0;
+        var iterationCount = 0;
+        var clearedContentCount = 0;
+        var refreshedCount = 0;
+        var updatedCount = 0;
+        var drawCompleteCount = 0;
 
-        int addedCount = 0;
-        int laidOutCount = 0;
+        var addedCount = 0;
+        var laidOutCount = 0;
 
         _output.WriteLine ($"Running Scenario '{scenarioType}'");
-        var scenario = (Scenario)Activator.CreateInstance (scenarioType);
+        var scenario = (Scenario)Activator.CreateInstance (scenarioType)!;
 
-        Stopwatch stopwatch = null;
+        Stopwatch? stopwatch = null;
 
         Application.InitializedChanged += OnApplicationOnInitializedChanged;
         Application.ForceDriver = "FakeDriver";
@@ -87,7 +80,7 @@ public class ScenariosStressTests : TestsAllViews
         }
 
         _output.WriteLine ($"Scenario {scenarioType}");
-        _output.WriteLine ($"  took {stopwatch.ElapsedMilliseconds} ms to run.");
+        _output.WriteLine ($"  took {stopwatch!.ElapsedMilliseconds} ms to run.");
         _output.WriteLine ($"  called Driver.ClearContents {clearedContentCount} times.");
         _output.WriteLine ($"  called Driver.Refresh {refreshedCount} times.");
         _output.WriteLine ($"    which updated the screen {updatedCount} times.");
@@ -101,7 +94,7 @@ public class ScenariosStressTests : TestsAllViews
 
         return;
 
-        void OnApplicationOnInitializedChanged (object s, EventArgs<bool> a)
+        void OnApplicationOnInitializedChanged (object? s, EventArgs<bool> a)
         {
             if (a.CurrentValue)
             {
@@ -110,21 +103,20 @@ public class ScenariosStressTests : TestsAllViews
                     timeout = Application.AddTimeout (TimeSpan.FromMilliseconds (abortTime), ForceCloseCallback);
                 }
 
-                initialized = true;
                 Application.Iteration += OnApplicationOnIteration;
                 Application.Driver!.ClearedContents += (sender, args) => clearedContentCount++;
 
                 if (Application.Driver is ConsoleDriver cd)
                 {
                     cd!.Refreshed += (sender, args) =>
-                    {
-                        refreshedCount++;
+                                     {
+                                         refreshedCount++;
 
-                        if (args.CurrentValue)
-                        {
-                            updatedCount++;
-                        }
-                    };
+                                         if (args.CurrentValue)
+                                         {
+                                             updatedCount++;
+                                         }
+                                     };
                 }
 
                 Application.NotifyNewRunState += OnApplicationNotifyNewRunState;
@@ -133,27 +125,27 @@ public class ScenariosStressTests : TestsAllViews
             }
             else
             {
-                shutdown = true;
                 Application.NotifyNewRunState -= OnApplicationNotifyNewRunState;
                 Application.Iteration -= OnApplicationOnIteration;
                 stopwatch!.Stop ();
             }
+
             _output.WriteLine ($"Initialized == {a.CurrentValue}");
         }
 
-        void OnApplicationOnIteration (object s, IterationEventArgs a)
+        void OnApplicationOnIteration (object? s, IterationEventArgs a)
         {
             iterationCount++;
+
             if (iterationCount > maxIterations)
             {
                 // Press QuitKey
-                _output.WriteLine ($"Attempting to quit scenario with RequestStop");
+                _output.WriteLine ("Attempting to quit scenario with RequestStop");
                 Application.RequestStop ();
             }
         }
 
-
-        void OnApplicationNotifyNewRunState (object sender, RunStateEventArgs e)
+        void OnApplicationNotifyNewRunState (object? sender, RunStateEventArgs e)
         {
             // Get a list of all subviews under Application.Top (and their subviews, etc.)
             // and subscribe to their DrawComplete event
@@ -162,13 +154,14 @@ public class ScenariosStressTests : TestsAllViews
                 view.DrawComplete += (s, a) => drawCompleteCount++;
                 view.SubviewsLaidOut += (s, a) => laidOutCount++;
                 view.Added += (s, a) => addedCount++;
+
                 foreach (View subview in view.Subviews)
                 {
                     SubscribeAllSubviews (subview);
                 }
             }
 
-            SubscribeAllSubviews (Application.Top);
+            SubscribeAllSubviews (Application.Top!);
         }
 
         // If the scenario doesn't close within the abort time, this will force it to quit
@@ -183,7 +176,7 @@ public class ScenariosStressTests : TestsAllViews
             }
 
             _output.WriteLine (
-                         $"'{scenario.GetName ()}' failed to Quit with {Application.QuitKey} after {abortTime}ms and {iterationCount} iterations. Force quit.");
+                               $"'{scenario!.GetName ()}' failed to Quit with {Application.QuitKey} after {abortTime}ms and {iterationCount} iterations. Force quit.");
 
             Application.RequestStop ();
 
@@ -191,4 +184,9 @@ public class ScenariosStressTests : TestsAllViews
         }
     }
 
+    public static IEnumerable<object []> AllScenarioTypes =>
+        typeof (Scenario).Assembly
+                         .GetTypes ()
+                         .Where (type => type.IsClass && !type.IsAbstract && type.IsSubclassOf (typeof (Scenario)))
+                         .Select (type => new object [] { type });
 }

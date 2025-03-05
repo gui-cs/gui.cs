@@ -3,7 +3,7 @@ using static Terminal.Gui.Pos;
 
 namespace Terminal.Gui.LayoutTests;
 
-public class PosAnchorEndTests (ITestOutputHelper output)
+public class PosAnchorEndTests ()
 {
     [Fact]
     public void PosAnchorEnd_Constructor ()

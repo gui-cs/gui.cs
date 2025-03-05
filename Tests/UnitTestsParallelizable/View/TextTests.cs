@@ -7,7 +7,7 @@ namespace Terminal.Gui.ViewTests;
 /// <summary>
 ///     Tests of the <see cref="View.Text"/> and <see cref="View.TextFormatter"/> properties.
 /// </summary>
-public class TextTests (ITestOutputHelper output)
+public class TextTests ()
 {
     // TextFormatter.Size should be empty unless DimAuto is set or ContentSize is set
     [Theory]
