@@ -38,7 +38,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DefineDebug>true</DefineDebug>
-    <DefineConstants>$(DefineConstants);DEBUG_IDISPOSABLE</DefineConstants>
+    <DefineConstants Condition="'$(DefineConstants)' != 'DISABLE_DEBUG_IDISPOSABLE'">$(DefineConstants);DEBUG_IDISPOSABLE</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <Optimize>true</Optimize>
