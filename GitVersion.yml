@@ -1,10 +1,9 @@
-mode: ContinuousDeployment
+workflow: GitFlow/v1
 tag-prefix: '[vV]'
-continuous-delivery-fallback-tag: dev
 branches:
   develop:
     mode: ContinuousDeployment
-    tag: develop
+    label: develop
     regex: v2_develop
     tracks-release-branches: true
     is-source-branch-for: ['main']
@@ -12,14 +11,14 @@ branches:
 
   main:
     mode: ContinuousDeployment
-    tag: prealpha
+    label: prealpha
     regex: v2_release
     is-release-branch: true
     source-branches: ['develop']
 
   v1_develop:
     mode: ContinuousDeployment
-    tag: v1_develop
+    label: v1_develop
     regex: v1_develop
     source-branches:
     - v1_release
@@ -33,9 +32,9 @@ branches:
 
   pull-request:
     mode: ContinuousDeployment
-    tag: PullRequest.{BranchName}
+    label: PullRequest.{BranchName}
     increment: Inherit
-    tag-number-pattern: '[/-](?<number>\d+)'
+    label-number-pattern: '[/-](?<number>\d+)'
     regex: ^(pull|pull\-requests|pr)[/-]
     source-branches:
     - develop
@@ -56,13 +55,13 @@ ignore:
 # branches:
 #   # v1_develop:
 #   #   mode: ContinuousDeployment
-#   #   tag: pre
+#   #   label: pre
 #   #   regex: ^v1_develop?[/-]
 #   #   is-release-branch: false
 #   #   source-branches:
 #   #   - v1
 #   # v1:
-#   #   tag: rc
+#   #   label: rc
 #   #   increment: Patch
 #   #   regex: ^v2?[/-]
 #   #   is-release-branch: false
@@ -71,7 +70,7 @@ ignore:
 
 #   v2_develop:
 #     mode: ContinuousDeployment
-#     tag: pre
+#     label: pre
 #     regex: ^v2_develop?[/-]
 #     is-release-branch: true
 #     tracks-release-branches: true
@@ -80,13 +79,13 @@ ignore:
 #   v2:
 #     mode: ContinuousDeployment
 #     is-release-branch: false
-#     tag: alpha
+#     label: alpha
 #     increment: Patch
 #     regex: ^v2?[/-]
 #     source-branches: ['v2_develop']
 
 #   # feature:
-#   #   tag: useBranchName
+#   #   label: useBranchName
 #   #   regex: ^features?[/-]
 #   #   source-branches:
 #   #   - v1
@@ -95,7 +94,7 @@ ignore:
 #   #   - v2_develop
  
 #   pull-request:
-#     tag: PullRequest.{BranchName}
+#     label: PullRequest.{BranchName}
 #     increment: Inherit
 # ignore:
 #   sha: []
