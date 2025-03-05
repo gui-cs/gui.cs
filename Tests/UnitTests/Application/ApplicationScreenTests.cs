@@ -2,14 +2,20 @@
 
 namespace Terminal.Gui.ApplicationTests;
 
-public class ApplicationScreenTests (ITestOutputHelper output)
+public class ApplicationScreenTests
 {
+    public ApplicationScreenTests (ITestOutputHelper output)
+    {
+        ConsoleDriver.RunningUnitTests = true;
+    }
+
+
     [Fact]
     public void ClearScreenNextIteration_Resets_To_False_After_LayoutAndDraw ()
     {
         // Arrange
         Application.ResetState (true);
-        //Application.Init ();
+        Application.Init ();
 
         // Act
         Application.ClearScreenNextIteration = true;
