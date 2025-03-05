@@ -1,9 +1,9 @@
 name: Check Duplicate Test Methods
 on:
   push:
-    branches: [ v2-3952_Test_Failures-fix ]
+    branches: [ v2_release, v2_develop ]
   pull_request:
-    branches: [ v2-3952_Test_Failures-fix ]
+    branches: [ v2_release, v2_develop ]
   workflow_dispatch:
 jobs:
   check-duplicates:

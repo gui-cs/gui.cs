@@ -1,10 +1,16 @@
 # FindDuplicateTestMethodsInSameFileName.ps1
 param (
-    [string]$solutionPath = "."
+    [string]$solutionPath = ".\Tests"
 )
 
 # Set the base path for relative paths (current directory when script is run)
 $basePath = Get-Location
+
+# Define projects to ignore (add your project names or path patterns here)
+$ignoreProjects = @(
+    "StressTests"
+    # Add more as needed, e.g., "Tests/SubFolder/OldProject"
+)
 
 # Function to extract method names from a C# file
 function Get-TestMethodNames {
@@ -41,6 +47,16 @@ foreach ($group in $fileGroups) {
         $methodMap = @{} # Track methods for this specific filename
 
         foreach ($file in $group.Group) {
+            # Skip files in ignored projects
+            $skipFile = $false
+            foreach ($ignore in $ignoreProjects) {
+                if ($file.FullName -like "*$ignore*") {
+                    $skipFile = $true
+                    break
+                }
+            }
+            if ($skipFile) { continue }
+
             $methods = Get-TestMethodNames -filePath $file.FullName
             foreach ($method in $methods) {
                 if ($methodMap.ContainsKey($method)) {
