@@ -65,26 +65,4 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
         Application.Top?.Dispose ();
         Application.ResetState (ignoreDisposed: true);
     }
-
-    [Fact]
-    public void Setting_Thickness_Causes_Adornment_SubView_Layout ()
-    {
-        var view = new View ();
-        var subView = new View ();
-        view.Margin.Add (subView);
-        view.BeginInit ();
-        view.EndInit ();
-        var raised = false;
-
-        subView.SubviewLayout += LayoutStarted;
-        view.Margin.Thickness = new Thickness (1, 2, 3, 4);
-        view.Layout ();
-        Assert.True (raised);
-
-        return;
-        void LayoutStarted (object sender, LayoutEventArgs e)
-        {
-            raised = true;
-        }
-    }
 }

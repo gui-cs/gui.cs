@@ -1,13 +1,9 @@
-﻿using UnitTests;
-using Xunit.Abstractions;
-using static Terminal.Gui.Dim;
+﻿using static Terminal.Gui.Dim;
 
 namespace Terminal.Gui.LayoutTests;
 
-public class DimViewTests (ITestOutputHelper output)
+public class DimViewTests
 {
-    private readonly ITestOutputHelper _output = output;
-
     [Fact]
     public void DimView_Equal ()
     {
@@ -25,14 +21,13 @@ public class DimViewTests (ITestOutputHelper output)
         Assert.NotEqual (dim1, dim2);
     }
 
-
     [Fact]
     public void DimView_Calculate_ReturnsCorrectValue ()
     {
         var view = new View { Width = 10 };
         view.Layout ();
         var dim = new DimView (view, Dimension.Width);
-        var result = dim.Calculate (0, 100, null, Dimension.None);
+        int result = dim.Calculate (0, 100, null, Dimension.None);
         Assert.Equal (10, result);
     }
 
@@ -45,8 +40,8 @@ public class DimViewTests (ITestOutputHelper output)
 
         var view = new View
         {
-            Width = Dim.Width (super), // this is allowed
-            Height = Dim.Height (super), // this is allowed
+            Width = Width (super), // this is allowed
+            Height = Height (super), // this is allowed
             Text = "view"
         };
 
