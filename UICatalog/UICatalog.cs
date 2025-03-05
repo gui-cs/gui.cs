@@ -1356,7 +1356,7 @@ public class UICatalogApp
                                //CanExecute = () => false
                            });
 
-            return menuItems.ToArray ();
+            return menuItems.ToArray ()!;
         }
 
         // TODO: This should be an ConfigurationManager setting

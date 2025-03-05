@@ -1,6 +1,5 @@
-﻿using System.Text;
-using System.Timers;
-using Terminal.Gui;
+﻿using Terminal.Gui;
+using Timer = System.Timers.Timer;
 
 namespace UICatalog.Scenarios;
 
@@ -20,21 +19,22 @@ public class Clipping : Scenario
 
         Window app = new ()
         {
-            Title = GetQuitKeyAndName (),
+            Title = GetQuitKeyAndName ()
+
             //BorderStyle = LineStyle.None
         };
 
         app.DrawingContent += (s, e) =>
-                           {
-                               app!.FillRect (app!.Viewport, Glyphs.Dot);
-                               e.Cancel = true;
-                           };
+                              {
+                                  app!.FillRect (app!.Viewport, Glyphs.Dot);
+                                  e.Cancel = true;
+                              };
 
-        var arrangementEditor = new ArrangementEditor ()
+        var arrangementEditor = new ArrangementEditor
         {
             X = Pos.AnchorEnd (),
             Y = 0,
-            AutoSelectViewToEdit = true,
+            AutoSelectViewToEdit = true
         };
         app.Add (arrangementEditor);
 
@@ -48,7 +48,7 @@ public class Clipping : Scenario
             Y = Pos.AnchorEnd (),
             Width = Dim.Fill (),
             Id = "tiledProgressBar",
-            BidirectionalMarquee = true,
+            BidirectionalMarquee = true
         };
         tiledView1.Add (tiledProgressBar1);
 
@@ -62,6 +62,7 @@ public class Clipping : Scenario
             Id = "tiledProgressBar",
             BidirectionalMarquee = true,
             ProgressBarStyle = ProgressBarStyle.MarqueeBlocks
+
             // BorderStyle = LineStyle.Rounded
         };
         tiledView2.Add (tiledProgressBar2);
@@ -84,7 +85,6 @@ public class Clipping : Scenario
         //};
         //overlappedView1.Add (progressBar);
 
-
         //View overlappedView2 = CreateOverlappedView (2, 32, 4);
         //View overlappedView3 = CreateOverlappedView (3, 34, 6);
 
@@ -92,7 +92,7 @@ public class Clipping : Scenario
         //app.Add (overlappedView2);
         //app.Add (overlappedView3);
 
-        Timer progressTimer = new Timer (150)
+        var progressTimer = new Timer (150)
         {
             AutoReset = true
         };
@@ -109,8 +109,6 @@ public class Clipping : Scenario
         progressTimer.Stop ();
         app.Dispose ();
         Application.Shutdown ();
-
-        return;
     }
 
     private View CreateOverlappedView (int id, Pos x, Pos y)
@@ -130,6 +128,7 @@ public class Clipping : Scenario
             TabStop = TabBehavior.TabGroup,
             Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped | ViewArrangement.Resizable
         };
+
         return overlapped;
     }
 
@@ -148,8 +147,9 @@ public class Clipping : Scenario
             CanFocus = true, // Can't drag without this? BUGBUG
             TabStop = TabBehavior.TabStop,
             Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
-            ShadowStyle = ShadowStyle.Transparent,
+            ShadowStyle = ShadowStyle.Transparent
         };
+
         //tiled.Padding.Thickness = new (1);
         //tiled.Padding.Diagnostics =  ViewDiagnosticFlags.Thickness;
 
@@ -159,7 +159,7 @@ public class Clipping : Scenario
         {
             Title = "FrameView",
             Width = 15,
-            Height = 3,
+            Height = 3
         };
         tiled.Add (fv);
 
