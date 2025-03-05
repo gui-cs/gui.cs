@@ -173,6 +173,7 @@ public static partial class Application
         MainThreadId = -1;
         Iteration = null;
         EndAfterFirstIteration = false;
+        ClearScreenNextIteration = false;
 
         // Driver stuff
         if (Driver is { })
@@ -212,7 +213,6 @@ public static partial class Application
 
         Navigation = null;
 
-        ClearScreenNextIteration = false;
 
         KeyBindings.Clear ();
         AddKeyBindings ();
