@@ -180,9 +180,6 @@ public class KeyTests
     [InlineData ('!', (KeyCode)'!')]
     [InlineData ('\r', KeyCode.Enter)]
     [InlineData ('\t', KeyCode.Tab)]
-#pragma warning disable xUnit1025 // InlineData should be unique within the Theory it belongs to
-    [InlineData ('\r', (KeyCode)13)]
-#pragma warning restore xUnit1025 // InlineData should be unique within the Theory it belongs to
     [InlineData ('\n', (KeyCode)10)]
     [InlineData ('ó', (KeyCode)'ó')]
     [InlineData ('Ó', (KeyCode)'Ó')]
@@ -412,15 +409,6 @@ public class KeyTests
     [InlineData (KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.Null, "Alt+Shift")]
     [InlineData (KeyCode.AltMask | KeyCode.CtrlMask | KeyCode.Null, "Ctrl+Alt")]
     [InlineData (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask | KeyCode.Null, "Ctrl+Alt+Shift")]
-#pragma warning disable xUnit1025 // InlineData should be unique within the Theory it belongs to
-    [InlineData (KeyCode.ShiftMask, "Shift")]
-    [InlineData (KeyCode.CtrlMask, "Ctrl")]
-    [InlineData (KeyCode.AltMask, "Alt")]
-    [InlineData (KeyCode.ShiftMask | KeyCode.CtrlMask, "Ctrl+Shift")]
-    [InlineData (KeyCode.ShiftMask | KeyCode.AltMask, "Alt+Shift")]
-    [InlineData (KeyCode.AltMask | KeyCode.CtrlMask, "Ctrl+Alt")]
-    [InlineData (KeyCode.ShiftMask | KeyCode.CtrlMask | KeyCode.AltMask, "Ctrl+Alt+Shift")]
-#pragma warning restore xUnit1025 // InlineData should be unique within the Theory it belongs to
     [InlineData (KeyCode.CharMask, "CharMask")]
     [InlineData (KeyCode.SpecialMask, "Ctrl+Alt+Shift")]
     [InlineData ((KeyCode)'+', "+")]

@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.IO;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
@@ -21,27 +20,10 @@ public class MainLoopTests
     // - wait = false
 
     // TODO: Add IMainLoop tests
-    private static volatile int tbCounter;
     private static int three;
     private static int total;
     private static int two;
     private static int zero;
-
-    public static IEnumerable<object []> TestAddIdle
-    {
-        get
-        {
-            // Goes fine
-            Action a1 = StartWindow;
-
-            yield return new object [] { a1, "Click Me", "Cancel", "Pew Pew", 0, 1, 2, 3, 4 };
-
-            // Also goes fine
-            Action a2 = () => Application.Invoke (StartWindow);
-
-            yield return new object [] { a2, "Click Me", "Cancel", "Pew Pew", 0, 1, 2, 3, 4 };
-        }
-    }
 
     // See Also ConsoleDRivers/MainLoopDriverTests.cs for tests of the MainLoopDriver
 
@@ -59,7 +41,7 @@ public class MainLoopTests
 
         Assert.Equal (2, ml.TimedEvents.IdleHandlers.Count);
         Assert.Equal (fnTrue, ml.TimedEvents.IdleHandlers [0]);
-        Assert.NotEqual (fnFalse, ml.TimedEvents.IdleHandlers[0]);
+        Assert.NotEqual (fnFalse, ml.TimedEvents.IdleHandlers [0]);
 
         Assert.True (ml.TimedEvents.RemoveIdle (fnTrue));
         Assert.Single (ml.TimedEvents.IdleHandlers);
@@ -81,15 +63,15 @@ public class MainLoopTests
         ml.AddIdle (fnTrue);
 
         Assert.Equal (2, ml.TimedEvents.IdleHandlers.Count);
-        Assert.Equal (fnTrue, ml.TimedEvents.IdleHandlers[0]);
-        Assert.True (ml.TimedEvents.IdleHandlers[0] ());
-        Assert.Equal (fnTrue, ml.TimedEvents.IdleHandlers[1]);
-        Assert.True (ml.TimedEvents.IdleHandlers[1] ());
+        Assert.Equal (fnTrue, ml.TimedEvents.IdleHandlers [0]);
+        Assert.True (ml.TimedEvents.IdleHandlers [0] ());
+        Assert.Equal (fnTrue, ml.TimedEvents.IdleHandlers [1]);
+        Assert.True (ml.TimedEvents.IdleHandlers [1] ());
 
         Assert.True (ml.TimedEvents.RemoveIdle (fnTrue));
         Assert.Single (ml.TimedEvents.IdleHandlers);
-        Assert.Equal (fnTrue, ml.TimedEvents.IdleHandlers[0]);
-        Assert.NotEqual (fnFalse, ml.TimedEvents.IdleHandlers[0]);
+        Assert.Equal (fnTrue, ml.TimedEvents.IdleHandlers [0]);
+        Assert.NotEqual (fnFalse, ml.TimedEvents.IdleHandlers [0]);
 
         Assert.True (ml.TimedEvents.RemoveIdle (fnTrue));
         Assert.Empty (ml.TimedEvents.IdleHandlers);
@@ -297,10 +279,10 @@ public class MainLoopTests
         TimeoutEventArgs args = null;
 
         ml.TimedEvents.TimeoutAdded += (s, e) =>
-                           {
-                               sender = s;
-                               args = e;
-                           };
+                                       {
+                                           sender = s;
+                                           args = e;
+                                       };
 
         object token = ml.TimedEvents.AddTimeout (TimeSpan.FromMilliseconds (ms), callback);
 
@@ -615,10 +597,9 @@ public class MainLoopTests
         Assert.Empty (mainloop.TimedEvents.IdleHandlers);
 
         Assert.NotNull (
-                        new Timeout { Span = new TimeSpan (), Callback = () => true }
+                        new Timeout { Span = new (), Callback = () => true }
                        );
     }
-
 
     [Theory]
     [MemberData (nameof (TestAddIdle))]
@@ -635,7 +616,7 @@ public class MainLoopTests
     )
     {
         // TODO: Expand this test to test all drivers
-        Application.Init (new FakeDriver());
+        Application.Init (new FakeDriver ());
 
         total = 0;
         btn = null;
@@ -748,6 +729,21 @@ public class MainLoopTests
         Assert.Equal (10, functionCalled);
     }
 
+    public static IEnumerable<object []> TestAddIdle
+    {
+        get
+        {
+            // Goes fine
+            Action a1 = StartWindow;
+
+            yield return new object [] { a1, "Click Me", "Cancel", "Pew Pew", 0, 1, 2, 3, 4 };
+
+            // Also goes fine
+            Action a2 = () => Application.Invoke (StartWindow);
+
+            yield return new object [] { a2, "Click Me", "Cancel", "Pew Pew", 0, 1, 2, 3, 4 };
+        }
+    }
 
     private static async void RunAsyncTest (object sender, EventArgs e)
     {
@@ -828,7 +824,7 @@ public class MainLoopTests
     {
         var startWindow = new Window { Modal = true };
 
-        btn = new Button { Text = "Click Me" };
+        btn = new() { Text = "Click Me" };
 
         btn.Accepting += RunAsyncTest;
 
@@ -849,8 +845,8 @@ public class MainLoopTests
 
     private class MillisecondTolerance : IEqualityComparer<TimeSpan>
     {
-        private readonly int _tolerance;
         public MillisecondTolerance (int tolerance) { _tolerance = tolerance; }
+        private readonly int _tolerance;
         public bool Equals (TimeSpan x, TimeSpan y) { return Math.Abs (x.Milliseconds - y.Milliseconds) <= _tolerance; }
         public int GetHashCode (TimeSpan obj) { return obj.GetHashCode (); }
     }

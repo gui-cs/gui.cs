@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using UnitTests;
-using UnitTests;
 using Xunit.Abstractions;
+
 // ReSharper disable AccessToModifiedClosure
 
 namespace Terminal.Gui.ViewsTests;
@@ -144,8 +144,6 @@ public class CheckBoxTests (ITestOutputHelper output)
         Assert.Equal (new (3, 4, 6, 1), ckb.Frame);
     }
 
-
-
     [Fact]
     [SetupFakeDriver]
     public void AllowCheckStateNone_Get_Set ()
@@ -176,21 +174,21 @@ public class CheckBoxTests (ITestOutputHelper output)
     [Fact]
     public void Commands_Select ()
     {
-        Application.Navigation = new ApplicationNavigation ();
-        Application.Top = new Toplevel ();
+        Application.Navigation = new ();
+        Application.Top = new ();
         View otherView = new () { CanFocus = true };
         var ckb = new CheckBox ();
         Application.Top.Add (ckb, otherView);
         Application.Top.SetFocus ();
         Assert.True (ckb.HasFocus);
 
-        int checkedStateChangingCount = 0;
+        var checkedStateChangingCount = 0;
         ckb.CheckedStateChanging += (s, e) => checkedStateChangingCount++;
 
-        int selectCount = 0;
+        var selectCount = 0;
         ckb.Selecting += (s, e) => selectCount++;
 
-        int acceptCount = 0;
+        var acceptCount = 0;
         ckb.Accepting += (s, e) => acceptCount++;
 
         Assert.Equal (CheckState.UnChecked, ckb.CheckedState);
@@ -226,7 +224,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         Assert.Equal (1, acceptCount);
 
         Application.Top.Dispose ();
-        Application.ResetState (false);
+        Application.ResetState ();
     }
 
     [Fact]
@@ -259,13 +257,13 @@ public class CheckBoxTests (ITestOutputHelper output)
         var checkBox = new CheckBox { Text = "_Checkbox" };
         Assert.True (checkBox.CanFocus);
 
-        int checkedStateChangingCount = 0;
+        var checkedStateChangingCount = 0;
         checkBox.CheckedStateChanging += (s, e) => checkedStateChangingCount++;
 
-        int selectCount = 0;
+        var selectCount = 0;
         checkBox.Selecting += (s, e) => selectCount++;
 
-        int acceptCount = 0;
+        var acceptCount = 0;
         checkBox.Accepting += (s, e) => acceptCount++;
 
         checkBox.HasFocus = true;
@@ -295,7 +293,6 @@ public class CheckBoxTests (ITestOutputHelper output)
         Assert.Equal (0, acceptCount);
     }
 
-
     [Fact]
     [SetupFakeDriver]
     public void Mouse_DoubleClick_Accepts ()
@@ -303,13 +300,14 @@ public class CheckBoxTests (ITestOutputHelper output)
         var checkBox = new CheckBox { Text = "_Checkbox" };
         Assert.True (checkBox.CanFocus);
 
-        int checkedStateChangingCount = 0;
+        var checkedStateChangingCount = 0;
         checkBox.CheckedStateChanging += (s, e) => checkedStateChangingCount++;
 
-        int selectCount = 0;
+        var selectCount = 0;
         checkBox.Selecting += (s, e) => selectCount++;
 
-        int acceptCount = 0;
+        var acceptCount = 0;
+
         checkBox.Accepting += (s, e) =>
                               {
                                   acceptCount++;
@@ -329,7 +327,6 @@ public class CheckBoxTests (ITestOutputHelper output)
         Assert.Equal (0, checkedStateChangingCount);
         Assert.Equal (0, selectCount);
         Assert.Equal (1, acceptCount);
-
     }
 
     #endregion Mouse Tests
@@ -573,7 +570,6 @@ public class CheckBoxTests (ITestOutputHelper output)
         void CheckBoxOnAccept (object sender, CommandEventArgs e) { accepted = true; }
     }
 
-
     [Theory]
     [InlineData (CheckState.Checked)]
     [InlineData (CheckState.UnChecked)]
@@ -616,6 +612,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         ckb.CheckedStateChanging += OnCheckedStateChanging;
 
         Assert.Equal (initialState, ckb.CheckedState);
+
         // AdvanceCheckState returns false if the state was changed, true if it was cancelled, null if it was not changed
         bool? ret = ckb.AdvanceCheckState ();
         Assert.True (ret);

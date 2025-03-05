@@ -128,7 +128,6 @@ public static partial class ColorTestsTheoryDataGenerators
             int expectedRgba = BinaryPrimitives.ReadInt32LittleEndian ([(byte)(i + 16), i, (byte)(i - 16), i]);
             values.Add ($"rgb({i - 16:D},{i:D},{i + 16:D})", expectedRgb);
             values.Add ($"rgb({i - 16:D},{i:D},{i + 16:D},{i:D})", expectedRgba);
-            values.Add ($"rgb({i - 16:D},{i:D},{i + 16:D})", expectedRgb);
             values.Add ($"rgba({i - 16:D},{i:D},{i + 16:D},{i:D})", expectedRgba);
             values.Add ($"#{i - 16:X2}{i:X2}{i + 16:X2}", expectedRgb);
             values.Add ($"#{i:X2}{i - 16:X2}{i:X2}{i + 16:X2}", expectedRgba);
@@ -164,5 +163,6 @@ public static partial class ColorTestsTheoryDataGenerators
         }
 
         return values;
+
     }
 }
