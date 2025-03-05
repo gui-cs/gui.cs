@@ -9,7 +9,7 @@ public class ApplicationScreenTests (ITestOutputHelper output)
     {
         // Arrange
         Application.ResetState (true);
-        Application.Init ();
+        //Application.Init ();
 
         // Act
         Application.ClearScreenNextIteration = true;
