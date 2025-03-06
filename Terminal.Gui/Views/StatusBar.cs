@@ -57,21 +57,16 @@ public class StatusBar : Bar, IDesignable
     }
 
     /// <inheritdoc/>
-    public override View Add (View view)
+    protected override void OnSubViewAdded (View subView)
     {
-        // Call base first, because otherwise it resets CanFocus to true
-        base.Add (view);
+        subView.CanFocus = false;
 
-        view.CanFocus = false;
-
-        if (view is Shortcut shortcut)
+        if (subView is Shortcut shortcut)
         {
             // TODO: not happy about using AlignmentModes for this. Too implied.
             // TODO: instead, add a property (a style enum?) to Shortcut to control this
             shortcut.AlignmentModes = AlignmentModes.EndToStart;
         }
-
-        return view;
     }
 
     /// <inheritdoc />

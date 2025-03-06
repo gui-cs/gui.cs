@@ -205,11 +205,7 @@ internal class KeyBindingsDialog : Dialog
                 RecordView (sub);
             }
 
-            // TODO: BUG: Based on my new understanding of Added event I think this is wrong
-            // (and always was wrong). Parents don't get to be told when new views are added
-            // to them
-
-            view.Added += (s, e) => RecordView (e.SubView);
+            view.SubViewAdded += (s, e) => RecordView (e.SubView);
         }
     }
 }

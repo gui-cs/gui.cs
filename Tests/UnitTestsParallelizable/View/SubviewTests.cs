@@ -3,30 +3,65 @@
 public class SubviewTests
 {
     [Fact]
-    public void Added_Removed ()
+    public void IsAddedChanged_Raised_On_Add ()
     {
-        var v = new View { Frame = new (0, 0, 10, 24) };
-        var t = new View ();
+        var super = new View { };
+        var sub = new View ();
 
-        v.Added += (s, e) =>
-                   {
-                       Assert.Same (v.SuperView, e.SuperView);
-                       Assert.Same (t, e.SuperView);
-                       Assert.Same (v, e.SubView);
-                   };
+        int superRaisedCount = 0;
+        int subRaisedCount = 0;
 
-        v.Removed += (s, e) =>
-                     {
-                         Assert.Same (t, e.SuperView);
-                         Assert.Same (v, e.SubView);
-                         Assert.True (v.SuperView == null);
-                     };
+        super.IsAddedChanged += (s, e) =>
+                              {
+                                    superRaisedCount++;
+                              };
+        sub.IsAddedChanged += (s, e) =>
+                                {
+                                    if (e.CurrentValue)
+                                    {
+                                        subRaisedCount++;
+                                    }
+                                };
 
-        t.Add (v);
-        Assert.True (t.Subviews.Count == 1);
+        super.Add (sub);
+        Assert.True (super.Subviews.Count == 1);
+        Assert.True (sub.IsAdded);
+        Assert.Equal (0, superRaisedCount);
+        Assert.Equal (1, subRaisedCount);
+    }
 
-        t.Remove (v);
-        Assert.True (t.Subviews.Count == 0);
+    [Fact]
+    public void IsAddedChanged_Raised_On_Remove ()
+    {
+        var super = new View { };
+        var sub = new View ();
+
+        int superRaisedCount = 0;
+        int subRaisedCount = 0;
+
+        super.IsAddedChanged += (s, e) =>
+                                {
+                                    superRaisedCount++;
+                                };
+        sub.IsAddedChanged += (s, e) =>
+                              {
+                                  if (!e.CurrentValue)
+                                  {
+                                      subRaisedCount++;
+                                  }
+                              };
+
+        super.Add (sub);
+        Assert.True (super.Subviews.Count == 1);
+        Assert.True (sub.IsAdded);
+        Assert.Equal (0, superRaisedCount);
+        Assert.Equal (0, subRaisedCount);
+
+        super.Remove (sub);
+        Assert.Empty (super.Subviews);
+        Assert.False (sub.IsAdded);
+        Assert.Equal (0, superRaisedCount);
+        Assert.Equal (1, subRaisedCount);
     }
 
     [Fact]
@@ -379,29 +414,29 @@ public class SubviewTests
 
         int tc = 0, wc = 0, v1c = 0, v2c = 0, sv1c = 0;
 
-        winAddedToTop.Added += (s, e) =>
+        winAddedToTop.SubViewAdded += (s, e) =>
         {
             Assert.Equal (e.SuperView.Frame.Width, winAddedToTop.Frame.Width);
             Assert.Equal (e.SuperView.Frame.Height, winAddedToTop.Frame.Height);
         };
 
-        v1AddedToWin.Added += (s, e) =>
-        {
-            Assert.Equal (e.SuperView.Frame.Width, v1AddedToWin.Frame.Width);
-            Assert.Equal (e.SuperView.Frame.Height, v1AddedToWin.Frame.Height);
-        };
+        v1AddedToWin.SubViewAdded += (s, e) =>
+                                     {
+                                         Assert.Equal (e.SuperView.Frame.Width, v1AddedToWin.Frame.Width);
+                                         Assert.Equal (e.SuperView.Frame.Height, v1AddedToWin.Frame.Height);
+                                     };
 
-        v2AddedToWin.Added += (s, e) =>
-        {
-            Assert.Equal (e.SuperView.Frame.Width, v2AddedToWin.Frame.Width);
-            Assert.Equal (e.SuperView.Frame.Height, v2AddedToWin.Frame.Height);
-        };
+        v2AddedToWin.SubViewAdded += (s, e) =>
+                                     {
+                                         Assert.Equal (e.SuperView.Frame.Width, v2AddedToWin.Frame.Width);
+                                         Assert.Equal (e.SuperView.Frame.Height, v2AddedToWin.Frame.Height);
+                                     };
 
-        svAddedTov1.Added += (s, e) =>
-        {
-            Assert.Equal (e.SuperView.Frame.Width, svAddedTov1.Frame.Width);
-            Assert.Equal (e.SuperView.Frame.Height, svAddedTov1.Frame.Height);
-        };
+        svAddedTov1.SubViewAdded += (s, e) =>
+                                    {
+                                        Assert.Equal (e.SuperView.Frame.Width, svAddedTov1.Frame.Width);
+                                        Assert.Equal (e.SuperView.Frame.Height, svAddedTov1.Frame.Height);
+                                    };
 
         top.Initialized += (s, e) =>
         {

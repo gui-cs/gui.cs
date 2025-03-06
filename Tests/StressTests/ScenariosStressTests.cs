@@ -154,7 +154,7 @@ public class ScenariosStressTests : TestsAllViews
             {
                 view.DrawComplete += (s, a) => drawCompleteCount++;
                 view.SubviewsLaidOut += (s, a) => laidOutCount++;
-                view.Added += (s, a) => addedCount++;
+                view.IsAddedChanged += (s, a) => addedCount++;
 
                 foreach (View subview in view.Subviews)
                 {

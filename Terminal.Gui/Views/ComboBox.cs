@@ -59,7 +59,7 @@ public class ComboBox : View, IDesignable
         // On resize
         SubviewsLaidOut += (sender, a) => ProcessLayout ();
 
-        Added += (s, e) =>
+        IsAddedChanged += (s, e) =>
                  {
                      // Determine if this view is hosted inside a dialog and is the only control
                      for (View view = SuperView; view != null; view = view.SuperView)

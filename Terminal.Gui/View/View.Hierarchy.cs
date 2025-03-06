@@ -1,6 +1,7 @@
 #nullable enable
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using Unix.Terminal;
 
 namespace Terminal.Gui;
 
@@ -32,9 +33,40 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
 
     #region AddRemove
 
-    /// <summary>Indicates whether the view was added to <see cref="SuperView"/>.</summary>
-    public bool IsAdded { get; private set; }
+    private bool _isAdded;
 
+    /// <summary>Indicates whether the view was added to <see cref="SuperView"/>.</summary>
+    public bool IsAdded
+    {
+        get => _isAdded;
+        private set
+        {
+            if (_isAdded == value)
+            {
+                return;
+            }
+            _isAdded = value;
+            RaiseIsAddedChanged ();
+        }
+    }
+
+    internal void RaiseIsAddedChanged ()
+    {
+        // Tell subclasses that a subview has been added
+        EventArgs<bool> args = new EventArgs<bool> (IsAdded);
+        OnIsAddedChanged (args);
+
+        IsAddedChanged?.Invoke (this, args);
+    }
+
+    /// <summary>Raised when this View has been added to a SuperView.</summary>
+    public event EventHandler<EventArgs<bool>>? IsAddedChanged;
+
+    /// <summary>Method invoked when a Subview has been added to this view.</summary>
+    /// <param name="newValue">The new value of IsAdded</param>
+    protected virtual void OnIsAddedChanged (EventArgs<bool> newValue)
+    {
+    }
     /// <summary>Adds a Subview (child) to this view.</summary>
     /// <remarks>
     ///     <para>
@@ -44,6 +76,9 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     ///     <para>
     ///         Subviews will be disposed when this View is disposed. In other-words, calling this method causes
     ///         the lifecycle of the subviews to be transferred to this View.
+    ///     </para>
+    ///     <para>
+    ///         Calls/Raises the <see cref="OnSubViewAdded"/>/<see cref="SubViewAdded"/> event.
     ///     </para>
     /// </remarks>
     /// <param name="view">The view to add.</param>
@@ -59,13 +94,17 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             _subviews = [];
         }
 
+        Debug.WriteLineIf (view.IsAdded, $"WARNING: {view} already has IsAdded == true.");
         Debug.WriteLineIf (_subviews.Contains (view), $"WARNING: {view} has already been added to {this}.");
 
         // TileView likes to add views that were previously added and have HasFocus = true. No bueno.
         view.HasFocus = false;
 
+        // TODO: Make this thread safe
         _subviews.Add (view);
         view._superView = this;
+        // This causes IsAddedChanged to be raised on view
+        view.IsAdded = true;
 
         if (view is { Enabled: true, Visible: true, CanFocus: true })
         {
@@ -81,7 +120,9 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             view.Enabled = false;
         }
 
-        OnAdded (new (this, view));
+        // Raise event indicating a subview has been added
+        // We do this before Init.
+        RaiseSubViewAdded (view);
 
         if (IsInitialized && !view.IsInitialized)
         {
@@ -120,27 +161,29 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         }
     }
 
-    // TODO: Make these events follow the standard pattern
+    internal void RaiseSubViewAdded (View view)
+    {
+        OnSubViewAdded (view);
+        SubViewAdded?.Invoke (this, new SuperViewChangedEventArgs (this, view));
+    }
+
+    /// <summary>
+    /// Called when a Subview has been added to this View.
+    /// </summary>
+    /// <remarks>
+    ///     If the Subview has not been initialized, this happens before BeginInit/EndInit is called.
+    /// </remarks>
+    /// <param name="view"></param>
+    protected virtual void OnSubViewAdded (View view)
+    {
+    }
+
     /// <summary>Raised when a Subview has been added to this View.</summary>
-    public event EventHandler<SuperViewChangedEventArgs>? Added;
+    /// <remarks>
+    ///     If the Subview has not been initialized, this happens before BeginInit/EndInit is called.
+    /// </remarks>
+    public event EventHandler<SuperViewChangedEventArgs>? SubViewAdded;
 
-    /// <summary>Method invoked when a Subview has been added to this view.</summary>
-    /// <param name="e">Event where <see cref="ViewEventArgs.View"/> is the subview being added.</param>
-    protected virtual void OnAdded (SuperViewChangedEventArgs e)
-    {
-        View view = e.SubView;
-        view.IsAdded = true;
-        view.Added?.Invoke (this, e);
-    }
-
-    /// <summary>Method invoked when a Subview is being removed from this view.</summary>
-    /// <param name="e">Event args describing the subview being removed.</param>
-    protected virtual void OnRemoved (SuperViewChangedEventArgs e)
-    {
-        View view = e.SubView;
-        view.IsAdded = false;
-        view.Removed?.Invoke (this, e);
-    }
 
     /// <summary>Removes a Subview added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.</summary>
     /// <remarks>
@@ -148,6 +191,9 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     ///         Normally Subviews will be disposed when this View is disposed. Removing a Subview causes ownership of the
     ///         Subview's
     ///         lifecycle to be transferred to the caller; the caller must call <see cref="Dispose()"/>.
+    ///     </para>
+    ///     <para>
+    ///         Calls/Raises the <see cref="OnSubViewRemoved"/>/<see cref="SubViewRemoved"/> event.
     ///     </para>
     /// </remarks>
     /// <returns>
@@ -164,6 +210,9 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         {
             return view;
         }
+
+        Debug.WriteLineIf (!view.IsAdded, $"WARNING: {view} already has IsAdded == false.");
+        Debug.WriteLineIf (!_subviews.Contains (view), $"WARNING: {view} has not been added to {this}.");
 
         Rectangle touched = view.Frame;
 
@@ -186,6 +235,9 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         }
         view._superView = null;
 
+        // This causes IsAddedChanged to be raised on view
+        view.IsAdded = false;
+
         SetNeedsLayout ();
         SetNeedsDraw ();
 
@@ -204,10 +256,27 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             _previouslyFocused = null;
         }
 
-        OnRemoved (new (this, view));
+        RaiseSubViewRemoved (view);
 
         return view;
     }
+
+    internal void RaiseSubViewRemoved (View view)
+    {
+        OnSubViewRemoved (view);
+        SubViewRemoved?.Invoke (this, new SuperViewChangedEventArgs (this, view));
+    }
+
+    /// <summary>
+    /// Called when a Subview has been removed from this View.
+    /// </summary>
+    /// <param name="view"></param>
+    protected virtual void OnSubViewRemoved (View view)
+    {
+    }
+
+    /// <summary>Raised when a Subview has been added to this View.</summary>
+    public event EventHandler<SuperViewChangedEventArgs>? SubViewRemoved;
 
     /// <summary>
     ///     Removes all Subview (children) added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.

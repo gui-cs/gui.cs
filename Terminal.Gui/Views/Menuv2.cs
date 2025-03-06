@@ -63,11 +63,10 @@ public class Menuv2 : Bar
     }
 
     /// <inheritdoc/>
-    public override View Add (View view)
+    /// 
+    protected override void OnSubViewAdded (View subView)
     {
-        base.Add (view);
-
-        if (view is Shortcut shortcut)
+        if (subView is Shortcut shortcut)
         {
             shortcut.CanFocus = true;
             shortcut.Orientation = Orientation.Vertical;
@@ -95,7 +94,5 @@ public class Menuv2 : Bar
                 //}
             }
         }
-
-        return view;
     }
 }
