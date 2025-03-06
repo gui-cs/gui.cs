@@ -14,7 +14,6 @@ public class ApplicationScreenTests
     public void ClearScreenNextIteration_Resets_To_False_After_LayoutAndDraw ()
     {
         // Arrange
-        ConsoleDriver.RunningUnitTests = true;
         Application.ResetState (true);
         Application.Init ();
 
@@ -27,7 +26,6 @@ public class ApplicationScreenTests
 
         // Cleanup
         Application.ResetState (true);
-        ConsoleDriver.RunningUnitTests = false;
     }
 
     [Fact]
