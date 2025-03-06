@@ -305,7 +305,6 @@ public class ApplicationTests
 
             // Public Properties
             Assert.Null (Application.Top);
-            //Assert.Null (Application.PopoverHost);
             Assert.Null (Application.MouseGrabView);
             Assert.Null (Application.WantContinuousButtonPressedView);
 
@@ -333,7 +332,6 @@ public class ApplicationTests
 
             // Mouse
             Assert.Null (Application._lastMousePosition);
-
 
             // Navigation
             Assert.Null (Application.Navigation);

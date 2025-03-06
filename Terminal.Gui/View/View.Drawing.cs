@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using System.ComponentModel;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Terminal.Gui;
 

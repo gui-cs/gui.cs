@@ -249,9 +249,9 @@ public class Region
     /// <param name="bounds">The bounding rectangle to use for complementing the region.</param>
     public void Complement (Rectangle bounds)
     {
-        if (bounds.IsEmpty || _rectangles!.Count == 0)
+        if (bounds.IsEmpty || _rectangles.Count == 0)
         {
-            _rectangles!.Clear ();
+            _rectangles.Clear ();
 
             return;
         }
@@ -410,7 +410,7 @@ public class Region
     /// <returns>A <see cref="Rectangle"/> that bounds the region.</returns>
     public Rectangle GetBounds ()
     {
-        if (_rectangles!.Count == 0)
+        if (_rectangles.Count == 0)
         {
             return Rectangle.Empty;
         }
