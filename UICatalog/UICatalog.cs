@@ -527,6 +527,7 @@ public class UICatalogApp
 
     private static void BenchmarkAllScenarios ()
     {
+        Application.MaximumIterationsPerSecond = ushort.MaxValue;
         List<BenchmarkResults> resultsList = new ();
 
         var maxScenarios = 5;
