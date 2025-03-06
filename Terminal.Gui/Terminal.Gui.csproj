@@ -1,23 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-<<<<<<< HEAD
-  <!-- =================================================================== -->
-  <!-- Version numbers -->
-  <!-- Automatically updated by gitversion (run `dotnet-gitversion`)  -->
-  <!-- GitVersion.xml controls settings  -->
-  <!-- See ./README.md for more -->
-  <!-- =================================================================== -->
-  <PropertyGroup>
-    <Version>2.0.0</Version>
-  </PropertyGroup>
-  <!-- =================================================================== -->
-  <!-- Assembly name. -->
-  <!-- Referenced throughout this file for consistency. -->
-  <!-- =================================================================== -->
-<PropertyGroup>
-  <AssemblyName>Terminal.Gui</AssemblyName>
-</PropertyGroup>
-=======
-    <!-- =================================================================== -->
+﻿    <!-- =================================================================== -->
     <!-- Version numbers -->
     <!-- Automatically updated by gitversion (run `dotnet-gitversion`)  -->
     <!-- GitVersion.xml controls settings  -->
@@ -33,7 +14,6 @@
     <PropertyGroup>
         <AssemblyName>Terminal.Gui</AssemblyName>
     </PropertyGroup>
->>>>>>> v2_develop
 
     <!-- =================================================================== -->
     <!-- .NET Build Settings -->
