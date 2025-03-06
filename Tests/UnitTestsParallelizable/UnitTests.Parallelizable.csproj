@@ -96,10 +96,4 @@
             False
         </IncludeTestAssembly>
     </PropertyGroup>
-    <Target Name="DebugDefineConstants" BeforeTargets="Build">
-        <Message Importance="high" Text="Configuration: $(Configuration)" />
-        <Message Importance="high" Text="Project: $(MSBuildProjectName)" />
-        <Message Importance="high" Text="DefineConstants before: $(DefineConstants)" />
-    </Target>
-
 </Project>
