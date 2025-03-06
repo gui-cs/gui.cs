@@ -54,8 +54,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NativeAot", "NativeAot\Nati
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks", "Benchmarks\Benchmarks.csproj", "{242FBD3E-2EC6-4274-BD40-8E62AF9327B2}"
 EndProject
-<<<<<<< HEAD
-=======
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "Tests\UnitTests\UnitTests.csproj", "{038B09F5-EF3A-F21E-7C10-A6551866ECE2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationTests", "Tests\IntegrationTests\IntegrationTests.csproj", "{F74EC349-B988-FCFA-A1E5-967F70FB75B5}"
@@ -64,7 +62,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StressTests", "Tests\Stress
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests.Parallelizable", "Tests\UnitTestsParallelizable\UnitTests.Parallelizable.csproj", "{DE780834-190A-8277-51FD-750CC666E82D}"
 EndProject
->>>>>>> v2_develop
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -103,8 +100,6 @@ Global
 		{242FBD3E-2EC6-4274-BD40-8E62AF9327B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{242FBD3E-2EC6-4274-BD40-8E62AF9327B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{242FBD3E-2EC6-4274-BD40-8E62AF9327B2}.Release|Any CPU.Build.0 = Release|Any CPU
-<<<<<<< HEAD
-=======
 		{038B09F5-EF3A-F21E-7C10-A6551866ECE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{038B09F5-EF3A-F21E-7C10-A6551866ECE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{038B09F5-EF3A-F21E-7C10-A6551866ECE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -121,7 +116,6 @@ Global
 		{DE780834-190A-8277-51FD-750CC666E82D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE780834-190A-8277-51FD-750CC666E82D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DE780834-190A-8277-51FD-750CC666E82D}.Release|Any CPU.Build.0 = Release|Any CPU
->>>>>>> v2_develop
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

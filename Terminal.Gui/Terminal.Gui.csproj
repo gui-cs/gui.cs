@@ -1,4 +1,5 @@
-﻿    <!-- =================================================================== -->
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <!-- =================================================================== -->
     <!-- Version numbers -->
     <!-- Automatically updated by gitversion (run `dotnet-gitversion`)  -->
     <!-- GitVersion.xml controls settings  -->
