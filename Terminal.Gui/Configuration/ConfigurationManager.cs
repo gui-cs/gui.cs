@@ -326,6 +326,9 @@ public static class ConfigurationManager
     }
 
 
+    /// <summary>
+    /// Logs any Json deserialization errors that occurred during deserialization to the logging system.
+    /// </summary>
     public static void LogJsonErrors ()
     {
         if (_jsonErrors.Length > 0)
