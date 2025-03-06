@@ -2,7 +2,7 @@
 namespace Terminal.Gui;
 
 /// <summary>
-///     Tracks the region that has been drawn during <see cref="View.Draw"/>. This is primarily
+///     Tracks the region that has been drawn during <see cref="View.Draw(DrawContext?)"/>. This is primarily
 ///     in support of <see cref="ViewportSettings.Transparent"/>.
 /// </summary>
 public class DrawContext

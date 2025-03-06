@@ -762,6 +762,7 @@ public partial class View // Mouse APIs
     ///     INTERNAL: Gets the Views that are under the mouse at <paramref name="location"/>, including Adornments.
     /// </summary>
     /// <param name="location"></param>
+    /// <param name="ignoreTransparent"></param>
     /// <returns></returns>
     internal static List<View?> GetViewsUnderMouse (in Point location, bool ignoreTransparent = false)
     {
