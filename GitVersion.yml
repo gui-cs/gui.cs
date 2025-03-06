@@ -22,12 +22,24 @@
 # - from v2_release (pre-release): 2.0.0-prealpha.1 or 2.0.0-beta.1
 # - from v2_release (release): 2.0.0 (patch version increments)
 #
-mode: ContinuousDeployment   # GitVersion 6.x uses Mainline mode for GitFlow, focusing on main branch releases
+mode: ContinuousDelivery   # GitVersion 6.x uses Mainline mode for GitFlow, focusing on main branch releases
 
 # We prefix our tags with 'v' or 'V' (e.g., v1.0.0)
 tag-prefix: '[vV]'
 
 branches:
+
+  # V2 Release Branch
+  main:
+    # Matches the v2_release branch
+    regex: ^v2_release$
+    # Uses 'prealpha' as pre-release label before official release
+    label: prealpha
+    # Increments patch version (x.y.z+1) on commits
+    increment: Patch
+    # Specifies v2_develop as the source branch
+    source-branches: ['develop']
+
   # V2 Development Branch
   develop:
     # Matches the v2_develop branch
@@ -41,32 +53,21 @@ branches:
     # Indicates this branch feeds into release branches
     tracks-release-branches: true
 
-  # V2 Release Branch
-  main:
-    # Matches the v2_release branch
-    regex: v2_release
-    # Uses 'prealpha' as pre-release label before official release
-    label: prealpha
-    # Increments patch version (x.y.z+1) on commits
-    increment: Patch
-    # Specifies v2_develop as the source branch
-    source-branches: ['develop']
+  # # V1 Branches - Included for historical reference
+  # v1_develop:
+  #   regex: v1_develop
+  #   label: v1_develop
+  #   increment: Minor
+  #   source-branches: ['v1_release']
+  #   # Lower weight keeps V1 pre-releases sorted below V2
+  #   pre-release-weight: 100
 
-  # V1 Branches - Included for historical reference
-  v1_develop:
-    regex: v1_develop
-    label: v1_develop
-    increment: Minor
-    source-branches: ['v1_release']
-    # Lower weight keeps V1 pre-releases sorted below V2
-    pre-release-weight: 100
-
-  v1_release:
-    regex: v1_release
-    # Empty label for stable releases
-    label: ''
-    increment: Patch
-    source-branches: ['v1_develop']
+  # v1_release:
+  #   regex: v1_release
+  #   # Empty label for stable releases
+  #   label: ''
+  #   increment: Patch
+  #   source-branches: ['v1_develop']
 
   # Pull Request Branches
   # Configures versioning for PRs (e.g., 2.0.0-pr.feature-123.1)
