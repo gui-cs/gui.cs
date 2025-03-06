@@ -112,8 +112,6 @@ public partial class View : IDisposable, ISupportInitializeNotification
     /// <remarks>The id should be unique across all Views that share a SuperView.</remarks>
     public string Id { get; set; } = "";
 
-    #region Constructors and Initialization
-
     /// <summary>
     ///     Points to the current driver in use by the view, it is a convenience property for simplifying the development
     ///     of new views.
