@@ -71,7 +71,7 @@ public class CsiKeyPattern : AnsiKeyboardParserPattern
 
         Key? key = _terminators.GetValueOrDefault (terminator);
 
-        if (key != null && int.TryParse (modifierGroup, out int modifier))
+        if (key is {} && int.TryParse (modifierGroup, out int modifier))
         {
             key = modifier switch
                   {

@@ -67,4 +67,4 @@ BenchmarkDotNet.Artifacts/
 
 *.log.*
 
-
+log.*

@@ -455,7 +455,7 @@ public class UICatalogApp
             scenario.TopLevelColorScheme = _topLevelColorScheme;
 
 #if DEBUG_IDISPOSABLE
-
+            View.DebugIDisposable = true;
             // Measure how long it takes for the app to shut down
             var sw = new Stopwatch ();
             string scenarioName = scenario.GetName ();
@@ -685,6 +685,10 @@ public class UICatalogApp
     private static void VerifyObjectsWereDisposed ()
     {
 #if DEBUG_IDISPOSABLE
+        if (!View.DebugIDisposable)
+        {
+            return;
+        }
 
         // Validate there are no outstanding Responder-based instances 
         // after a scenario was selected to run. This proves the main UI Catalog
@@ -1356,7 +1360,7 @@ public class UICatalogApp
                                //CanExecute = () => false
                            });
 
-            return menuItems.ToArray ();
+            return menuItems.ToArray ()!;
         }
 
         // TODO: This should be an ConfigurationManager setting

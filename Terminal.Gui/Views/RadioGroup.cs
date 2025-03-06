@@ -409,6 +409,7 @@ public class RadioGroup : View, IDesignable, IOrientation
 
     /// <inheritdoc/>
     public event EventHandler<EventArgs<Orientation>>? OrientationChanged;
+#pragma warning restore CS0067 // The event is never used
 
 #pragma warning restore CS0067
 

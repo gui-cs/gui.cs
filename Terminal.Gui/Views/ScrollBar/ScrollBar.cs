@@ -171,6 +171,7 @@ public class ScrollBar : View, IOrientation, IDesignable
 
     /// <inheritdoc/>
     public event EventHandler<EventArgs<Orientation>>? OrientationChanged;
+#pragma warning restore CS0067 // The event is never used
 
     /// <inheritdoc/>
     public void OnOrientationChanged (Orientation newOrientation)
