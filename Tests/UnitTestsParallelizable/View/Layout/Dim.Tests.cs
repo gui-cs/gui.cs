@@ -23,8 +23,9 @@ public class DimTests
     {
         var t = new View { Width = 80, Height = 25, Text = "top" };
 
-        var w = new Window
+        var w = new View
         {
+            BorderStyle = LineStyle.Single,
             X = 1,
             Y = 2,
             Width = 4,
