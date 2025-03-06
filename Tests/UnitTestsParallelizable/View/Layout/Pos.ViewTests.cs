@@ -1,10 +1,8 @@
-﻿using UnitTests;
-using Xunit.Abstractions;
-using static Terminal.Gui.Pos;
+﻿using static Terminal.Gui.Pos;
 
 namespace Terminal.Gui.LayoutTests;
 
-public class PosViewTests ()
+public class PosViewTests
 {
     [Fact]
     public void PosView_Equal ()
@@ -243,12 +241,5 @@ public class PosViewTests ()
                       $"Combine(View(Side={side},Target=View(){testRect}){(testInt < 0 ? '-' : '+')}Absolute({testInt}))",
                       pos.ToString ()
                      );
-
-#if DEBUG_IDISPOSABLE
-
-        // HACK: Force clean up of Responders to avoid having to Dispose all the Views created above.
-        View.Instances.Clear ();
-#endif
     }
-
 }

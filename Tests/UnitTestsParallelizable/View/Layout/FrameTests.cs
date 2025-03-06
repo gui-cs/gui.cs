@@ -1,54 +1,84 @@
-﻿using UnitTests;
-using Xunit.Abstractions;
+﻿namespace Terminal.Gui.LayoutTests;
 
-namespace Terminal.Gui.LayoutTests;
-
-public class FrameTests (ITestOutputHelper output)
+public class FrameTests
 {
-    private readonly ITestOutputHelper _output = output;
-
     [Fact]
     public void Frame_Empty_Default ()
     {
         View view = new ();
-        Assert.Equal(Rectangle.Empty, view.Frame);
+        Assert.Equal (Rectangle.Empty, view.Frame);
 
-        view.BeginInit();
-        view.EndInit();
+        view.BeginInit ();
+        view.EndInit ();
         Assert.Equal (Rectangle.Empty, view.Frame);
     }
 
     [Fact]
-    public void Frame_Set_Sets ()
+    public void Frame_Empty_Initializer_Overrides_Base ()
     {
-        Rectangle frame = new (1, 2, 3, 4);
-        View view = new ();
+        // Prove TestView is correct
+        FrameTestView view = new ();
         Assert.True (view.NeedsLayout);
-        Assert.Equal (Rectangle.Empty, view.Frame);
 
-        view.Frame = frame;
-        Assert.Equal (frame, view.Frame);
-        Assert.False (view.NeedsLayout);
+        view.Layout ();
+        Assert.Equal (new (10, 20, 30, 40), view.Frame);
+        Assert.Equal (10, view.X.GetAnchor (0));
+        Assert.Equal (20, view.Y.GetAnchor (0));
+        Assert.Equal (30, view.Width!.GetAnchor (0));
+        Assert.Equal (40, view.Height!.GetAnchor (0));
+        Assert.Equal (new (0, 0, 30, 40), view.Viewport);
 
-        Assert.Equal(view.X, frame.X);
-        Assert.Equal (view.Y, frame.Y);
-        Assert.Equal (view.Width, frame.Width);
-        Assert.Equal (view.Height, frame.Height);
-    }
-
-    [Fact]
-    public void Frame_Initializer_Sets ()
-    {
+        // Set Frame via init
         Rectangle frame = new (1, 2, 3, 4);
-        View view = new ()
-        {
-            Frame = frame,
-        };
 
+        view = new ()
+        {
+            Frame = frame
+        };
         Assert.Equal (frame, view.Frame);
         Assert.False (view.NeedsLayout);
         Assert.Equal (frame.Size, view.Viewport.Size);
 
+        Assert.Equal (view.X, frame.X);
+        Assert.Equal (view.Y, frame.Y);
+        Assert.Equal (view.Width, frame.Width);
+        Assert.Equal (view.Height, frame.Height);
+
+        // Set Frame via init to empty
+        frame = Rectangle.Empty;
+
+        view = new ()
+        {
+            Frame = frame
+        };
+        Assert.Equal (frame, view.Frame);
+        Assert.False (view.NeedsLayout);
+        Assert.Equal (frame.Size, view.Viewport.Size);
+
+        Assert.Equal (view.X, frame.X);
+        Assert.Equal (view.Y, frame.Y);
+        Assert.Equal (view.Width, frame.Width);
+        Assert.Equal (view.Height, frame.Height);
+
+        // Set back to original state
+        view.X = Pos.Func (() => 10);
+        view.Y = Pos.Func (() => 20);
+        view.Width = Dim.Func (() => 30);
+        view.Height = Dim.Func (() => 40);
+        Assert.True (view.NeedsLayout);
+
+        view.Layout ();
+        Assert.Equal (new (10, 20, 30, 40), view.Frame);
+        Assert.Equal (10, view.X.GetAnchor (0));
+        Assert.Equal (20, view.Y.GetAnchor (0));
+        Assert.Equal (30, view.Width!.GetAnchor (0));
+        Assert.Equal (40, view.Height!.GetAnchor (0));
+        Assert.Equal (new (0, 0, 30, 40), view.Viewport);
+
+        view.Frame = frame;
+        Assert.Equal (frame, view.Frame);
+        Assert.False (view.NeedsLayout);
+        Assert.Equal (frame.Size, view.Viewport.Size);
 
         Assert.Equal (view.X, frame.X);
         Assert.Equal (view.Y, frame.Y);
@@ -56,14 +86,14 @@ public class FrameTests (ITestOutputHelper output)
         Assert.Equal (view.Height, frame.Height);
     }
 
-
     [Fact]
     public void Frame_Empty_Initializer_Sets ()
     {
         Rectangle frame = new (1, 2, 3, 4);
+
         View view = new ()
         {
-            Frame = frame,
+            Frame = frame
         };
 
         Assert.Equal (frame, view.Frame);
@@ -101,71 +131,18 @@ public class FrameTests (ITestOutputHelper output)
         Assert.Equal (view.Y, Rectangle.Empty.Y);
         Assert.Equal (view.Width, Rectangle.Empty.Width);
         Assert.Equal (view.Height, Rectangle.Empty.Height);
-
     }
-
 
     [Fact]
-    public void Frame_Empty_Initializer_Overrides_Base ()
+    public void Frame_Initializer_Sets ()
     {
-        // Prove TestView is correct
-        FrameTestView view = new ();
-        Assert.True (view.NeedsLayout);
-
-        view.Layout ();
-        Assert.Equal (new Rectangle(10, 20, 30, 40), view.Frame);
-        Assert.Equal (10, view.X.GetAnchor(0));
-        Assert.Equal (20, view.Y.GetAnchor(0));
-        Assert.Equal (30, view.Width!.GetAnchor(0));
-        Assert.Equal (40, view.Height!.GetAnchor(0));
-        Assert.Equal (new Rectangle (0, 0, 30, 40), view.Viewport);
-
-        // Set Frame via init
         Rectangle frame = new (1, 2, 3, 4);
-        view = new ()
+
+        View view = new ()
         {
-            Frame = frame,
+            Frame = frame
         };
-        Assert.Equal (frame, view.Frame);
-        Assert.False (view.NeedsLayout);
-        Assert.Equal (frame.Size, view.Viewport.Size);
 
-        Assert.Equal (view.X, frame.X);
-        Assert.Equal (view.Y, frame.Y);
-        Assert.Equal (view.Width, frame.Width);
-        Assert.Equal (view.Height, frame.Height);
-
-        // Set Frame via init to empty
-        frame = Rectangle.Empty;
-        view = new ()
-        {
-            Frame = frame,
-        };
-        Assert.Equal (frame, view.Frame);
-        Assert.False (view.NeedsLayout);
-        Assert.Equal (frame.Size, view.Viewport.Size);
-
-        Assert.Equal (view.X, frame.X);
-        Assert.Equal (view.Y, frame.Y);
-        Assert.Equal (view.Width, frame.Width);
-        Assert.Equal (view.Height, frame.Height);
-
-        // Set back to original state
-        view.X = Pos.Func (() => 10);
-        view.Y = Pos.Func (() => 20);
-        view.Width = Dim.Func (() => 30);
-        view.Height = Dim.Func (() => 40);
-        Assert.True (view.NeedsLayout);
-
-        view.Layout ();
-        Assert.Equal (new Rectangle (10, 20, 30, 40), view.Frame);
-        Assert.Equal (10, view.X.GetAnchor (0));
-        Assert.Equal (20, view.Y.GetAnchor (0));
-        Assert.Equal (30, view.Width!.GetAnchor (0));
-        Assert.Equal (40, view.Height!.GetAnchor (0));
-        Assert.Equal (new Rectangle (0, 0, 30, 40), view.Viewport);
-
-        view.Frame = frame;
         Assert.Equal (frame, view.Frame);
         Assert.False (view.NeedsLayout);
         Assert.Equal (frame.Size, view.Viewport.Size);
@@ -175,18 +152,6 @@ public class FrameTests (ITestOutputHelper output)
         Assert.Equal (view.Width, frame.Width);
         Assert.Equal (view.Height, frame.Height);
     }
-
-    private class FrameTestView : View
-    {
-        public FrameTestView ()
-        {
-            X = Pos.Func (() => 10);
-            Y = Pos.Func (() => 20);
-            Width = Dim.Func (() => 30);
-            Height = Dim.Func (() => 40);
-        }
-    }
-
 
     // Moved this test from AbsoluteLayoutTests
     // TODO: Refactor as Theory
@@ -200,14 +165,14 @@ public class FrameTests (ITestOutputHelper output)
         Assert.Equal (Rectangle.Empty, v.Frame);
         v.Dispose ();
 
-        v = new View { Frame = frame };
+        v = new() { Frame = frame };
         Assert.Equal (frame, v.Frame);
 
         v.Frame = newFrame;
         Assert.Equal (newFrame, v.Frame);
 
         Assert.Equal (
-                      new Rectangle (0, 0, newFrame.Width, newFrame.Height),
+                      new (0, 0, newFrame.Width, newFrame.Height),
                       v.Viewport
                      ); // With Absolute Viewport *is* deterministic before Layout
         Assert.Equal (Pos.Absolute (1), v.X);
@@ -216,12 +181,12 @@ public class FrameTests (ITestOutputHelper output)
         Assert.Equal (Dim.Absolute (40), v.Height);
         v.Dispose ();
 
-        v = new View { X = frame.X, Y = frame.Y, Text = "v" };
+        v = new() { X = frame.X, Y = frame.Y, Text = "v" };
         v.Frame = newFrame;
         Assert.Equal (newFrame, v.Frame);
 
         Assert.Equal (
-                      new Rectangle (0, 0, newFrame.Width, newFrame.Height),
+                      new (0, 0, newFrame.Width, newFrame.Height),
                       v.Viewport
                      ); // With Absolute Viewport *is* deterministic before Layout
         Assert.Equal (Pos.Absolute (1), v.X);
@@ -230,13 +195,13 @@ public class FrameTests (ITestOutputHelper output)
         Assert.Equal (Dim.Absolute (40), v.Height);
         v.Dispose ();
 
-        newFrame = new Rectangle (10, 20, 30, 40);
-        v = new View { Frame = frame };
+        newFrame = new (10, 20, 30, 40);
+        v = new() { Frame = frame };
         v.Frame = newFrame;
         Assert.Equal (newFrame, v.Frame);
 
         Assert.Equal (
-                      new Rectangle (0, 0, newFrame.Width, newFrame.Height),
+                      new (0, 0, newFrame.Width, newFrame.Height),
                       v.Viewport
                      ); // With Absolute Viewport *is* deterministic before Layout
         Assert.Equal (Pos.Absolute (10), v.X);
@@ -245,12 +210,12 @@ public class FrameTests (ITestOutputHelper output)
         Assert.Equal (Dim.Absolute (40), v.Height);
         v.Dispose ();
 
-        v = new View { X = frame.X, Y = frame.Y, Text = "v" };
+        v = new() { X = frame.X, Y = frame.Y, Text = "v" };
         v.Frame = newFrame;
         Assert.Equal (newFrame, v.Frame);
 
         Assert.Equal (
-                      new Rectangle (0, 0, newFrame.Width, newFrame.Height),
+                      new (0, 0, newFrame.Width, newFrame.Height),
                       v.Viewport
                      ); // With Absolute Viewport *is* deterministic before Layout
         Assert.Equal (Pos.Absolute (10), v.X);
@@ -260,21 +225,39 @@ public class FrameTests (ITestOutputHelper output)
         v.Dispose ();
     }
 
-    private class TestFrameEventsView : View
+    [Fact]
+    public void Frame_Set_Sets ()
     {
-        public int OnFrameChangedCallCount { get; private set; }
-        public int FrameChangedEventCallCount { get; private set; }
+        Rectangle frame = new (1, 2, 3, 4);
+        View view = new ();
+        Assert.True (view.NeedsLayout);
+        Assert.Equal (Rectangle.Empty, view.Frame);
 
-        public TestFrameEventsView ()
-        {
-            FrameChanged += (sender, args) => FrameChangedEventCallCount++;
-        }
+        view.Frame = frame;
+        Assert.Equal (frame, view.Frame);
+        Assert.False (view.NeedsLayout);
 
-        protected override void OnFrameChanged (in Rectangle frame)
-        {
-            OnFrameChangedCallCount++;
-            base.OnFrameChanged (frame);
-        }
+        Assert.Equal (view.X, frame.X);
+        Assert.Equal (view.Y, frame.Y);
+        Assert.Equal (view.Width, frame.Width);
+        Assert.Equal (view.Height, frame.Height);
+    }
+
+    [Fact]
+    public void FrameChanged_Event_Raised_When_Frame_Changes ()
+    {
+        // Arrange
+        var view = new TestFrameEventsView ();
+        var initialFrame = new Rectangle (0, 0, 10, 10);
+        var newFrame = new Rectangle (0, 0, 20, 20);
+        view.Frame = initialFrame;
+        Assert.Equal (1, view.FrameChangedEventCallCount);
+
+        // Act
+        view.Frame = newFrame;
+
+        // Assert
+        Assert.Equal (2, view.FrameChangedEventCallCount);
     }
 
     [Fact]
@@ -294,20 +277,28 @@ public class FrameTests (ITestOutputHelper output)
         Assert.Equal (2, view.OnFrameChangedCallCount);
     }
 
-    [Fact]
-    public void FrameChanged_Event_Raised_When_Frame_Changes ()
+    private class FrameTestView : View
     {
-        // Arrange
-        var view = new TestFrameEventsView ();
-        var initialFrame = new Rectangle (0, 0, 10, 10);
-        var newFrame = new Rectangle (0, 0, 20, 20);
-        view.Frame = initialFrame;
-        Assert.Equal (1, view.FrameChangedEventCallCount);
+        public FrameTestView ()
+        {
+            X = Pos.Func (() => 10);
+            Y = Pos.Func (() => 20);
+            Width = Dim.Func (() => 30);
+            Height = Dim.Func (() => 40);
+        }
+    }
 
-        // Act
-        view.Frame = newFrame;
+    private class TestFrameEventsView : View
+    {
+        public TestFrameEventsView () { FrameChanged += (sender, args) => FrameChangedEventCallCount++; }
 
-        // Assert
-        Assert.Equal (2, view.FrameChangedEventCallCount);
+        public int FrameChangedEventCallCount { get; private set; }
+        public int OnFrameChangedCallCount { get; private set; }
+
+        protected override void OnFrameChanged (in Rectangle frame)
+        {
+            OnFrameChangedCallCount++;
+            base.OnFrameChanged (frame);
+        }
     }
 }

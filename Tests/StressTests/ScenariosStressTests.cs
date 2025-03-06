@@ -11,6 +11,7 @@ public class ScenariosStressTests : TestsAllViews
     public ScenariosStressTests (ITestOutputHelper output)
     {
 #if DEBUG_IDISPOSABLE
+        View.DebugIDisposable = true;
         View.Instances.Clear ();
 #endif
         _output = output;

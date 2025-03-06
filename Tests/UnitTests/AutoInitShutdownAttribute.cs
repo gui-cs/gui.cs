@@ -120,6 +120,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         if (AutoInit)
         {
 #if DEBUG_IDISPOSABLE
+            View.DebugIDisposable = true;
 
             // Clear out any lingering Responder instances from previous tests
             if (View.Instances.Count == 0)

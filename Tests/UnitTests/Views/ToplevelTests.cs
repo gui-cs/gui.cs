@@ -2,8 +2,15 @@
 
 namespace Terminal.Gui.ViewsTests;
 
-public partial class ToplevelTests ()
+public partial class ToplevelTests 
 {
+    public ToplevelTests ()
+    {
+#if DEBUG_IDISPOSABLE
+        View.DebugIDisposable = true;
+#endif
+    }
+
     [Fact]
     public void Constructor_Default ()
     {

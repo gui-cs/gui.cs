@@ -8,7 +8,14 @@ namespace Terminal.Gui.DialogTests;
 public class DialogTests
 {
     private readonly ITestOutputHelper _output;
-    public DialogTests (ITestOutputHelper output) { _output = output; }
+
+    public DialogTests (ITestOutputHelper output)
+    {
+#if DEBUG_IDISPOSABLE
+        View.DebugIDisposable = true;
+#endif
+        _output = output;
+    }
 
     [Fact]
     [AutoInitShutdown]

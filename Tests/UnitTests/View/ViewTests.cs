@@ -6,16 +6,26 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
-public class ViewTests (ITestOutputHelper output)
+public class ViewTests
 {
+    private ITestOutputHelper _output;
+
+    public ViewTests (ITestOutputHelper output)
+    {
+        output = output;
+#if DEBUG_IDISPOSABLE
+        View.DebugIDisposable = true;
+#endif
+    }
+
     // Generic lifetime (IDisposable) tests
     [Fact]
     [TestRespondersDisposed]
     public void Dispose_Works ()
     {
         var r = new View ();
-#if DEBUG_IDISPOSABL
-        Assert.Equals (3, View.Instances.Count);
+#if DEBUG_IDISPOSABLE
+        Assert.Equal (4, View.Instances.Count);
 #endif
 
         r.Dispose ();
@@ -340,7 +350,7 @@ public class ViewTests (ITestOutputHelper output)
 111
 ───────────
 222";
-        DriverAssert.AssertDriverContentsAre (looksLike, output);
+        DriverAssert.AssertDriverContentsAre (looksLike, _output);
         v.Dispose ();
         top.Dispose ();
         bottom.Dispose ();
@@ -454,7 +464,7 @@ public class ViewTests (ITestOutputHelper output)
 │                            │
 └────────────────────────────┘
 ",
-                                                      output
+                                                      _output
                                                      );
 
         view.Visible = false;
@@ -470,7 +480,7 @@ public class ViewTests (ITestOutputHelper output)
 │                            │
 └────────────────────────────┘
 ",
-                                                      output
+                                                      _output
                                                      );
         Application.End (rs);
         top.Dispose ();

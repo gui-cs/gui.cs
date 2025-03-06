@@ -23,6 +23,8 @@ public class TestRespondersDisposedAttribute : BeforeAfterTestAttribute
         base.After (methodUnderTest);
 
 #if DEBUG_IDISPOSABLE
+        View.DebugIDisposable = true;
+
         Assert.Empty (View.Instances);
 #endif
     }
@@ -33,7 +35,7 @@ public class TestRespondersDisposedAttribute : BeforeAfterTestAttribute
 
         base.Before (methodUnderTest);
 #if DEBUG_IDISPOSABLE
-
+        View.DebugIDisposable = true;
         // Clear out any lingering Responder instances from previous tests
         View.Instances.Clear ();
         Assert.Empty (View.Instances);

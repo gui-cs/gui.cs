@@ -152,7 +152,7 @@ public static partial class Application
 #if DEBUG_IDISPOSABLE
 
         // Don't dispose the Top. It's up to caller dispose it
-        if (!ignoreDisposed && Top is { })
+        if (View.DebugIDisposable && !ignoreDisposed && Top is { })
         {
             Debug.Assert (Top.WasDisposed);
 
