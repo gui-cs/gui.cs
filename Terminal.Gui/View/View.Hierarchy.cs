@@ -26,7 +26,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     public virtual View? SuperView
     {
         get => _superView!;
-        set => throw new NotImplementedException ();
+        set => _superView = value;// throw new NotImplementedException ();
     }
 
     #region AddRemove

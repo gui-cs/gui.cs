@@ -298,7 +298,7 @@ public class Bar : View, IOrientation, IDesignable
     }
 
     /// <inheritdoc />
-    public bool EnableForDesign ()
+    public virtual bool EnableForDesign ()
     {
         var shortcut = new Shortcut
         {

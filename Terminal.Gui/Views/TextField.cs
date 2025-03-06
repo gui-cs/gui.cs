@@ -318,7 +318,7 @@ public class TextField : View
                     Command.Context,
                     () =>
                     {
-                        ShowContextMenu ();
+                        ShowContextMenu (keyboard: true);
 
                         return true;
                     }
@@ -397,14 +397,12 @@ public class TextField : View
         KeyBindings.Add (Key.R.WithCtrl, Command.DeleteAll);
         KeyBindings.Add (Key.D.WithCtrl.WithShift, Command.DeleteAll);
 
+        KeyBindings.Remove (Key.Space);
+
         _currentCulture = Thread.CurrentThread.CurrentUICulture;
 
-        ContextMenu = new () { Host = this };
-        ContextMenu.KeyChanged += ContextMenu_KeyChanged;
-
+        CreateContextMenu ();
         KeyBindings.Add (ContextMenu.Key, Command.Context);
-
-        KeyBindings.Remove (Key.Space);
     }
 
     /// <summary>
@@ -423,7 +421,8 @@ public class TextField : View
     public Color CaptionColor { get; set; }
 
     /// <summary>Get the <see cref="ContextMenu"/> for this view.</summary>
-    public ContextMenu ContextMenu { get; }
+    [CanBeNull]
+    public ContextMenuv2 ContextMenu { get; private set; }
 
     /// <summary>Sets or gets the current cursor position.</summary>
     public virtual int CursorPosition
@@ -803,7 +802,7 @@ public class TextField : View
             && !ev.Flags.HasFlag (MouseFlags.ReportMousePosition)
             && !ev.Flags.HasFlag (MouseFlags.Button1DoubleClicked)
             && !ev.Flags.HasFlag (MouseFlags.Button1TripleClicked)
-            && !ev.Flags.HasFlag (ContextMenu.MouseFlags))
+            && !ev.Flags.HasFlag (ContextMenu!.MouseFlags))
         {
             return false;
         }
@@ -903,9 +902,13 @@ public class TextField : View
             ClearAllSelection ();
             PrepareSelection (0, _text.Count);
         }
-        else if (ev.Flags == ContextMenu.MouseFlags)
+        else if (ev.Flags == ContextMenu?.MouseFlags)
         {
-            ShowContextMenu ();
+            PositionCursor (ev);
+
+            ContextMenu!.X = ev.ScreenPosition.X;
+            ContextMenu!.Y = ev.ScreenPosition.Y + 1;
+            ShowContextMenu (false);
         }
 
         //SetNeedsDraw ();
@@ -1225,72 +1228,31 @@ public class TextField : View
         }
     }
 
-    private MenuBarItem BuildContextMenuBarItem ()
+    private void CreateContextMenu ()
     {
-        return new (
-                    new MenuItem []
-                    {
-                        new (
-                             Strings.ctxSelectAll,
-                             "",
-                             () => SelectAll (),
-                             null,
-                             null,
-                             (KeyCode)KeyBindings.GetFirstFromCommands (Command.SelectAll)
-                            ),
-                        new (
-                             Strings.ctxDeleteAll,
-                             "",
-                             () => DeleteAll (),
-                             null,
-                             null,
-                             (KeyCode)KeyBindings.GetFirstFromCommands (Command.DeleteAll)
-                            ),
-                        new (
-                             Strings.ctxCopy,
-                             "",
-                             () => Copy (),
-                             null,
-                             null,
-                             (KeyCode)KeyBindings.GetFirstFromCommands (Command.Copy)
-                            ),
-                        new (
-                             Strings.ctxCut,
-                             "",
-                             () => Cut (),
-                             null,
-                             null,
-                             (KeyCode)KeyBindings.GetFirstFromCommands (Command.Cut)
-                            ),
-                        new (
-                             Strings.ctxPaste,
-                             "",
-                             () => Paste (),
-                             null,
-                             null,
-                             (KeyCode)KeyBindings.GetFirstFromCommands (Command.Paste)
-                            ),
-                        new (
-                             Strings.ctxUndo,
-                             "",
-                             () => Undo (),
-                             null,
-                             null,
-                             (KeyCode)KeyBindings.GetFirstFromCommands (Command.Undo)
-                            ),
-                        new (
-                             Strings.ctxRedo,
-                             "",
-                             () => Redo (),
-                             null,
-                             null,
-                             (KeyCode)KeyBindings.GetFirstFromCommands (Command.Redo)
-                            )
-                    }
-                   );
+        DisposeContextMenu ();
+        ContextMenuv2 menu = new (new List<Shortcut> ()
+        {
+            new (this, Command.SelectAll, Strings.ctxSelectAll),
+            new (this, Command.DeleteAll, Strings.ctxDeleteAll),
+            new (this, Command.Copy, Strings.ctxCopy),
+            new (this, Command.Cut, Strings.ctxCut),
+            new (this, Command.Paste, Strings.ctxPaste),
+            new (this, Command.Undo, Strings.ctxUndo),
+            new (this, Command.Redo, Strings.ctxRedo),
+        });
+
+        HotKeyBindings.Remove (menu.Key);
+        HotKeyBindings.Add (menu.Key, Command.Context);
+        menu.KeyChanged += ContextMenu_KeyChanged;
+
+        ContextMenu = menu;
     }
 
-    private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e) { KeyBindings.Replace (e.OldKey.KeyCode, e.NewKey.KeyCode); }
+    private void ContextMenu_KeyChanged (object sender, KeyChangedEventArgs e)
+    {
+        KeyBindings.Replace (e.OldKey.KeyCode, e.NewKey.KeyCode);
+    }
 
     private List<Rune> DeleteSelectedText ()
     {
@@ -1810,14 +1772,31 @@ public class TextField : View
     private void SetText (List<Rune> newText) { Text = StringExtensions.ToString (newText); }
     private void SetText (IEnumerable<Rune> newText) { SetText (newText.ToList ()); }
 
-    private void ShowContextMenu ()
+    private void ShowContextMenu (bool keyboard)
     {
+
         if (!Equals (_currentCulture, Thread.CurrentThread.CurrentUICulture))
         {
             _currentCulture = Thread.CurrentThread.CurrentUICulture;
+
+            if (ContextMenu is { })
+            {
+                Point currentLoc = ContextMenu.Frame.Location;
+
+                CreateContextMenu ();
+                ContextMenu!.X = currentLoc.X;
+                ContextMenu!.Y = currentLoc.Y;
+            }
         }
 
-        ContextMenu.Show (BuildContextMenuBarItem ());
+        if (keyboard)
+        {
+            Point loc = ViewportToScreen (new Point (_cursorPosition - ScrollOffset, 1));
+            ContextMenu!.X = loc.X;
+            ContextMenu!.Y = loc.Y;
+        }
+        //Application.Popover = ContextMenu;
+        ContextMenu!.Visible = true;
     }
 
     private void TextField_Added (object sender, SuperViewChangedEventArgs e)
@@ -1845,6 +1824,27 @@ public class TextField : View
             Autocomplete.HostControl = this;
             Autocomplete.PopupInsideContainer = false;
         }
+    }
+
+    private void DisposeContextMenu ()
+    {
+        if (ContextMenu is { })
+        {
+            ContextMenu.Visible = false;
+            ContextMenu.KeyChanged -= ContextMenu_KeyChanged;
+            ContextMenu.Dispose ();
+            ContextMenu = null;
+        }
+    }
+
+    /// <inheritdoc />
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing)
+        {
+            DisposeContextMenu ();
+        }
+        base.Dispose (disposing);
     }
 }
 

@@ -690,7 +690,7 @@ public class UICatalogApp
             return;
         }
 
-        // Validate there are no outstanding Responder-based instances 
+        // Validate there are no outstanding View instances 
         // after a scenario was selected to run. This proves the main UI Catalog
         // 'app' closed cleanly.
         foreach (View? inst in View.Instances)
