@@ -82,21 +82,6 @@ public class Adornment : View, IDesignable
     #endregion Thickness
 
     #region View Overrides
-
-    /// <summary>
-    ///     Adornments cannot be used as sub-views (see <see cref="Parent"/>); setting this property will throw
-    ///     <see cref="InvalidOperationException"/>.
-    /// </summary>
-    /// <remarks>
-    ///     While there are no real use cases for an Adornment being a subview, it is not explicitly dis-allowed to support
-    ///     testing. E.g. in AllViewsTester.
-    /// </remarks>
-    public override View? SuperView
-    {
-        get => base.SuperView!;
-        set => throw new InvalidOperationException (@"Adornments can not be Subviews or have SuperViews. Use Parent instead.");
-    }
-
     /// <summary>
     ///     Gets the rectangle that describes the area of the Adornment. The Location is always (0,0).
     ///     The size is the size of the <see cref="View.Frame"/>.

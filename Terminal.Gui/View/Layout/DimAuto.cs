@@ -72,7 +72,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
         {
             maxCalculatedSize = textSize;
 
-            if (us is { ContentSizeTracksViewport: false, Subviews.Count: 0 })
+            if (us is { ContentSizeTracksViewport: false, InternalSubviews.Count: 0 })
             {
                 // ContentSize was explicitly set. Use `us.ContentSize` to determine size.
                 maxCalculatedSize = dimension == Dimension.Width ? us.GetContentSize ().Width : us.GetContentSize ().Height;
@@ -81,7 +81,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
             {
                 // TOOD: All the below is a naive implementation. It may be possible to optimize this.
 
-                List<View> includedSubviews = us.Subviews.ToList ();
+                List<View> includedSubviews = us.InternalSubviews.ToList ();
 
                 // If [x] it can cause `us.ContentSize` to change.
                 // If [ ] it doesn't need special processing for us to determine `us.ContentSize`.
@@ -197,11 +197,11 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
 
                 if (dimension == Dimension.Width)
                 {
-                    centeredSubViews = us.Subviews.Where (v => v.X.Has<PosCenter> (out _)).ToList ();
+                    centeredSubViews = us.InternalSubviews.Where (v => v.X.Has<PosCenter> (out _)).ToList ();
                 }
                 else
                 {
-                    centeredSubViews = us.Subviews.Where (v => v.Y.Has<PosCenter> (out _)).ToList ();
+                    centeredSubViews = us.InternalSubviews.Where (v => v.Y.Has<PosCenter> (out _)).ToList ();
                 }
 
                 viewsNeedingLayout.AddRange (centeredSubViews);

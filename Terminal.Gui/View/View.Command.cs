@@ -91,7 +91,7 @@ public partial class View // Command APIs
         if (!args.Cancel)
         {
             // If there's an IsDefault peer view in Subviews, try it
-            var isDefaultView = SuperView?.Subviews.FirstOrDefault (v => v is Button { IsDefault: true });
+            var isDefaultView = SuperView?.InternalSubviews.FirstOrDefault (v => v is Button { IsDefault: true });
 
             if (isDefaultView != this && isDefaultView is Button { IsDefault: true } button)
             {

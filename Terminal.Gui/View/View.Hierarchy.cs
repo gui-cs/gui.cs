@@ -15,18 +15,19 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     // to make the same mistakes our users make when they poke at the Subviews.
     internal IList<View> InternalSubviews => _subviews ?? _empty;
 
-    /// <summary>This returns a list of the subviews contained by this view.</summary>
-    /// <value>The subviews.</value>
+    /// <summary>Gets the list of Subviews.</summary>
+    /// <remarks>
+    ///     Use <see cref="Add(Terminal.Gui.View?)"/> and <see cref="Remove(Terminal.Gui.View?)"/> to add or remove subviews.
+    /// </remarks>
     public IList<View> Subviews => _subviews?.AsReadOnly () ?? _empty;
 
     private View? _superView;
 
-    /// <summary>Returns the container for this view, or null if this view has not been added to a container.</summary>
-    /// <value>The super view.</value>
-    public virtual View? SuperView
+    /// <summary>Gets this Views SuperView (the View's container), or <see langword="null"/> if this view has not been added as a Subview.</summary>
+    public View? SuperView
     {
         get => _superView!;
-        set => throw new NotImplementedException ();
+        set => throw new InvalidOperationException (@"SuperView cannot be set.");
     }
 
     #region AddRemove
@@ -34,7 +35,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// <summary>Indicates whether the view was added to <see cref="SuperView"/>.</summary>
     public bool IsAdded { get; private set; }
 
-    /// <summary>Adds a subview (child) to this view.</summary>
+    /// <summary>Adds a Subview (child) to this view.</summary>
     /// <remarks>
     ///     <para>
     ///         The Views that have been added to this view can be retrieved via the <see cref="Subviews"/> property. See also
@@ -94,7 +95,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         return view;
     }
 
-    /// <summary>Adds the specified views (children) to the view.</summary>
+    /// <summary>Adds the specified Subview (children) to the view.</summary>
     /// <param name="views">Array of one or more views (can be optional parameter).</param>
     /// <remarks>
     ///     <para>
@@ -119,28 +120,29 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         }
     }
 
-    /// <summary>Event fired when this view is added to another.</summary>
+    // TODO: Make these events follow the standard pattern
+    /// <summary>Raised when a Subview has been added to this View.</summary>
     public event EventHandler<SuperViewChangedEventArgs>? Added;
 
-    /// <summary>Method invoked when a subview is being added to this view.</summary>
+    /// <summary>Method invoked when a Subview has been added to this view.</summary>
     /// <param name="e">Event where <see cref="ViewEventArgs.View"/> is the subview being added.</param>
-    public virtual void OnAdded (SuperViewChangedEventArgs e)
+    protected virtual void OnAdded (SuperViewChangedEventArgs e)
     {
         View view = e.SubView;
         view.IsAdded = true;
         view.Added?.Invoke (this, e);
     }
 
-    /// <summary>Method invoked when a subview is being removed from this view.</summary>
+    /// <summary>Method invoked when a Subview is being removed from this view.</summary>
     /// <param name="e">Event args describing the subview being removed.</param>
-    public virtual void OnRemoved (SuperViewChangedEventArgs e)
+    protected virtual void OnRemoved (SuperViewChangedEventArgs e)
     {
         View view = e.SubView;
         view.IsAdded = false;
         view.Removed?.Invoke (this, e);
     }
 
-    /// <summary>Removes a subview added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.</summary>
+    /// <summary>Removes a Subview added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.</summary>
     /// <remarks>
     ///     <para>
     ///         Normally Subviews will be disposed when this View is disposed. Removing a Subview causes ownership of the
@@ -208,7 +210,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     }
 
     /// <summary>
-    ///     Removes all subviews (children) added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.
+    ///     Removes all Subview (children) added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -231,15 +233,15 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         }
     }
 
-    /// <summary>Event fired when this view is removed from another.</summary>
+    /// <summary>Raised when a Subview has been removed from this View.</summary>
     public event EventHandler<SuperViewChangedEventArgs>? Removed;
 
     #endregion AddRemove
 
-    // TODO: Mark as internal. Or nuke.
+    // TODO: This drives a weird coupling of Application.Top and View. It's not clear why this is needed.
     /// <summary>Get the top superview of a given <see cref="View"/>.</summary>
     /// <returns>The superview view.</returns>
-    public View? GetTopSuperView (View? view = null, View? superview = null)
+    internal View? GetTopSuperView (View? view = null, View? superview = null)
     {
         View? top = superview ?? Application.Top;
 
@@ -275,7 +277,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             return true;
         }
 
-        foreach (View subView in start.Subviews)
+        foreach (View subView in start.InternalSubviews)
         {
             if (view == subView)
             {
