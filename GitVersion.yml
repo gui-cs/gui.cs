@@ -1,8 +1,40 @@
-mode: ContinuousDeployment
+# This file is used to configure GitVersion to work with the GitFlow branching strategy.
+#
+# Terminal.Gui uses the GitFlow branching strategy. 
+# https://gitversion.net/docs/learn/branching-strategies/gitflow/
+#
+# - We have two main branches: `v2_release` and `v2_develop`.
+# - `v2_release` is the main branch for V2 releases and always matches the latest release package on Nuget (e.g. 2.0.0); 
+#   prior to release it is a pre-release package (e.g. 2.0.0-prealpha.1).
+# - `v2_develop` is the main branch for V2 development and is always a pre-release package (e.g. 2.0.0-develop.1).
+# - We do all development work on feature branches off of `v2_develop`.
+# - When we deem it time to do a release, we merge the feature branches into `v2_develop` and then `v2_develop` into `v2_release`.
+# - The ./.github/workflows/publish.yml file is configured to build and publish on pushes to `v2_develop` and `v2_release`.
+#
+# We currently use GitVersion 5.1
+#
+# Branches:
+# - v1_release: This is `main` branch for V1
+# - v1_develop: This is `develop` branch for V1
+# - v2_release: This is `main` branch for V2  
+# - v2_develop: This is `develop` branch for V2
+#
+# Package Naming: 
+# - from v2_develop: v2.0.0-develop.1
+# - from v2_release: Prior to Release: v2.0.0-beta.1 or v2.0.0-alpha.1 or v2.0.0-prealpha.1
+# - from v2_release: Release: v2.0.0
+# 
+
+# We prefix our tags with a 'v' or 'V' (e.g. v1.0.0)
 tag-prefix: '[vV]'
+
+# This is legacy from v1 and probably can be removed - see tag: develop below
 continuous-delivery-fallback-tag: dev
+
 branches:
+# V2 Branches
   develop:
+    # We don't really use ContinuousDeployment, but ContinuousDelivery - I don't remember why we have this here but it works.
     mode: ContinuousDeployment
     tag: develop
     regex: v2_develop
@@ -11,12 +43,18 @@ branches:
     source-branches: []
 
   main:
+    # We don't really use ContinuousDeployment, but ContinuousDelivery - I don't remember why we have this here but it works.
     mode: ContinuousDeployment
+
+    # For V2 releases, prior to Alpha we use prealpha.
     tag: prealpha
     regex: v2_release
     is-release-branch: true
+
+    # This tells GitVersion that the main (branch is the source branch for the develop branch.
     source-branches: ['develop']
 
+# V1 Branches - These are really just here for reference.
   v1_develop:
     mode: ContinuousDeployment
     tag: v1_develop
@@ -31,6 +69,8 @@ branches:
     is-release-branch: true
     source-branches: ['v1_develop']
 
+# Pull Request Branches
+# I don't fully understand this, but it seems to work
   pull-request:
     mode: ContinuousDeployment
     tag: PullRequest.{BranchName}
@@ -45,58 +85,8 @@ branches:
     - hotfix
     pre-release-weight: 30000
 
+# I don't remember why we have this here but it works.
 ignore:
   sha: []
 
-
-# next-version: 2.0.0
-# mode: ContinuousDeployment
-# tag-prefix: '[vV]'
-# continuous-delivery-fallback-tag: 'pre'
-# branches:
-#   # v1_develop:
-#   #   mode: ContinuousDeployment
-#   #   tag: pre
-#   #   regex: ^v1_develop?[/-]
-#   #   is-release-branch: false
-#   #   source-branches:
-#   #   - v1
-#   # v1:
-#   #   tag: rc
-#   #   increment: Patch
-#   #   regex: ^v2?[/-]
-#   #   is-release-branch: false
-#   #   source-branches: []
-#   #   is-mainline: true
-
-#   v2_develop:
-#     mode: ContinuousDeployment
-#     tag: pre
-#     regex: ^v2_develop?[/-]
-#     is-release-branch: true
-#     tracks-release-branches: true
-#     is-source-branch-for: ['v2']
-#     source-branches: []
-#   v2:
-#     mode: ContinuousDeployment
-#     is-release-branch: false
-#     tag: alpha
-#     increment: Patch
-#     regex: ^v2?[/-]
-#     source-branches: ['v2_develop']
-
-#   # feature:
-#   #   tag: useBranchName
-#   #   regex: ^features?[/-]
-#   #   source-branches:
-#   #   - v1
-#   #   - v1_develop
-#   #   - v2
-#   #   - v2_develop
- 
-#   pull-request:
-#     tag: PullRequest.{BranchName}
-#     increment: Inherit
-# ignore:
-#   sha: []
-# merge-message-formats: {}
+  
