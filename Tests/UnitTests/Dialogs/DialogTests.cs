@@ -86,7 +86,11 @@ public class DialogTests
         RunIteration (ref runstate);
 
         buttonRow = $"{Glyphs.VLine}{btn1}         {Glyphs.VLine}";
+<<<<<<< HEAD:UnitTests/Dialogs/DialogTests.cs
+        TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
+=======
         DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
+>>>>>>> v2_develop:Tests/UnitTests/Dialogs/DialogTests.cs
 
         // Now add a second button
         buttonRow = $"{Glyphs.VLine}{btn1}   {btn2}{Glyphs.VLine}";
@@ -113,7 +117,11 @@ public class DialogTests
         RunIteration (ref runstate);
 
         buttonRow = $"{Glyphs.VLine}{new (' ', width - btn1.Length - 2)}{btn1}{Glyphs.VLine}";
+<<<<<<< HEAD:UnitTests/Dialogs/DialogTests.cs
+        TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
+=======
         DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
+>>>>>>> v2_develop:Tests/UnitTests/Dialogs/DialogTests.cs
 
         // Now add a second button
         buttonRow = $"{Glyphs.VLine}  {btn1} {btn2}{Glyphs.VLine}";
@@ -140,7 +148,11 @@ public class DialogTests
         RunIteration (ref runstate);
 
         buttonRow = $"{Glyphs.VLine}{btn1}{new (' ', width - btn1.Length - 2)}{Glyphs.VLine}";
+<<<<<<< HEAD:UnitTests/Dialogs/DialogTests.cs
+        TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
+=======
         DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
+>>>>>>> v2_develop:Tests/UnitTests/Dialogs/DialogTests.cs
 
         // Now add a second button
         buttonRow = $"{Glyphs.VLine}{btn1} {btn2}  {Glyphs.VLine}";
@@ -869,7 +881,11 @@ public class DialogTests
         button1.Visible = false;
         RunIteration (ref runstate, firstIteration);
         buttonRow = $@"{Glyphs.VLine}         {btn2} {Glyphs.VLine}";
+<<<<<<< HEAD:UnitTests/Dialogs/DialogTests.cs
+        TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
+=======
         DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
+>>>>>>> v2_develop:Tests/UnitTests/Dialogs/DialogTests.cs
         End (runstate);
         dlg.Dispose ();
 
@@ -881,7 +897,11 @@ public class DialogTests
         button1.Visible = false;
         RunIteration (ref runstate, firstIteration);
         buttonRow = $@"{Glyphs.VLine}          {btn2}{Glyphs.VLine}";
+<<<<<<< HEAD:UnitTests/Dialogs/DialogTests.cs
+        TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
+=======
         DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
+>>>>>>> v2_develop:Tests/UnitTests/Dialogs/DialogTests.cs
         End (runstate);
         dlg.Dispose ();
 
@@ -904,7 +924,11 @@ public class DialogTests
         button1.Visible = false;
         RunIteration (ref runstate, firstIteration);
         buttonRow = $@"{Glyphs.VLine}        {btn2}  {Glyphs.VLine}";
+<<<<<<< HEAD:UnitTests/Dialogs/DialogTests.cs
+        TestHelpers.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
+=======
         DriverAssert.AssertDriverContentsWithFrameAre ($"{buttonRow}", _output);
+>>>>>>> v2_develop:Tests/UnitTests/Dialogs/DialogTests.cs
         End (runstate);
         dlg.Dispose ();
     }

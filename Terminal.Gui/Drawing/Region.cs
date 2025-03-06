@@ -1,5 +1,12 @@
 ﻿#nullable enable
 
+<<<<<<< HEAD
+using System.Buffers;
+
+/// <summary>
+///     Represents a region composed of one or more rectangles, providing methods for union, intersection, exclusion, and
+///     complement operations.
+=======
 namespace Terminal.Gui;
 
 /// <summary>
@@ -8,6 +15,7 @@ namespace Terminal.Gui;
 ///     intersection, exclusion, and complement. This class is designed for use in graphical or terminal-based user
 ///     interfaces
 ///     where regions need to be manipulated to manage screen areas, clipping, or drawing boundaries.
+>>>>>>> v2_develop
 /// </summary>
 /// <remarks>
 ///     <para>
@@ -66,7 +74,76 @@ public class Region
     /// <param name="rectangle">The initial rectangle for the region.</param>
     public Region (Rectangle rectangle)
     {
+<<<<<<< HEAD
+        _rectangles.Add (rectangle);
+        _rectangles = MergeRectangles (_rectangles);
+    }
+
+    /// <summary>
+    ///     Adds the specified region to this region.
+    /// </summary>
+    /// <param name="region">The region to add to this region.</param>
+    public void Union (Region region)
+    {
+        _rectangles.AddRange (region._rectangles);
+        _rectangles = MergeRectangles (_rectangles);
+    }
+
+    /// <summary>
+    ///     Updates the region to be the intersection of itself with the specified rectangle.
+    /// </summary>
+    /// <param name="rectangle">The rectangle to intersect with the region.</param>
+    public void Intersect (Rectangle rectangle)
+    {
+        if (_rectangles.Count == 0)
+        {
+            return;
+        }
+        // TODO: In-place swap within the original list. Does order of intersections matter?
+        // Rectangle = 4 * i32 = 16 B
+        // ~128 B stack allocation
+        const int maxStackallocLength = 8;
+        Rectangle []? rentedArray = null;
+        try
+        {
+            Span<Rectangle> rectBuffer = _rectangles.Count <= maxStackallocLength
+                ? stackalloc Rectangle[maxStackallocLength]
+                : (rentedArray = ArrayPool<Rectangle>.Shared.Rent (_rectangles.Count));
+
+            _rectangles.CopyTo (rectBuffer);
+            ReadOnlySpan<Rectangle> rectangles = rectBuffer[.._rectangles.Count];
+            _rectangles.Clear ();
+
+            foreach (var rect in rectangles)
+            {
+                Rectangle intersection = Rectangle.Intersect (rect, rectangle);
+                if (!intersection.IsEmpty)
+                {
+                    _rectangles.Add (intersection);
+                }
+            }
+        }
+        finally
+        {
+            if (rentedArray != null)
+            {
+                ArrayPool<Rectangle>.Shared.Return (rentedArray);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Updates the region to be the intersection of itself with the specified region.
+    /// </summary>
+    /// <param name="region">The region to intersect with this region.</param>
+    public void Intersect (Region region)
+    {
+        List<Rectangle> intersections = new List<Rectangle> ();
+
+        foreach (Rectangle rect1 in _rectangles)
+=======
         lock (_syncLock)
+>>>>>>> v2_develop
         {
             _rectangles.Add (rectangle);
         }
@@ -441,12 +518,48 @@ public class Region
     {
         var hash = new HashCode ();
 
+<<<<<<< HEAD
+    /// <summary>
+    ///     Determines whether the specified point is contained within the region.
+    /// </summary>
+    /// <param name="x">The x-coordinate of the point.</param>
+    /// <param name="y">The y-coordinate of the point.</param>
+    /// <returns><c>true</c> if the point is contained within the region; otherwise, <c>false</c>.</returns>
+    public bool Contains (int x, int y)
+    {
+        foreach (var rect in _rectangles)
+        {
+            if (rect.Contains (x, y))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /// <summary>
+    ///     Determines whether the specified rectangle is contained within the region.
+    /// </summary>
+    /// <param name="rectangle">The rectangle to check for containment.</param>
+    /// <returns><c>true</c> if the rectangle is contained within the region; otherwise, <c>false</c>.</returns>
+    public bool Contains (Rectangle rectangle)
+    {
+        foreach (var rect in _rectangles)
+        {
+            if (rect.Contains (rectangle))
+            {
+                return true;
+            }
+        }
+        return false;
+=======
         foreach (Rectangle rect in _rectangles)
         {
             hash.Add (rect);
         }
 
         return hash.ToHashCode ();
+>>>>>>> v2_develop
     }
 
     /// <summary>

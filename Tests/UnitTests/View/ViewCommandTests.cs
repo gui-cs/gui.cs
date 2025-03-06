@@ -167,8 +167,12 @@ public class ViewCommandTests
 
         w.LayoutSubviews ();
 
+<<<<<<< HEAD:UnitTests/View/ViewCommandTests.cs
+        Application.Begin (w);
+=======
         Application.Top = w;
         Application.TopLevels.Push(w);
+>>>>>>> v2_develop:Tests/UnitTests/View/ViewCommandTests.cs
         Assert.Same (Application.Top, w);
 
         // Click button 2
@@ -196,8 +200,11 @@ public class ViewCommandTests
         // Button A (IsDefault) should NOT have been accepted because B canceled
         Assert.Equal (1, A_AcceptedCount);
         Assert.Equal (2, B_AcceptedCount);
+<<<<<<< HEAD:UnitTests/View/ViewCommandTests.cs
+=======
 
         Application.ResetState (true);
+>>>>>>> v2_develop:Tests/UnitTests/View/ViewCommandTests.cs
     }
 
     // See: https://github.com/gui-cs/Terminal.Gui/issues/3905
@@ -238,12 +245,18 @@ public class ViewCommandTests
 
         w.Add (btn);
 
+<<<<<<< HEAD:UnitTests/View/ViewCommandTests.cs
+        w.LayoutSubviews ();
+
+        Application.Begin (w);
+=======
 
         Application.Top = w;
         Application.TopLevels.Push (w);
         Assert.Same (Application.Top, w);
 
         w.LayoutSubviews ();
+>>>>>>> v2_develop:Tests/UnitTests/View/ViewCommandTests.cs
 
         // Click button just like a driver would
         var btnFrame = btn.FrameToScreen ();
@@ -270,8 +283,11 @@ public class ViewCommandTests
 
         Assert.Equal (1, btnAcceptedCount);
         Assert.Equal (2, wAcceptedCount);
+<<<<<<< HEAD:UnitTests/View/ViewCommandTests.cs
+=======
 
         Application.ResetState (true);
+>>>>>>> v2_develop:Tests/UnitTests/View/ViewCommandTests.cs
     }
 
     #endregion OnAccept/Accept tests

@@ -25,10 +25,17 @@ public class Clipping : Scenario
         };
 
         app.DrawingContent += (s, e) =>
+<<<<<<< HEAD
+                           {
+                               app!.FillRect (app!.Viewport, Glyphs.Dot);
+                               e.Cancel = true;
+                           };
+=======
                               {
                                   app!.FillRect (app!.Viewport, Glyphs.Dot);
                                   e.Cancel = true;
                               };
+>>>>>>> v2_develop
 
         var arrangementEditor = new ArrangementEditor
         {

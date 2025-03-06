@@ -1,5 +1,8 @@
 ﻿using System.Diagnostics;
+<<<<<<< HEAD:UnitTests/Application/ApplicationTests.cs
+=======
 using UnitTests;
+>>>>>>> v2_develop:Tests/UnitTests/Application/ApplicationTests.cs
 using Xunit.Abstractions;
 using static Terminal.Gui.ConfigurationManager;
 

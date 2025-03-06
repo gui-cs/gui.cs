@@ -169,6 +169,131 @@ public class PosAnchorEndTests ()
         Assert.Equal (expectedXPosition, view.Frame.X);
     }
 
+<<<<<<< HEAD:UnitTests/View/Layout/Pos.AnchorEndTests.cs
+    // This test used to be Dialog_In_Window_With_TextField_And_Button_AnchorEnd in DialogTests.
+    [Fact]
+    [SetupFakeDriver]
+    public void PosAnchorEnd_View_And_Button ()
+    {
+        ((FakeDriver)Application.Driver!).SetBufferSize (20, 5);
+
+        // Override CM
+        Button.DefaultShadow = ShadowStyle.None;
+
+        var b = $"{Glyphs.LeftBracket} Ok {Glyphs.RightBracket}";
+
+        var frame = new FrameView { Width = 18, Height = 3 };
+        Assert.Equal (16, frame.Viewport.Width);
+
+        Button btn = null;
+
+        int Btn_Width () { return btn?.Viewport.Width ?? 0; }
+
+        btn = new () { Text = "Ok", X = Pos.AnchorEnd (0) - Pos.Func (Btn_Width) };
+
+        var view = new View
+        {
+            Text = "0123456789abcdefghij",
+
+            // Dim.Fill (1) fills remaining space minus 1 (16 - 1 = 15)
+            // Dim.Function (Btn_Width) is 6
+            // Width should be 15 - 6 = 9
+            Width = Dim.Fill (1) - Dim.Func (Btn_Width),
+            Height = 1
+        };
+
+        frame.Add (btn, view);
+        frame.BeginInit(); // Needed to enable Border
+        frame.EndInit();
+        frame.Layout ();
+
+        Assert.Equal (6, btn.Viewport.Width);
+        Assert.Equal (10, btn.Frame.X); // frame.Viewport.Width (16) - btn.Frame.Width (6) = 10
+        Assert.Equal (0, btn.Frame.Y);
+        Assert.Equal (6, btn.Frame.Width);
+        Assert.Equal (1, btn.Frame.Height);
+
+        Assert.Equal (9, view.Viewport.Width); // frame.Viewport.Width (16) - Dim.Fill (1) - Dim.Function (6) = 9
+        Assert.Equal (0, view.Frame.X);
+        Assert.Equal (0, view.Frame.Y);
+        Assert.Equal (9, view.Frame.Width);
+        Assert.Equal (1, view.Frame.Height);
+
+        frame.Draw ();
+        var expected = $@"
+┌────────────────┐
+│012345678 {b}│
+└────────────────┘
+";
+        _ = TestHelpers.AssertDriverContentsWithFrameAre (expected, output);
+    }
+
+
+    // TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+    // TODO: A new test that calls SetRelativeLayout directly is needed.
+    [Fact]
+    [AutoInitShutdown]
+    public void PosAnchorEnd_Equal_Inside_Window ()
+    {
+        var viewWidth = 10;
+        var viewHeight = 1;
+
+        var tv = new TextView
+        {
+            X = Pos.AnchorEnd (viewWidth), Y = Pos.AnchorEnd (viewHeight), Width = viewWidth, Height = viewHeight
+        };
+
+        var win = new Window ();
+
+        win.Add (tv);
+
+        Toplevel top = new ();
+        top.Add (win);
+        RunState rs = Application.Begin (top);
+
+        Assert.Equal (new (0, 0, 80, 25), top.Frame);
+        Assert.Equal (new (0, 0, 80, 25), win.Frame);
+        Assert.Equal (new (68, 22, 10, 1), tv.Frame);
+        Application.End (rs);
+        top.Dispose ();
+    }
+
+    //// TODO: This actually a SetRelativeLayout/LayoutSubViews test and should be moved
+    //// TODO: A new test that calls SetRelativeLayout directly is needed.
+    //[Fact]
+    //[AutoInitShutdown]
+    //public void  PosAnchorEnd_Equal_Inside_Window_With_MenuBar_And_StatusBar_On_Toplevel ()
+    //{
+    //    var viewWidth = 10;
+    //    var viewHeight = 1;
+
+    //    var tv = new TextView
+    //    {
+    //        X = Pos.AnchorEnd (viewWidth), Y = Pos.AnchorEnd (viewHeight), Width = viewWidth, Height = viewHeight
+    //    };
+
+    //    var win = new Window ();
+
+    //    win.Add (tv);
+
+    //    var menu = new MenuBar ();
+    //    var status = new StatusBar ();
+    //    Toplevel top = new ();
+    //    top.Add (win, menu, status);
+    //    RunState rs = Application.Begin (top);
+
+    //    Assert.Equal (new (0, 0, 80, 25), top.Frame);
+    //    Assert.Equal (new (0, 0, 80, 1), menu.Frame);
+    //    Assert.Equal (new (0, 24, 80, 1), status.Frame);
+    //    Assert.Equal (new (0, 1, 80, 23), win.Frame);
+    //    Assert.Equal (new (68, 20, 10, 1), tv.Frame);
+
+    //    Application.End (rs);
+    //    top.Dispose ();
+    //}
+
+=======
+>>>>>>> v2_develop:Tests/UnitTestsParallelizable/View/Layout/Pos.AnchorEndTests.cs
     [Fact]
     public void PosAnchorEnd_Calculate_ReturnsExpectedValue ()
     {

@@ -293,7 +293,11 @@ public static class ConfigurationManager
     /// </summary>
     public static void OnApplied ()
     {
+<<<<<<< HEAD
+        Debug.WriteLine ("ConfigurationManager.OnApplied()");
+=======
         //Logging.Trace ("");
+>>>>>>> v2_develop
 
         Applied?.Invoke (null, new ());
 

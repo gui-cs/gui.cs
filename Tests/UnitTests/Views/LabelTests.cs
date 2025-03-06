@@ -1,7 +1,10 @@
 ﻿using System.ComponentModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+<<<<<<< HEAD:UnitTests/Views/LabelTests.cs
+=======
 using UnitTests;
 using UnitTests;
+>>>>>>> v2_develop:Tests/UnitTests/Views/LabelTests.cs
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
