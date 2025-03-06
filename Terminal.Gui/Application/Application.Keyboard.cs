@@ -177,7 +177,6 @@ public static partial class Application // Keyboard handling
                         return true;
                     }
                    );
-
         AddCommand (
                     Command.Suspend,
                     static () =>
@@ -187,7 +186,6 @@ public static partial class Application // Keyboard handling
                         return true;
                     }
                    );
-
         AddCommand (
                     Command.NextTabStop,
                     static () => Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop));

@@ -11,8 +11,7 @@ public partial class View
     ///         There is a single clip region for the entire application.
     ///     </para>
     ///     <para>
-    ///         This method returns the current clip region, not a clone. If there is a need to modify the clip region, it is
-    ///         recommended to clone it first.
+    ///         This method returns the current clip region, not a clone. If there is a need to modify the clip region, clone it first.
     ///     </para>
     /// </remarks>
     /// <returns>The current Clip.</returns>
@@ -75,6 +74,17 @@ public partial class View
     public static void ExcludeFromClip (Rectangle rectangle) { Driver?.Clip?.Exclude (rectangle); }
 
     /// <summary>
+    ///     Removes the specified rectangle from the Clip.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         There is a single clip region for the entire application.
+    ///     </para>
+    /// </remarks>
+    /// <param name="region"></param>
+    public static void ExcludeFromClip (Region? region) { Driver?.Clip?.Exclude (region); }
+
+    /// <summary>
     ///     Changes the Clip to the intersection of the current Clip and the <see cref="Frame"/> of this View.
     /// </summary>
     /// <remarks>
@@ -86,7 +96,7 @@ public partial class View
     /// <returns>
     ///     The current Clip, which can be then re-applied <see cref="View.SetClip"/>
     /// </returns>
-    internal Region? ClipFrame ()
+    internal Region? AddFrameToClip ()
     {
         if (Driver is null)
         {
@@ -133,7 +143,7 @@ public partial class View
     /// <returns>
     ///     The current Clip, which can be then re-applied <see cref="View.SetClip"/>
     /// </returns>
-    public Region? ClipViewport ()
+    public Region? AddViewportToClip ()
     {
         if (Driver is null)
         {
