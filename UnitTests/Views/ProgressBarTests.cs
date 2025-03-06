@@ -18,7 +18,7 @@ public class ProgressBarTests
         Assert.Equal (1, pb.Frame.Height);
         Assert.Equal (ProgressBarStyle.Blocks, pb.ProgressBarStyle);
         Assert.Equal (ProgressBarFormat.Simple, pb.ProgressBarFormat);
-        Assert.Equal (CM.Glyphs.BlocksMeterSegment, pb.SegmentCharacter);
+        Assert.Equal (Glyphs.BlocksMeterSegment, pb.SegmentCharacter);
     }
 
     [Fact]
@@ -41,7 +41,7 @@ public class ProgressBarTests
 
             if (i == 0)
             {
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
@@ -50,8 +50,8 @@ public class ProgressBarTests
             }
             else if (i == 1)
             {
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
@@ -59,38 +59,38 @@ public class ProgressBarTests
             }
             else if (i == 2)
             {
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
             }
             else if (i == 3)
             {
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
             }
             else if (i == 4)
             {
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
             }
             else if (i == 5)
             {
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
             }
         }
@@ -148,16 +148,16 @@ public class ProgressBarTests
         var pb = new ProgressBar ();
 
         pb.ProgressBarStyle = ProgressBarStyle.Blocks;
-        Assert.Equal (CM.Glyphs.BlocksMeterSegment, pb.SegmentCharacter);
+        Assert.Equal (Glyphs.BlocksMeterSegment, pb.SegmentCharacter);
 
         pb.ProgressBarStyle = ProgressBarStyle.Continuous;
-        Assert.Equal (CM.Glyphs.ContinuousMeterSegment, pb.SegmentCharacter);
+        Assert.Equal (Glyphs.ContinuousMeterSegment, pb.SegmentCharacter);
 
         pb.ProgressBarStyle = ProgressBarStyle.MarqueeBlocks;
-        Assert.Equal (CM.Glyphs.BlocksMeterSegment, pb.SegmentCharacter);
+        Assert.Equal (Glyphs.BlocksMeterSegment, pb.SegmentCharacter);
 
         pb.ProgressBarStyle = ProgressBarStyle.MarqueeContinuous;
-        Assert.Equal (CM.Glyphs.ContinuousMeterSegment, pb.SegmentCharacter);
+        Assert.Equal (Glyphs.ContinuousMeterSegment, pb.SegmentCharacter);
     }
 
     [Fact]
@@ -183,7 +183,7 @@ public class ProgressBarTests
 
             if (i == 0)
             {
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
@@ -201,8 +201,8 @@ public class ProgressBarTests
             }
             else if (i == 1)
             {
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
@@ -219,9 +219,9 @@ public class ProgressBarTests
             }
             else if (i == 2)
             {
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
@@ -237,10 +237,10 @@ public class ProgressBarTests
             }
             else if (i == 3)
             {
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
@@ -255,11 +255,11 @@ public class ProgressBarTests
             }
             else if (i == 4)
             {
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
@@ -274,11 +274,11 @@ public class ProgressBarTests
             else if (i == 5)
             {
                 Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
@@ -293,11 +293,11 @@ public class ProgressBarTests
             {
                 Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
@@ -312,11 +312,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
@@ -331,11 +331,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
@@ -350,11 +350,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
@@ -369,11 +369,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
@@ -388,11 +388,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
@@ -407,11 +407,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
             }
@@ -426,11 +426,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
             }
             else if (i == 14)
@@ -445,11 +445,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
             }
             else if (i == 15)
             {
@@ -464,10 +464,10 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
             }
             else if (i == 16)
             {
@@ -483,9 +483,9 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
             }
             else if (i == 17)
             {
@@ -502,8 +502,8 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
             }
             else if (i == 18)
             {
@@ -521,11 +521,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
             }
             else if (i == 19)
             {
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
@@ -543,8 +543,8 @@ public class ProgressBarTests
             }
             else if (i == 20)
             {
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
@@ -561,9 +561,9 @@ public class ProgressBarTests
             }
             else if (i == 21)
             {
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
@@ -579,10 +579,10 @@ public class ProgressBarTests
             }
             else if (i == 22)
             {
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
@@ -597,11 +597,11 @@ public class ProgressBarTests
             }
             else if (i == 23)
             {
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
@@ -616,11 +616,11 @@ public class ProgressBarTests
             else if (i == 24)
             {
                 Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
@@ -635,11 +635,11 @@ public class ProgressBarTests
             {
                 Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
@@ -654,11 +654,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
@@ -673,11 +673,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
@@ -692,11 +692,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
@@ -711,11 +711,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
@@ -730,11 +730,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
@@ -749,11 +749,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
             }
@@ -768,11 +768,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
             }
             else if (i == 33)
@@ -787,11 +787,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
             }
             else if (i == 34)
             {
@@ -806,10 +806,10 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
             }
             else if (i == 35)
             {
@@ -825,9 +825,9 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
             }
             else if (i == 36)
             {
@@ -844,8 +844,8 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
             }
             else if (i == 37)
             {
@@ -863,7 +863,7 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
             }
         }
     }
@@ -888,7 +888,7 @@ public class ProgressBarTests
 
             if (i == 0)
             {
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
@@ -906,8 +906,8 @@ public class ProgressBarTests
             }
             else if (i == 1)
             {
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
@@ -924,9 +924,9 @@ public class ProgressBarTests
             }
             else if (i == 2)
             {
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
@@ -942,10 +942,10 @@ public class ProgressBarTests
             }
             else if (i == 3)
             {
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
@@ -960,11 +960,11 @@ public class ProgressBarTests
             }
             else if (i == 4)
             {
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
@@ -979,11 +979,11 @@ public class ProgressBarTests
             else if (i == 5)
             {
                 Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
@@ -998,11 +998,11 @@ public class ProgressBarTests
             {
                 Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
@@ -1017,11 +1017,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
@@ -1036,11 +1036,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
@@ -1055,11 +1055,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
@@ -1074,11 +1074,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
@@ -1093,11 +1093,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
@@ -1112,11 +1112,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
             }
@@ -1131,11 +1131,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
             }
             else if (i == 14)
@@ -1150,11 +1150,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
             }
             else if (i == 15)
             {
@@ -1169,10 +1169,10 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
             }
             else if (i == 16)
             {
@@ -1188,9 +1188,9 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
             }
             else if (i == 17)
             {
@@ -1207,8 +1207,8 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
             }
             else if (i == 18)
             {
@@ -1226,7 +1226,7 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
             }
             else if (i == 19)
             {
@@ -1243,8 +1243,8 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
             }
             else if (i == 20)
             {
@@ -1260,9 +1260,9 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
             }
             else if (i == 21)
             {
@@ -1277,10 +1277,10 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
             }
             else if (i == 22)
             {
@@ -1294,11 +1294,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 14].Rune);
             }
             else if (i == 23)
             {
@@ -1311,11 +1311,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 13].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
             }
             else if (i == 24)
@@ -1328,11 +1328,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 12].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
             }
@@ -1345,11 +1345,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 11].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 14].Rune);
@@ -1362,11 +1362,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 10].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 13].Rune);
@@ -1379,11 +1379,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 9].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 12].Rune);
@@ -1396,11 +1396,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 8].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 11].Rune);
@@ -1413,11 +1413,11 @@ public class ProgressBarTests
                 Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 7].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 10].Rune);
@@ -1430,11 +1430,11 @@ public class ProgressBarTests
             {
                 Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 6].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 9].Rune);
@@ -1447,11 +1447,11 @@ public class ProgressBarTests
             else if (i == 31)
             {
                 Assert.Equal ((Rune)' ', driver.Contents [0, 0].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 5].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 8].Rune);
@@ -1464,11 +1464,11 @@ public class ProgressBarTests
             }
             else if (i == 32)
             {
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 4].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 7].Rune);
@@ -1482,10 +1482,10 @@ public class ProgressBarTests
             }
             else if (i == 33)
             {
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 3].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 6].Rune);
@@ -1500,9 +1500,9 @@ public class ProgressBarTests
             }
             else if (i == 34)
             {
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 2].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 5].Rune);
@@ -1518,8 +1518,8 @@ public class ProgressBarTests
             }
             else if (i == 35)
             {
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);
@@ -1536,7 +1536,7 @@ public class ProgressBarTests
             }
             else if (i == 36)
             {
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 1].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
@@ -1554,8 +1554,8 @@ public class ProgressBarTests
             }
             else if (i == 37)
             {
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
-                Assert.Equal (CM.Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 0].Rune);
+                Assert.Equal (Glyphs.BlocksMeterSegment, driver.Contents [0, 1].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 2].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 3].Rune);
                 Assert.Equal ((Rune)' ', driver.Contents [0, 4].Rune);

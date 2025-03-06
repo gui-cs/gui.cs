@@ -334,7 +334,7 @@ internal class WindowsConsole
             visibility = CursorVisibility.Default;
         }
 
-        return true;
+        return visibility != CursorVisibility.Invisible;
     }
 
     public bool EnsureCursorVisibility ()

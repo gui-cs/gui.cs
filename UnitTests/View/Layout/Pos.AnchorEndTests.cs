@@ -180,7 +180,7 @@ public class PosAnchorEndTests (ITestOutputHelper output)
         // Override CM
         Button.DefaultShadow = ShadowStyle.None;
 
-        var b = $"{CM.Glyphs.LeftBracket} Ok {CM.Glyphs.RightBracket}";
+        var b = $"{Glyphs.LeftBracket} Ok {Glyphs.RightBracket}";
 
         var frame = new FrameView { Width = 18, Height = 3 };
         Assert.Equal (16, frame.Viewport.Width);

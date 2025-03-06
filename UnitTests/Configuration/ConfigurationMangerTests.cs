@@ -208,6 +208,27 @@ public class ConfigurationManagerTests
         Reset ();
     }
 
+    [Fact]
+    public void Load_Performance_Check ()
+    {
+        Locations = ConfigLocations.All;
+        Reset ();
+
+        // Start stopwatch
+        Stopwatch stopwatch = new Stopwatch ();
+        stopwatch.Start ();
+
+        // Act
+        Load (true);
+        Apply();
+
+        // Stop stopwatch
+        stopwatch.Stop ();
+
+        // Assert
+        _output.WriteLine ($"Load took {stopwatch.ElapsedMilliseconds} ms");
+    }
+
 
     [Fact]
     public void Load_Loads_Custom_Json ()
@@ -236,41 +257,41 @@ public class ConfigurationManagerTests
         Reset ();
     }
 
-    [Fact]
-    [AutoInitShutdown]
-    public void LoadConfigurationFromAllSources_ShouldLoadSettingsFromAllSources ()
-    {
-        //var _configFilename = "config.json";
-        //// Arrange
-        //// Create a mock of the configuration files in all sources
-        //// Home directory
-        //string homeDir = Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.UserProfile), ".tui");
-        //if (!Directory.Exists (homeDir)) {
-        //	Directory.CreateDirectory (homeDir);
-        //}
-        //string globalConfigFile = Path.Combine (homeDir, _configFilename);
-        //string appSpecificConfigFile = Path.Combine (homeDir, "appname.config.json");
-        //File.WriteAllText (globalConfigFile, "{\"Settings\": {\"TestSetting\":\"Global\"}}");
-        //File.WriteAllText (appSpecificConfigFile, "{\"Settings\": {\"TestSetting\":\"AppSpecific\"}}");
+    //[Fact]
+    //[AutoInitShutdown]
+    //public void LoadConfigurationFromAllSources_ShouldLoadSettingsFromAllSources ()
+    //{
+    //    //var _configFilename = "config.json";
+    //    //// Arrange
+    //    //// Create a mock of the configuration files in all sources
+    //    //// Home directory
+    //    //string homeDir = Path.Combine (Environment.GetFolderPath (Environment.SpecialFolder.UserProfile), ".tui");
+    //    //if (!Directory.Exists (homeDir)) {
+    //    //	Directory.CreateDirectory (homeDir);
+    //    //}
+    //    //string globalConfigFile = Path.Combine (homeDir, _configFilename);
+    //    //string appSpecificConfigFile = Path.Combine (homeDir, "appname.config.json");
+    //    //File.WriteAllText (globalConfigFile, "{\"Settings\": {\"TestSetting\":\"Global\"}}");
+    //    //File.WriteAllText (appSpecificConfigFile, "{\"Settings\": {\"TestSetting\":\"AppSpecific\"}}");
 
-        //// App directory
-        //string appDir = Directory.GetCurrentDirectory ();
-        //string appDirGlobalConfigFile = Path.Combine (appDir, _configFilename);
-        //string appDirAppSpecificConfigFile = Path.Combine (appDir, "appname.config.json");
-        //File.WriteAllText (appDirGlobalConfigFile, "{\"Settings\": {\"TestSetting\":\"GlobalAppDir\"}}");
-        //File.WriteAllText (appDirAppSpecificConfigFile, "{\"Settings\": {\"TestSetting\":\"AppSpecificAppDir\"}}");
+    //    //// App directory
+    //    //string appDir = Directory.GetCurrentDirectory ();
+    //    //string appDirGlobalConfigFile = Path.Combine (appDir, _configFilename);
+    //    //string appDirAppSpecificConfigFile = Path.Combine (appDir, "appname.config.json");
+    //    //File.WriteAllText (appDirGlobalConfigFile, "{\"Settings\": {\"TestSetting\":\"GlobalAppDir\"}}");
+    //    //File.WriteAllText (appDirAppSpecificConfigFile, "{\"Settings\": {\"TestSetting\":\"AppSpecificAppDir\"}}");
 
-        //// App resources
-        //// ...
+    //    //// App resources
+    //    //// ...
 
-        //// Act
-        //ConfigurationManager.Locations = ConfigurationManager.ConfigLocation.All;
-        //ConfigurationManager.Load ();
+    //    //// Act
+    //    //ConfigurationManager.Locations = ConfigurationManager.ConfigLocation.All;
+    //    //ConfigurationManager.Load ();
 
-        //// Assert
-        //// Check that the settings from the highest precedence source are loaded
-        //Assert.Equal ("AppSpecific", ConfigurationManager.Config.Settings.TestSetting);
-    }
+    //    //// Assert
+    //    //// Check that the settings from the highest precedence source are loaded
+    //    //Assert.Equal ("AppSpecific", ConfigurationManager.Config.Settings.TestSetting);
+    //}
 
 
     [Fact]

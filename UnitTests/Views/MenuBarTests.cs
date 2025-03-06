@@ -107,7 +107,7 @@ public class MenuBarTests (ITestOutputHelper output)
                                                       @$"
  Nullable Checked       
 ┌──────────────────────┐
-│ {CM.Glyphs.CheckStateNone} Check this out 你  │
+│ {Glyphs.CheckStateNone} Check this out 你  │
 └──────────────────────┘",
                                                       output
                                                      );
@@ -3771,11 +3771,11 @@ Edit
 
         public string ExpectedBottomRow (int i)
         {
-            return $"{CM.Glyphs.LLCorner}{new (CM.Glyphs.HLine.ToString () [0], Menus [i].Children [0].TitleLength + 3)}{CM.Glyphs.LRCorner}  \n";
+            return $"{Glyphs.LLCorner}{new (Glyphs.HLine.ToString () [0], Menus [i].Children [0].TitleLength + 3)}{Glyphs.LRCorner}  \n";
         }
 
         // The 3 spaces at end are a result of Menu.cs line 1062 where `pos` is calculated (` + spacesAfterTitle`)
-        public string ExpectedMenuItemRow (int i) { return $"{CM.Glyphs.VLine} {Menus [i].Children [0].Title}  {CM.Glyphs.VLine}   \n"; }
+        public string ExpectedMenuItemRow (int i) { return $"{Glyphs.VLine} {Menus [i].Children [0].Title}  {Glyphs.VLine}   \n"; }
 
         // The full expected string for an open sub menu
         public string ExpectedSubMenuOpen (int i)
@@ -3800,7 +3800,7 @@ Edit
         //   1 space before the Title and 2 spaces after the Title/Check/Help
         public string ExpectedTopRow (int i)
         {
-            return $"{CM.Glyphs.ULCorner}{new (CM.Glyphs.HLine.ToString () [0], Menus [i].Children [0].TitleLength + 3)}{CM.Glyphs.URCorner}  \n";
+            return $"{Glyphs.ULCorner}{new (Glyphs.HLine.ToString () [0], Menus [i].Children [0].TitleLength + 3)}{Glyphs.URCorner}  \n";
         }
 
         // Each MenuBar title has a 1 space pad on each side

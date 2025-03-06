@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
@@ -30,11 +31,13 @@ public class LabelTests (ITestOutputHelper output)
         Assert.Equal ("Hello", label.TitleTextFormatter.Text);
     }
 
-    [Fact]
-    public void HotKey_Command_SetsFocus_OnNextSubview ()
+    [Theory]
+    [CombinatorialData]
+    public void HotKey_Command_SetsFocus_OnNextSubview (bool hasHotKey)
     {
         var superView = new View { CanFocus = true };
         var label = new Label ();
+        label.HotKey = hasHotKey ? Key.A.WithAlt : Key.Empty;
         var nextSubview = new View { CanFocus = true };
         superView.Add (label, nextSubview);
         superView.BeginInit ();
@@ -45,15 +48,18 @@ public class LabelTests (ITestOutputHelper output)
 
         label.InvokeCommand (Command.HotKey);
         Assert.False (label.HasFocus);
-        Assert.True (nextSubview.HasFocus);
+        Assert.Equal (hasHotKey, nextSubview.HasFocus);
     }
 
-    [Fact]
-    public void MouseClick_SetsFocus_OnNextSubview ()
+    [Theory]
+    [CombinatorialData]
+    public void MouseClick_SetsFocus_OnNextSubview (bool hasHotKey)
     {
         var superView = new View { CanFocus = true, Height = 1, Width = 15 };
         var focusedView = new View { CanFocus = true, Width = 1, Height = 1 };
-        var label = new Label { X = 2, Title = "_x" };
+        var label = new Label { X = 2 };
+        label.HotKey = hasHotKey ? Key.X.WithAlt : Key.Empty;
+
         var nextSubview = new View { CanFocus = true, X = 4, Width = 4, Height = 1 };
         superView.Add (focusedView, label, nextSubview);
         superView.BeginInit ();
@@ -65,7 +71,7 @@ public class LabelTests (ITestOutputHelper output)
 
         label.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
         Assert.False (label.HasFocus);
-        Assert.True (nextSubview.HasFocus);
+        Assert.Equal (hasHotKey, nextSubview.HasFocus);
     }
 
     [Fact]

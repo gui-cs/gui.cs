@@ -1118,7 +1118,7 @@ public class TextAnnotationTests
         var expected =
             @$"
  │
- ┤      {CM.Glyphs.Dot}
+ ┤      {Glyphs.Dot}
  ┤
 0┼┬┬┬┬┬┬┬┬
  0    5";
@@ -1593,9 +1593,9 @@ public class PathAnnotationTests
    │
   2┤
    │
-  1┤{CM.Glyphs.Dot}
+  1┤{Glyphs.Dot}
    │ 
-  0┼┬┬┬┬{CM.Glyphs.Dot}┬
+  0┼┬┬┬┬{Glyphs.Dot}┬
    0    5
          
           ";
@@ -1630,9 +1630,9 @@ public class PathAnnotationTests
         var expected =
             @$"
  │
-1┤{CM.Glyphs.Dot}
+1┤{Glyphs.Dot}
  │ 
-0┼┬┬┬┬{CM.Glyphs.Dot}┬┬┬
+0┼┬┬┬┬{Glyphs.Dot}┬┬┬
  0    5   
           
           ";

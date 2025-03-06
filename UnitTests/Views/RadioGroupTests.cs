@@ -543,8 +543,8 @@ public class RadioGroupTests (ITestOutputHelper output)
 
         var expected = @$"
 ┌────────────────────────────┐
-│{CM.Glyphs.Selected} Test                      │
-│{CM.Glyphs.UnSelected} New Test 你               │
+│{Glyphs.Selected} Test                      │
+│{Glyphs.UnSelected} New Test 你               │
 │                            │
 └────────────────────────────┘
 ";
@@ -564,7 +564,7 @@ public class RadioGroupTests (ITestOutputHelper output)
 
         expected = @$"
 ┌────────────────────────────┐
-│{CM.Glyphs.Selected} Test  {CM.Glyphs.UnSelected} New Test 你       │
+│{Glyphs.Selected} Test  {Glyphs.UnSelected} New Test 你       │
 │                            │
 │                            │
 └────────────────────────────┘
@@ -585,7 +585,7 @@ public class RadioGroupTests (ITestOutputHelper output)
 
         expected = @$"
 ┌────────────────────────────┐
-│{CM.Glyphs.Selected} Test    {CM.Glyphs.UnSelected} New Test 你     │
+│{Glyphs.Selected} Test    {Glyphs.UnSelected} New Test 你     │
 │                            │
 │                            │
 └────────────────────────────┘

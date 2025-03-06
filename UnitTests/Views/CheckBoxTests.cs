@@ -79,7 +79,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         Assert.Equal ("Hello", view.TitleTextFormatter.Text);
 
         Assert.Equal ("Hello", view.Text);
-        Assert.Equal ($"{CM.Glyphs.CheckStateUnChecked} Hello", view.TextFormatter.Text);
+        Assert.Equal ($"{Glyphs.CheckStateUnChecked} Hello", view.TextFormatter.Text);
     }
 
     [Fact]
@@ -88,7 +88,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         var view = new CheckBox ();
         view.Text = "Hello";
         Assert.Equal ("Hello", view.Text);
-        Assert.Equal ($"{CM.Glyphs.CheckStateUnChecked} Hello", view.TextFormatter.Text);
+        Assert.Equal ($"{Glyphs.CheckStateUnChecked} Hello", view.TextFormatter.Text);
 
         Assert.Equal ("Hello", view.Title);
         Assert.Equal ("Hello", view.TitleTextFormatter.Text);
@@ -104,7 +104,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         Assert.Equal (CheckState.UnChecked, ckb.CheckedState);
         Assert.False (ckb.AllowCheckStateNone);
         Assert.Equal (string.Empty, ckb.Text);
-        Assert.Equal ($"{CM.Glyphs.CheckStateUnChecked} ", ckb.TextFormatter.Text);
+        Assert.Equal ($"{Glyphs.CheckStateUnChecked} ", ckb.TextFormatter.Text);
         Assert.True (ckb.CanFocus);
         Assert.Equal (new (0, 0, 2, 1), ckb.Frame);
 
@@ -115,7 +115,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         Assert.Equal (CheckState.Checked, ckb.CheckedState);
         Assert.False (ckb.AllowCheckStateNone);
         Assert.Equal ("Test", ckb.Text);
-        Assert.Equal ($"{CM.Glyphs.CheckStateChecked} Test", ckb.TextFormatter.Text);
+        Assert.Equal ($"{Glyphs.CheckStateChecked} Test", ckb.TextFormatter.Text);
         Assert.True (ckb.CanFocus);
         Assert.Equal (new (0, 0, 6, 1), ckb.Frame);
 
@@ -126,7 +126,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         Assert.Equal (CheckState.UnChecked, ckb.CheckedState);
         Assert.False (ckb.AllowCheckStateNone);
         Assert.Equal ("Test", ckb.Text);
-        Assert.Equal ($"{CM.Glyphs.CheckStateUnChecked} Test", ckb.TextFormatter.Text);
+        Assert.Equal ($"{Glyphs.CheckStateUnChecked} Test", ckb.TextFormatter.Text);
         Assert.True (ckb.CanFocus);
         Assert.Equal (new (1, 2, 6, 1), ckb.Frame);
 
@@ -137,7 +137,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         Assert.Equal (CheckState.Checked, ckb.CheckedState);
         Assert.False (ckb.AllowCheckStateNone);
         Assert.Equal ("Test", ckb.Text);
-        Assert.Equal ($"{CM.Glyphs.CheckStateChecked} Test", ckb.TextFormatter.Text);
+        Assert.Equal ($"{Glyphs.CheckStateChecked} Test", ckb.TextFormatter.Text);
         Assert.True (ckb.CanFocus);
         Assert.Equal (new (3, 4, 6, 1), ckb.Frame);
     }
@@ -359,7 +359,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         var expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│    {CM.Glyphs.CheckStateUnChecked} Check this out 你     │
+│    {Glyphs.CheckStateUnChecked} Check this out 你     │
 │                            │
 └────────────────────────────┘
 ";
@@ -373,7 +373,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│    {CM.Glyphs.CheckStateChecked} Check this out 你     │
+│    {Glyphs.CheckStateChecked} Check this out 你     │
 │                            │
 └────────────────────────────┘
 ";
@@ -420,8 +420,8 @@ public class CheckBoxTests (ITestOutputHelper output)
         var expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│ {CM.Glyphs.CheckStateUnChecked}   Check  first  out  你  │
-│ {CM.Glyphs.CheckStateUnChecked}  Check  second  out  你  │
+│ {Glyphs.CheckStateUnChecked}   Check  first  out  你  │
+│ {Glyphs.CheckStateUnChecked}  Check  second  out  你  │
 │                            │
 └────────────────────────────┘
 ";
@@ -443,8 +443,8 @@ public class CheckBoxTests (ITestOutputHelper output)
         expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│ {CM.Glyphs.CheckStateChecked}   Check  first  out  你  │
-│ {CM.Glyphs.CheckStateChecked}  Check  second  out  你  │
+│ {Glyphs.CheckStateChecked}   Check  first  out  你  │
+│ {Glyphs.CheckStateChecked}  Check  second  out  你  │
 │                            │
 └────────────────────────────┘
 ";
@@ -480,7 +480,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         var expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│ {CM.Glyphs.CheckStateUnChecked} Check this out 你        │
+│ {Glyphs.CheckStateUnChecked} Check this out 你        │
 │                            │
 └────────────────────────────┘
 ";
@@ -494,7 +494,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│ {CM.Glyphs.CheckStateChecked} Check this out 你        │
+│ {Glyphs.CheckStateChecked} Check this out 你        │
 │                            │
 └────────────────────────────┘
 ";
@@ -531,7 +531,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         var expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│       Check this out 你 {CM.Glyphs.CheckStateUnChecked}  │
+│       Check this out 你 {Glyphs.CheckStateUnChecked}  │
 │                            │
 └────────────────────────────┘
 ";
@@ -545,7 +545,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         expected = @$"
 ┌┤Test Demo 你├──────────────┐
 │                            │
-│       Check this out 你 {CM.Glyphs.CheckStateChecked}  │
+│       Check this out 你 {Glyphs.CheckStateChecked}  │
 │                            │
 └────────────────────────────┘
 ";

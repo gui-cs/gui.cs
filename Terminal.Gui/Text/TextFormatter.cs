@@ -1926,12 +1926,12 @@ public class TextFormatter
 
     private static int GetRuneWidth (string str, int tabWidth, TextDirection textDirection = TextDirection.LeftRight_TopBottom)
     {
-        return GetRuneWidth (str.EnumerateRunes ().ToList (), tabWidth, textDirection);
-    }
-
-    private static int GetRuneWidth (List<Rune> runes, int tabWidth, TextDirection textDirection = TextDirection.LeftRight_TopBottom)
-    {
-        return runes.Sum (r => GetRuneWidth (r, tabWidth, textDirection));
+        int runesWidth = 0;
+        foreach (Rune rune in str.EnumerateRunes ())
+        {
+            runesWidth += GetRuneWidth (rune, tabWidth, textDirection);
+        }
+        return runesWidth;
     }
 
     private static int GetRuneWidth (Rune rune, int tabWidth, TextDirection textDirection = TextDirection.LeftRight_TopBottom)

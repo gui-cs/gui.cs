@@ -268,12 +268,19 @@ internal class WindowsDriver : ConsoleDriver
     {
         if (WinConsole is { })
         {
-            return WinConsole.GetCursorVisibility (out visibility);
+            bool result = WinConsole.GetCursorVisibility (out visibility);
+
+            if (_cachedCursorVisibility is { } && visibility != _cachedCursorVisibility)
+            {
+                _cachedCursorVisibility = visibility;
+            }
+
+            return result;
         }
 
         visibility = _cachedCursorVisibility ?? CursorVisibility.Default;
 
-        return true;
+        return visibility != CursorVisibility.Invisible;
     }
 
     /// <inheritdoc/>

@@ -25,7 +25,7 @@ public class Clipping : Scenario
 
         app.DrawingContent += (s, e) =>
                            {
-                               app!.FillRect (app!.Viewport, CM.Glyphs.Dot);
+                               app!.FillRect (app!.Viewport, Glyphs.Dot);
                                e.Cancel = true;
                            };
 

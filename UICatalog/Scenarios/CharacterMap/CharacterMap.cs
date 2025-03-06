@@ -270,7 +270,7 @@ public class CharacterMap : Scenario
         var startSort = string.Empty;
         var endSort = string.Empty;
 
-        string sortIndicator = descending ? CM.Glyphs.DownArrow.ToString () : CM.Glyphs.UpArrow.ToString ();
+        string sortIndicator = descending ? Glyphs.DownArrow.ToString () : Glyphs.UpArrow.ToString ();
 
         switch (sortByColumn)
         {
