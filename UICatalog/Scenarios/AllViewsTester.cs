@@ -18,10 +18,9 @@ public class AllViewsTester : Scenario
     private Dictionary<string, Type>? _viewClasses;
     private ListView? _classListView;
     private AdornmentsEditor? _adornmentsEditor;
-
     private ArrangementEditor? _arrangementEditor;
-
     private LayoutEditor? _layoutEditor;
+    private ViewportSettingsEditor? _viewportSettingsEditor;
     private FrameView? _settingsPane;
     private RadioGroup? _orientation;
     private string _demoText = "This, that, and the other thing.";
@@ -133,13 +132,27 @@ public class AllViewsTester : Scenario
             AutoSelectAdornments = false,
             SuperViewRendersLineCanvas = true
         };
-        _layoutEditor.Border!.Thickness = new (1);
+        _layoutEditor.Border!.Thickness = new (1, 1, 1, 0);
+
+        _viewportSettingsEditor = new ()
+        {
+            Title = "ViewportSettings [_5]",
+            X = Pos.Right (_arrangementEditor) - 1,
+            Y = Pos.Bottom (_layoutEditor) - Pos.Func (() => _layoutEditor.Frame.Height == 1 ? 0 : 1),
+            Width = Dim.Width (_layoutEditor),
+            Height = Dim.Auto (),
+            CanFocus = true,
+            AutoSelectViewToEdit = false,
+            AutoSelectAdornments = false,
+            SuperViewRendersLineCanvas = true
+        };
+        _viewportSettingsEditor.Border!.Thickness = new (1, 1, 1, 1);
 
         _settingsPane = new ()
         {
-            Title = "Settings [_5]",
+            Title = "Misc Settings [_6]",
             X = Pos.Right (_adornmentsEditor) - 1,
-            Y = Pos.Bottom (_layoutEditor) - Pos.Func (() => _layoutEditor.Frame.Height == 1 ? 0 : 1),
+            Y = Pos.Bottom (_viewportSettingsEditor) - Pos.Func (() => _viewportSettingsEditor.Frame.Height == 1 ? 0 : 1),
             Width = Dim.Width (_layoutEditor),
             Height = Dim.Auto (),
             CanFocus = true,
@@ -237,7 +250,7 @@ public class AllViewsTester : Scenario
         _hostPane.Padding.Diagnostics = ViewDiagnosticFlags.Ruler;
         _hostPane.Padding.ColorScheme = app.ColorScheme;
 
-        app.Add (_classListView, _adornmentsEditor, _arrangementEditor, _layoutEditor, _settingsPane, _eventLog, _hostPane);
+        app.Add (_classListView, _adornmentsEditor, _arrangementEditor, _layoutEditor, _viewportSettingsEditor, _settingsPane, _eventLog, _hostPane);
 
         app.Initialized += App_Initialized;
 
@@ -306,6 +319,7 @@ public class AllViewsTester : Scenario
 
         _hostPane!.Add (_curView);
         _layoutEditor!.ViewToEdit = _curView;
+        _viewportSettingsEditor!.ViewToEdit = _curView;
         _arrangementEditor!.ViewToEdit = _curView;
         _curView.SetNeedsLayout ();
     }
@@ -318,6 +332,7 @@ public class AllViewsTester : Scenario
             _curView.SubviewsLaidOut -= CurrentView_LayoutComplete;
             _hostPane!.Remove (_curView);
             _layoutEditor!.ViewToEdit = null;
+            _viewportSettingsEditor!.ViewToEdit = null;
             _arrangementEditor!.ViewToEdit = null;
 
             _curView.Dispose ();

@@ -53,7 +53,7 @@ This example shows a prompt and returns an integer value depending on which valu
 
 More interesting user interfaces can be created by composing some of the various `View` classes that are included. 
 
-In the example above, [Application.Init()](xref:Terminal.Gui.Application.Init(Terminal.Gui.ConsoleDriver,System.String)) sets up the environment, initializes the color schemes, and clears the screen to start the application.
+In the example above, @Terminal.Gui.Application.Init(Terminal.Gui.IConsoleDriver,System.String) sets up the environment, initializes the color schemes, and clears the screen to start the application.
 
 The [Application](~/api/Terminal.Gui.Application.yml) class additionally creates an instance of the [Toplevel](~/api/Terminal.Gui.Toplevel.yml) View available in the `Application.Top` property, and can be used like this:
 

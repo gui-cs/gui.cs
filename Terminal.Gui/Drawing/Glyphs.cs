@@ -1,13 +1,14 @@
-﻿namespace Terminal.Gui;
+﻿#nullable enable
+namespace Terminal.Gui;
 
 /// <summary>Defines the standard set of glyphs used to draw checkboxes, lines, borders, etc...</summary>
 /// <remarks>
 ///     <para>
-///         Access with <see cref="CM.Glyphs"/> (which is a global using alias for
-///         <see cref="ConfigurationManager.Glyphs"/>).
+///         Access with <see cref="Glyphs"/> (which is a global using alias for
+///         <see cref="Glyphs"/>).
 ///     </para>
 ///     <para>
-///         The default glyphs can be changed via the <see cref="ConfigurationManager"/>. Within a <c>config.json</c>
+///         The default glyphs can be changed per-<see cref="ThemeScope"/> in <see cref="ConfigurationManager"/>. Within a <c>config.json</c>
 ///         file the Json property name is the property name prefixed with "Glyphs.".
 ///     </para>
 ///     <para>
