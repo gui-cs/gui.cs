@@ -17,7 +17,7 @@ public class NetInputProcessor : InputProcessor<ConsoleKeyInfo>
     ///     </remarks>
     /// </summary>
     public static bool GenerateTestCasesForKeyPresses = false;
-#pragma warning enable CA2211
+#pragma warning restore CA2211
 
     /// <inheritdoc/>
     public NetInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer) : base (inputBuffer, new NetKeyConverter ()) { }

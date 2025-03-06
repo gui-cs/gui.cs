@@ -658,7 +658,7 @@ public class Region
             }
             else
             {
-                result.Add (new (startX, currentTop.Value, endX - startX, currentBottom.Value - currentTop.Value));
+                result.Add (new (startX, currentTop.Value, endX - startX, currentBottom!.Value - currentTop.Value));
                 currentTop = yTop;
                 currentBottom = yBottom;
             }

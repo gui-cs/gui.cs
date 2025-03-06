@@ -151,7 +151,7 @@ public class MainLoop<T> : IMainLoop<T>
 
     private void SetCursor ()
     {
-        View? mostFocused = Application.Top.MostFocused;
+        View? mostFocused = Application.Top!.MostFocused;
 
         if (mostFocused == null)
         {

@@ -24,6 +24,83 @@ namespace Terminal.Gui;
 
 public partial class View : IDisposable, ISupportInitializeNotification
 {
+    private bool _disposedValue;
+
+    /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resource.</summary>
+    public void Dispose ()
+    {
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        Disposing?.Invoke (this, EventArgs.Empty);
+        Dispose (true);
+        GC.SuppressFinalize (this);
+#if DEBUG_IDISPOSABLE
+        if (DebugIDisposable)
+        {
+            WasDisposed = true;
+
+            foreach (View? instance in Instances.Where (
+                                                        x =>
+                                                        {
+                                                            if (x is { })
+                                                            {
+                                                                return x.WasDisposed;
+                                                            }
+
+                                                            return false;
+                                                        })
+                                                .ToList ())
+            {
+                Instances.Remove (instance);
+            }
+        }
+#endif
+    }
+
+    /// <summary>
+    ///     Riased when the <see cref="View"/> is being disposed.
+    /// </summary>
+    public event EventHandler? Disposing;
+
+    /// <summary>Pretty prints the View</summary>
+    /// <returns></returns>
+    public override string ToString () { return $"{GetType ().Name}({Id}){Frame}"; }
+
+    /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
+    /// <remarks>
+    ///     If disposing equals true, the method has been called directly or indirectly by a user's code. Managed and
+    ///     unmanaged resources can be disposed. If disposing equals false, the method has been called by the runtime from
+    ///     inside the finalizer and you should not reference other objects. Only unmanaged resources can be disposed.
+    /// </remarks>
+    /// <param name="disposing"></param>
+    protected virtual void Dispose (bool disposing)
+    {
+        LineCanvas.Dispose ();
+
+        DisposeMouse ();
+        DisposeKeyboard ();
+        DisposeAdornments ();
+        DisposeScrollBars ();
+
+        for (int i = InternalSubviews.Count - 1; i >= 0; i--)
+        {
+            View subview = InternalSubviews [i];
+            Remove (subview);
+            subview.Dispose ();
+        }
+
+        if (!_disposedValue)
+        {
+            if (disposing)
+            {
+                // TODO: dispose managed state (managed objects)
+            }
+
+            _disposedValue = true;
+        }
+
+        Debug.Assert (InternalSubviews.Count == 0);
+    }
+
     #region Constructors and Initialization
 
     /// <summary>Gets or sets arbitrary data for the view.</summary>
@@ -51,7 +128,10 @@ public partial class View : IDisposable, ISupportInitializeNotification
     public View ()
     {
 #if DEBUG_IDISPOSABLE
-        Instances.Add (this);
+        if (DebugIDisposable)
+        {
+            Instances.Add (this);
+        }
 #endif
 
         SetupAdornments ();
@@ -168,6 +248,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
             // TODO: Figure out how to move this out of here and just depend on LayoutNeeded in Mainloop
             Layout (); // the EventLog in AllViewsTester fails to layout correctly if this is not here (convoluted Dim.Fill(Func)).
         }
+
         SetNeedsLayout ();
 
         Initialized?.Invoke (this, EventArgs.Empty);
@@ -371,7 +452,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
         get
         {
 #if DEBUG_IDISPOSABLE
-            if (WasDisposed)
+            if (DebugIDisposable && WasDisposed)
             {
                 throw new ObjectDisposedException (GetType ().FullName);
             }
@@ -381,7 +462,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
         set
         {
 #if DEBUG_IDISPOSABLE
-            if (WasDisposed)
+            if (DebugIDisposable && WasDisposed)
             {
                 throw new ObjectDisposedException (GetType ().FullName);
             }
@@ -450,71 +531,12 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
     #endregion
 
-    /// <summary>Pretty prints the View</summary>
-    /// <returns></returns>
-    public override string ToString () { return $"{GetType ().Name}({Id}){Frame}"; }
-
-    private bool _disposedValue;
-
-    /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
-    /// <remarks>
-    ///     If disposing equals true, the method has been called directly or indirectly by a user's code. Managed and
-    ///     unmanaged resources can be disposed. If disposing equals false, the method has been called by the runtime from
-    ///     inside the finalizer and you should not reference other objects. Only unmanaged resources can be disposed.
-    /// </remarks>
-    /// <param name="disposing"></param>
-    protected virtual void Dispose (bool disposing)
-    {
-        LineCanvas.Dispose ();
-
-        DisposeMouse ();
-        DisposeKeyboard ();
-        DisposeAdornments ();
-        DisposeScrollBars ();
-
-        for (int i = InternalSubviews.Count - 1; i >= 0; i--)
-        {
-            View subview = InternalSubviews [i];
-            Remove (subview);
-            subview.Dispose ();
-        }
-
-        if (!_disposedValue)
-        {
-            if (disposing)
-            {
-                // TODO: dispose managed state (managed objects)
-            }
-
-            _disposedValue = true;
-        }
-
-        Debug.Assert (InternalSubviews.Count == 0);
-    }
-
+#if DEBUG_IDISPOSABLE
     /// <summary>
-    ///     Riased when the <see cref="View"/> is being disposed.
+    ///     Set to false to disable the debug IDisposable feature.
     /// </summary>
-    public event EventHandler? Disposing;
+    public static bool DebugIDisposable { get; set; } = false;
 
-    /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resource.</summary>
-    public void Dispose ()
-    {
-        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        Disposing?.Invoke (this, EventArgs.Empty);
-        Dispose (true);
-        GC.SuppressFinalize (this);
-#if DEBUG_IDISPOSABLE
-        WasDisposed = true;
-
-        foreach (View instance in Instances.Where (x => x.WasDisposed).ToList ())
-        {
-            Instances.Remove (instance);
-        }
-#endif
-    }
-
-#if DEBUG_IDISPOSABLE
     /// <summary>For debug purposes to verify objects are being disposed properly</summary>
     public bool WasDisposed { get; set; }
 

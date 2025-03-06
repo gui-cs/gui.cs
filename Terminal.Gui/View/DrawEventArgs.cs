@@ -16,7 +16,7 @@ public class DrawEventArgs : CancelEventArgs
     ///     <see cref="View"/>.
     /// </param>
     /// <param name="drawContext">
-    ///     Add any regions that have been drawn to during <see cref="View.Draw"/> operations to this context. This is
+    ///     Add any regions that have been drawn to during <see cref="View.Draw(DrawContext?)"/> operations to this context. This is
     ///     primarily
     ///     in support of <see cref="ViewportSettings.Transparent"/>.
     /// </param>
@@ -34,7 +34,7 @@ public class DrawEventArgs : CancelEventArgs
     public Rectangle NewViewport { get; }
 
     /// <summary>
-    ///     Add any regions that have been drawn to during <see cref="View.Draw"/> operations to this context. This is
+    ///     Add any regions that have been drawn to during <see cref="View.Draw(DrawContext?)"/> operations to this context. This is
     ///     primarily
     ///     in support of <see cref="ViewportSettings.Transparent"/>.
     /// </summary>

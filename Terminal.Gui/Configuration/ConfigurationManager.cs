@@ -326,14 +326,17 @@ public static class ConfigurationManager
     }
 
 
+    /// <summary>
+    ///     Logs Json deserialization errors that occurred during deserialization.
+    /// </summary>
     public static void LogJsonErrors ()
     {
         if (_jsonErrors.Length > 0)
         {
-            Logging.Warning (
+            Logging.Error (
                                @"Encountered the following errors while deserializing configuration files:"
                               );
-            Logging.Warning (_jsonErrors.ToString ());
+            Logging.Error (_jsonErrors.ToString ());
         }
     }
 
