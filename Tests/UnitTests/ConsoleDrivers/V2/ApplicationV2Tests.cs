@@ -221,6 +221,53 @@ public class ApplicationV2Tests
 
         ApplicationImpl.ChangeInstance (orig);
     }
+
+    [Fact]
+    public void Test_V2_ClosingRaised ()
+    {
+        var orig = ApplicationImpl.Instance;
+
+        var v2 = NewApplicationV2 ();
+        ApplicationImpl.ChangeInstance (v2);
+
+        v2.Init ();
+
+        int closing=0;
+        int closed = 0;
+        var t=new Toplevel ();
+        t.Closing
+            += (_, a) =>
+               {
+                   // Cancel the first time
+                   if (closing==0)
+                   {
+                       a.Cancel = true;
+                   }
+                   closing++;
+                   Assert.Same(t,a.RequestingTop);
+               };
+
+        t.Closed
+            += (_, a) =>
+               {
+                   closed++;
+                   Assert.Same (t, a.Toplevel);
+               };
+
+        v2.AddIdle (IdleExit);
+
+        // Blocks until the timeout call is hit
+
+        v2.Run (t);
+
+        Assert.Null (Application.Top);
+        v2.Shutdown ();
+
+        ApplicationImpl.ChangeInstance (orig);
+
+        Assert.Equal (2,closing);
+        Assert.Equal (1, closed);
+    }
     private bool IdleExit ()
     {
         if (Application.Top != null)

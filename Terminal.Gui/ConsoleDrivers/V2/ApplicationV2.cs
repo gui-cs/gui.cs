@@ -194,6 +194,23 @@ public class ApplicationV2 : ApplicationImpl
     {
         Logging.Logger.LogInformation ($"RequestStop '{top}'");
 
+        top ??= Application.Top;
+
+        if (top == null)
+        {
+            return;
+        }
+
+        var ev = new ToplevelClosingEventArgs (top);
+        top.OnClosing (ev);
+
+        if (ev.Cancel)
+        {
+            return;
+        }
+
+        top.Running = false;
+
         // TODO: This definition of stop seems sketchy
         Application.TopLevels.TryPop (out _);
 
@@ -205,6 +222,9 @@ public class ApplicationV2 : ApplicationImpl
         {
             Application.Top = null;
         }
+
+        // Notify that it is closed
+        top.OnClosed (top);
     }
 
     /// <inheritdoc/>

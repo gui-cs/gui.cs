@@ -1,8 +1,8 @@
-$apiKey = "key"  # Replace with your actual API key
+$apiKey = ""  # Replace with your actual API key
 # Unlist all packages matching "2.0.0-v2-develop.*"
 # PowerShell script to unlist NuGet packages using dotnet CLI
 $packageId = "terminal.gui"  # Ensure this is the correct package name (case-sensitive)
-$packagePattern = "^2\.0\.0-v2-develop\..*$"  # Regex pattern for filtering versions
+$packagePattern = "^2\.0\.0-develop\..*$"  # Regex pattern for filtering versions
 $nugetSource = "https://api.nuget.org/v3/index.json"
 
 # Fetch package versions from NuGet API
