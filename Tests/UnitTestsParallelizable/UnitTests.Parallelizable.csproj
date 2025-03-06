@@ -20,22 +20,12 @@
         <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
     </PropertyGroup>
 
-    <PropertyGroup>
-        <DisableDebugIDisposable>true</DisableDebugIDisposable>
-    </PropertyGroup>
-
     <PropertyGroup Condition="'$(Configuration)'=='Debug'">
         <DefineDebug>true</DefineDebug>
         <DefineConstants>$(DefineConstants)</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)'=='Release'">
         <Optimize>true</Optimize>
-    </PropertyGroup>
-
-    <PropertyGroup>
-        <DisableDebugIDisposable>true</DisableDebugIDisposable>
-        <BaseOutputPath>$(MSBuildProjectDirectory)\bin\</BaseOutputPath>
-        <OutputPath>$(BaseOutputPath)$(Configuration)\</OutputPath>
     </PropertyGroup>
 
     <ItemGroup>
@@ -59,11 +49,9 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
     </ItemGroup>
+
     <ItemGroup>
         <ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj">
-            <Properties>
-                DisableDebugIDisposable=true;
-            </Properties>
         </ProjectReference>
     </ItemGroup>
 

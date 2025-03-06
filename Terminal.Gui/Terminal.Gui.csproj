@@ -36,17 +36,14 @@
         <IsTrimmable>true</IsTrimmable>
         <IsAotCompatible>true</IsAotCompatible>
     </PropertyGroup>
-
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
         <DefineDebug>true</DefineDebug>
         <DefineConstants>$(DefineConstants);DEBUG_IDISPOSABLE</DefineConstants>
     </PropertyGroup>
-
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
         <Optimize>true</Optimize>
         <VersionSuffix></VersionSuffix>
     </PropertyGroup>
-
     <!-- =================================================================== -->
     <!-- Configuration Manager -->
     <!-- =================================================================== -->
