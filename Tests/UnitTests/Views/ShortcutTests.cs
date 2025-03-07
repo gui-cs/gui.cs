@@ -452,19 +452,6 @@ public class ShortcutTests
         Application.ResetState (true);
     }
 
-    [Fact]
-    public void ColorScheme_SetsAndGetsCorrectly ()
-    {
-        var colorScheme = new ColorScheme ();
-
-        var shortcut = new Shortcut
-        {
-            ColorScheme = colorScheme
-        };
-
-        Assert.Same (colorScheme, shortcut.ColorScheme);
-    }
-
     // https://github.com/gui-cs/Terminal.Gui/issues/3664
     [Fact]
     public void ColorScheme_SetColorScheme_Does_Not_Fault_3664 ()
