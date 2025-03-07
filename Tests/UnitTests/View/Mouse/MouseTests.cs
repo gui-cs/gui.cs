@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 namespace Terminal.Gui.ViewMouseTests;
 
 [Trait ("Category", "Input")]
-public class MouseTests (ITestOutputHelper output) : TestsAllViews
+public class MouseTests : TestsAllViews
 {
    // TODO: Add more tests that ensure the above test works with positive adornments
 

@@ -2,10 +2,8 @@
 namespace Terminal.Gui.ViewTests;
 
 [Trait ("Category", "Output")]
-public class ColorSchemeTests ()
+public class ColorSchemeTests
 {
-
-
     [Fact]
     public void GetHotNormalColor_ColorScheme ()
     {
@@ -29,5 +27,4 @@ public class ColorSchemeTests ()
         Assert.Equal (view.ColorScheme.Disabled, view.GetNormalColor ());
         view.Dispose ();
     }
-
 }
