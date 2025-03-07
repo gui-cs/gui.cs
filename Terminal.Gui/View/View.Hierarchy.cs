@@ -7,7 +7,7 @@ namespace Terminal.Gui;
 public partial class View // SuperView/SubView hierarchy management (SuperView, SubViews, Add, Remove, etc.)
 {
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    private static readonly IReadOnlyCollection<View> _empty = new List<View> (0).AsReadOnly ();
+    private static readonly IReadOnlyCollection<View> _empty = [];
 
     private List<View>? _subviews; // This is null, and allocated on demand.
 
