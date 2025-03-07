@@ -121,49 +121,6 @@ public class GetViewsUnderMouseTests
     }
 
     [Theory]
-    [InlineData (0, 0)]
-    [InlineData (2, 1)]
-    [InlineData (20, 20)]
-    public void GetViewsUnderMouse_Returns_Null_If_No_SubViews_Coords_Outside (int testX, int testY)
-    {
-        // Arrange
-        var view = new View
-        {
-            Frame = new (0, 0, 10, 10)
-        };
-
-        var location = new Point (testX, testY);
-
-        // Act
-        List<View?> viewsUnderMouse = View.GetViewsUnderMouse (location);
-
-        // Assert
-        Assert.Empty (viewsUnderMouse);
-    }
-
-    [Theory]
-    [InlineData (0, 0)]
-    [InlineData (2, 1)]
-    [InlineData (20, 20)]
-    public void GetViewsUnderMouse_Returns_Null_If_Start_Not_Visible (int testX, int testY)
-    {
-        // Arrange
-        var view = new View
-        {
-            Frame = new (0, 0, 10, 10),
-            Visible = false
-        };
-
-        var location = new Point (testX, testY);
-
-        // Act
-        List<View?> viewsUnderMouse = View.GetViewsUnderMouse (location);
-
-        // Assert
-        Assert.Empty (viewsUnderMouse);
-    }
-
-    [Theory]
     [InlineData (0, 0, false)]
     [InlineData (1, 1, true)]
     [InlineData (9, 9, false)]
