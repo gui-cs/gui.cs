@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Reflection;
-using System.Text;
-using UnitTests;
+﻿using System.Reflection;
 using UnitTests;
 using Xunit.Abstractions;
 
@@ -11,16 +8,16 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
 {
     // TODO: Update all these tests to use AllViews like AllViews_Center_Properly does
 
-
     [Theory]
     [MemberData (nameof (AllViewTypes))]
     [SetupFakeDriver] // Required for spinner view that wants to register timeouts
     public void AllViews_Center_Properly (Type viewType)
     {
         // Required for spinner view that wants to register timeouts
-        Application.MainLoop = new MainLoop (new FakeMainLoop (Application.Driver));
+        Application.MainLoop = new (new FakeMainLoop (Application.Driver));
 
-        var view = (View)CreateInstanceIfNotGeneric (viewType);
+        var view = CreateInstanceIfNotGeneric (viewType);
+
         // See https://github.com/gui-cs/Terminal.Gui/issues/3156
 
         if (view == null)
@@ -63,17 +60,12 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
                      $"{view} did not center vertically. Expected: {expectedY}. Actual: {view.Frame.Top}"
                     );
         Application.Shutdown ();
-
     }
 
     [Theory]
     [MemberData (nameof (AllViewTypes))]
     [SetupFakeDriver] // Required for spinner view that wants to register timeouts
-    public void AllViews_Tests_All_Constructors (Type viewType)
-    {
-        Assert.True (Test_All_Constructors_Of_Type (viewType));
-    }
-
+    public void AllViews_Tests_All_Constructors (Type viewType) { Assert.True (Test_All_Constructors_Of_Type (viewType)); }
 
     public bool Test_All_Constructors_Of_Type (Type type)
     {
@@ -108,9 +100,9 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
     public void AllViews_Command_Select_Raises_Selecting (Type viewType)
     {
         // Required for spinner view that wants to register timeouts
-        Application.MainLoop = new MainLoop (new FakeMainLoop (Application.Driver));
+        Application.MainLoop = new (new FakeMainLoop (Application.Driver));
 
-        var view = (View)CreateInstanceIfNotGeneric (viewType);
+        var view = CreateInstanceIfNotGeneric (viewType);
 
         if (view == null)
         {
@@ -128,15 +120,11 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
         view.Selecting += (s, e) => selectingCount++;
 
         var acceptedCount = 0;
-        view.Accepting += (s, e) =>
-                         {
-                             acceptedCount++;
-                         };
+        view.Accepting += (s, e) => { acceptedCount++; };
 
-
-        if (view.InvokeCommand(Command.Select) == true)
+        if (view.InvokeCommand (Command.Select) == true)
         {
-            Assert.Equal(1, selectingCount);
+            Assert.Equal (1, selectingCount);
             Assert.Equal (0, acceptedCount);
         }
     }
@@ -147,9 +135,9 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
     public void AllViews_Command_Accept_Raises_Accepted (Type viewType)
     {
         // Required for spinner view that wants to register timeouts
-        Application.MainLoop = new MainLoop (new FakeMainLoop (Application.Driver));
+        Application.MainLoop = new (new FakeMainLoop (Application.Driver));
 
-        var view = (View)CreateInstanceIfNotGeneric (viewType);
+        var view = CreateInstanceIfNotGeneric (viewType);
 
         if (view == null)
         {
@@ -167,11 +155,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
         view.Selecting += (s, e) => selectingCount++;
 
         var acceptedCount = 0;
-        view.Accepting += (s, e) =>
-                         {
-                             acceptedCount++;
-                         };
-
+        view.Accepting += (s, e) => { acceptedCount++; };
 
         if (view.InvokeCommand (Command.Accept) == true)
         {
@@ -180,16 +164,15 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
         }
     }
 
-
     [Theory]
     [MemberData (nameof (AllViewTypes))]
     [SetupFakeDriver] // Required for spinner view that wants to register timeouts
     public void AllViews_Command_HotKey_Raises_HandlingHotKey (Type viewType)
     {
         // Required for spinner view that wants to register timeouts
-        Application.MainLoop = new MainLoop (new FakeMainLoop (Application.Driver));
+        Application.MainLoop = new (new FakeMainLoop (Application.Driver));
 
-        var view = (View)CreateInstanceIfNotGeneric (viewType);
+        var view = CreateInstanceIfNotGeneric (viewType);
 
         if (view == null)
         {
@@ -208,16 +191,10 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
         }
 
         var acceptedCount = 0;
-        view.Accepting += (s, e) =>
-                         {
-                             acceptedCount++;
-                         };
+        view.Accepting += (s, e) => { acceptedCount++; };
 
         var handlingHotKeyCount = 0;
-        view.HandlingHotKey += (s, e) =>
-                         {
-                             handlingHotKeyCount++;
-                         };
+        view.HandlingHotKey += (s, e) => { handlingHotKeyCount++; };
 
         if (view.InvokeCommand (Command.HotKey) == true)
         {

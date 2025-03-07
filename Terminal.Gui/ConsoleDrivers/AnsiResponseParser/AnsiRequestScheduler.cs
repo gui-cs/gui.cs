@@ -35,7 +35,7 @@ public class AnsiRequestScheduler
     ///         queued).
     ///     </para>
     /// </summary>
-    private readonly ConcurrentDictionary<string, DateTime> _lastSend = new ();
+    private readonly ConcurrentDictionary<string?, DateTime> _lastSend = new ();
 
     /// <summary>
     ///     Number of milliseconds after sending a request that we allow
@@ -108,7 +108,7 @@ public class AnsiRequestScheduler
 
     private void EvictStaleRequests ()
     {
-        foreach (string stale in _lastSend.Where (v => IsStale (v.Value)).Select (k => k.Key))
+        foreach (string? stale in _lastSend.Where (v => IsStale (v.Value)).Select (k => k.Key))
         {
             EvictStaleRequests (stale);
         }
@@ -123,7 +123,7 @@ public class AnsiRequestScheduler
     /// </summary>
     /// <param name="withTerminator"></param>
     /// <returns></returns>
-    private bool EvictStaleRequests (string withTerminator)
+    private bool EvictStaleRequests (string? withTerminator)
     {
         if (_lastSend.TryGetValue (withTerminator, out DateTime dt))
         {

@@ -1,10 +1,9 @@
 ﻿using UnitTests;
-using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.LayoutTests;
 
-public class AllViewsDrawTests (ITestOutputHelper _output) : TestsAllViews
+public class AllViewsDrawTests (ITestOutputHelper output) : TestsAllViews
 {
     [Theory]
     [SetupFakeDriver] // Required for spinner view that wants to register timeouts
@@ -19,12 +18,12 @@ public class AllViewsDrawTests (ITestOutputHelper _output) : TestsAllViews
 
         if (view == null)
         {
-            _output.WriteLine ($"Ignoring {viewType} - It's a Generic");
+            output.WriteLine ($"Ignoring {viewType} - It's a Generic");
 
             return;
         }
 
-        _output.WriteLine ($"Testing {viewType}");
+        output.WriteLine ($"Testing {viewType}");
 
         if (view is IDesignable designable)
         {

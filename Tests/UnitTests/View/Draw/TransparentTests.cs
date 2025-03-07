@@ -1,13 +1,11 @@
 #nullable enable
-using System.Text;
-using UnitTests;
 using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
 [Trait ("Category", "Output")]
-public class TransparentTests (ITestOutputHelper _output)
+public class TransparentTests (ITestOutputHelper output)
 {
     [Fact]
     [SetupFakeDriver]
@@ -50,7 +48,7 @@ public class TransparentTests (ITestOutputHelper _output)
 ░┌─────────────┐░░░░
 ░│Sub░░░░░░░░░░│░░░░
 ░└─────────────┘░░░░
-░░░░░░░░░░░░░░░░░░░░", _output);
+░░░░░░░░░░░░░░░░░░░░", output);
     }
 
     [Fact]
@@ -104,6 +102,6 @@ public class TransparentTests (ITestOutputHelper _output)
 ░┌─────────────┐░░░░
 ░│░░░subSub░░░░│░░░░
 ░└─────────────┘░░░░
-░░░░░░░░░░░░░░░░░░░░", _output);
+░░░░░░░░░░░░░░░░░░░░", output);
     }
 }

@@ -1,7 +1,5 @@
 ﻿using System.Text;
 using UnitTests;
-using Terminal.Gui.ViewMouseTests;
-using UnitTests;
 using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;

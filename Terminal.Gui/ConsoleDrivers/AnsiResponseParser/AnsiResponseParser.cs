@@ -233,7 +233,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
     {
         lock (_lockState)
         {
-            string cur = _heldContent.HeldToString ();
+            string? cur = _heldContent.HeldToString ();
 
             if (HandleKeyboard)
             {
@@ -270,7 +270,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
     {
         lock (_lockState)
         {
-            string cur = _heldContent.HeldToString ();
+            string? cur = _heldContent.HeldToString ();
 
             if (HandleMouse && IsMouse (cur))
             {
@@ -354,7 +354,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
         return false; // Continue accumulating
     }
 
-    private void RaiseMouseEvent (string cur)
+    private void RaiseMouseEvent (string? cur)
     {
         MouseEventArgs? ev = _mouseParser.ProcessMouseInput (cur);
 
@@ -364,9 +364,9 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
         }
     }
 
-    private bool IsMouse (string cur) { return _mouseParser.IsMouse (cur); }
+    private bool IsMouse (string? cur) { return _mouseParser.IsMouse (cur); }
 
-    protected void RaiseKeyboardEvent (AnsiKeyboardParserPattern pattern, string cur)
+    protected void RaiseKeyboardEvent (AnsiKeyboardParserPattern pattern, string? cur)
     {
         Key? k = pattern.GetKey (cur);
 
@@ -394,7 +394,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
     /// <returns></returns>
     protected abstract bool ShouldSwallowUnexpectedResponse ();
 
-    private bool MatchResponse (string cur, List<AnsiResponseExpectation> collection, bool invokeCallback, bool removeExpectation)
+    private bool MatchResponse (string? cur, List<AnsiResponseExpectation> collection, bool invokeCallback, bool removeExpectation)
     {
         // Check for expected responses
         AnsiResponseExpectation? matchingResponse = collection.FirstOrDefault (r => r.Matches (cur));
@@ -422,7 +422,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
     }
 
     /// <inheritdoc/>
-    public void ExpectResponse (string terminator, Action<string> response, Action? abandoned, bool persistent)
+    public void ExpectResponse (string? terminator, Action<string?> response, Action? abandoned, bool persistent)
     {
         lock (_lockExpectedResponses)
         {
@@ -438,7 +438,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
     }
 
     /// <inheritdoc/>
-    public bool IsExpecting (string terminator)
+    public bool IsExpecting (string? terminator)
     {
         lock (_lockExpectedResponses)
         {
@@ -448,7 +448,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
     }
 
     /// <inheritdoc/>
-    public void StopExpecting (string terminator, bool persistent)
+    public void StopExpecting (string? terminator, bool persistent)
     {
         lock (_lockExpectedResponses)
         {
@@ -530,7 +530,7 @@ internal class AnsiResponseParser<T> : AnsiResponseParserBase
     /// <param name="response"></param>
     /// <param name="abandoned"></param>
     /// <param name="persistent"></param>
-    public void ExpectResponseT (string terminator, Action<IEnumerable<Tuple<char, T>>> response, Action? abandoned, bool persistent)
+    public void ExpectResponseT (string? terminator, Action<IEnumerable<Tuple<char, T>>> response, Action? abandoned, bool persistent)
     {
         lock (_lockExpectedResponses)
         {
@@ -562,7 +562,7 @@ internal class AnsiResponseParser () : AnsiResponseParserBase (new StringHeld ()
     ///         keystrokes 'swallowed' (i.e. not returned to input stream).
     ///     </para>
     /// </summary>
-    public Func<string, bool> UnknownResponseHandler { get; set; } = _ => false;
+    public Func<string?, bool> UnknownResponseHandler { get; set; } = _ => false;
 
     public string ProcessInput (string input)
     {
@@ -583,13 +583,13 @@ internal class AnsiResponseParser () : AnsiResponseParserBase (new StringHeld ()
         output.Append (c);
     }
 
-    public string Release ()
+    public string? Release ()
     {
         lock (_lockState)
         {
             TryLastMinuteSequences ();
 
-            string output = _heldContent.HeldToString ();
+            string? output = _heldContent.HeldToString ();
             ResetState ();
 
             return output;

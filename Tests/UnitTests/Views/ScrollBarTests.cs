@@ -1,7 +1,5 @@
 ﻿using UnitTests;
-using UnitTests;
 using Xunit.Abstractions;
-using static Unix.Terminal.Delegates;
 
 namespace Terminal.Gui.ViewsTests;
 

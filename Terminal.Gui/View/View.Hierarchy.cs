@@ -315,8 +315,10 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         }
     }
 
+#pragma warning disable CS0067 // The event is never used
     /// <summary>Raised when a SubView has been removed from this View.</summary>
     public event EventHandler<SuperViewChangedEventArgs>? Removed;
+#pragma warning restore CS0067 // The event is never used   
 
     #endregion AddRemove
 

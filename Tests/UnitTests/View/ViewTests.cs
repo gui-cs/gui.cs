@@ -1,6 +1,3 @@
-using System.ComponentModel;
-using System.Text;
-using UnitTests;
 using UnitTests;
 using Xunit.Abstractions;
 
@@ -8,11 +5,11 @@ namespace Terminal.Gui.ViewTests;
 
 public class ViewTests
 {
-    private ITestOutputHelper _output;
+    private readonly ITestOutputHelper _output;
 
     public ViewTests (ITestOutputHelper output)
     {
-        output = output;
+        _output = output;
 #if DEBUG_IDISPOSABLE
         View.DebugIDisposable = true;
 #endif
@@ -46,16 +43,9 @@ public class ViewTests
         var count = 0;
 
         var view = new View { Id = "View" };
-        view.Disposing += View_Disposing;
+        view.Disposing += ViewDisposing;
         container1.Add (view);
         Assert.Equal (container1, view.SuperView);
-
-        void View_Disposing (object sender, EventArgs e)
-        {
-            count++;
-            Assert.Equal (view, sender);
-            container1.Remove ((View)sender);
-        }
 
         Assert.Single (container1.SubViews);
 
@@ -76,6 +66,15 @@ public class ViewTests
 #if DEBUG_IDISPOSABLE
         Assert.Empty (View.Instances);
 #endif
+
+        return;
+
+        void ViewDisposing (object sender, EventArgs e)
+        {
+            count++;
+            Assert.Equal (view, sender);
+            container1.Remove ((View)sender);
+        }
     }
 
     [Fact]

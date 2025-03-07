@@ -9,9 +9,9 @@ internal class EscAsAltPattern : AnsiKeyboardParserPattern
 
     private static readonly Regex _pattern = new (@"^\u001b([a-zA-Z0-9_])$");
 
-    public override bool IsMatch (string input) { return _pattern.IsMatch (input); }
+    public override bool IsMatch (string? input) { return _pattern.IsMatch (input); }
 
-    protected override Key? GetKeyImpl (string input)
+    protected override Key? GetKeyImpl (string? input)
     {
         Match match = _pattern.Match (input);
 

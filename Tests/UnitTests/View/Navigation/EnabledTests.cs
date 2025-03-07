@@ -1,10 +1,8 @@
 ﻿using UnitTests;
-using UnitTests;
-using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewTests;
 
-public class EnabledTests () : TestsAllViews
+public class EnabledTests : TestsAllViews
 {
     [Fact]
     public void Enabled_False_Leaves ()

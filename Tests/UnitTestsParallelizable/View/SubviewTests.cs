@@ -526,4 +526,40 @@ public class SubViewTests
         Assert.False (svAddedTov1.CanFocus); // False because sv1 was disposed and it isn't a subview of v1.
     }
 
+    [Fact]
+    public void IsAdded_IsAddedChanged_SubViewAdded_SubViewRemoved ()
+    {
+        var isAdded = false;
+
+        View superView = new () { Id = "superView" };
+        View subView = new () { Id = "subView" };
+
+        superView.SubViewAdded += (s, e) =>
+                                  {
+                                      Assert.True (isAdded);
+                                      Assert.True (subView.IsAdded);
+                                      Assert.Equal (subView, e.SubView);
+                                      Assert.Equal (superView, e.SuperView);
+                                  };
+
+        superView.SubViewRemoved += (s, e) =>
+                                    {
+                                        Assert.False (isAdded);
+                                        Assert.False (subView.IsAdded);
+                                        Assert.Equal (subView, e.SubView);
+                                        Assert.Equal (superView, e.SuperView);
+                                    };
+
+        subView.IsAddedChanged += (s, e) => { isAdded = e.CurrentValue; };
+
+        superView.Add (subView);
+        Assert.True (isAdded);
+        Assert.True (subView.IsAdded);
+        Assert.Single (superView.SubViews);
+
+        superView.Remove (subView);
+        Assert.False (isAdded);
+        Assert.False (subView.IsAdded);
+        Assert.Empty (superView.SubViews);
+    }
 }

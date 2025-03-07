@@ -17,7 +17,7 @@ public class AnsiMouseParser
     /// </summary>
     /// <param name="cur"></param>
     /// <returns></returns>
-    public bool IsMouse (string cur)
+    public bool IsMouse (string? cur)
     {
         // Typically in this format
         // ESC [ < {button_code};{x_pos};{y_pos}{final_byte}
@@ -30,7 +30,7 @@ public class AnsiMouseParser
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    public MouseEventArgs? ProcessMouseInput (string input)
+    public MouseEventArgs? ProcessMouseInput (string? input)
     {
         // Match mouse wheel events first
         Match match = _mouseEventPattern.Match (input);

@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-using UnitTests;
-using UnitTests;
+﻿using UnitTests;
 using Xunit.Abstractions;
 
 // ReSharper disable AccessToModifiedClosure

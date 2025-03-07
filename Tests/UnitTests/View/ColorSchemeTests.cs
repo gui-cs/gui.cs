@@ -1,11 +1,8 @@
 ﻿#nullable enable
-using System.Text;
-using Xunit.Abstractions;
-
 namespace Terminal.Gui.ViewTests;
 
 [Trait ("Category", "Output")]
-public class ColorSchemeTests (ITestOutputHelper _output)
+public class ColorSchemeTests ()
 {
 
 
@@ -14,7 +11,7 @@ public class ColorSchemeTests (ITestOutputHelper _output)
     {
         var view = new View { ColorScheme = Colors.ColorSchemes ["Base"] };
 
-        Assert.Equal (view.ColorScheme.HotNormal, view.GetHotNormalColor ());
+        Assert.Equal (view.ColorScheme!.HotNormal, view.GetHotNormalColor ());
 
         view.Enabled = false;
         Assert.Equal (view.ColorScheme.Disabled, view.GetHotNormalColor ());
@@ -26,7 +23,7 @@ public class ColorSchemeTests (ITestOutputHelper _output)
     {
         var view = new View { ColorScheme = Colors.ColorSchemes ["Base"] };
 
-        Assert.Equal (view.ColorScheme.Normal, view.GetNormalColor ());
+        Assert.Equal (view.ColorScheme!.Normal, view.GetNormalColor ());
 
         view.Enabled = false;
         Assert.Equal (view.ColorScheme.Disabled, view.GetNormalColor ());

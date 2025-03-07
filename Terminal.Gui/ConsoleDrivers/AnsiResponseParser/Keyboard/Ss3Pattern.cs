@@ -12,14 +12,14 @@ public class Ss3Pattern : AnsiKeyboardParserPattern
     private static readonly Regex _pattern = new (@"^\u001bO([PQRStDCAB])$");
 
     /// <inheritdoc/>
-    public override bool IsMatch (string input) { return _pattern.IsMatch (input); }
+    public override bool IsMatch (string? input) { return _pattern.IsMatch (input); }
 
     /// <summary>
     ///     Returns the ss3 key that corresponds to the provided input escape sequence
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    protected override Key? GetKeyImpl (string input)
+    protected override Key? GetKeyImpl (string? input)
     {
         Match match = _pattern.Match (input);
 

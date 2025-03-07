@@ -74,9 +74,9 @@ public class GetViewsUnderMouseTests
         {
             Frame = new (frameX, frameY, 10, 10)
         };
-        Application.Top.Margin.Thickness = new (marginThickness);
-        Application.Top.Border.Thickness = new (borderThickness);
-        Application.Top.Padding.Thickness = new (paddingThickness);
+        Application.Top.Margin!.Thickness = new (marginThickness);
+        Application.Top.Border!.Thickness = new (borderThickness);
+        Application.Top.Padding!.Thickness = new (paddingThickness);
 
         var location = new Point (testX, testY);
 
@@ -274,9 +274,9 @@ public class GetViewsUnderMouseTests
             X = frameX, Y = frameY,
             Width = 10, Height = 10
         };
-        view.Margin.Thickness = new (marginThickness);
-        view.Border.Thickness = new (borderThickness);
-        view.Padding.Thickness = new (paddingThickness);
+        view.Margin!.Thickness = new (marginThickness);
+        view.Border!.Thickness = new (borderThickness);
+        view.Padding!.Thickness = new (paddingThickness);
 
         Type? containedType = null;
 
@@ -465,7 +465,7 @@ public class GetViewsUnderMouseTests
         {
             Width = 10, Height = 10
         };
-        Application.Top.Margin.Thickness = new (1);
+        Application.Top.Margin!.Thickness = new (1);
 
         var subview = new View
         {
@@ -529,7 +529,7 @@ public class GetViewsUnderMouseTests
         {
             Width = 10, Height = 10
         };
-        Application.Top.Padding.Thickness = new (1);
+        Application.Top.Padding!.Thickness = new (1);
 
         var subview = new View
         {
@@ -561,9 +561,9 @@ public class GetViewsUnderMouseTests
         {
             Width = 10, Height = 10
         };
-        Application.Top.Margin.Thickness = new (1);
-        Application.Top.Border.Thickness = new (1);
-        Application.Top.Padding.Thickness = new (1);
+        Application.Top.Margin!.Thickness = new (1);
+        Application.Top.Border!.Thickness = new (1);
+        Application.Top.Padding!.Thickness = new (1);
 
         var subview = new View
         {
@@ -601,7 +601,7 @@ public class GetViewsUnderMouseTests
             X = 1, Y = 2,
             Width = 5, Height = 5
         };
-        subview.Margin.Thickness = new (1);
+        subview.Margin!.Thickness = new (1);
         Application.Top.Add (subview);
 
         View? found = View.GetViewsUnderMouse (new (testX, testY)).LastOrDefault ();
@@ -635,7 +635,7 @@ public class GetViewsUnderMouseTests
             X = 1, Y = 1,
             Width = 5, Height = 5
         };
-        subview.Padding.Thickness = new (1);
+        subview.Padding!.Thickness = new (1);
 
         // This subview will be at the bottom-right-corner of subview
         // So screen-relative location will be X + Width - 1 = 5
@@ -682,7 +682,7 @@ public class GetViewsUnderMouseTests
             X = 1, Y = 1,
             Width = 5, Height = 5
         };
-        subview.Padding.Thickness = new (1);
+        subview.Padding!.Thickness = new (1);
 
         // Scroll the subview
         subview.SetContentSize (new (10, 10));
