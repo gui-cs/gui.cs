@@ -75,11 +75,6 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         }
     }
 
-    private void _top_Added (object sender, SuperViewChangedEventArgs e)
-    {
-        throw new NotImplementedException ();
-    }
-
     /// <inheritdoc/>
     public override void EnsureSelectedIdxIsValid ()
     {
