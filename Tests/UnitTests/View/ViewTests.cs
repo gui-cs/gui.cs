@@ -152,12 +152,12 @@ public class ViewTests
 
         // Trying access disposed properties
 #if DEBUG_IDISPOSABLE
-        Assert.True (container2.SubViews [0].WasDisposed);
+        Assert.True (container2.SubViews.ElementAt (0).WasDisposed);
 #endif
-        Assert.False (container2.SubViews [0].CanFocus);
-        Assert.Null (container2.SubViews [0].Margin);
-        Assert.Null (container2.SubViews [0].Border);
-        Assert.Null (container2.SubViews [0].Padding);
+        Assert.False (container2.SubViews.ElementAt (0).CanFocus);
+        Assert.Null (container2.SubViews.ElementAt (0).Margin);
+        Assert.Null (container2.SubViews.ElementAt (0).Border);
+        Assert.Null (container2.SubViews.ElementAt (0).Padding);
         Assert.Null (view.SuperView);
 
         container2.Dispose ();

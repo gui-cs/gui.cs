@@ -541,9 +541,9 @@ public class DynamicStatusBar : Scenario
                 int index
             )
             {
-                _statusBar.SubViews [index].Title = statusItem.Title;
-                ((Shortcut)_statusBar.SubViews [index]).Action = frmStatusBarDetails.CreateAction (statusItem);
-                ((Shortcut)_statusBar.SubViews [index]).Key = statusItem.Shortcut;
+                _statusBar.SubViews.ElementAt (index).Title = statusItem.Title;
+                ((Shortcut)_statusBar.SubViews.ElementAt (index)).Action = frmStatusBarDetails.CreateAction (statusItem);
+                ((Shortcut)_statusBar.SubViews.ElementAt (index)).Key = statusItem.Shortcut;
 
                 if (DataContext.Items.Count == 0)
                 {

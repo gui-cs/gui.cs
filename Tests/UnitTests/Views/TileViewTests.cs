@@ -862,10 +862,10 @@ public class TileViewTests (ITestOutputHelper output)
         Assert.Same (left.SuperView, tileView);
 
         Assert.Equal (2, left.Tiles.ElementAt (0).ContentView.SubViews.Count);
-        Assert.IsType<Label> (left.Tiles.ElementAt (0).ContentView.SubViews [0]);
-        Assert.IsType<Label> (left.Tiles.ElementAt (0).ContentView.SubViews [1]);
-        var onesTop = (Label)left.Tiles.ElementAt (0).ContentView.SubViews [0];
-        var onesBottom = (Label)left.Tiles.ElementAt (0).ContentView.SubViews [1];
+        Assert.IsType<Label> (left.Tiles.ElementAt (0).ContentView.SubViews.ElementAt (0));
+        Assert.IsType<Label> (left.Tiles.ElementAt (0).ContentView.SubViews.ElementAt (1));
+        var onesTop = (Label)left.Tiles.ElementAt (0).ContentView.SubViews.ElementAt (0);
+        var onesBottom = (Label)left.Tiles.ElementAt (0).ContentView.SubViews.ElementAt (1);
 
         Assert.Same (left.Tiles.ElementAt (0).ContentView, onesTop.SuperView);
         Assert.Same (left.Tiles.ElementAt (0).ContentView, onesBottom.SuperView);

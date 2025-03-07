@@ -319,7 +319,7 @@ public class AdvanceFocusTests ()
         Assert.True (otherTabGroupSubView.HasFocus);
         Assert.False (tabStopView.HasFocus);
 
-        // TagBroup navs to the other subview
+        // TabGroup navs to the other subview
         top.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup);
         Assert.Equal (compoundSubView, top.Focused);
         Assert.True (tabStopView.HasFocus); 

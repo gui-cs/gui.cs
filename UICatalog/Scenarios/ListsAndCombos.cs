@@ -111,15 +111,15 @@ public class ListsAndCombos : Scenario
         comboBox.SelectedItemChanged += (s, text) => lbComboBox.Text = text.Value.ToString ();
         win.Add (lbComboBox, comboBox);
 
-        //var scrollBarCbx = new ScrollBarView (comboBox.SubViews [1], true);
+        //var scrollBarCbx = new ScrollBarView (comboBox.SubViews.ElementAt (1), true);
 
         //scrollBarCbx.ChangedPosition += (s, e) =>
         //                                {
-        //                                    ((ListView)comboBox.SubViews [1]).TopItem = scrollBarCbx.Position;
+        //                                    ((ListView)comboBox.SubViews.ElementAt (1)).TopItem = scrollBarCbx.Position;
 
-        //                                    if (((ListView)comboBox.SubViews [1]).TopItem != scrollBarCbx.Position)
+        //                                    if (((ListView)comboBox.SubViews.ElementAt (1)).TopItem != scrollBarCbx.Position)
         //                                    {
-        //                                        scrollBarCbx.Position = ((ListView)comboBox.SubViews [1]).TopItem;
+        //                                        scrollBarCbx.Position = ((ListView)comboBox.SubViews.ElementAt (1)).TopItem;
         //                                    }
 
         //                                    comboBox.SetNeedsDraw ();
@@ -127,11 +127,11 @@ public class ListsAndCombos : Scenario
 
         //scrollBarCbx.OtherScrollBarView.ChangedPosition += (s, e) =>
         //                                                   {
-        //                                                       ((ListView)comboBox.SubViews [1]).LeftItem = scrollBarCbx.OtherScrollBarView.Position;
+        //                                                       ((ListView)comboBox.SubViews.ElementAt (1)).LeftItem = scrollBarCbx.OtherScrollBarView.Position;
 
-        //                                                       if (((ListView)comboBox.SubViews [1]).LeftItem != scrollBarCbx.OtherScrollBarView.Position)
+        //                                                       if (((ListView)comboBox.SubViews.ElementAt (1)).LeftItem != scrollBarCbx.OtherScrollBarView.Position)
         //                                                       {
-        //                                                           scrollBarCbx.OtherScrollBarView.Position = ((ListView)comboBox.SubViews [1]).LeftItem;
+        //                                                           scrollBarCbx.OtherScrollBarView.Position = ((ListView)comboBox.SubViews.ElementAt (1)).LeftItem;
         //                                                       }
 
         //                                                       comboBox.SetNeedsDraw ();
@@ -140,9 +140,9 @@ public class ListsAndCombos : Scenario
         //comboBox.DrawingContent += (s, e) =>
         //                        {
         //                            scrollBarCbx.Size = comboBox.Source.Count;
-        //                            scrollBarCbx.Position = ((ListView)comboBox.SubViews [1]).TopItem;
-        //                            scrollBarCbx.OtherScrollBarView.Size = ((ListView)comboBox.SubViews [1]).MaxLength - 1;
-        //                            scrollBarCbx.OtherScrollBarView.Position = ((ListView)comboBox.SubViews [1]).LeftItem;
+        //                            scrollBarCbx.Position = ((ListView)comboBox.SubViews.ElementAt (1)).TopItem;
+        //                            scrollBarCbx.OtherScrollBarView.Size = ((ListView)comboBox.SubViews.ElementAt (1)).MaxLength - 1;
+        //                            scrollBarCbx.OtherScrollBarView.Position = ((ListView)comboBox.SubViews.ElementAt (1)).LeftItem;
         //                            scrollBarCbx.Refresh ();
         //                        };
 

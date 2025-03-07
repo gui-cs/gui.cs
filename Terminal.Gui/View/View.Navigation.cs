@@ -906,11 +906,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         if (behavior.HasValue)
         {
-            filteredSubViews = _subviews?.Where (v => v.TabStop == behavior && v is { CanFocus: true, Visible: true, Enabled: true });
+            filteredSubViews = InternalSubViews?.Where (v => v.TabStop == behavior && v is { CanFocus: true, Visible: true, Enabled: true });
         }
         else
         {
-            filteredSubViews = _subviews?.Where (v => v is { CanFocus: true, Visible: true, Enabled: true });
+            filteredSubViews = InternalSubViews?.Where (v => v is { CanFocus: true, Visible: true, Enabled: true });
         }
 
         // How about in Adornments? 

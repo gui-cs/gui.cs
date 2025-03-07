@@ -39,7 +39,7 @@ public class BarTests
         Assert.Equal (shortcuts.Count, bar.SubViews.Count);
         for (int i = 0; i < shortcuts.Count; i++)
         {
-            Assert.Same (shortcuts [i], bar.SubViews [i]);
+            Assert.Same (shortcuts [i], bar.SubViews.ElementAt (i));
         }
     }
 

@@ -7,19 +7,19 @@ namespace Terminal.Gui;
 public partial class View // SuperView/SubView hierarchy management (SuperView, SubViews, Add, Remove, etc.)
 {
     [SuppressMessage ("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-    private static readonly IList<View> _empty = new List<View> (0).AsReadOnly ();
+    private static readonly IReadOnlyCollection<View> _empty = new List<View> (0).AsReadOnly ();
 
     private List<View>? _subviews; // This is null, and allocated on demand.
 
     // Internally, we use InternalSubViews rather than subviews, as we do not expect us
     // to make the same mistakes our users make when they poke at the SubViews.
-    internal IList<View> InternalSubViews => _subviews ?? _empty;
+    internal IList<View> InternalSubViews => _subviews ?? [];
 
     /// <summary>Gets the list of SubViews.</summary>
     /// <remarks>
     ///     Use <see cref="Add(Terminal.Gui.View?)"/> and <see cref="Remove(Terminal.Gui.View?)"/> to add or remove subviews.
     /// </remarks>
-    public IList<View> SubViews => _subviews?.AsReadOnly () ?? _empty;
+    public IReadOnlyCollection<View> SubViews => _subviews?.AsReadOnly () ?? _empty;
 
     private View? _superView;
 

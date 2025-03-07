@@ -531,9 +531,9 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                      );
 
         Assert.True (
-                     top.SubViews [0]
+                     top.SubViews.ElementAt (0)
                         .NewMouseEvent (
-                                        new MouseEventArgs { Position = new (0, 3), Flags = MouseFlags.ReportMousePosition, View = top.SubViews [0] }
+                                        new MouseEventArgs { Position = new (0, 3), Flags = MouseFlags.ReportMousePosition, View = top.SubViews.ElementAt (0) }
                                        )
                     );
         Application.RunIteration (ref rs);
@@ -579,9 +579,9 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                      );
 
         Assert.True (
-                     top.SubViews [0]
+                     top.SubViews.ElementAt (0)
                         .NewMouseEvent (
-                                        new MouseEventArgs { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.SubViews [0] }
+                                        new MouseEventArgs { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.SubViews.ElementAt (0) }
                                        )
                     );
         Application.RunIteration (ref rs);
@@ -626,9 +626,9 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                      );
 
         Assert.True (
-                     top.SubViews [0]
+                     top.SubViews.ElementAt (0)
                         .NewMouseEvent (
-                                        new MouseEventArgs { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.SubViews [0] }
+                                        new MouseEventArgs { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.SubViews.ElementAt (0) }
                                        )
                     );
         Application.RunIteration (ref rs);
@@ -670,9 +670,9 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                      );
 
         Assert.True (
-                     top.SubViews [0]
+                     top.SubViews.ElementAt (0)
                         .NewMouseEvent (
-                                        new MouseEventArgs { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.SubViews [0] }
+                                        new MouseEventArgs { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.SubViews.ElementAt (0) }
                                        )
                     );
         Application.RunIteration (ref rs);
@@ -714,9 +714,9 @@ public class ContextMenuTests (ITestOutputHelper output)
                                                      );
 
         Assert.True (
-                     top.SubViews [0]
+                     top.SubViews.ElementAt (0)
                         .NewMouseEvent (
-                                        new MouseEventArgs { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.SubViews [0] }
+                                        new MouseEventArgs { Position = new (30, 3), Flags = MouseFlags.ReportMousePosition, View = top.SubViews.ElementAt (0) }
                                        )
                     );
         Application.RunIteration (ref rs);
@@ -1223,7 +1223,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         Toplevel top = new ();
         RunState rs = Application.Begin (top);
         cm.Show (menuItems);
-        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top!.SubViews [0].Frame);
+        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top!.SubViews.ElementAt (0).Frame);
         Application.LayoutAndDraw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1241,8 +1241,8 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         var firstIteration = false;
         Application.RunIteration (ref rs, firstIteration);
-        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.SubViews [0].Frame);
-        Assert.Equal (new Rectangle (5, 11, 15, 6), Application.Top.SubViews [1].Frame);
+        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.SubViews.ElementAt (0).Frame);
+        Assert.Equal (new Rectangle (5, 11, 15, 6), Application.Top.SubViews.ElementAt (1).Frame);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1259,7 +1259,7 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         firstIteration = false;
         Application.RunIteration (ref rs, firstIteration);
-        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.SubViews [0].Frame);
+        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.SubViews.ElementAt (0).Frame);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1316,7 +1316,7 @@ public class ContextMenuTests (ITestOutputHelper output)
         RunState rs = Application.Begin (top);
         cm.Show (menuItems);
 
-        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.SubViews [0].Frame);
+        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.SubViews.ElementAt (0).Frame);
         Application.LayoutAndDraw ();
 
         DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1333,7 +1333,7 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         var firstIteration = false;
         Application.RunIteration (ref rs, firstIteration);
-        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.SubViews [0].Frame);
+        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.SubViews.ElementAt (0).Frame);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1350,7 +1350,7 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         firstIteration = false;
         Application.RunIteration (ref rs, firstIteration);
-        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.SubViews [0].Frame);
+        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.SubViews.ElementAt (0).Frame);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"
@@ -1368,7 +1368,7 @@ public class ContextMenuTests (ITestOutputHelper output)
 
         firstIteration = false;
         Application.RunIteration (ref rs, firstIteration);
-        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.SubViews [0].Frame);
+        Assert.Equal (new Rectangle (5, 11, 10, 5), Application.Top.SubViews.ElementAt (0).Frame);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
                                                       @"

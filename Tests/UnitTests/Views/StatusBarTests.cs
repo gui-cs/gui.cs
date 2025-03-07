@@ -16,22 +16,22 @@ public class StatusBarTests
 
         sb.AddShortcutAt (2, new (Key.C.WithCtrl, "Close", null));
 
-        Assert.Equal ("Open", sb.SubViews [0].Title);
-        Assert.Equal ("Save", sb.SubViews [1].Title);
-        Assert.Equal ("Close", sb.SubViews [2].Title);
-        Assert.Equal ("Quit", sb.SubViews [^1].Title);
+        Assert.Equal ("Open", sb.SubViews.ElementAt (0).Title);
+        Assert.Equal ("Save", sb.SubViews.ElementAt (1).Title);
+        Assert.Equal ("Close", sb.SubViews.ElementAt (2).Title);
+        Assert.Equal ("Quit", sb.SubViews.ToArray() [^1].Title);
 
         Assert.Equal ("Save", sb.RemoveShortcut (1).Title);
 
-        Assert.Equal ("Open", sb.SubViews [0].Title);
-        Assert.Equal ("Close", sb.SubViews [1].Title);
-        Assert.Equal ("Quit", sb.SubViews [^1].Title);
+        Assert.Equal ("Open", sb.SubViews.ElementAt (0).Title);
+        Assert.Equal ("Close", sb.SubViews.ElementAt (1).Title);
+        Assert.Equal ("Quit", sb.SubViews.ToArray () [^1].Title);
 
         sb.AddShortcutAt (1, new Shortcut (Key.A.WithCtrl, "Save As", null));
 
-        Assert.Equal ("Open", sb.SubViews [0].Title);
-        Assert.Equal ("Save As", sb.SubViews [1].Title);
-        Assert.Equal ("Quit", sb.SubViews [^1].Title);
+        Assert.Equal ("Open", sb.SubViews.ElementAt (0).Title);
+        Assert.Equal ("Save As", sb.SubViews.ElementAt (1).Title);
+        Assert.Equal ("Quit", sb.SubViews.ToArray () [^1].Title);
     }
 
     //[Fact]

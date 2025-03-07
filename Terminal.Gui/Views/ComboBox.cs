@@ -64,7 +64,7 @@ public class ComboBox : View, IDesignable
                      // Determine if this view is hosted inside a dialog and is the only control
                      for (View view = SuperView; view != null; view = view.SuperView)
                      {
-                         if (view is Dialog && SuperView is { } && SuperView.SubViews.Count == 1 && SuperView.SubViews [0] == this)
+                         if (view is Dialog && SuperView is { } && SuperView.SubViews.Count == 1 && SuperView.SubViews.ElementAt (0) == this)
                          {
                              _autoHide = false;
 

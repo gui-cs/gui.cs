@@ -80,7 +80,7 @@ public class Label : View, IDesignable
             if (me != -1 && me < SuperView?.SubViews.Count - 1)
             {
 
-                return SuperView?.SubViews [me + 1].InvokeCommand (Command.HotKey) == true;
+                return SuperView?.SubViews.ElementAt (me + 1).InvokeCommand (Command.HotKey) == true;
             }
         }
 

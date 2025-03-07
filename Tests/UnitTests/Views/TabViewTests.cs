@@ -101,7 +101,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         tv.Draw ();
 
-        View tabRow = tv.SubViews [0];
+        View tabRow = tv.SubViews.ElementAt (0);
         Assert.Equal ("TabRow", tabRow.GetType ().Name);
 
         DriverAssert.AssertDriverContentsAre (
@@ -184,7 +184,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         tv.Draw ();
 
-        View tabRow = tv.SubViews [0];
+        View tabRow = tv.SubViews.ElementAt (0);
         Assert.Equal ("TabRow", tabRow.GetType ().Name);
 
         DriverAssert.AssertDriverContentsAre (
@@ -272,7 +272,7 @@ public class TabViewTests (ITestOutputHelper output)
 
         tv.Draw ();
 
-        View tabRow = tv.SubViews [0];
+        View tabRow = tv.SubViews.ElementAt (0);
         Assert.Equal ("TabRow", tabRow.GetType ().Name);
 
         DriverAssert.AssertDriverContentsAre (

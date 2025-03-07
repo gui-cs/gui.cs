@@ -51,7 +51,7 @@ public class Menuv2 : Bar
     {
         for (int index = 0; index < SubViews.Count; index++)
         {
-            View barItem = SubViews [index];
+            View barItem = SubViews.ElementAt (index);
 
             if (!barItem.Visible)
             {

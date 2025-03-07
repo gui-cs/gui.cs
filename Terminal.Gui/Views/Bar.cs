@@ -183,7 +183,7 @@ public class Bar : View, IOrientation, IDesignable
         {
             if (i == index)
             {
-                toRemove = SubViews [i];
+                toRemove = SubViews.ElementAt (i);
             }
         }
 
@@ -212,7 +212,7 @@ public class Bar : View, IOrientation, IDesignable
             case Orientation.Horizontal:
                 for (var index = 0; index < SubViews.Count; index++)
                 {
-                    View barItem = SubViews [index];
+                    View barItem = SubViews.ElementAt (index);
 
                     barItem.ColorScheme = ColorScheme;
                     barItem.X = Pos.Align (Alignment.Start, AlignmentModes);
@@ -239,7 +239,7 @@ public class Bar : View, IOrientation, IDesignable
 
                     for (var index = 0; index < SubViews.Count; index++)
                     {
-                        View barItem = SubViews [index];
+                        View barItem = SubViews.ElementAt (index);
 
 
                         barItem.ColorScheme = ColorScheme;

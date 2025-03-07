@@ -140,10 +140,10 @@ public class SubViewTests
         superView.Add (subview1, subview2, subview3);
 
         superView.MoveSubViewToStart (subview2);
-        Assert.Equal (subview2, superView.SubViews [0]);
+        Assert.Equal (subview2, superView.SubViews.ElementAt (0));
 
         superView.MoveSubViewToStart (subview3);
-        Assert.Equal (subview3, superView.SubViews [0]);
+        Assert.Equal (subview3, superView.SubViews.ElementAt (0));
     }
 
     [Fact]
@@ -169,14 +169,14 @@ public class SubViewTests
         superView.Add (subview1, subview2, subview3);
 
         superView.MoveSubViewTowardsStart (subview2);
-        Assert.Equal (subview2, superView.SubViews [0]);
+        Assert.Equal (subview2, superView.SubViews.ElementAt (0));
 
         superView.MoveSubViewTowardsStart (subview3);
-        Assert.Equal (subview3, superView.SubViews [1]);
+        Assert.Equal (subview3, superView.SubViews.ElementAt (1));
 
         // Already at front, what happens?
         superView.MoveSubViewTowardsStart (subview2);
-        Assert.Equal (subview2, superView.SubViews [0]);
+        Assert.Equal (subview2, superView.SubViews.ElementAt (0));
     }
 
     [Fact]
@@ -202,10 +202,10 @@ public class SubViewTests
         superView.Add (subview1, subview2, subview3);
 
         superView.MoveSubViewToEnd (subview1);
-        Assert.Equal (subview1, superView.SubViews [^1]);
+        Assert.Equal (subview1, superView.SubViews.ToArray () [^1]);
 
         superView.MoveSubViewToEnd (subview2);
-        Assert.Equal (subview2, superView.SubViews [^1]);
+        Assert.Equal (subview2, superView.SubViews.ToArray () [^1]);
     }
 
     [Fact]
@@ -231,14 +231,14 @@ public class SubViewTests
         superView.Add (subview1, subview2, subview3);
 
         superView.MoveSubViewTowardsEnd (subview2);
-        Assert.Equal (subview2, superView.SubViews [^1]);
+        Assert.Equal (subview2, superView.SubViews.ToArray() [^1]);
 
         superView.MoveSubViewTowardsEnd (subview1);
-        Assert.Equal (subview1, superView.SubViews [1]);
+        Assert.Equal (subview1, superView.SubViews.ToArray() [1]);
 
         // Already at end, what happens?
         superView.MoveSubViewTowardsEnd (subview2);
-        Assert.Equal (subview2, superView.SubViews [^1]);
+        Assert.Equal (subview2, superView.SubViews.ToArray() [^1]);
     }
 
     [Fact]

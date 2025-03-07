@@ -58,7 +58,7 @@ public record PosAlign : Pos
     /// <param name="views"></param>
     /// <param name="dimension"></param>
     /// <returns></returns>
-    public static int CalculateMinDimension (int groupId, IList<View> views, Dimension dimension)
+    public static int CalculateMinDimension (int groupId, IReadOnlyCollection<View> views, Dimension dimension)
     {
         int dimensionsSum = 0;
         foreach (var view in views)

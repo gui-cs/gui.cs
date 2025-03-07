@@ -409,13 +409,13 @@ public class MenuBarTests (ITestOutputHelper output)
                                               );
 
         Assert.True (
-                     top.SubViews [1]
+                     top.SubViews.ElementAt (1)
                         .NewMouseEvent (
-                                        new () { Position = new (0, 2), Flags = MouseFlags.Button1Clicked, View = top.SubViews [1] }
+                                        new () { Position = new (0, 2), Flags = MouseFlags.Button1Clicked, View = top.SubViews.ElementAt (1) }
                                        )
                     );
-        top.SubViews [1].Layout();
-        top.SubViews [1].Draw ();
+        top.SubViews.ElementAt (1).Layout();
+        top.SubViews.ElementAt (1).Draw ();
 
         DriverAssert.AssertDriverAttributesAre (
                                                @"
@@ -432,12 +432,12 @@ public class MenuBarTests (ITestOutputHelper output)
                                               );
 
         Assert.True (
-                     top.SubViews [1]
+                     top.SubViews.ElementAt (1)
                         .NewMouseEvent (
-                                        new () { Position = new (0, 2), Flags = MouseFlags.ReportMousePosition, View = top.SubViews [1] }
+                                        new () { Position = new (0, 2), Flags = MouseFlags.ReportMousePosition, View = top.SubViews.ElementAt (1) }
                                        )
                     );
-        top.SubViews [1].Draw ();
+        top.SubViews.ElementAt (1).Draw ();
 
         DriverAssert.AssertDriverAttributesAre (
                                                @"
@@ -1217,7 +1217,7 @@ wo
         Application.Top.Draw ();
         DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), output);
 
-        Assert.True (Application.Top.SubViews [1].NewKeyDownEvent (Key.N));
+        Assert.True (Application.Top.SubViews.ElementAt (1).NewKeyDownEvent (Key.N));
         Application.MainLoop.RunIteration ();
         Assert.True (newAction);
 
@@ -1226,7 +1226,7 @@ wo
         Application.Top.Draw ();
         DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (1), output);
 
-        Assert.True (Application.Top.SubViews [1].NewKeyDownEvent (Key.C));
+        Assert.True (Application.Top.SubViews.ElementAt (1).NewKeyDownEvent (Key.C));
         Application.MainLoop.RunIteration ();
         Assert.True (copyAction);
         top.Dispose ();
@@ -1978,7 +1978,7 @@ wo
                                                                                    output
                                                                                   );
 
-                                     Assert.True (top.SubViews [0].NewKeyDownEvent (Key.CursorRight));
+                                     Assert.True (top.SubViews.ElementAt (0).NewKeyDownEvent (Key.CursorRight));
                                      Application.LayoutAndDraw ();
 
                                      DriverAssert.AssertDriverContentsWithFrameAre (
@@ -1995,7 +1995,7 @@ wo
                                                                                   );
 
                                      Assert.True (
-                                                  ((MenuBar)top.SubViews [0])._openMenu.NewKeyDownEvent (Key.CursorRight)
+                                                  ((MenuBar)top.SubViews.ElementAt (0))._openMenu.NewKeyDownEvent (Key.CursorRight)
                                                  );
                                      top.Draw ();
 
@@ -2013,7 +2013,7 @@ wo
                                                                                   );
 
                                      Assert.True (
-                                                  ((MenuBar)top.SubViews [0])._openMenu.NewKeyDownEvent (Key.CursorRight)
+                                                  ((MenuBar)top.SubViews.ElementAt (0))._openMenu.NewKeyDownEvent (Key.CursorRight)
                                                  );
                                      View.SetClipToScreen ();
                                      top.Draw ();
@@ -2088,7 +2088,7 @@ wo
         DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), output);
 
         // Open second
-        Assert.True (Application.Top.SubViews [1].NewKeyDownEvent (Key.CursorRight));
+        Assert.True (Application.Top.SubViews.ElementAt (1).NewKeyDownEvent (Key.CursorRight));
         Assert.True (menu.IsMenuOpen);
         View.SetClipToScreen ();
         top.Draw ();
@@ -2136,7 +2136,7 @@ wo
         DriverAssert.AssertDriverContentsAre (expectedMenu.ExpectedSubMenuOpen (0), output);
 
         // Open second
-        Assert.True (top.SubViews [1].NewKeyDownEvent (Key.CursorRight));
+        Assert.True (top.SubViews.ElementAt (1).NewKeyDownEvent (Key.CursorRight));
         Assert.True (menu.IsMenuOpen);
         View.SetClipToScreen ();
         Application.Top.Draw ();
@@ -3080,7 +3080,7 @@ Edit
 
         pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
-        Assert.True (Application.Top.SubViews [1].NewKeyDownEvent (Key.CursorDown));
+        Assert.True (Application.Top.SubViews.ElementAt (1).NewKeyDownEvent (Key.CursorDown));
         top.Draw ();
 
         expected = @"
@@ -3095,7 +3095,7 @@ Edit
 
         pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
-        Assert.True (Application.Top.SubViews [2].NewKeyDownEvent (Key.CursorLeft));
+        Assert.True (Application.Top.SubViews.ElementAt (2).NewKeyDownEvent (Key.CursorLeft));
         top.Draw ();
 
         expected = @"
@@ -3109,7 +3109,7 @@ Edit
 
         pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
 
-        Assert.True (Application.Top.SubViews [1].NewKeyDownEvent (Key.Esc));
+        Assert.True (Application.Top.SubViews.ElementAt (1).NewKeyDownEvent (Key.Esc));
         top.Draw ();
 
         expected = @"
@@ -3191,7 +3191,7 @@ Edit
         menu.NewMouseEvent (
                             new ()
                             {
-                                Position = new (1, 2), Flags = MouseFlags.ReportMousePosition, View = Application.Top.SubViews [1]
+                                Position = new (1, 2), Flags = MouseFlags.ReportMousePosition, View = Application.Top.SubViews.ElementAt (1)
                             }
                            );
         top.Draw ();
@@ -3213,7 +3213,7 @@ Edit
                       menu.NewMouseEvent (
                                           new ()
                                           {
-                                              Position = new (1, 1), Flags = MouseFlags.ReportMousePosition, View = Application.Top.SubViews [1]
+                                              Position = new (1, 1), Flags = MouseFlags.ReportMousePosition, View = Application.Top.SubViews.ElementAt (1)
                                           }
                                          )
                      );
@@ -3382,8 +3382,8 @@ Edit
         pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 10, 6), pos);
 
-        Assert.True (Application.Top.SubViews [1].NewKeyDownEvent (Key.CursorDown));
-        Assert.True (Application.Top.SubViews [1].NewKeyDownEvent (Key.Enter));
+        Assert.True (Application.Top.SubViews.ElementAt (1).NewKeyDownEvent (Key.CursorDown));
+        Assert.True (Application.Top.SubViews.ElementAt (1).NewKeyDownEvent (Key.Enter));
         top.Draw ();
 
         expected = @"
@@ -3399,7 +3399,7 @@ Edit
         pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 15, 7), pos);
 
-        Assert.True (Application.Top.SubViews [2].NewKeyDownEvent (Key.Enter));
+        Assert.True (Application.Top.SubViews.ElementAt (2).NewKeyDownEvent (Key.Enter));
         top.Draw ();
 
         expected = @"
@@ -3414,7 +3414,7 @@ Edit
         pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 10, 6), pos);
 
-        Assert.True (Application.Top.SubViews [1].NewKeyDownEvent (Key.Esc));
+        Assert.True (Application.Top.SubViews.ElementAt (1).NewKeyDownEvent (Key.Esc));
         top.Draw ();
 
         expected = @"
@@ -3494,7 +3494,7 @@ Edit
         pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 10, 6), pos);
 
-        Assert.False (menu.NewMouseEvent (new () { Position = new (1, 2), Flags = MouseFlags.Button1Clicked, View = Application.Top.SubViews [1] }));
+        Assert.False (menu.NewMouseEvent (new () { Position = new (1, 2), Flags = MouseFlags.Button1Clicked, View = Application.Top.SubViews.ElementAt (1) }));
         top.Draw ();
 
         expected = @"
@@ -3510,7 +3510,7 @@ Edit
         pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (1, 0, 15, 7), pos);
 
-        menu.NewMouseEvent (new () { Position = new (1, 1), Flags = MouseFlags.Button1Clicked, View = Application.Top.SubViews [2] });
+        menu.NewMouseEvent (new () { Position = new (1, 1), Flags = MouseFlags.Button1Clicked, View = Application.Top.SubViews.ElementAt (2) });
         top.Draw ();
 
         expected = @"
@@ -3680,7 +3680,7 @@ Edit
         Assert.Equal (new (1, 0, 8, 4), pos);
 
         menu.NewMouseEvent (
-                            new () { Position = new (1, 2), Flags = MouseFlags.Button1Clicked, View = Application.Top.SubViews [1] }
+                            new () { Position = new (1, 2), Flags = MouseFlags.Button1Clicked, View = Application.Top.SubViews.ElementAt (1) }
                            );
         top.Draw ();
 
@@ -3696,7 +3696,7 @@ Edit
         Assert.Equal (new (1, 0, 13, 5), pos);
 
         menu.NewMouseEvent (
-                            new () { Position = new (1, 1), Flags = MouseFlags.Button1Clicked, View = Application.Top.SubViews [2] }
+                            new () { Position = new (1, 1), Flags = MouseFlags.Button1Clicked, View = Application.Top.SubViews.ElementAt (2) }
                            );
         top.Draw ();
 

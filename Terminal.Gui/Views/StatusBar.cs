@@ -36,7 +36,7 @@ public class StatusBar : Bar, IDesignable
     {
         for (int index = 0; index < SubViews.Count; index++)
         {
-            View barItem = SubViews [index];
+            View barItem = SubViews.ElementAt (index);
 
             barItem.BorderStyle = BorderStyle;
 

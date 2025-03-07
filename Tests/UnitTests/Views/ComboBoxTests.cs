@@ -144,13 +144,13 @@ public class ComboBoxTests (ITestOutputHelper output)
         Assert.Equal (0, cb.SelectedItem);
         Assert.Equal ("One", cb.Text);
 
-        Assert.True (cb.SubViews [1].NewKeyDownEvent (Key.CursorDown));
+        Assert.True (cb.SubViews.ElementAt (1).NewKeyDownEvent (Key.CursorDown));
         Assert.Equal ("", selected);
         Assert.True (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
         Assert.Equal ("Two", cb.Text);
 
-        Assert.True (cb.SubViews [1].NewKeyDownEvent (Key.Enter));
+        Assert.True (cb.SubViews.ElementAt (1).NewKeyDownEvent (Key.Enter));
         Assert.Equal ("Two", selected);
         Assert.False (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
@@ -161,7 +161,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         Assert.True (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
         Assert.Equal ("Two", cb.Text);
-        Assert.True (cb.SubViews [1].NewKeyDownEvent (Key.CursorDown));
+        Assert.True (cb.SubViews.ElementAt (1).NewKeyDownEvent (Key.CursorDown));
         Assert.Equal ("Two", selected);
         Assert.True (cb.IsShow);
         Assert.Equal (2, cb.SelectedItem);
@@ -202,7 +202,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         Assert.Equal (0, cb.SelectedItem);
         Assert.Equal ("One", cb.Text);
 
-        Assert.True (cb.SubViews [1].NewKeyDownEvent (Key.CursorDown));
+        Assert.True (cb.SubViews.ElementAt (1).NewKeyDownEvent (Key.CursorDown));
         Assert.True (Application.RaiseKeyDownEvent (Key.F4));
         Assert.Equal ("Two", selected);
         Assert.False (cb.IsShow);
@@ -240,13 +240,13 @@ public class ComboBoxTests (ITestOutputHelper output)
         Assert.Equal (0, cb.SelectedItem);
         Assert.Equal ("One", cb.Text);
 
-        Assert.True (cb.SubViews [1].NewKeyDownEvent (Key.CursorDown));
+        Assert.True (cb.SubViews.ElementAt (1).NewKeyDownEvent (Key.CursorDown));
         Assert.Equal ("", selected);
         Assert.True (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
         Assert.Equal ("Two", cb.Text);
 
-        Assert.True (cb.SubViews [1].NewKeyDownEvent (Key.Enter));
+        Assert.True (cb.SubViews.ElementAt (1).NewKeyDownEvent (Key.Enter));
         Assert.Equal ("Two", selected);
         Assert.False (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
@@ -257,7 +257,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         Assert.True (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
         Assert.Equal ("Two", cb.Text);
-        Assert.True (cb.SubViews [1].NewKeyDownEvent (Key.CursorDown));
+        Assert.True (cb.SubViews.ElementAt (1).NewKeyDownEvent (Key.CursorDown));
         Assert.Equal ("Two", selected);
         Assert.True (cb.IsShow);
         Assert.Equal (2, cb.SelectedItem);
@@ -301,7 +301,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         cb.Layout ();
 
         Assert.True (
-                     cb.SubViews [1]
+                     cb.SubViews.ElementAt (1)
                        .NewMouseEvent (
                                        new() { Position = new (0, 1), Flags = MouseFlags.Button1Clicked }
                                       )
@@ -312,7 +312,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         Assert.Equal ("Two", cb.Text);
 
         Assert.True (
-                     cb.SubViews [1]
+                     cb.SubViews.ElementAt (1)
                        .NewMouseEvent (
                                        new() { Position = new (0, 1), Flags = MouseFlags.Button1Clicked }
                                       )
@@ -325,7 +325,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         cb.HideDropdownListOnClick = true;
 
         Assert.True (
-                     cb.SubViews [1]
+                     cb.SubViews.ElementAt (1)
                        .NewMouseEvent (
                                        new() { Position = new (0, 2), Flags = MouseFlags.Button1Clicked }
                                       )
@@ -342,7 +342,7 @@ public class ComboBoxTests (ITestOutputHelper output)
                     );
 
         Assert.True (
-                     cb.SubViews [1]
+                     cb.SubViews.ElementAt (1)
                        .NewMouseEvent (
                                        new() { Position = new (0, 2), Flags = MouseFlags.Button1Clicked }
                                       )
@@ -363,7 +363,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         Assert.Equal ("Three", cb.Text);
 
         Assert.True (
-                     cb.SubViews [1]
+                     cb.SubViews.ElementAt (1)
                        .NewMouseEvent (
                                        new() { Position = new (0, 0), Flags = MouseFlags.Button1Clicked }
                                       )
@@ -399,7 +399,7 @@ public class ComboBoxTests (ITestOutputHelper output)
                     );
 
         Assert.True (
-                     cb.SubViews [1]
+                     cb.SubViews.ElementAt (1)
                        .NewMouseEvent (
                                        new() { Position = new (cb.Viewport.Right - 1, 0), Flags = MouseFlags.Button1Clicked }
                                       )
@@ -410,7 +410,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         Assert.Equal ("", cb.Text);
 
         Assert.True (
-                     cb.SubViews [1]
+                     cb.SubViews.ElementAt (1)
                        .NewMouseEvent (
                                        new() { Position = new (-1, 0), Flags = MouseFlags.Button1Clicked }
                                       )
@@ -423,7 +423,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         Assert.True (Application.RaiseKeyDownEvent (Key.F4));
 
         Assert.True (
-                     cb.SubViews [1]
+                     cb.SubViews.ElementAt (1)
                        .NewMouseEvent (
                                        new() { Position = new (cb.Viewport.Right - 1, 0), Flags = MouseFlags.Button1Clicked }
                                       )
@@ -434,7 +434,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         Assert.Equal ("", cb.Text);
 
         Assert.True (
-                     cb.SubViews [1]
+                     cb.SubViews.ElementAt (1)
                        .NewMouseEvent (
                                        new() { Position = new (0, -1), Flags = MouseFlags.Button1Clicked }
                                       )
@@ -447,7 +447,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         Assert.True (Application.RaiseKeyDownEvent (Key.F4));
 
         Assert.True (
-                     cb.SubViews [1]
+                     cb.SubViews.ElementAt (1)
                        .NewMouseEvent (
                                        new() { Position = new (cb.Viewport.Right - 1, 0), Flags = MouseFlags.Button1Clicked }
                                       )
@@ -458,7 +458,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         Assert.Equal ("", cb.Text);
 
         Assert.True (
-                     cb.SubViews [1]
+                     cb.SubViews.ElementAt (1)
                        .NewMouseEvent (
                                        new() { Position = new (cb.Frame.Width, 0), Flags = MouseFlags.Button1Clicked }
                                       )
@@ -471,7 +471,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         Assert.True (Application.RaiseKeyDownEvent (Key.F4));
 
         Assert.True (
-                     cb.SubViews [1]
+                     cb.SubViews.ElementAt (1)
                        .NewMouseEvent (
                                        new() { Position = new (cb.Viewport.Right - 1, 0), Flags = MouseFlags.Button1Clicked }
                                       )
@@ -482,7 +482,7 @@ public class ComboBoxTests (ITestOutputHelper output)
         Assert.Equal ("", cb.Text);
 
         Assert.True (
-                     cb.SubViews [1]
+                     cb.SubViews.ElementAt (1)
                        .NewMouseEvent (
                                        new() { Position = new (0, cb.Frame.Height), Flags = MouseFlags.Button1Clicked }
                                       )
@@ -542,13 +542,13 @@ Three ",
         Attribute [] attributes =
         {
             // 0
-            cb.SubViews [0].ColorScheme.Focus,
+            cb.SubViews.ElementAt (0).ColorScheme.Focus,
 
             // 1
-            cb.SubViews [1].ColorScheme.HotFocus,
+            cb.SubViews.ElementAt (1).ColorScheme.HotFocus,
 
             // 2
-            cb.SubViews [1].GetNormalColor ()
+            cb.SubViews.ElementAt (1).GetNormalColor ()
         };
 
         DriverAssert.AssertDriverAttributesAre (
@@ -562,7 +562,7 @@ Three ",
                                                 attributes
                                                );
 
-        Assert.True (cb.SubViews [1].NewKeyDownEvent (Key.CursorDown));
+        Assert.True (cb.SubViews.ElementAt (1).NewKeyDownEvent (Key.CursorDown));
         Assert.Equal ("", selected);
         Assert.True (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
@@ -581,7 +581,7 @@ Three ",
                                                 attributes
                                                );
 
-        Assert.True (cb.SubViews [1].NewKeyDownEvent (Key.CursorDown));
+        Assert.True (cb.SubViews.ElementAt (1).NewKeyDownEvent (Key.CursorDown));
         Assert.Equal ("", selected);
         Assert.True (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
@@ -600,7 +600,7 @@ Three ",
                                                 attributes
                                                );
 
-        Assert.True (cb.SubViews [1].NewKeyDownEvent (Key.Enter));
+        Assert.True (cb.SubViews.ElementAt (1).NewKeyDownEvent (Key.Enter));
         Assert.Equal ("Three", selected);
         Assert.False (cb.IsShow);
         Assert.Equal (2, cb.SelectedItem);
@@ -625,7 +625,7 @@ Three ",
                                                 attributes
                                                );
 
-        Assert.True (cb.SubViews [1].NewKeyDownEvent (Key.CursorUp));
+        Assert.True (cb.SubViews.ElementAt (1).NewKeyDownEvent (Key.CursorUp));
         Assert.Equal ("Three", selected);
         Assert.True (cb.IsShow);
         Assert.Equal (2, cb.SelectedItem);
@@ -644,7 +644,7 @@ Three ",
                                                 attributes
                                                );
 
-        Assert.True (cb.SubViews [1].NewKeyDownEvent (Key.CursorUp));
+        Assert.True (cb.SubViews.ElementAt (1).NewKeyDownEvent (Key.CursorUp));
         Assert.Equal ("Three", selected);
         Assert.True (cb.IsShow);
         Assert.Equal (2, cb.SelectedItem);
@@ -698,7 +698,7 @@ Three ",
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
 
-        Assert.True (cb.SubViews [1].NewKeyDownEvent (Key.CursorDown));
+        Assert.True (cb.SubViews.ElementAt (1).NewKeyDownEvent (Key.CursorDown));
 
         Assert.True (
                      cb.NewMouseEvent (
@@ -720,7 +720,7 @@ Three ",
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
 
-        Assert.True (cb.SubViews [1].NewKeyDownEvent (Key.CursorUp));
+        Assert.True (cb.SubViews.ElementAt (1).NewKeyDownEvent (Key.CursorUp));
 
         Assert.True (
                      cb.NewMouseEvent (
@@ -761,13 +761,13 @@ Three ",
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
 
-        Assert.True (cb.SubViews [1].NewKeyDownEvent (Key.CursorDown));
+        Assert.True (cb.SubViews.ElementAt (1).NewKeyDownEvent (Key.CursorDown));
         Assert.Equal ("", selected);
         Assert.True (cb.IsShow);
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
 
-        Assert.True (cb.SubViews [1].NewKeyDownEvent (Key.Enter));
+        Assert.True (cb.SubViews.ElementAt (1).NewKeyDownEvent (Key.Enter));
         Assert.Equal ("Two", selected);
         Assert.False (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
@@ -778,7 +778,7 @@ Three ",
         Assert.True (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
         Assert.Equal ("Two", cb.Text);
-        Assert.True (cb.SubViews [1].NewKeyDownEvent (Key.CursorDown));
+        Assert.True (cb.SubViews.ElementAt (1).NewKeyDownEvent (Key.CursorDown));
         Assert.Equal ("Two", selected);
         Assert.True (cb.IsShow);
         Assert.Equal (1, cb.SelectedItem);
@@ -819,7 +819,7 @@ Three ",
         Assert.Equal (-1, cb.SelectedItem);
         Assert.Equal ("", cb.Text);
 
-        Assert.True (cb.SubViews [1].NewKeyDownEvent (Key.CursorDown));
+        Assert.True (cb.SubViews.ElementAt (1).NewKeyDownEvent (Key.CursorDown));
         Assert.True (Application.RaiseKeyDownEvent (Key.F4));
         Assert.Equal ("", selected);
         Assert.False (cb.IsShow);
