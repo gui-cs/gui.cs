@@ -35,6 +35,7 @@ public class ViewTests
     public void Disposing_Event_Notify_All_Subscribers_On_The_First_Container ()
     {
 #if DEBUG_IDISPOSABLE
+
         // Only clear before because need to test after assert
         View.Instances.Clear ();
 #endif
@@ -81,6 +82,7 @@ public class ViewTests
     public void Disposing_Event_Notify_All_Subscribers_On_The_Second_Container ()
     {
 #if DEBUG_IDISPOSABLE
+
         // Only clear before because need to test after assert
         View.Instances.Clear ();
 #endif
@@ -120,7 +122,6 @@ public class ViewTests
         Assert.Empty (View.Instances);
 #endif
     }
-
 
     [Fact]
     public void Not_Notifying_Dispose ()
@@ -184,15 +185,13 @@ public class ViewTests
         Assert.Null (view.Border);
         Assert.Null (view.Padding);
     }
-    
+
     [Fact]
     public void Internal_Tests ()
     {
         var rect = new Rectangle (1, 1, 10, 1);
         var view = new View { Frame = rect };
     }
-
-
 
     [Fact]
     [TestRespondersDisposed]
@@ -456,15 +455,15 @@ public class ViewTests
         ((FakeDriver)Application.Driver!).SetBufferSize (30, 5);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
+                                                       @"
 ┌────────────────────────────┐
 │Testing visibility.         │
 │                            │
 │                            │
 └────────────────────────────┘
 ",
-                                                      _output
-                                                     );
+                                                       _output
+                                                      );
 
         view.Visible = false;
 
@@ -472,15 +471,15 @@ public class ViewTests
         Application.RunIteration (ref rs, firstIteration);
 
         DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
+                                                       @"
 ┌────────────────────────────┐
 │                            │
 │                            │
 │                            │
 └────────────────────────────┘
 ",
-                                                      _output
-                                                     );
+                                                       _output
+                                                      );
         Application.End (rs);
         top.Dispose ();
     }

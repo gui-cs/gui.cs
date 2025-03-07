@@ -62,26 +62,6 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
         Application.Shutdown ();
     }
 
-    [Theory]
-    [MemberData (nameof (AllViewTypes))]
-    [SetupFakeDriver] // Required for spinner view that wants to register timeouts
-    public void AllViews_Tests_All_Constructors (Type viewType) { Assert.True (Test_All_Constructors_Of_Type (viewType)); }
-
-    public bool Test_All_Constructors_Of_Type (Type type)
-    {
-        foreach (ConstructorInfo ctor in type.GetConstructors ())
-        {
-            View view = ViewTestHelpers.CreateViewFromType (type, ctor);
-
-            if (view != null)
-            {
-                Assert.True (type.FullName == view.GetType ().FullName);
-            }
-        }
-
-        return true;
-    }
-
     //[Fact]
     //public void AllViews_HotKey_Works ()
     //{

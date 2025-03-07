@@ -171,7 +171,7 @@ public class ScenarioTests : TestsAllViews
 
         var top = new Toplevel ();
 
-        Dictionary<string, Type> viewClasses = ViewTestHelpers.GetAllViewClasses ().ToDictionary (t => t.Name);
+        Dictionary<string, Type> viewClasses = GetAllViewClasses().ToDictionary (t => t.Name);
 
         Window leftPane = new ()
         {
