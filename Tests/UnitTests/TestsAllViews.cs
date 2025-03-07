@@ -1,5 +1,4 @@
 ﻿#nullable enable
-
 using System.Drawing;
 using System.Reflection;
 using Terminal.Gui;
@@ -11,12 +10,22 @@ namespace UnitTests;
 /// </summary>
 public class TestsAllViews
 {
+    /// <summary>
+    ///     Gets all view types.
+    /// </summary>
     public static IEnumerable<object []> AllViewTypes =>
         typeof (View).Assembly
                      .GetTypes ()
-                     .Where (type => type is { IsClass: true, IsAbstract: false, IsPublic: true } && (type.IsSubclassOf (typeof (View)) || type == typeof (View)))
+                     .Where (
+                             type => type is { IsClass: true, IsAbstract: false, IsPublic: true }
+                                     && (type.IsSubclassOf (typeof (View)) || type == typeof (View)))
                      .Select (type => new object [] { type });
 
+    /// <summary>
+    ///    Creates an instance of a view if it is not a generic type.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
     public static View? CreateInstanceIfNotGeneric (Type type)
     {
         if (type.IsGenericType)
@@ -28,6 +37,10 @@ public class TestsAllViews
         return Activator.CreateInstance (type) as View;
     }
 
+    /// <summary>
+    ///     Gets a list of all view classes.
+    /// </summary>
+    /// <returns></returns>
     public static List<Type> GetAllViewClasses ()
     {
         return typeof (View).Assembly.GetTypes ()
@@ -38,11 +51,17 @@ public class TestsAllViews
                             .ToList ();
     }
 
-    public static View CreateViewFromType (Type type, ConstructorInfo ctor)
+    /// <summary>
+    ///     Creates a view from a type.
+    /// </summary>
+    /// <param name="type">The type.</param>
+    /// <param name="ctor">The constructor to call.</param>
+    /// <returns></returns>
+    public static View? CreateViewFromType (Type type, ConstructorInfo ctor)
     {
-        View viewType = null;
+        View? viewType = null;
 
-        if (type.IsGenericType && type.IsTypeDefinition)
+        if (type is { IsGenericType: true, IsTypeDefinition: true })
         {
             List<Type> gTypes = new ();
 
@@ -53,7 +72,7 @@ public class TestsAllViews
 
             type = type.MakeGenericType (gTypes.ToArray ());
 
-            Assert.IsType (type, (View)Activator.CreateInstance (type));
+            Assert.IsType (type, (View)Activator.CreateInstance (type)!);
         }
         else
         {
@@ -84,7 +103,7 @@ public class TestsAllViews
 
                 if (p.HasDefaultValue)
                 {
-                    pTypes.Add (p.DefaultValue);
+                    pTypes.Add (p.DefaultValue!);
                 }
                 else
                 {
@@ -92,16 +111,16 @@ public class TestsAllViews
                 }
             }
 
-            if (type.IsGenericType && !type.IsTypeDefinition)
+            if (type is { IsGenericType: true, IsTypeDefinition: false })
             {
-                viewType = (View)Activator.CreateInstance (type);
-                Assert.IsType (type, viewType);
+                viewType = Activator.CreateInstance (type) as View;
             }
             else
             {
                 viewType = (View)ctor.Invoke (pTypes.ToArray ());
-                Assert.IsType (type, viewType);
             }
+
+            Assert.IsType (type, viewType);
         }
 
         return viewType;
@@ -154,7 +173,7 @@ public class TestsAllViews
         }
         else
         {
-            pTypes.Add (null);
+            pTypes.Add (null!);
         }
     }
 }

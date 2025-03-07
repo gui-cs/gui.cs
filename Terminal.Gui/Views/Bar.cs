@@ -235,7 +235,7 @@ public class Bar : View, IOrientation, IDesignable
                         minKeyWidth = int.Max (minKeyWidth, shortcut.KeyView.Text.GetColumns ());
                     }
 
-                    var _maxBarItemWidth = 0;
+                    var maxBarItemWidth = 0;
 
                     for (var index = 0; index < SubViews.Count; index++)
                     {
@@ -255,7 +255,7 @@ public class Bar : View, IOrientation, IDesignable
                             scBarItem.MinimumKeyTextSize = minKeyWidth;
                             scBarItem.Width = scBarItem.GetWidthDimAuto ();
                             barItem.Layout (Application.Screen.Size);
-                            _maxBarItemWidth = Math.Max (_maxBarItemWidth, barItem.Frame.Width);
+                            maxBarItemWidth = Math.Max (maxBarItemWidth, barItem.Frame.Width);
                         }
 
                         if (prevBarItem == null)
@@ -278,7 +278,7 @@ public class Bar : View, IOrientation, IDesignable
                     {
                         if (subView is not Line)
                         {
-                            subView.Width = Dim.Auto (DimAutoStyle.Auto, minimumContentDim: _maxBarItemWidth);
+                            subView.Width = Dim.Auto (DimAutoStyle.Auto, minimumContentDim: maxBarItemWidth);
                         }
                     }
                 }

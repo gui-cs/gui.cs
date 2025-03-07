@@ -4,7 +4,7 @@ using Xunit.Abstractions;
 
 namespace Terminal.Gui.ViewsTests;
 
-public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
+public class AllViewsTests : TestsAllViews
 {
     [Theory]
     [MemberData (nameof (AllViewTypes))]

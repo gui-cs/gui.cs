@@ -8,10 +8,30 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
 {
     private const char ESCAPE = '\x1B';
     private readonly AnsiMouseParser _mouseParser = new ();
+#pragma warning disable IDE1006 // Naming Styles
     protected readonly AnsiKeyboardParser _keyboardParser = new ();
     protected object _lockExpectedResponses = new ();
 
     protected object _lockState = new ();
+    protected readonly IHeld _heldContent;
+
+    /// <summary>
+    ///     Responses we are expecting to come in.
+    /// </summary>
+    protected readonly List<AnsiResponseExpectation> _expectedResponses = [];
+
+    /// <summary>
+    ///     Collection of responses that we <see cref="StopExpecting"/>.
+    /// </summary>
+    protected readonly List<AnsiResponseExpectation> _lateResponses = [];
+
+    /// <summary>
+    ///     Responses that you want to look out for that will come in continuously e.g. mouse events.
+    ///     Key is the terminator.
+    /// </summary>
+    protected readonly List<AnsiResponseExpectation> _persistentExpectations = [];
+
+#pragma warning restore IDE1006 // Naming Styles
 
     /// <summary>
     ///     Event raised when mouse events are detected - requires setting <see cref="HandleMouse"/> to true
@@ -35,22 +55,6 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
     /// </summary>
     public bool HandleKeyboard { get; set; } = false;
 
-    /// <summary>
-    ///     Responses we are expecting to come in.
-    /// </summary>
-    protected readonly List<AnsiResponseExpectation> _expectedResponses = [];
-
-    /// <summary>
-    ///     Collection of responses that we <see cref="StopExpecting"/>.
-    /// </summary>
-    protected readonly List<AnsiResponseExpectation> _lateResponses = [];
-
-    /// <summary>
-    ///     Responses that you want to look out for that will come in continuously e.g. mouse events.
-    ///     Key is the terminator.
-    /// </summary>
-    protected readonly List<AnsiResponseExpectation> _persistentExpectations = [];
-
     private AnsiResponseParserState _state = AnsiResponseParserState.Normal;
 
     /// <inheritdoc/>
@@ -63,8 +67,6 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
             _state = value;
         }
     }
-
-    protected readonly IHeld _heldContent;
 
     /// <summary>
     ///     When <see cref="State"/> was last changed.

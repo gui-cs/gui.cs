@@ -7,11 +7,11 @@ public class ViewCommandTests
     [Fact]
     public void Button_IsDefault_Raises_Accepted_Correctly ()
     {
-        int A_AcceptedCount = 0;
-        bool A_CancelAccepting = false;
+        int aAcceptedCount = 0;
+        bool aCancelAccepting = false;
 
-        int B_AcceptedCount = 0;
-        bool B_CancelAccepting = false;
+        int bAcceptedCount = 0;
+        bool bCancelAccepting = false;
 
         var w = new Window ()
         {
@@ -27,8 +27,8 @@ public class ViewCommandTests
         };
         btnA.Accepting += (s, e) =>
                           {
-                              A_AcceptedCount++;
-                              e.Cancel = A_CancelAccepting;
+                              aAcceptedCount++;
+                              e.Cancel = aCancelAccepting;
                           };
 
         var btnB = new Button ()
@@ -39,8 +39,8 @@ public class ViewCommandTests
 
         btnB.Accepting += (s, e) =>
                           {
-                              B_AcceptedCount++;
-                              e.Cancel = B_CancelAccepting;
+                              bAcceptedCount++;
+                              e.Cancel = bCancelAccepting;
                           };
         w.Add (btnA, btnB);
 
@@ -61,10 +61,10 @@ public class ViewCommandTests
                          });
 
         // Button A should have been accepted because B didn't cancel and A IsDefault
-        Assert.Equal (1, A_AcceptedCount);
-        Assert.Equal (1, B_AcceptedCount);
+        Assert.Equal (1, aAcceptedCount);
+        Assert.Equal (1, bAcceptedCount);
 
-        B_CancelAccepting = true;
+        bCancelAccepting = true;
         Application.RaiseMouseEvent (
                                      new MouseEventArgs ()
                                      {
@@ -73,8 +73,8 @@ public class ViewCommandTests
                                      });
 
         // Button A (IsDefault) should NOT have been accepted because B canceled
-        Assert.Equal (1, A_AcceptedCount);
-        Assert.Equal (2, B_AcceptedCount);
+        Assert.Equal (1, aAcceptedCount);
+        Assert.Equal (2, bAcceptedCount);
 
         Application.ResetState (true);
     }

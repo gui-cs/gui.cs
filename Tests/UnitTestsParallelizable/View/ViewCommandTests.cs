@@ -167,19 +167,19 @@ public class ViewCommandTests
     public void Select_Handle_Event_OnSelecting_Returns_True ()
     {
         var view = new View ();
-        var SelectingInvoked = false;
+        var selectingInvoked = false;
 
         view.Selecting += ViewOnSelect;
 
         bool? ret = view.InvokeCommand (Command.Select);
         Assert.True (ret);
-        Assert.True (SelectingInvoked);
+        Assert.True (selectingInvoked);
 
         return;
 
         void ViewOnSelect (object sender, CommandEventArgs e)
         {
-            SelectingInvoked = true;
+            selectingInvoked = true;
             e.Cancel = true;
         }
     }

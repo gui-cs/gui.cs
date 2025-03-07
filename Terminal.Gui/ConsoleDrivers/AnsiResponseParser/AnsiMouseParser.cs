@@ -21,7 +21,7 @@ public class AnsiMouseParser
     {
         // Typically in this format
         // ESC [ < {button_code};{x_pos};{y_pos}{final_byte}
-        return cur.EndsWith ('M') || cur.EndsWith ('m');
+        return cur!.EndsWith ('M') || cur.EndsWith ('m');
     }
 
     /// <summary>
@@ -33,7 +33,7 @@ public class AnsiMouseParser
     public MouseEventArgs? ProcessMouseInput (string? input)
     {
         // Match mouse wheel events first
-        Match match = _mouseEventPattern.Match (input);
+        Match match = _mouseEventPattern.Match (input!);
 
         if (match.Success)
         {

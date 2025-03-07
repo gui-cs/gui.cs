@@ -125,7 +125,7 @@ public class AnsiRequestScheduler
     /// <returns></returns>
     private bool EvictStaleRequests (string? withTerminator)
     {
-        if (_lastSend.TryGetValue (withTerminator, out DateTime dt))
+        if (_lastSend.TryGetValue (withTerminator!, out DateTime dt))
         {
             if (IsStale (dt))
             {
@@ -178,7 +178,7 @@ public class AnsiRequestScheduler
 
     private void Send (AnsiEscapeSequenceRequest r)
     {
-        _lastSend.AddOrUpdate (r.Terminator, _ => Now (), (_, _) => Now ());
+        _lastSend.AddOrUpdate (r.Terminator!, _ => Now (), (_, _) => Now ());
         _parser.ExpectResponse (r.Terminator, r.ResponseReceived, r.Abandoned, false);
         r.Send ();
     }
@@ -206,7 +206,7 @@ public class AnsiRequestScheduler
 
     private bool ShouldThrottle (AnsiEscapeSequenceRequest r)
     {
-        if (_lastSend.TryGetValue (r.Terminator, out DateTime value))
+        if (_lastSend.TryGetValue (r.Terminator!, out DateTime value))
         {
             return Now () - value < _throttle;
         }
