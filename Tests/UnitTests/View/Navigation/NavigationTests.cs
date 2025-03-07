@@ -328,7 +328,7 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
 
     // View.Focused - No subviews
     [Fact]
-    public void Focused_NoSubviews ()
+    public void Focused_NoSubViews ()
     {
         var view = new View ();
         Assert.Null (view.Focused);
@@ -338,7 +338,7 @@ public class NavigationTests (ITestOutputHelper _output) : TestsAllViews
     }
 
     [Fact]
-    public void GetMostFocused_NoSubviews_Returns_Null ()
+    public void GetMostFocused_NoSubViews_Returns_Null ()
     {
         var view = new View ();
         Assert.Null (view.Focused);

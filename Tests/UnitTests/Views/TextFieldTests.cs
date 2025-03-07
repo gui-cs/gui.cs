@@ -2068,12 +2068,12 @@ Les Miśerables",
         TextField t = new ();
 
         superView.Add (t);
-        Assert.Single (superView.Subviews);
+        Assert.Single (superView.SubViews);
 
         superView.BeginInit ();
         superView.EndInit ();
 
-        Assert.Equal (2, superView.Subviews.Count);
+        Assert.Equal (2, superView.SubViews.Count);
     }
 
     [Fact]
@@ -2087,7 +2087,7 @@ Les Miśerables",
 
         superView.BeginInit ();
         superView.EndInit ();
-        Assert.Empty (superView.Subviews);
+        Assert.Empty (superView.SubViews);
 
         TextField t = new ()
         {
@@ -2096,7 +2096,7 @@ Les Miśerables",
 
         superView.Add (t);
 
-        Assert.Equal (2, superView.Subviews.Count);
+        Assert.Equal (2, superView.SubViews.Count);
     }
 
     [Fact]
@@ -2160,7 +2160,7 @@ Les Miśerables",
         superView.BeginInit ();
         superView.EndInit ();
 
-        Assert.Equal (2, superView.Subviews.Count);
+        Assert.Equal (2, superView.SubViews.Count);
 
         Assert.True (t.Visible);
         Assert.False (t.Autocomplete.Visible);

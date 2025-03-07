@@ -56,7 +56,7 @@ public class TransparentTests (ITestOutputHelper _output)
     [Fact]
     [SetupFakeDriver]
 
-    public void Transparent_Subview_Occludes ()
+    public void Transparent_SubView_Occludes ()
     {
         var super = new View
         {

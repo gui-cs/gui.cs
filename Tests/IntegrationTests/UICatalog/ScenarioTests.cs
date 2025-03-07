@@ -294,7 +294,7 @@ public class ScenarioTests : TestsAllViews
             // Remove existing class, if any
             if (_curView != null)
             {
-                _curView.SubviewsLaidOut -= LayoutCompleteHandler;
+                _curView.SubViewsLaidOut -= LayoutCompleteHandler;
                 _hostPane.Remove (_curView);
                 _curView.Dispose ();
                 _curView = null;
@@ -358,7 +358,7 @@ public class ScenarioTests : TestsAllViews
 
         top.Add (_leftPane, _settingsPane, _hostPane);
 
-        top.LayoutSubviews ();
+        top.LayoutSubViews ();
 
         _curView = CreateClass (_viewClasses.First ().Value);
 
@@ -593,13 +593,13 @@ public class ScenarioTests : TestsAllViews
             _hostPane.Add (view);
 
             //DimPosChanged ();
-            _hostPane.LayoutSubviews ();
+            _hostPane.LayoutSubViews ();
             _hostPane.ClearViewport ();
             _hostPane.SetNeedsDraw ();
             UpdateSettings (view);
             UpdateTitle (view);
 
-            view.SubviewsLaidOut += LayoutCompleteHandler;
+            view.SubViewsLaidOut += LayoutCompleteHandler;
 
             return view;
         }

@@ -81,9 +81,9 @@ public partial class View : IDisposable, ISupportInitializeNotification
         DisposeAdornments ();
         DisposeScrollBars ();
 
-        for (int i = InternalSubviews.Count - 1; i >= 0; i--)
+        for (int i = InternalSubViews.Count - 1; i >= 0; i--)
         {
-            View subview = InternalSubviews [i];
+            View subview = InternalSubViews [i];
             Remove (subview);
             subview.Dispose ();
         }
@@ -98,7 +98,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
             _disposedValue = true;
         }
 
-        Debug.Assert (InternalSubviews.Count == 0);
+        Debug.Assert (InternalSubViews.Count == 0);
     }
 
     #region Constructors and Initialization
@@ -213,7 +213,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
     /// <summary>Signals the View that initialization is ending. See <see cref="ISupportInitialize"/>.</summary>
     /// <remarks>
-    ///     <para>Initializes all Subviews and Invokes the <see cref="Initialized"/> event.</para>
+    ///     <para>Initializes all SubViews and Invokes the <see cref="Initialized"/> event.</para>
     /// </remarks>
     public virtual void EndInit ()
     {

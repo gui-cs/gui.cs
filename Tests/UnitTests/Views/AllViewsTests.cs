@@ -47,7 +47,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
         frame.Add (view);
         frame.BeginInit ();
         frame.EndInit ();
-        frame.LayoutSubviews ();
+        frame.LayoutSubViews ();
 
         // What's the natural width/height?
         int expectedX = (frame.Frame.Width - view.Frame.Width) / 2;

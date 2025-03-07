@@ -132,7 +132,7 @@ public class ToplevelTests
 
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         top.Add (win);
-        top.LayoutSubviews ();
+        top.LayoutSubViews ();
 
         // The SuperView is always the same regardless of the caller.
         supView = View.GetLocationEnsuringFullVisibility (win, 0, 0, out nx, out ny /*, out sb*/);
@@ -571,12 +571,12 @@ public class ToplevelTests
         Assert.False (subTop.IsLoaded);
         Assert.Equal (new (0, 0, 20, 10), view.Frame);
 
-        view.SubviewLayout += ViewLayoutStarted;
+        view.SubViewLayout += ViewLayoutStarted;
 
         void ViewLayoutStarted (object sender, LayoutEventArgs e)
         {
             Assert.Equal (new (0, 0, 20, 10), view._needsDrawRect);
-            view.SubviewLayout -= ViewLayoutStarted;
+            view.SubViewLayout -= ViewLayoutStarted;
         }
 
         Application.Begin (top);

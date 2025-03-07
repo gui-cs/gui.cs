@@ -1901,7 +1901,7 @@ public class TextView : View
 
         IsAddedChanged += TextView_IsAddedChanged!;
 
-        SubviewsLaidOut += TextView_LayoutComplete;
+        SubViewsLaidOut += TextView_LayoutComplete;
 
         // Things this view knows how to do
 

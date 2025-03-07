@@ -891,11 +891,11 @@ public class TileViewTests
         var left = (TileView)tileView.Tiles.ElementAt (0).ContentView;
         Assert.Same (left.SuperView, tileView);
 
-        Assert.Equal (2, left.Tiles.ElementAt (0).ContentView.Subviews.Count);
-        Assert.IsType<Label> (left.Tiles.ElementAt (0).ContentView.Subviews [0]);
-        Assert.IsType<Label> (left.Tiles.ElementAt (0).ContentView.Subviews [1]);
-        var onesTop = (Label)left.Tiles.ElementAt (0).ContentView.Subviews [0];
-        var onesBottom = (Label)left.Tiles.ElementAt (0).ContentView.Subviews [1];
+        Assert.Equal (2, left.Tiles.ElementAt (0).ContentView.SubViews.Count);
+        Assert.IsType<Label> (left.Tiles.ElementAt (0).ContentView.SubViews [0]);
+        Assert.IsType<Label> (left.Tiles.ElementAt (0).ContentView.SubViews [1]);
+        var onesTop = (Label)left.Tiles.ElementAt (0).ContentView.SubViews [0];
+        var onesBottom = (Label)left.Tiles.ElementAt (0).ContentView.SubViews [1];
 
         Assert.Same (left.Tiles.ElementAt (0).ContentView, onesTop.SuperView);
         Assert.Same (left.Tiles.ElementAt (0).ContentView, onesBottom.SuperView);
@@ -947,7 +947,7 @@ public class TileViewTests
         // anything is sticking out but drawn over
 
         // 3 panels + 2 splitters
-        Assert.Equal (5, tileView.Subviews.Count);
+        Assert.Equal (5, tileView.SubViews.Count);
 
         // Check X and Widths of Tiles
         Assert.Equal (0, tileView.Tiles.ElementAt (0).ContentView.Frame.X);
@@ -975,13 +975,13 @@ public class TileViewTests
         Assert.Equal (6, subSplit.Tiles.ElementAt (0).ContentView.Frame.Width);
         Assert.Equal (0, subSplit.Tiles.ElementAt (0).ContentView.Frame.Y);
         Assert.Equal (5, subSplit.Tiles.ElementAt (0).ContentView.Frame.Height);
-        //Assert.IsType<TextView> (subSplit.Tiles.ElementAt (0).ContentView.Subviews.Single ());
+        //Assert.IsType<TextView> (subSplit.Tiles.ElementAt (0).ContentView.SubViews.Single ());
 
         Assert.Equal (0, subSplit.Tiles.ElementAt (1).ContentView.Frame.X);
         Assert.Equal (6, subSplit.Tiles.ElementAt (1).ContentView.Frame.Width);
         Assert.Equal (6, subSplit.Tiles.ElementAt (1).ContentView.Frame.Y);
         Assert.Equal (4, subSplit.Tiles.ElementAt (1).ContentView.Frame.Height);
-        //Assert.IsType<TextView> (subSplit.Tiles.ElementAt (1).ContentView.Subviews.Single ());
+        //Assert.IsType<TextView> (subSplit.Tiles.ElementAt (1).ContentView.SubViews.Single ());
     }
 
     [Fact]
@@ -1486,7 +1486,7 @@ public class TileViewTests
         // anything is sticking out but drawn over
 
         // 3 panels + 2 splitters
-        Assert.Equal (5, tileView.Subviews.Count);
+        Assert.Equal (5, tileView.SubViews.Count);
 
         // Check X and Widths of Tiles
         Assert.Equal (1, tileView.Tiles.ElementAt (0).ContentView.Frame.X);
@@ -1514,13 +1514,13 @@ public class TileViewTests
         Assert.Equal (5, subSplit.Tiles.ElementAt (0).ContentView.Frame.Width);
         Assert.Equal (0, subSplit.Tiles.ElementAt (0).ContentView.Frame.Y);
         Assert.Equal (4, subSplit.Tiles.ElementAt (0).ContentView.Frame.Height);
-        //Assert.IsType<TextView> (subSplit.Tiles.ElementAt (0).ContentView.Subviews.Single ());
+        //Assert.IsType<TextView> (subSplit.Tiles.ElementAt (0).ContentView.SubViews.Single ());
 
         Assert.Equal (0, subSplit.Tiles.ElementAt (1).ContentView.Frame.X);
         Assert.Equal (5, subSplit.Tiles.ElementAt (1).ContentView.Frame.Width);
         Assert.Equal (5, subSplit.Tiles.ElementAt (1).ContentView.Frame.Y);
         Assert.Equal (3, subSplit.Tiles.ElementAt (1).ContentView.Frame.Height);
-        //Assert.IsType<TextView> (subSplit.Tiles.ElementAt (1).ContentView.Subviews.Single ());
+        //Assert.IsType<TextView> (subSplit.Tiles.ElementAt (1).ContentView.SubViews.Single ());
     }
 
     [Fact]
@@ -1566,11 +1566,11 @@ public class TileViewTests
         top.Add (tv);
         tv.BeginInit ();
         tv.EndInit ();
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
 
-        tv.LayoutSubviews ();
-        tv.Tiles.ElementAt (1).ContentView.LayoutSubviews ();
-        tv2.LayoutSubviews ();
+        tv.LayoutSubViews ();
+        tv.Tiles.ElementAt (1).ContentView.LayoutSubViews ();
+        tv2.LayoutSubViews ();
 
         // tv2 is not considered a root because 
         // it was created via TrySplitTile so it
@@ -1616,11 +1616,11 @@ public class TileViewTests
         top.Add (tv);
         tv.BeginInit ();
         tv.EndInit ();
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
 
-        tv.LayoutSubviews ();
-        tv.Tiles.ElementAt (1).ContentView.LayoutSubviews ();
-        tv2.LayoutSubviews ();
+        tv.LayoutSubViews ();
+        tv.Tiles.ElementAt (1).ContentView.LayoutSubViews ();
+        tv2.LayoutSubViews ();
 
         // tv2 is still considered a root because 
         // it was manually created by API user. That
@@ -1810,7 +1810,7 @@ public class TileViewTests
         Assert.Equal (0, tv.IndexOf (tv.Tiles.ElementAt (0).ContentView, recursive));
         Assert.Equal (1, tv.IndexOf (tv.Tiles.ElementAt (1).ContentView, recursive));
 
-        // IndexOf supports looking for Tile.View.Subviews
+        // IndexOf supports looking for Tile.View.SubViews
         tv.Tiles.ElementAt (0).ContentView.Add (lbl1);
         Assert.Equal (0, tv.IndexOf (lbl1, recursive));
 
@@ -2326,7 +2326,7 @@ public class TileViewTests
         return tv;
     }
 
-    private LineView GetLine (TileView tileView) { return tileView.Subviews.OfType<LineView> ().Single (); }
+    private LineView GetLine (TileView tileView) { return tileView.SubViews.OfType<LineView> ().Single (); }
 
     /// <summary>Creates a vertical orientation root container with left pane split into two (with horizontal splitter line).</summary>
     /// <param name="withBorder"></param>
@@ -2340,7 +2340,7 @@ public class TileViewTests
         newContainer.ColorScheme = new ColorScheme ();
         container.ColorScheme = new ColorScheme ();
 
-        container.LayoutSubviews ();
+        container.LayoutSubViews ();
 
         return container;
     }

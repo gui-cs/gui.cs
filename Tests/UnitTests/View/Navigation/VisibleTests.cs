@@ -22,7 +22,7 @@ public class VisibleTests () : TestsAllViews
     }
 
     [Fact]
-    public void Visible_False_Leaves_Subview ()
+    public void Visible_False_Leaves_SubView ()
     {
         var view = new View
         {
@@ -49,7 +49,7 @@ public class VisibleTests () : TestsAllViews
     }
 
     [Fact]
-    public void Visible_False_Leaves_Subview2 ()
+    public void Visible_False_Leaves_SubView2 ()
     {
         var view = new Window
         {
@@ -76,7 +76,7 @@ public class VisibleTests () : TestsAllViews
     }
 
     [Fact]
-    public void Visible_False_On_Subview_Leaves_Just_Subview ()
+    public void Visible_False_On_SubView_Leaves_Just_SubView ()
     {
         var view = new View
         {
@@ -103,7 +103,7 @@ public class VisibleTests () : TestsAllViews
     }
 
     [Fact]
-    public void Visible_False_Focuses_Deepest_Focusable_Subview ()
+    public void Visible_False_Focuses_Deepest_Focusable_SubView ()
     {
         var view = new View
         {
@@ -151,7 +151,7 @@ public class VisibleTests () : TestsAllViews
     }
 
     [Fact]
-    public void Visible_True_Subview_Focuses_SubView ()
+    public void Visible_True_SubView_Focuses_SubView ()
     {
         var view = new View
         {
@@ -178,7 +178,7 @@ public class VisibleTests () : TestsAllViews
     }
 
     [Fact]
-    public void Visible_True_On_Subview_Focuses ()
+    public void Visible_True_On_SubView_Focuses ()
     {
         var view = new View
         {
@@ -205,7 +205,7 @@ public class VisibleTests () : TestsAllViews
     }
 
     [Fact]
-    public void Visible_True_Focuses_Deepest_Focusable_Subview ()
+    public void Visible_True_Focuses_Deepest_Focusable_SubView ()
     {
         var view = new View
         {

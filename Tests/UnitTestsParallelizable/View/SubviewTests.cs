@@ -1,6 +1,6 @@
 ﻿namespace Terminal.Gui.ViewTests;
 
-public class SubviewTests
+public class SubViewTests
 {
     [Fact]
     public void IsAddedChanged_Raised_On_Add ()
@@ -24,7 +24,7 @@ public class SubviewTests
                                 };
 
         super.Add (sub);
-        Assert.True (super.Subviews.Count == 1);
+        Assert.True (super.SubViews.Count == 1);
         Assert.True (sub.IsAdded);
         Assert.Equal (0, superRaisedCount);
         Assert.Equal (1, subRaisedCount);
@@ -52,13 +52,13 @@ public class SubviewTests
                               };
 
         super.Add (sub);
-        Assert.True (super.Subviews.Count == 1);
+        Assert.True (super.SubViews.Count == 1);
         Assert.True (sub.IsAdded);
         Assert.Equal (0, superRaisedCount);
         Assert.Equal (0, subRaisedCount);
 
         super.Remove (sub);
-        Assert.Empty (super.Subviews);
+        Assert.Empty (super.SubViews);
         Assert.False (sub.IsAdded);
         Assert.Equal (0, superRaisedCount);
         Assert.Equal (1, subRaisedCount);
@@ -118,7 +118,7 @@ public class SubviewTests
     }
 
     [Fact]
-    public void MoveSubviewToStart ()
+    public void MoveSubViewToStart ()
     {
         View superView = new ();
 
@@ -139,15 +139,15 @@ public class SubviewTests
 
         superView.Add (subview1, subview2, subview3);
 
-        superView.MoveSubviewToStart (subview2);
-        Assert.Equal (subview2, superView.Subviews [0]);
+        superView.MoveSubViewToStart (subview2);
+        Assert.Equal (subview2, superView.SubViews [0]);
 
-        superView.MoveSubviewToStart (subview3);
-        Assert.Equal (subview3, superView.Subviews [0]);
+        superView.MoveSubViewToStart (subview3);
+        Assert.Equal (subview3, superView.SubViews [0]);
     }
 
     [Fact]
-    public void MoveSubviewTowardsFront ()
+    public void MoveSubViewTowardsFront ()
     {
         View superView = new ();
 
@@ -168,19 +168,19 @@ public class SubviewTests
 
         superView.Add (subview1, subview2, subview3);
 
-        superView.MoveSubviewTowardsStart (subview2);
-        Assert.Equal (subview2, superView.Subviews [0]);
+        superView.MoveSubViewTowardsStart (subview2);
+        Assert.Equal (subview2, superView.SubViews [0]);
 
-        superView.MoveSubviewTowardsStart (subview3);
-        Assert.Equal (subview3, superView.Subviews [1]);
+        superView.MoveSubViewTowardsStart (subview3);
+        Assert.Equal (subview3, superView.SubViews [1]);
 
         // Already at front, what happens?
-        superView.MoveSubviewTowardsStart (subview2);
-        Assert.Equal (subview2, superView.Subviews [0]);
+        superView.MoveSubViewTowardsStart (subview2);
+        Assert.Equal (subview2, superView.SubViews [0]);
     }
 
     [Fact]
-    public void MoveSubviewToEnd ()
+    public void MoveSubViewToEnd ()
     {
         View superView = new ();
 
@@ -201,15 +201,15 @@ public class SubviewTests
 
         superView.Add (subview1, subview2, subview3);
 
-        superView.MoveSubviewToEnd (subview1);
-        Assert.Equal (subview1, superView.Subviews [^1]);
+        superView.MoveSubViewToEnd (subview1);
+        Assert.Equal (subview1, superView.SubViews [^1]);
 
-        superView.MoveSubviewToEnd (subview2);
-        Assert.Equal (subview2, superView.Subviews [^1]);
+        superView.MoveSubViewToEnd (subview2);
+        Assert.Equal (subview2, superView.SubViews [^1]);
     }
 
     [Fact]
-    public void MoveSubviewTowardsEnd ()
+    public void MoveSubViewTowardsEnd ()
     {
         View superView = new ();
 
@@ -230,15 +230,15 @@ public class SubviewTests
 
         superView.Add (subview1, subview2, subview3);
 
-        superView.MoveSubviewTowardsEnd (subview2);
-        Assert.Equal (subview2, superView.Subviews [^1]);
+        superView.MoveSubViewTowardsEnd (subview2);
+        Assert.Equal (subview2, superView.SubViews [^1]);
 
-        superView.MoveSubviewTowardsEnd (subview1);
-        Assert.Equal (subview1, superView.Subviews [1]);
+        superView.MoveSubViewTowardsEnd (subview1);
+        Assert.Equal (subview1, superView.SubViews [1]);
 
         // Already at end, what happens?
-        superView.MoveSubviewTowardsEnd (subview2);
-        Assert.Equal (subview2, superView.Subviews [^1]);
+        superView.MoveSubViewTowardsEnd (subview2);
+        Assert.Equal (subview2, superView.SubViews [^1]);
     }
 
     [Fact]
@@ -281,7 +281,7 @@ public class SubviewTests
     }
 
     [Fact]
-    public void IsInHierarchy_ViewIsDirectSubview_ReturnsTrue ()
+    public void IsInHierarchy_ViewIsDirectSubView_ReturnsTrue ()
     {
         // Arrange
         var start = new View ();
@@ -296,17 +296,17 @@ public class SubviewTests
     }
 
     [Fact]
-    public void IsInHierarchy_ViewIsNestedSubview_ReturnsTrue ()
+    public void IsInHierarchy_ViewIsNestedSubView_ReturnsTrue ()
     {
         // Arrange
         var start = new View ();
         var subview = new View ();
-        var nestedSubview = new View ();
+        var nestedSubView = new View ();
         start.Add (subview);
-        subview.Add (nestedSubview);
+        subview.Add (nestedSubView);
 
         // Act
-        bool result = View.IsInHierarchy (start, nestedSubview);
+        bool result = View.IsInHierarchy (start, nestedSubView);
 
         // Assert
         Assert.True (result);

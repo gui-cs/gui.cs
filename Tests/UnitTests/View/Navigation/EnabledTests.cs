@@ -23,7 +23,7 @@ public class EnabledTests () : TestsAllViews
     }
 
     [Fact]
-    public void Enabled_False_Leaves_Subview ()
+    public void Enabled_False_Leaves_SubView ()
     {
         var view = new View
         {
@@ -50,7 +50,7 @@ public class EnabledTests () : TestsAllViews
     }
 
     [Fact]
-    public void Enabled_False_Leaves_Subview2 ()
+    public void Enabled_False_Leaves_SubView2 ()
     {
         var view = new Window
         {
@@ -77,7 +77,7 @@ public class EnabledTests () : TestsAllViews
     }
 
     [Fact]
-    public void Enabled_False_On_Subview_Leaves_Just_Subview ()
+    public void Enabled_False_On_SubView_Leaves_Just_SubView ()
     {
         var view = new View
         {
@@ -104,7 +104,7 @@ public class EnabledTests () : TestsAllViews
     }
 
     [Fact]
-    public void Enabled_False_Focuses_Deepest_Focusable_Subview ()
+    public void Enabled_False_Focuses_Deepest_Focusable_SubView ()
     {
         var view = new View
         {
@@ -152,7 +152,7 @@ public class EnabledTests () : TestsAllViews
     }
 
     [Fact]
-    public void Enabled_True_Subview_Focuses_SubView ()
+    public void Enabled_True_SubView_Focuses_SubView ()
     {
         var view = new View
         {
@@ -179,7 +179,7 @@ public class EnabledTests () : TestsAllViews
     }
 
     [Fact]
-    public void Enabled_True_On_Subview_Focuses ()
+    public void Enabled_True_On_SubView_Focuses ()
     {
         var view = new View
         {
@@ -206,7 +206,7 @@ public class EnabledTests () : TestsAllViews
     }
 
     [Fact]
-    public void Enabled_True_Focuses_Deepest_Focusable_Subview ()
+    public void Enabled_True_Focuses_Deepest_Focusable_SubView ()
     {
         var view = new View
         {
@@ -255,7 +255,7 @@ public class EnabledTests () : TestsAllViews
 
     [Fact]
     [AutoInitShutdown]
-    public void _Enabled_Sets_Also_Sets_Subviews ()
+    public void _Enabled_Sets_Also_Sets_SubViews ()
     {
         var wasClicked = false;
         var button = new Button { Text = "Click Me" };

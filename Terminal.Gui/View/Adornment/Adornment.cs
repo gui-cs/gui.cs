@@ -11,7 +11,7 @@ namespace Terminal.Gui;
 ///     <para>
 ///         Each of <see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/> has slightly different
 ///         behavior relative to <see cref="ColorScheme"/>, <see cref="View.SetFocus()"/>, keyboard input, and
-///         mouse input. Each can be customized by manipulating their Subviews.
+///         mouse input. Each can be customized by manipulating their SubViews.
 ///     </para>
 /// </remarsk>
 public class Adornment : View, IDesignable
@@ -165,7 +165,7 @@ public class Adornment : View, IDesignable
     protected override bool OnDrawingText () { return Thickness == Thickness.Empty; }
 
     /// <inheritdoc/>
-    protected override bool OnDrawingSubviews () { return Thickness == Thickness.Empty; }
+    protected override bool OnDrawingSubViews () { return Thickness == Thickness.Empty; }
 
 
     /// <summary>Does nothing for Adornment</summary>

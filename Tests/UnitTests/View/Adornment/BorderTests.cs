@@ -838,7 +838,7 @@ public class BorderTests (ITestOutputHelper output)
 │ ┊ ┊
 └─┴┄┘")]
     [SetupFakeDriver]
-    public void SuperViewRendersLineCanvas_No_Subviews_AutoJoinsLines (bool superViewRendersLineCanvas, string expected)
+    public void SuperViewRendersLineCanvas_No_SubViews_AutoJoinsLines (bool superViewRendersLineCanvas, string expected)
     {
         View superView = new View ()
         {

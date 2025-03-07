@@ -367,42 +367,42 @@ public class ShortcutTests
     }
 
     [Fact]
-    public void Subview_Visibility_Controlled_By_Removal ()
+    public void SubView_Visibility_Controlled_By_Removal ()
     {
         var shortcut = new Shortcut ();
 
         Assert.True (shortcut.CommandView.Visible);
-        Assert.Contains (shortcut.CommandView, shortcut.Subviews);
+        Assert.Contains (shortcut.CommandView, shortcut.SubViews);
         Assert.True (shortcut.HelpView.Visible);
-        Assert.DoesNotContain (shortcut.HelpView, shortcut.Subviews);
+        Assert.DoesNotContain (shortcut.HelpView, shortcut.SubViews);
         Assert.True (shortcut.KeyView.Visible);
-        Assert.DoesNotContain (shortcut.KeyView, shortcut.Subviews);
+        Assert.DoesNotContain (shortcut.KeyView, shortcut.SubViews);
 
         shortcut.HelpText = "help";
         Assert.True (shortcut.HelpView.Visible);
-        Assert.Contains (shortcut.HelpView, shortcut.Subviews);
+        Assert.Contains (shortcut.HelpView, shortcut.SubViews);
         Assert.True (shortcut.KeyView.Visible);
-        Assert.DoesNotContain (shortcut.KeyView, shortcut.Subviews);
+        Assert.DoesNotContain (shortcut.KeyView, shortcut.SubViews);
 
         shortcut.Key = Key.A;
         Assert.True (shortcut.HelpView.Visible);
-        Assert.Contains (shortcut.HelpView, shortcut.Subviews);
+        Assert.Contains (shortcut.HelpView, shortcut.SubViews);
         Assert.True (shortcut.KeyView.Visible);
-        Assert.Contains (shortcut.KeyView, shortcut.Subviews);
+        Assert.Contains (shortcut.KeyView, shortcut.SubViews);
 
         shortcut.HelpView.Visible = false;
         shortcut.ShowHide ();
         Assert.False (shortcut.HelpView.Visible);
-        Assert.DoesNotContain (shortcut.HelpView, shortcut.Subviews);
+        Assert.DoesNotContain (shortcut.HelpView, shortcut.SubViews);
         Assert.True (shortcut.KeyView.Visible);
-        Assert.Contains (shortcut.KeyView, shortcut.Subviews);
+        Assert.Contains (shortcut.KeyView, shortcut.SubViews);
 
         shortcut.KeyView.Visible = false;
         shortcut.ShowHide ();
         Assert.False (shortcut.HelpView.Visible);
-        Assert.DoesNotContain (shortcut.HelpView, shortcut.Subviews);
+        Assert.DoesNotContain (shortcut.HelpView, shortcut.SubViews);
         Assert.False (shortcut.KeyView.Visible);
-        Assert.DoesNotContain (shortcut.KeyView, shortcut.Subviews);
+        Assert.DoesNotContain (shortcut.KeyView, shortcut.SubViews);
     }
 
     [Fact]
@@ -531,7 +531,7 @@ public class ShortcutTests
 
         Application.Top.Add (shortcut);
         Application.Top.SetRelativeLayout (new (100, 100));
-        Application.Top.LayoutSubviews ();
+        Application.Top.LayoutSubViews ();
 
         Application.RaiseMouseEvent (
                                   new ()
@@ -585,7 +585,7 @@ public class ShortcutTests
         shortcut.CommandView.Accepting += (s, e) => { buttonAccepted++; };
         Application.Top.Add (shortcut);
         Application.Top.SetRelativeLayout (new (100, 100));
-        Application.Top.LayoutSubviews ();
+        Application.Top.LayoutSubViews ();
 
         var accepted = 0;
         shortcut.Accepting += (s, e) => { accepted++; };
@@ -650,7 +650,7 @@ public class ShortcutTests
 
         Application.Top.Add (shortcut);
         Application.Top.SetRelativeLayout (new (100, 100));
-        Application.Top.LayoutSubviews ();
+        Application.Top.LayoutSubViews ();
 
         var selected = 0;
         shortcut.Selecting += (s, e) =>

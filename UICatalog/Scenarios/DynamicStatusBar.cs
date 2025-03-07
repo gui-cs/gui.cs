@@ -318,7 +318,7 @@ public class DynamicStatusBar : Scenario
 
                                   if (statusItem != null)
                                   {
-                                      Shortcut [] items = _statusBar.Subviews.Cast<Shortcut> ().ToArray ();
+                                      Shortcut [] items = _statusBar.SubViews.Cast<Shortcut> ().ToArray ();
 
                                       if (i > 0)
                                       {
@@ -341,7 +341,7 @@ public class DynamicStatusBar : Scenario
 
                                     if (statusItem != null)
                                     {
-                                        Shortcut [] items = _statusBar.Subviews.Cast<Shortcut> ().ToArray ();
+                                        Shortcut [] items = _statusBar.SubViews.Cast<Shortcut> ().ToArray ();
 
                                         if (i < items.Length - 1)
                                         {
@@ -521,7 +521,7 @@ public class DynamicStatusBar : Scenario
 
                 if (statusItem != null)
                 {
-                    foreach (Shortcut si in _statusBar.Subviews.Cast<Shortcut> ())
+                    foreach (Shortcut si in _statusBar.SubViews.Cast<Shortcut> ())
                     {
                         DataContext.Items.Add (new DynamicStatusItemList (si.Title, si));
                     }
@@ -541,9 +541,9 @@ public class DynamicStatusBar : Scenario
                 int index
             )
             {
-                _statusBar.Subviews [index].Title = statusItem.Title;
-                ((Shortcut)_statusBar.Subviews [index]).Action = _frmStatusBarDetails.CreateAction (statusItem);
-                ((Shortcut)_statusBar.Subviews [index]).Key = statusItem.Shortcut;
+                _statusBar.SubViews [index].Title = statusItem.Title;
+                ((Shortcut)_statusBar.SubViews [index]).Action = _frmStatusBarDetails.CreateAction (statusItem);
+                ((Shortcut)_statusBar.SubViews [index]).Key = statusItem.Shortcut;
 
                 if (DataContext.Items.Count == 0)
                 {

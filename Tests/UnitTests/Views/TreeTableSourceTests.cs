@@ -294,7 +294,7 @@ public class TreeTableSourceTests : IDisposable
 
         tableView.BeginInit ();
         tableView.EndInit ();
-        tableView.LayoutSubviews ();
+        tableView.LayoutSubViews ();
 
         var top = new Toplevel ();
         top.Add (tableView);

@@ -2,10 +2,10 @@
 
 namespace Terminal.Gui.ViewTests;
 
-public class SubviewTests
+public class SubViewTests
 {
     private readonly ITestOutputHelper _output;
-    public SubviewTests (ITestOutputHelper output) { _output = output; }
+    public SubViewTests (ITestOutputHelper output) { _output = output; }
 
     // TODO: This is a poor unit tests. Not clear what it's testing. Refactor.
     [Fact]

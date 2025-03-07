@@ -27,7 +27,7 @@ public class TextTests (ITestOutputHelper output)
 
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
 
-        top.LayoutSubviews ();
+        top.LayoutSubViews ();
         top.Draw ();
 
         var expected = @"
@@ -42,7 +42,7 @@ Y
 
         Assert.Equal (new (0, 0, 10, 2), label.Frame);
 
-        top.LayoutSubviews ();
+        top.LayoutSubViews ();
         View.SetClipToScreen ();
         top.Draw ();
 

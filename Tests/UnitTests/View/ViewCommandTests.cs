@@ -165,7 +165,7 @@ public class ViewCommandTests
                           };
         w.Add (btnA, btnB);
 
-        w.LayoutSubviews ();
+        w.LayoutSubViews ();
 
         Application.Top = w;
         Application.TopLevels.Push(w);
@@ -243,7 +243,7 @@ public class ViewCommandTests
         Application.TopLevels.Push (w);
         Assert.Same (Application.Top, w);
 
-        w.LayoutSubviews ();
+        w.LayoutSubViews ();
 
         // Click button just like a driver would
         var btnFrame = btn.FrameToScreen ();

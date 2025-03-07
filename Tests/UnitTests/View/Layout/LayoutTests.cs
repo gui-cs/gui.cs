@@ -33,10 +33,10 @@ public class LayoutTests (ITestOutputHelper _output) : TestsAllViews
         view.DrawingContent += (s, e) => drawContentCount++;
 
         var layoutStartedCount = 0;
-        view.SubviewLayout += (s, e) => layoutStartedCount++;
+        view.SubViewLayout += (s, e) => layoutStartedCount++;
 
         var layoutCompleteCount = 0;
-        view.SubviewsLaidOut += (s, e) => layoutCompleteCount++;
+        view.SubViewsLaidOut += (s, e) => layoutCompleteCount++;
 
         view.SetNeedsLayout ();
         view.SetNeedsDraw();

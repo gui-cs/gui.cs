@@ -132,7 +132,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
         Action = action;
 
-        SubviewLayout += OnLayoutStarted;
+        SubViewLayout += OnLayoutStarted;
 
         ShowHide ();
     }
@@ -221,7 +221,7 @@ public class Shortcut : View, IOrientation, IDesignable
         HelpView.SetRelativeLayout (Application.Screen.Size);
         KeyView.SetRelativeLayout (Application.Screen.Size);
 
-        _minimumNaturalWidth = PosAlign.CalculateMinDimension (0, Subviews, Dimension.Width);
+        _minimumNaturalWidth = PosAlign.CalculateMinDimension (0, SubViews, Dimension.Width);
 
         // Reset our relative layout
         SetRelativeLayout (SuperView?.GetContentSize () ?? Application.Screen.Size);

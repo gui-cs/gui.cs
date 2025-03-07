@@ -42,7 +42,7 @@ public class RadioGroupTests (ITestOutputHelper output)
         view.Add (rg);
         view.BeginInit ();
         view.EndInit ();
-        view.LayoutSubviews ();
+        view.LayoutSubViews ();
 
         Assert.True (rg.CanFocus);
         Assert.Single (rg.RadioLabels);

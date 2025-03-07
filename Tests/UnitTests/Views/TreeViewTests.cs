@@ -712,7 +712,7 @@ public class TreeViewTests
         tv.AddObject ("1");
         tv.ColorScheme = new ColorScheme ();
 
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
         tv.Draw ();
 
         // Nothing expanded
@@ -751,7 +751,7 @@ public class TreeViewTests
         tv.AddObject ("1");
         tv.ColorScheme = new ColorScheme ();
 
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
         tv.Draw ();
 
         // Nothing expanded
@@ -826,7 +826,7 @@ public class TreeViewTests
         tv.Expand (n1);
 
         tv.ColorScheme = new ColorScheme ();
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
         tv.Draw ();
 
         DriverAssert.AssertDriverContentsAre (
@@ -881,7 +881,7 @@ public class TreeViewTests
         tv.Expand (n1);
 
         tv.ColorScheme = new ColorScheme ();
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
         View.SetClipToScreen ();
         tv.Draw ();
 
@@ -901,7 +901,7 @@ public class TreeViewTests
 
         tv.Collapse (n1);
 
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
         View.SetClipToScreen ();
         tv.Draw ();
 
@@ -919,7 +919,7 @@ public class TreeViewTests
         // scroll down 1
         tv.ScrollOffsetVertical = 1;
 
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
         View.SetClipToScreen ();
         tv.Draw ();
 
@@ -956,7 +956,7 @@ public class TreeViewTests
         tv.Expand (n1);
 
         tv.ColorScheme = new ColorScheme ();
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
         View.SetClipToScreen ();
         tv.Draw ();
 
@@ -1032,7 +1032,7 @@ public class TreeViewTests
         tv.Expand (n1);
 
         tv.ColorScheme = new ColorScheme ();
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
         tv.Draw ();
 
         // Normal drawing of the tree view
@@ -1072,7 +1072,7 @@ FFFFFFFFFF
         tv.Expand (n1);
 
         tv.ColorScheme = new ColorScheme ();
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
         tv.Draw ();
 
         // Normal drawing of the tree view
@@ -1128,7 +1128,7 @@ oot two
         tv.Expand (n1);
 
         tv.ColorScheme = new ColorScheme ();
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
         tv.Draw ();
 
         // Normal drawing of the tree view
@@ -1217,7 +1217,7 @@ oot two
         tv.Expand (n1);
 
         tv.ColorScheme = new ColorScheme ();
-        tv.LayoutSubviews ();
+        tv.LayoutSubViews ();
         tv.Draw ();
 
         // create a new color scheme

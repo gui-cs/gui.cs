@@ -8353,7 +8353,7 @@ line.
         tv.ReadOnly = true;
         tv.CursorPosition = new Point (6, 2);
         Assert.Equal (new Point (5, 2), tv.CursorPosition);
-        top.LayoutSubviews ();
+        top.LayoutSubViews ();
         View.SetClipToScreen ();
         tv.Draw ();
 
@@ -8748,12 +8748,12 @@ line.
         TextView t = new ();
 
         superView.Add (t);
-        Assert.Single (superView.Subviews);
+        Assert.Single (superView.SubViews);
 
         superView.BeginInit ();
         superView.EndInit ();
 
-        Assert.Equal (2, superView.Subviews.Count);
+        Assert.Equal (2, superView.SubViews.Count);
     }
 
 
@@ -8768,7 +8768,7 @@ line.
 
         superView.BeginInit ();
         superView.EndInit ();
-        Assert.Empty (superView.Subviews);
+        Assert.Empty (superView.SubViews);
 
         TextView t = new ()
         {
@@ -8777,7 +8777,7 @@ line.
 
         superView.Add (t);
 
-        Assert.Equal (2, superView.Subviews.Count);
+        Assert.Equal (2, superView.SubViews.Count);
     }
 
 
@@ -8795,7 +8795,7 @@ line.
         superView.BeginInit ();
         superView.EndInit ();
 
-        Assert.Equal (2, superView.Subviews.Count);
+        Assert.Equal (2, superView.SubViews.Count);
 
         Assert.True (t.Visible);
         Assert.False (t.Autocomplete.Visible);

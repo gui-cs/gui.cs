@@ -523,7 +523,7 @@ public class GetViewsUnderMouseTests
     [InlineData (2, 3, false)]
     [InlineData (5, 6, false)]
     [InlineData (6, 7, false)]
-    public void Returns_Correct_If_Start_Has_Adornment_WithSubview (int testX, int testY, bool expectedSubViewFound)
+    public void Returns_Correct_If_Start_Has_Adornment_WithSubView (int testX, int testY, bool expectedSubViewFound)
     {
         Application.Top = new ()
         {
@@ -622,7 +622,7 @@ public class GetViewsUnderMouseTests
     [InlineData (5, 6, false)]
     [InlineData (6, 5, false)]
     [InlineData (5, 5, true)]
-    public void Returns_Correct_If_SubView_Has_Adornment_WithSubview (int testX, int testY, bool expectedSubViewFound)
+    public void Returns_Correct_If_SubView_Has_Adornment_WithSubView (int testX, int testY, bool expectedSubViewFound)
     {
         Application.Top = new ()
         {
@@ -639,21 +639,21 @@ public class GetViewsUnderMouseTests
 
         // This subview will be at the bottom-right-corner of subview
         // So screen-relative location will be X + Width - 1 = 5
-        var paddingSubview = new View
+        var paddingSubView = new View
         {
             X = Pos.AnchorEnd (1),
             Y = Pos.AnchorEnd (1),
             Width = 1,
             Height = 1
         };
-        subview.Padding.Add (paddingSubview);
+        subview.Padding.Add (paddingSubView);
         Application.Top.Add (subview);
         Application.Top.BeginInit ();
         Application.Top.EndInit ();
 
         View? found = View.GetViewsUnderMouse (new (testX, testY)).LastOrDefault ();
 
-        Assert.Equal (expectedSubViewFound, found == paddingSubview);
+        Assert.Equal (expectedSubViewFound, found == paddingSubView);
         Application.Top.Dispose ();
         Application.ResetState (true);
     }
@@ -669,7 +669,7 @@ public class GetViewsUnderMouseTests
     [InlineData (5, 6, false)]
     [InlineData (6, 5, false)]
     [InlineData (5, 5, true)]
-    public void Returns_Correct_If_SubView_Is_Scrolled_And_Has_Adornment_WithSubview (int testX, int testY, bool expectedSubViewFound)
+    public void Returns_Correct_If_SubView_Is_Scrolled_And_Has_Adornment_WithSubView (int testX, int testY, bool expectedSubViewFound)
     {
         Application.Top = new ()
         {
@@ -690,21 +690,21 @@ public class GetViewsUnderMouseTests
 
         // This subview will be at the bottom-right-corner of subview
         // So screen-relative location will be X + Width - 1 = 5
-        var paddingSubview = new View
+        var paddingSubView = new View
         {
             X = Pos.AnchorEnd (1),
             Y = Pos.AnchorEnd (1),
             Width = 1,
             Height = 1
         };
-        subview.Padding.Add (paddingSubview);
+        subview.Padding.Add (paddingSubView);
         Application.Top.Add (subview);
         Application.Top.BeginInit ();
         Application.Top.EndInit ();
 
         View? found = View.GetViewsUnderMouse (new (testX, testY)).LastOrDefault ();
 
-        Assert.Equal (expectedSubViewFound, found == paddingSubview);
+        Assert.Equal (expectedSubViewFound, found == paddingSubView);
         Application.Top.Dispose ();
         Application.ResetState (true);
     }
@@ -762,7 +762,7 @@ public class GetViewsUnderMouseTests
     [InlineData (2, 2, new [] { "top", "view", "subView" })]
     [InlineData (3, 3, new [] { "top" })] // clipped
     [InlineData (2, 3, new [] { "top" })] // clipped
-    public void GetViewsUnderMouse_Tiled_Subviews (int mouseX, int mouseY, string [] viewIdStrings)
+    public void GetViewsUnderMouse_Tiled_SubViews (int mouseX, int mouseY, string [] viewIdStrings)
     {
         // Arrange
         Application.Top = new ()

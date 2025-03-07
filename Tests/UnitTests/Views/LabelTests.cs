@@ -35,45 +35,45 @@ public class LabelTests (ITestOutputHelper output)
 
     [Theory]
     [CombinatorialData]
-    public void HotKey_Command_SetsFocus_OnNextSubview (bool hasHotKey)
+    public void HotKey_Command_SetsFocus_OnNextSubView (bool hasHotKey)
     {
         var superView = new View { CanFocus = true };
         var label = new Label ();
         label.HotKey = hasHotKey ? Key.A.WithAlt : Key.Empty;
-        var nextSubview = new View { CanFocus = true };
-        superView.Add (label, nextSubview);
+        var nextSubView = new View { CanFocus = true };
+        superView.Add (label, nextSubView);
         superView.BeginInit ();
         superView.EndInit ();
 
         Assert.False (label.HasFocus);
-        Assert.False (nextSubview.HasFocus);
+        Assert.False (nextSubView.HasFocus);
 
         label.InvokeCommand (Command.HotKey);
         Assert.False (label.HasFocus);
-        Assert.Equal (hasHotKey, nextSubview.HasFocus);
+        Assert.Equal (hasHotKey, nextSubView.HasFocus);
     }
 
     [Theory]
     [CombinatorialData]
-    public void MouseClick_SetsFocus_OnNextSubview (bool hasHotKey)
+    public void MouseClick_SetsFocus_OnNextSubView (bool hasHotKey)
     {
         var superView = new View { CanFocus = true, Height = 1, Width = 15 };
         var focusedView = new View { CanFocus = true, Width = 1, Height = 1 };
         var label = new Label { X = 2 };
         label.HotKey = hasHotKey ? Key.X.WithAlt : Key.Empty;
 
-        var nextSubview = new View { CanFocus = true, X = 4, Width = 4, Height = 1 };
-        superView.Add (focusedView, label, nextSubview);
+        var nextSubView = new View { CanFocus = true, X = 4, Width = 4, Height = 1 };
+        superView.Add (focusedView, label, nextSubView);
         superView.BeginInit ();
         superView.EndInit ();
 
         Assert.False (focusedView.HasFocus);
         Assert.False (label.HasFocus);
-        Assert.False (nextSubview.HasFocus);
+        Assert.False (nextSubView.HasFocus);
 
         label.NewMouseEvent (new () { Position = new (0, 0), Flags = MouseFlags.Button1Clicked });
         Assert.False (label.HasFocus);
-        Assert.Equal (hasHotKey, nextSubview.HasFocus);
+        Assert.Equal (hasHotKey, nextSubView.HasFocus);
     }
 
     [Fact]
@@ -1061,7 +1061,7 @@ e
         win.Add (label);
         win.BeginInit ();
         win.EndInit ();
-        win.LayoutSubviews ();
+        win.LayoutSubViews ();
         win.Draw ();
 
         Assert.Equal (5, text.Length);
@@ -1084,7 +1084,7 @@ e
         text = "0123456789";
         Assert.Equal (10, text.Length);
         label.Width = Dim.Fill () - text.Length;
-        win.LayoutSubviews ();
+        win.LayoutSubViews ();
         win.ClearViewport ();
         win.Draw ();
 
@@ -1321,7 +1321,7 @@ e
 
         label.Text = "New text";
         super.Add (label);
-        super.LayoutSubviews ();
+        super.LayoutSubViews ();
 
         Rectangle expectedLabelBounds = new (0, 0, 8, 1);
         Assert.Equal (expectedLabelBounds, label.Viewport);

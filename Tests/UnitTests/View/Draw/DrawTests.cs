@@ -407,7 +407,7 @@ public class DrawTests (ITestOutputHelper _output)
 
         // BUGBUG: v2 - it's bogus to reference .Frame before BeginInit. And why is the clip being set anyway???
 
-        top.SubviewsLaidOut += Top_LayoutComplete;
+        top.SubViewsLaidOut += Top_LayoutComplete;
         Application.Begin (top);
 
         Application.LayoutAndDraw ();

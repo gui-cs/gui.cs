@@ -11,21 +11,21 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
 
     private List<View>? _subviews; // This is null, and allocated on demand.
 
-    // Internally, we use InternalSubviews rather than subviews, as we do not expect us
-    // to make the same mistakes our users make when they poke at the Subviews.
-    internal IList<View> InternalSubviews => _subviews ?? _empty;
+    // Internally, we use InternalSubViews rather than subviews, as we do not expect us
+    // to make the same mistakes our users make when they poke at the SubViews.
+    internal IList<View> InternalSubViews => _subviews ?? _empty;
 
-    /// <summary>Gets the list of Subviews.</summary>
+    /// <summary>Gets the list of SubViews.</summary>
     /// <remarks>
     ///     Use <see cref="Add(Terminal.Gui.View?)"/> and <see cref="Remove(Terminal.Gui.View?)"/> to add or remove subviews.
     /// </remarks>
-    public IList<View> Subviews => _subviews?.AsReadOnly () ?? _empty;
+    public IList<View> SubViews => _subviews?.AsReadOnly () ?? _empty;
 
     private View? _superView;
 
     /// <summary>
     ///     Gets this Views SuperView (the View's container), or <see langword="null"/> if this view has not been added as a
-    ///     Subview.
+    ///     SubView.
     /// </summary>
     public View? SuperView
     {
@@ -65,18 +65,18 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// <summary>Raised when this View has been added to a SuperView.</summary>
     public event EventHandler<EventArgs<bool>>? IsAddedChanged;
 
-    /// <summary>Method invoked when a Subview has been added to this view.</summary>
+    /// <summary>Method invoked when a SubView has been added to this view.</summary>
     /// <param name="newValue">The new value of IsAdded</param>
     protected virtual void OnIsAddedChanged (EventArgs<bool> newValue) { }
 
-    /// <summary>Adds a Subview (child) to this view.</summary>
+    /// <summary>Adds a SubView (child) to this view.</summary>
     /// <remarks>
     ///     <para>
-    ///         The Views that have been added to this view can be retrieved via the <see cref="Subviews"/> property. See also
+    ///         The Views that have been added to this view can be retrieved via the <see cref="SubViews"/> property. See also
     ///         <seealso cref="Remove(View)"/> <seealso cref="RemoveAll"/>
     ///     </para>
     ///     <para>
-    ///         Subviews will be disposed when this View is disposed. In other-words, calling this method causes
+    ///         SubViews will be disposed when this View is disposed. In other-words, calling this method causes
     ///         the lifecycle of the subviews to be transferred to this View.
     ///     </para>
     ///     <para>
@@ -144,15 +144,15 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         return view;
     }
 
-    /// <summary>Adds the specified Subview (children) to the view.</summary>
+    /// <summary>Adds the specified SubView (children) to the view.</summary>
     /// <param name="views">Array of one or more views (can be optional parameter).</param>
     /// <remarks>
     ///     <para>
-    ///         The Views that have been added to this view can be retrieved via the <see cref="Subviews"/> property. See also
+    ///         The Views that have been added to this view can be retrieved via the <see cref="SubViews"/> property. See also
     ///         <seealso cref="Remove(View)"/> and <seealso cref="RemoveAll"/>.
     ///     </para>
     ///     <para>
-    ///         Subviews will be disposed when this View is disposed. In other-words, calling this method causes
+    ///         SubViews will be disposed when this View is disposed. In other-words, calling this method causes
     ///         the lifecycle of the subviews to be transferred to this View.
     ///     </para>
     /// </remarks>
@@ -176,25 +176,25 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     }
 
     /// <summary>
-    ///     Called when a Subview has been added to this View.
+    ///     Called when a SubView has been added to this View.
     /// </summary>
     /// <remarks>
-    ///     If the Subview has not been initialized, this happens before BeginInit/EndInit is called.
+    ///     If the SubView has not been initialized, this happens before BeginInit/EndInit is called.
     /// </remarks>
     /// <param name="view"></param>
     protected virtual void OnSubViewAdded (View view) { }
 
-    /// <summary>Raised when a Subview has been added to this View.</summary>
+    /// <summary>Raised when a SubView has been added to this View.</summary>
     /// <remarks>
-    ///     If the Subview has not been initialized, this happens before BeginInit/EndInit is called.
+    ///     If the SubView has not been initialized, this happens before BeginInit/EndInit is called.
     /// </remarks>
     public event EventHandler<SuperViewChangedEventArgs>? SubViewAdded;
 
-    /// <summary>Removes a Subview added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.</summary>
+    /// <summary>Removes a SubView added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.</summary>
     /// <remarks>
     ///     <para>
-    ///         Normally Subviews will be disposed when this View is disposed. Removing a Subview causes ownership of the
-    ///         Subview's
+    ///         Normally SubViews will be disposed when this View is disposed. Removing a SubView causes ownership of the
+    ///         SubView's
     ///         lifecycle to be transferred to the caller; the caller must call <see cref="Dispose()"/>.
     ///     </para>
     ///     <para>
@@ -283,21 +283,21 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     }
 
     /// <summary>
-    ///     Called when a Subview has been removed from this View.
+    ///     Called when a SubView has been removed from this View.
     /// </summary>
     /// <param name="view"></param>
     protected virtual void OnSubViewRemoved (View view) { }
 
-    /// <summary>Raised when a Subview has been added to this View.</summary>
+    /// <summary>Raised when a SubView has been added to this View.</summary>
     public event EventHandler<SuperViewChangedEventArgs>? SubViewRemoved;
 
     /// <summary>
-    ///     Removes all Subview (children) added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.
+    ///     Removes all SubView (children) added via <see cref="Add(View)"/> or <see cref="Add(View[])"/> from this View.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Normally Subviews will be disposed when this View is disposed. Removing a Subview causes ownership of the
-    ///         Subview's
+    ///         Normally SubViews will be disposed when this View is disposed. Removing a SubView causes ownership of the
+    ///         SubView's
     ///         lifecycle to be transferred to the caller; the caller must call <see cref="Dispose()"/> on any Views that were
     ///         added.
     ///     </para>
@@ -315,7 +315,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         }
     }
 
-    /// <summary>Raised when a Subview has been removed from this View.</summary>
+    /// <summary>Raised when a SubView has been removed from this View.</summary>
     public event EventHandler<SuperViewChangedEventArgs>? Removed;
 
     #endregion AddRemove
@@ -341,7 +341,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     }
 
     /// <summary>
-    ///     Gets whether <paramref name="view"/> is in the Subview hierarchy of <paramref name="start"/>.
+    ///     Gets whether <paramref name="view"/> is in the SubView hierarchy of <paramref name="start"/>.
     /// </summary>
     /// <param name="start">The View at the start of the hierarchy.</param>
     /// <param name="view">The View to test.</param>
@@ -359,7 +359,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             return true;
         }
 
-        foreach (View subView in start.InternalSubviews)
+        foreach (View subView in start.InternalSubViews)
         {
             if (view == subView)
             {
@@ -404,12 +404,12 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     #region SubViewOrdering
 
     /// <summary>
-    ///     Moves <paramref name="subview"/> one position towards the end of the <see cref="Subviews"/> list.
+    ///     Moves <paramref name="subview"/> one position towards the end of the <see cref="SubViews"/> list.
     /// </summary>
     /// <param name="subview">The subview to move.</param>
-    public void MoveSubviewTowardsEnd (View subview)
+    public void MoveSubViewTowardsEnd (View subview)
     {
-        PerformActionForSubview (
+        PerformActionForSubView (
                                  subview,
                                  x =>
                                  {
@@ -425,12 +425,12 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     }
 
     /// <summary>
-    ///     Moves <paramref name="subview"/> to the end of the <see cref="Subviews"/> list.
+    ///     Moves <paramref name="subview"/> to the end of the <see cref="SubViews"/> list.
     /// </summary>
     /// <param name="subview">The subview to move.</param>
-    public void MoveSubviewToEnd (View subview)
+    public void MoveSubViewToEnd (View subview)
     {
-        PerformActionForSubview (
+        PerformActionForSubView (
                                  subview,
                                  x =>
                                  {
@@ -441,12 +441,12 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     }
 
     /// <summary>
-    ///     Moves <paramref name="subview"/> one position towards the start of the <see cref="Subviews"/> list.
+    ///     Moves <paramref name="subview"/> one position towards the start of the <see cref="SubViews"/> list.
     /// </summary>
     /// <param name="subview">The subview to move.</param>
-    public void MoveSubviewTowardsStart (View subview)
+    public void MoveSubViewTowardsStart (View subview)
     {
-        PerformActionForSubview (
+        PerformActionForSubView (
                                  subview,
                                  x =>
                                  {
@@ -462,12 +462,12 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     }
 
     /// <summary>
-    ///     Moves <paramref name="subview"/> to the start of the <see cref="Subviews"/> list.
+    ///     Moves <paramref name="subview"/> to the start of the <see cref="SubViews"/> list.
     /// </summary>
     /// <param name="subview">The subview to move.</param>
-    public void MoveSubviewToStart (View subview)
+    public void MoveSubViewToStart (View subview)
     {
-        PerformActionForSubview (
+        PerformActionForSubView (
                                  subview,
                                  x =>
                                  {
@@ -478,11 +478,11 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     }
 
     /// <summary>
-    ///     Internal API that runs <paramref name="action"/> on a subview if it is part of the <see cref="Subviews"/> list.
+    ///     Internal API that runs <paramref name="action"/> on a subview if it is part of the <see cref="SubViews"/> list.
     /// </summary>
     /// <param name="subview"></param>
     /// <param name="action"></param>
-    private void PerformActionForSubview (View subview, Action<View> action)
+    private void PerformActionForSubView (View subview, Action<View> action)
     {
         if (_subviews!.Contains (subview))
         {

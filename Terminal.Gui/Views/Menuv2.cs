@@ -47,11 +47,11 @@ public class Menuv2 : Bar
     // The first item has no left border, the last item has no right border.
     // The Shortcuts are configured with the command, help, and key views aligned in reverse order (EndToStart).
     /// <inheritdoc />
-    protected override void OnSubviewLayout (LayoutEventArgs args)
+    protected override void OnSubViewLayout (LayoutEventArgs args)
     {
-        for (int index = 0; index < Subviews.Count; index++)
+        for (int index = 0; index < SubViews.Count; index++)
         {
-            View barItem = Subviews [index];
+            View barItem = SubViews [index];
 
             if (!barItem.Visible)
             {
@@ -59,7 +59,7 @@ public class Menuv2 : Bar
             }
 
         }
-        base.OnSubviewLayout (args);
+        base.OnSubViewLayout (args);
     }
 
     /// <inheritdoc/>

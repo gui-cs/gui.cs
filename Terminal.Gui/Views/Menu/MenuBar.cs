@@ -559,7 +559,7 @@ public class MenuBar : View, IDesignable
         if (Application.Top is { })
         {
             // Close others menu bar opened
-            Menu? menu = Application.Top.Subviews.FirstOrDefault (v => v is Menu m && m.Host != this && m.Host.IsMenuOpen) as Menu;
+            Menu? menu = Application.Top.SubViews.FirstOrDefault (v => v is Menu m && m.Host != this && m.Host.IsMenuOpen) as Menu;
             menu?.Host.CleanUp ();
         }
     }
