@@ -283,11 +283,10 @@ public class ScrollBarTests (ITestOutputHelper output)
         Assert.Equal (1, count);
     }
 
-    [Theory]
-    [SetupFakeDriver]
-
     #region Draw
 
+    [Theory]
+    [SetupFakeDriver]
 
     #region Horizontal
 
