@@ -35,7 +35,7 @@ public class AnsiRequestScheduler
     ///         queued).
     ///     </para>
     /// </summary>
-    private readonly ConcurrentDictionary<string?, DateTime> _lastSend = new ();
+    private readonly ConcurrentDictionary<string, DateTime> _lastSend = new ();
 
     /// <summary>
     ///     Number of milliseconds after sending a request that we allow

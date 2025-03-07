@@ -6,7 +6,7 @@ namespace Terminal.Gui;
 
 internal abstract class AnsiResponseParserBase : IAnsiResponseParser
 {
-    private const char Escape = '\x1B';
+    private const char ESCAPE = '\x1B';
     private readonly AnsiMouseParser _mouseParser = new ();
     protected readonly AnsiKeyboardParser _keyboardParser = new ();
     protected object _lockExpectedResponses = new ();
@@ -74,17 +74,17 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
     // These all are valid terminators on ansi responses,
     // see CSI in https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Functions-using-CSI-_-ordered-by-the-final-character_s
     // No - N or O
-    protected readonly HashSet<char> _knownTerminators = new (
-                                                              [
-                                                                  '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+    protected readonly HashSet<char> _knownTerminators =
+    [
+        '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
 
-                                                                  // No - N or O
-                                                                  'P', 'Q', 'R', 'S', 'T', 'W', 'X', 'Z',
-                                                                  '^', '`', '~',
-                                                                  'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
-                                                                  'l', 'm', 'n',
-                                                                  'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
-                                                              ]);
+        // No - N or O
+        'P', 'Q', 'R', 'S', 'T', 'W', 'X', 'Z',
+        '^', '`', '~',
+        'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
+        'l', 'm', 'n',
+        'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'
+    ];
 
     protected AnsiResponseParserBase (IHeld heldContent) { _heldContent = heldContent; }
 
@@ -137,7 +137,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
             char currentChar = getCharAtIndex (index);
             object currentObj = getObjectAtIndex (index);
 
-            bool isEscape = currentChar == Escape;
+            bool isEscape = currentChar == ESCAPE;
 
             switch (State)
             {
@@ -250,7 +250,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
 
             // We have something totally unexpected, not a CSI and
             // still Esc+<something>. So give last minute swallow chance
-            if (cur.Length >= 2 && cur [0] == Escape)
+            if (cur!.Length >= 2 && cur [0] == ESCAPE)
             {
                 // Maybe swallow anyway if user has custom delegate
                 bool swallow = ShouldSwallowUnexpectedResponse ();
@@ -328,7 +328,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
 
             // Finally if it is a valid ansi response but not one we are expect (e.g. its mouse activity)
             // then we can release it back to input processing stream
-            if (_knownTerminators.Contains (cur.Last ()) && cur.StartsWith (EscSeqUtils.CSI))
+            if (_knownTerminators.Contains (cur!.Last ()) && cur!.StartsWith (EscSeqUtils.CSI))
             {
                 // We have found a terminator so bail
                 State = AnsiResponseParserState.Normal;
@@ -443,7 +443,7 @@ internal abstract class AnsiResponseParserBase : IAnsiResponseParser
         lock (_lockExpectedResponses)
         {
             // If any of the new terminator matches any existing terminators characters it's a collision so true.
-            return _expectedResponses.Any (r => r.Terminator.Intersect (terminator).Any ());
+            return _expectedResponses.Any (r => r.Terminator!.Intersect (terminator!).Any ());
         }
     }
 
